@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+&nbsp;
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3">Z88 Developers' Notes</th>
+
+ </tr>
+ <tr>
+
+   <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+   <td align="right" nowrap="nowrap" valign="bottom" width="10%"><a href="sysref.html">Contents
+of System Calls</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr>
+<p><b><font size="+1">OZ_Buf, buffer service routine&nbsp;</font></b>
+</p>
+<p><tt>CALL $0051</tt>
+</p>
+<p><tt>IN:</tt>
+</p>
+<p><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+L = reason call</tt>
+<br>
+<tt>OUT:</tt>
+<br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Depends on the reason.</tt>
+</p>
+<p><tt>Registers changed after return:</tt>
+<br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+..BCDEHL/IXIY same</tt>
+<br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+AF....../.... different</tt>
+</p>
+<p>Notes:
+</p>
+<blockquote>Internal operating system useage. Removed since 0Z V4.1.<br>
+Circulary
+buffer structure have been fixed to 256 bytes to improve speed. All the
+calls to this routine are direct and all the code have been relocated
+in low ram for speed.<br>
+&nbsp;</blockquote>
+
+</body>
+</html>

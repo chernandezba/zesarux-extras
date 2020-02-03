@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3">Z88 Developers' Notes</th>
+
+ </tr>
+ <tr>
+
+   <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+   <td align="right" nowrap="nowrap" valign="bottom" width="10%"><a href="sysref.html">Contents
+of System Calls</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr>
+<p><b><font size="+1">EXTCALL, call subroutine in external bank</font></b>
+</p>
+<p><span style="font-family: monospace;">RST&nbsp;10H</span></p>
+<p>This routine is executed by the RST 10H vector. Both RST 10H and
+this routine is located in LOWRAM. The 24bit address is available in
+low byte - high byte order following the RST 10H instruction opcode.
+The segment specifier (bits 15,14) of the lower 16bit address
+automatically identifies where the bank will be bound into the Z80
+address space. The bank number of the 24bit address may be specified as absolute or as slot relative ($00 - $3F). <span style="font-family: monospace;"><br>
+</span></p>
+<p>In Z80 assembler, Mpm notation: EXTCALL $C000,$FE (a RST 10H
+followed by 24bit address) execute code in bank $FE at address $C000
+bound into segment 3 (the instruction opcode sequence in memory is $D7,
+$00, $C0, $FE). This call instruction uses an absolute bank (located in
+slot 3) in the 24bit address, ie. a piece of code in slot 2 might want
+to execute a subroutine in slot 3.<br>
+</p>
+<p>Slot relative subroutine calls
+defines the bank number in the range $00 - $3F (same principle as for
+DOR pointers in application cards). An instantiated large application
+using more than 32K code space (that typically needs the remaining free
+segments in the Z80 address space for dynamic data structure
+management) would use the 24bit slot relative call to execute
+subroutines in banks that are not bound in the Z80 address by default as defined by the Application DOR). </p>
+Registers changed after return:
+<br>
+<p style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;AFBCDEHL/IXIY same<br>
+&nbsp;&nbsp;&nbsp;&nbsp;......../.... different</p>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; The ExtCall does not destroy any register call arguments or return values.<span style="font-family: monospace;"><br>
+</span><br>
+Notes:<br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; New API introduced in OZ V4.1<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ExtCall is to be regarded as a normal CALL instruction but for 24bit address range.<br>
+<p>Related calls:</p>
+<p>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; None</p>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+  <td align="center" valign="bottom" width="80%">&nbsp;</td>
+  <td align="right" valign="bottom" width="10%"><a
+  href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+</table>
+
+<hr>
+
+<p><font size="4"><b>OS_Cli, CLI interface</b></font> </p>
+
+<p><tt>RST 20H, DEFB $84</tt> </p>
+
+<p>IN: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = CL_RIM ($01), get raw input
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BC = timeout in 1/100 second ticks
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BC = 0, return immediately if no data
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BC = -1 ($FFFF), wait forever for data
+
+&nbsp;&nbsp;&nbsp;&nbsp; A = CL_MBC ($02), meta/base to character conversion
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DE = meta (D) / base (E)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D = $01&nbsp;&nbsp; SHIFT
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = $02&nbsp;&nbsp; CTRL (DIAMOND)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = $04&nbsp;&nbsp; ALT (SQUARE)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = $08&nbsp;&nbsp; special
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; E = base character
+
+&nbsp;&nbsp;&nbsp;&nbsp; A = CL_CMB ($03), character to meta/base conversion
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DE = raw character
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D = 0, E is ISO character
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D = 1, E is special character
+
+&nbsp;&nbsp;&nbsp;&nbsp; A = CL_INC ($04), increment CLI use count
+&nbsp;&nbsp;&nbsp;&nbsp; A = CL_DEC ($05), decrement CLI use count
+&nbsp;&nbsp;&nbsp;&nbsp; A = CL_RES ($06), reset CLI use count
+
+&nbsp;&nbsp;&nbsp;&nbsp; A = CL_ACK ($07), acknowledge CLI/Escape
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D = reset mask (zero to reset):
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLM_SH ($01) = SHIFT (bit)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLM_CT ($02) = DIAMOND (bit)</pre>
+
+<p>OUT, A(in) = CL_RIN, successful: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; BC = remaining timeout
+&nbsp;&nbsp;&nbsp;&nbsp; DE = character:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D = 0, E is ISO character
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D = 1, E is special character</pre>
+
+<p>OUT, A(in) = CL_RIN, failed: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_ESC
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_SUSP
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_TIME</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......HL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBCDE../.... different</pre>
+
+<p>OUT, A(in) = CL_MBC, successful: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; DE = character:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D = 0, E is ISO character
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D = 1, E is special character</pre>
+
+<p>OUT, A(in) = CL_MBC, failed: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_FAIL, not a meaningful character</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BC..HL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF..DE../.... different</pre>
+
+<p>OUT, A(in) = CL_CMB, successful: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; DE = meta (D) / base (E)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D = $01&nbsp;&nbsp; SHIFT
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = $02&nbsp;&nbsp; CTRL (DIAMOND)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = $04&nbsp;&nbsp; ALT (SQUARE)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = $08&nbsp;&nbsp; special
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; E = base character</pre>
+
+<p>OUT, A(in) = CL_CMB, failed: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_FAIL, not a meaningful character</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BC..HL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF..DE../.... different</pre>
+
+<p>OUT, A(in) = CL_INC, CL_DEC, CL_RES always: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different</pre>
+
+<p>OUT, A(in) = CL_ACK, always: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; Fz = 1, no Escape
+&nbsp;&nbsp;&nbsp;&nbsp; Fz = 0, Escape
+&nbsp;&nbsp;&nbsp;&nbsp; D = resulting mask</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different</pre>
+
+<p>Notes: </p>
+
+<blockquote>
+ <p>Internal operating system usage.</p>
+</blockquote>
+
+<p>Bugs: </p>
+
+<p>Related calls: </p>
+
+<blockquote>
+ <p><a href="dcicl.html">DC_Icl</a>, Invoke new CLI<br>
+ <a href="dcin.html">DC_In</a>, Read from CLI<br>
+ <a href="dcout.html">DC_Out</a>, Write to CLI<br>
+ <a href="dcprt.html">DC_Prt</a>, Print to CLI<br>
+ <a href="dcrbd.html">DC_Rbd</a>, Rebind streams<br>
+ <a href="dcxin.html">DC_Xin</a>, examine CLI input<br>
+ <a href="dcgen.html">DC_Gen</a>, screen driver SOH call</p>
+</blockquote>
+</body>
+</html>

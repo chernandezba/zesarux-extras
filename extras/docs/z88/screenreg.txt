@@ -1,0 +1,102 @@
+These registers are write-only. They are set by OS_Sci with OUT (C),A instructions are used. B always contains the left bits of data (more than 8), A the data, C the port. So, A is ($047x) and B is ($046x). Please, refer to the Screen Files chapter for more about their structure.
+
+
+Es decir, el valor que se envia al puerto es de 16 bits: se hace OUT(C),a, el puerto va en C y vale #70, o #71, etc... y en B van los bits mas significativos del valor final y en A los menos significativos del valor final
+De esta manera, realmente se hace OUT a puerto:
+
+B*256+C
+
+Y a gestionar los puertos solo se debe ver los 8 bits menos significativos, y el valor de B y A son los que cuentan como valor final de 16 bits enviado a registro PB0 , PB1, etc..
+
+
+; -----------------------------------------------------------------------------
+;
+; alter screen information
+;
+;IN:    A=reason code
+;               SC_LR0  LORES0 (512 bytes granularity, 13 bits width)
+;               SC_LR1  LORES1 (4K granularity, 10 bits width)
+;               SC_HR0  HIRES0 (8K granularity, 9 bits  width)
+;               SC_HR1  HIRES1 (2K granularity, 11 bits width)
+;               SC_SBR  screen base (2K granularity, 11 bits width)
+;       B=0, get pointer address
+;       B<>0, set pointer address
+;OUT:   Fc=0, BHL = old pointer address
+;       Fc=1, A=error if fail
+;chg:   AFBCDEHL/....
+;
+; -----------------------------------------------------------------------------
+
+
+
+.OSSci
+        or      a
+        jr      z, ossci_4                      ; A = 0, bad reason
+        cp      6
+        jr      nc, ossci_4                     ; A > 5, bad reason
+
+        ld      de, OSSciTable
+        add     a, e
+        ld      e, a
+        add     a, BL_PB0-1
+        ld      c, a                            ; BLINK register
+
+        ld      a, (de)                         ; granularity
+        push    bc
+        inc     b
+        dec     b
+        push    af                              ; shift count, B=0 status
+
+        sla     h                               ; H<<2, get rid of segment bits
+        sla     h
+.ossci_1
+        srl     b                               ; BH>>A
+        rr      h
+        dec     a
+        jr      nz, ossci_1
+
+        pop     af                              ; B=0 status
+        push    af
+
+        ld      a, h                            ; AB=blink value
+        ld      h, BLSC_PAGE                    ; HL=$047x
+        ld      l, c
+        ld      e, (hl)                         ; old value into DE
+        res     4, l                            ; $046x
+        ld      d, (hl)                         ; old value
+        jr      z, ossci_2                      ; B=0? don't set
+
+        set     4, l                            ; $047x
+        ld      (hl), a
+        res     4, l                            ; $046x
+        ld      (hl), b
+        out     (c), a
+
+.ossci_2
+        ld      a, c                            ; blink register
+        ex      de, hl
+        pop     bc                              ; B=shift count
+
+.ossci_3
+        add     hl, hl
+        djnz    ossci_3
+        srl     l                               ; normalize HL
+        srl     l
+        pop     de
+        ld      (iy+OSFrame_B), h
+        ld      (iy+OSFrame_H), l
+        ld      (iy+OSFrame_L), 0
+        xor     BL_SBR                          ; screen base reg.
+        ret     nz                              ; not SBR? exit
+        bit     6, c                            ; B=0
+        ret     nz                              ; read only? exit
+
+        ld      a, d                            ; init screen
+        ld      (ubScreenBase), a
+        call    ScreenOpen
+        call    InitSBF
+        call    ScreenClose
+        or      a
+        ret
+
+

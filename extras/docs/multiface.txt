@@ -1,0 +1,31 @@
+http://problemkaputt.de/zxdocs.htm
+
+Other
+  xx9F ........             Multiface I In
+  xx1F ........             Multiface I Out
+  xxBF ........             Multiface 128 In
+  xx9F ........             Multiface 128 In v2 (Disciple) (uh/what?)
+  xx3F ........             Multiface 128 Out
+  xx3F ........             Multiface III Button
+  xx3F ........             Multiface III In
+  xxBF ........             Multiface III Out
+  7F3F                      Multiface III P7FFD (uh?)
+  1F3F                      Multiface III P1FFD (uh?)
+  FF3F                      British Micro Grafpad Pen up/
+
+
+http://www.worldofspectrum.org/faq/reference/ports.htm
+
+
+
+
+
+http://mdfs.net/Docs/Comp/Spectrum/Hardware/Garner.htm
+To page the MF RAM in or out, read from the specified ports below, for example using IN A,(xx) in machine code (use IN to page both in and out...). To re-enable the stop button for normal operation, OUT to the port (eg OUT (xx),A). The Multiface 3 has less space than the others for usable RAM, as you can see.
+0-8191 - rom multiface
+8192-16383 ram multiface
+
+
+mapear multiface: leer puerto 9f (en multiface 1). desmapear: hacer out a puerto 1f
+
+pulsar nmi: mapea toda multiface y salta a 66h?

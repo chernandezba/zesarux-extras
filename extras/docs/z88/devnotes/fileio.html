@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>File Input-Output</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="scrdrver.html">Previous</a></td>
+
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="bottom" width="10%"><a href="kdecoder.html">Next</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+
+<b><font size="+1">8. File Input / Output</font></b>
+</p>
+<p>The Z88 supports a fairly uniform device-independent I/O system, so
+although calls do exist wich will explicitly send data to, say, the screen
+or the serial port, for all operations other than reading from standard
+input and writing to standard output, it is usual to regard such devices
+as files and use a standard file I/O interface.
+</p>
+<p>This section will cover file access for applications, while noting that
+the approach remains the same if device names are substituted for the filename,
+thus opening a stream to the device. Major pseudo-file are:
+</p>
+<pre>:SCR.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The screen. Write only.<br>:PRT.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The printer. Write only.<br>:COM.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The serial interface<br>:NUL.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Null device. Output discarded, always end of file for input.<br>:INP.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Standard input. Read only. Normally the keyboard, but may be<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; redirected by the CLI.<br>:OUT.0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Standard output. Write only. Normally the screen, but again, may be<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; redirected.</pre>
+
+Note that the terminating numbers are optional, ie. ':COM' is equivalent
+to ':COM.0'. As an example of how devices are accessed using file I/O look
+at this BBC BASIC program:
+<blockquote><tt>10 LF$ = CHR$10</tt>
+  <br>
+  <tt>20 X% = OPENOUT(":COM.0")</tt>
+  <br>
+  <tt>30 PRINT#X%,"Hello"+LF$</tt>
+  <br>
+  <tt>40 CLOSE#X%</tt></blockquote>
+
+The program sends 'Hello' to the serial port. The extra line feed character
+is necessary as both &lt;CR&gt; and &lt;LF&gt; are necessary for a true newline
+when writing to an actual display device and BBC BASIC's PRINT# command
+only sends a &lt;CR&gt;.
+<br>
+&nbsp;
+<p><b>Accessing Files</b>
+</p>
+<p>This can be broken into three basic stages:
+</p>
+<pre>1. Opening</pre>
+<blockquote>The open file call must be provided with a filename and an
+access mode. The access mode is open for input, output or update, although
+other options are available for working with directories and DOR's. The
+call returns a handle which is unique to the particular access of the file,
+but note that more than one handle may be associated with any particular
+file. A file may be open for input from several source, but may only be
+opened for update or output by one source. An attempt to open a file for
+output or updating, which is already open for output or updating will result
+in an "In use" error, RC_USE. Other reasons for not being able to open
+files are poor filenames, read or write protection of a device, non-existence
+(in the case of opening for input or update), a lack of memory or lack
+of handles. There are only a finite supply of handles - about 150. The
+call used for opening files and is <a href="gnopf.html">GN_Opf</a>.</blockquote>
+
+<tt>2. Access</tt>
+<blockquote>All file access is referenced by the file handle. Access to
+RAM files is random with a sequential pointer into the file which can be
+both read and written. Both byte by byte transfer, and transfer of whole
+blocks is possible. Calls for file access are <a href="ospb.html">OS_Pb</a> (put byte), <a href="osgb.html">OS_Gb</a> (get
+byte) and <a href="osmv.html">OS_Mv</a> (move bytes between a file and memory). Timed versions
+of the byte transfer calls exists (<a href="ospbt.html">OS_Pbt</a> and <a href="osgbt.html">OS_Gbt</a>) for use with devices
+like the printer and serial port. Three file attributes can be read, and
+two written. PTR (pointer) is the file pointer and gives the location wthin
+the file. EXT (extent) gives the size of the file and finally EOF (end
+of file) is the read only attribute which is true when the file pointer
+is at the end of the file ie. when PTR = EXT. These attributes may be read
+using <a href="osfrm.html">OS_Frm</a> (file read miscellaneous) and written with <a href="osfwm.html">OS_Fwm</a> (file write
+miscellaneous).</blockquote>
+
+<tt>3. Closing</tt>
+<blockquote>The close call needs only be supplied with the file handle.
+When closed, a file is free for updates from other sources, its handle
+is released, any memory used for buffers is freed, etc. The call used to
+close files and streams is <a href="gncl.html">GN_Cl</a>.</blockquote>
+
+An open file may not be deleted and an attempt to do this will result in
+an "In use" (RC_USE) error. Note that because opening a file for output
+will attempt delete the file if it already exists, the "In use" error also
+occurs in this context.
+<br>
+&nbsp;
+<p><b>Filenames</b>
+</p>
+<p>Filenames come in two forms, only one of which is actually given a name.
+Ordinary, as it were, filenames can have as much or as little information
+as is required to uniquely identify a file. For example "fred.txt" is an
+ordinary filename, or even "fred.*", which will probably be sufficient
+to find the same file. An explicit filename, on the other hand, is one
+which includes all the information associated with the file, including
+it's full name, any directory within which it resides, and any in which
+that may reside, and finally the device where the file is stored. So we
+might have ":RAM.1/maindir/fred.txt" as an explicit filename.
+</p>
+<p>Each part of the explicit filename divided by slashes (or backslashes)
+is called a segment, so the above name consists of three segments which
+are a device, a directory and a filename respectively. Segments will always
+come in this order, but there may be several directories in the explicit
+name. Each segment consists of a name which is up to twelve characters
+long and an optional extension, separated from the name by a full stop,
+which may be up to three characters long. All device names are preceeded
+by a colon. The system provides various calls for breaking down and assembling
+filenames in terms of segments, such as <a href="gnesa.html">GN_Esa</a> (read and write specific
+segments), <a href="gnfex.html">GN_Fex</a> (produce explicit filename) and <a href="gnfcm.html">GN_Fcm</a> (compress an explicit
+filename). The open file call, <a href="gnopf.html">GN_Opf</a>, in the course of its operation produces
+from the filename supplied an explicit filename which can be returned in
+full, or in a cut down form, to the user. Other useful filename processing
+calls are <a href="gnpfs.html">GN_Pfs</a> (parse filename segment) and <a href="gnprs.html">GN_Prs</a> (parse filename),
+which not only check for correct syntax, but also return information as
+to what has been specified in the filename, eg. whether wildcards have
+been used, or a specific device mentioned. The wildcard facilities are
+covered later in "Wildcards".
+<br>
+&nbsp;
+</p>
+<p><b>Suspension</b>
+</p>
+<p>The file transfer calls may be suspended in circumstances. If the stream
+being used is associated either the serial port or printer then RC_SUSP
+will be returned if the machine is switched off and on again, or if a battery
+low interrupt occurs. If escape detection is enabled then &lt;ESC&gt; will
+cause file transfer to abort and RC_ESC to be returned. A more serious
+case is where the stream is associated with the keyboard. If this is the
+situation, pre-emption can occur when reading from the stream and the possible
+return codes will be RC_SUSP, RC_DRAW and RC_QUIT.
+<br>
+&nbsp;
+</p>
+<p><b>Block Transfer</b>
+</p>
+<p>If a lot of data is to be transferred between memory and a stream then
+doing the work a byte at a time can be quite a slow process. Each time
+a byte is transferred with these calls, the operating system must be paged
+in and various checks and action carried out, all of which generates a
+considerable overhead. The <a href="osmv.html">OS_Mv</a> call reduces this overhead by transferring
+a large number of bytes between memory and a stream all in one go, and
+so can operate much more quickly. It can be useful for operations like
+loading and saving files.
+<br>
+&nbsp;
+</p>
+<p><b>Summary</b>
+</p>
+<pre><a href="gnopf.html">GN_Opf</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Open a file, returns a file handle used for subsequent access<br><a href="gncl.html">GN_Cl</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Close a file or stream<br><a href="osgb.html">OS_Gb</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Get byte from file or stream<br><a href="osgbt.html">OS_Gbt</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; As <a href="osgb.html">OS_Gb</a> but with timeout<br><a href="ospb.html">OS_Pb</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Put byte to file or stream<br><a href="ospbt.html">OS_Pbt</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; As <a href="ospb.html">OS_Pb</a> but with timeout<br><a href="osmv.html">OS_Mv</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Move bytes from stream to memory, or from memory to stream<br><a href="osfrm.html">OS_Frm</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Read file or stream parameters PTR, EXT and EOF<br><a href="osfwm.html">OS_Fwm</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Write file parameters PTR and EXT<br><br><a href="gnesa.html">GN_Esa</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Read and write filename segments<br><a href="gnfex.html">GN_Fex</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Produce explicit filename<br><a href="gnfcm.html">GN_Fcm</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Compress explicit filename<br><a href="gnpfs.html">GN_Pfs</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parse filename segment<br><a href="gnprs.html">GN_Prs</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parse filename<br><br></pre>
+
+<b>Example</b>
+<p>
+</p>
+<hr width="100%">
+<p><tt>; very simple example of opening and closing a file</tt>
+<br>
+<tt>; open a file and display full filename assumes that on entry</tt>
+<br>
+<tt>; HL points to filename and that DE points to a 40 byte buffer</tt>
+<br>
+<tt>; entry point is main</tt>
+</p>
+<pre>include "fileio.def"&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; file I/O definition calls, parameters<br>include "stdio.def"&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; standard I/O definition calls, parameters<br>include "errors.def"&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; error code definitions<br><br><br>.main&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; push de&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; save DE for future reference<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; b, 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; indicate HL a local address<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; c, 40&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; size of expanded name buffer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, OP_IN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; open file for input<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnopf.html">GN_Opf</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; open...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; nc, no_error<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnerr.html">GN_Err</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; display error in error box<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pop&nbsp; de&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; balance stack<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret<br><br>.no_error&nbsp;&nbsp; xor&nbsp; a<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; (de),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; terminate explicit filename<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; hl, file_mess<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnsop.html">GN_Sop</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; output constant string<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pop&nbsp; hl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get start address of expanded name<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnsop.html">GN_Sop</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; output expanded name<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnnln.html">GN_Nln</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; newline<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gncl.html">GN_Cl</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; now close the file<br><br>.file_mess&nbsp; defm "Using: ", 0</pre>
+<p>
+</p>
+<hr width="100%">
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <td align="left" valign="top" width="33%"><a href="scrdrver.html">Previous</a></td>
+
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="top" width="33%"><a href="kdecoder.html">Next</a></td>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="top" width="33%">Output and the screen driver</td>
+
+   <td align="center" valign="top" width="34%">File Input / Output</td>
+
+   <td align="right" valign="top" width="33%">Input and the keyboard decoder</td>
+
+ </tr>
+
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,63 @@
+4.4.10 Inves Spectrum+ Emulation
+
+The Inves Spectrum+ was a computer created by Investronica near 1988. It has some bugs compared to a Spectrum: 
+The ROM is similar to the Spectrum 128k ROM 1, although it has only 48k RAM, and it has the paging routines at the address 14446.
+Screen updating is different from a Spectrum, in the manner that when an interruption is produced, the ULA starts drawing at the screen zone (address 16384), but not at the top of the border, So, in some games that use the time of the top border to erase objects, in the Inves we will see flickering. Also, in many game screens we may see "false" lines when a combination of colours is produced (I don't know yet which combination produce this effect). I don't know the Inves timings, but I suppose they are the same as the Spectrum ones.
+
+The most interesting feature of the Inves Spectrum+ is the 64 KB RAM. Yes, it has 64 KB of RAM, write operations are always to RAM, even on address 0-16383, but reading operations on this low address space (0-16383) comes always from ROM, as on a normal Spectrum.
+You can not read this low hidden RAM but you can notice the effects produced when OUT to an ULA port (tipically XXFEh, but it can be any even port).
+On Inves, every value sent to an X ULA port (any even port) is ANDed with the value that comes from RAM on the same X address (having the whole Inves 64 KB RAM). For example, if you make a OUT (254),A, the value sent to ULA is previously ANDed with RAM address 254 (RAM address 254, NOT ROM address). So the final value (border and sound) is affected by the contents of the whole RAM
+
+Considering the ULA port:
+        Bit   7   6   5   4   3   2   1   0
+            +-------------------------------+
+            |   |   |   | E | M |   Border  |
+            +-------------------------------+
+
+E Means EAR
+M Means MIC
+
+Bits 5, 6 and 7 are not used, so, in a normal situation, values sent to ULA ports are from range 0...31. When using the Z80 D3 opcode (OUT (N),A), where N is 254, this opcode will use port A*256+N. So, if range values are 0..31, ports used are from 0 to 8190 (31*256+254). And on Inves, out values sent to ULA are ANDed with low RAM from address 0 to 8190.
+This is the normal situation... I have found some games, like Hysteria (A Year After Mix) that uses all bits, when the same opcode OUT (N),A... so the result is that out ports are from 0 until 65534! So, the value sent to ULA is ANDed with values readed from RAM from addresses 0 until 65534
+Note that Inves RAM is initialized (at machine Power On) with values FF,00,FF,00... So even address are normally FF, so the value send to ULA (even ports) is not changed because is ANDed with 255, unless you change it with Poke.
+
+There is a second bug that affects the sound. I'll try to explain it on an easy way, but it's a bit complicated. Bits 3 and 4 of the value sent to ULA port (after the AND with RAM) are XORed and we get 1 bit of result. Then, this bit is sent to the speaker, in the manner that if we sent a bit equal to the previous bit the speaker doesn't swicth and we hear nothing. We must remember that in a normal Spectrum, any value sent to bits 3 and 4 different from the previous ones produce sound. So, we have the following combinations: (Y means that a sound is produced, N means no sound)
+
+
+                         Bits 4 and 3 ULA AND value
+                         ----------------------------
+                         |      |      |      |     |
+Bits 4 and 3 port 254    |      |      |      |     |
+(first and second value  |  11  |  10  |  01  |  00 |
+sent)                    |      |      |      |     |
+-----------------------------------------------------
+00                       |  S   |  N   |  S   |  N  |
+01                       |      |      |      |     |
+-----------------------------------------------------
+00                       |  S   |  S   |  N   |  N  |
+10                       |      |      |      |     |
+-----------------------------------------------------
+00                       |  N   |  S   |  S   |  N  |
+11                       |      |      |      |     |
+-----------------------------------------------------
+01                       |  N   |  S   |  S   |  N  |
+10                       |      |      |      |     |
+-----------------------------------------------------
+01                       |  S   |  S   |  N   |  N  |
+11                       |      |      |      |     |
+-----------------------------------------------------
+10                       |  S   |  N   |  S   |  N  |
+11                       |      |      |      |     |
+-----------------------------------------------------
+
+
+
+In a normal Spectrum, any combination of these bits 4 and 3 in the port 254 will produce sound; in an Inves (and in the emulator) it is not the same. You can find some games, normally those that makes two-channel sound with the Speaker, like Lemmings, ATV, Batman the caped crusader that in a default Inves, you can only hear the rythm and not the second channel (in Batman you hear nothing!). This is because they use bits 3 and 4 to make the music (both set to 1). On Inves, these two bits to 1 means 0! (because they are XORed).
+So, to fix the music on these games, you can poke the Inves low RAM with 15 (7 to have mask 111 for border plus 8 to hear bit 3) or value 23 (7 for border plus 16 to hear bit 4)
+                         
+As you may see in the table, there's not any POKE value that makes the Inves work as a Spectrum.
+
+
+There is another bug.... when interrupts are enabled and it is generated (all types: im0, 1 or 2) the address I*256+R is written with 255 (considering only the low 7 bits of R register). It is not always a problem... most games use a 257 byte table to store the interrupt vector, and only the last two bytes are used (because the interrupt vector is read from address I*256+255). So, Inves will randomly overwrite addresses from I*256 to I*256+127... the interrupt vector is not altered, but these 128 bytes addresses are changed to 255.
+
+

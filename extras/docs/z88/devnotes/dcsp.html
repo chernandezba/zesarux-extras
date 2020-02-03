@@ -1,0 +1,77 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+  <td align="center" valign="bottom" width="80%">&nbsp;</td>
+  <td align="right" valign="bottom" width="10%" nowrap><a
+  href="sysref.html">Contents of System Calls</a></td>
+ </tr>
+</table>
+
+<hr>
+
+<p><font size="4"><b>DC_Sp, handle Director/CLI settings</b></font>
+</p>
+
+<p><tt>RST 20H, DEFW $180C</tt> </p>
+
+<p>IN:</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; C = reason code
+  &nbsp;&nbsp;&nbsp;&nbsp; DQ_Dev ($00), define default device&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;   DQ_Dir ($03), define default directory&nbsp;
+ &nbsp;&nbsp;&nbsp;   DQ_Fnm ($06), define filename match string
+&nbsp;&nbsp;&nbsp;&nbsp; B = 0, always
+&nbsp;&nbsp;&nbsp;&nbsp; HL = points to a null-terminated string, the argument</pre>
+
+<p>OUT:</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0,&nbsp;&nbsp; Successful
+&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1,&nbsp;A = RC error&nbsp;if failure</pre>
+
+<p>Registers affected after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different</pre>
+
+<p>Notes: </p>
+
+<blockquote>
+ <p>Internal operating system usage. <br>
+ DC_SP is a subcall of OS_SP, use <a href="ossp.html">OS_SP</a>
+ instead.<br>
+ Attribute (Dev, Dir, Fnm) is set into Filer process if it is
+ running, otherwise by Index.<br>
+ If DQ_Dev argument points to null byte, PA_Dev is used as
+ source.<br>
+ Works if string at HL is terminated by a control-char
+ ($00-$1F).</p>
+</blockquote>
+
+<p>Bugs: -</p>
+
+<p>Related calls: </p>
+
+<blockquote>
+ <p><a href="dcsp.html">DC_Sp</a>, DC specify<br>
+ <a href="dcnq.html">DC_Nq</a>, DC enquire<br>
+ <a href="ossp.html">OS_Sp</a>, specify<br>
+ <a href="osnq.html">OS_NQ</a>, enquire<br>
+ </p>
+</blockquote>
+</body>
+</html>

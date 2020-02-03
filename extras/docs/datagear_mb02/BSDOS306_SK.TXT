@@ -1,0 +1,316 @@
+
+
+                      #####################
+                      ###  Syst‚m MB-02 ###
+                      #####################
+
+
+ Diskovì syst‚m MB-02 sa sklad  z dvoch Ÿast¡: zo samotn‚ho DOSu
+(BS-dos) a z opravenej a upravenej romky (BS-rom).  Tento  popis
+sa konkr‚tne tìka verzi¡ BS dos 306 a BS rom 118.
+ Samotn  romka sa d  pou§iœ aj samostatne  -  nap liœ  do  EPROM
+(alebo nahraœ do RAM od nuly) a daœ si ju namiesto p“vodnej.
+
+
+                       ##################
+                       ### BS dos 306 ###
+                       ##################
+
+
+ Ka§dì disk (v z kladnom re§ime) obsahuje 256  adres rov.  Tieto
+adres re sa daj£  logicky  usporiadaœ  do  –ubovolnej  çtrukt£ry
+(teda nie len do  stromu!).  Jedinìm  obmedzen¡m  je,  §e  ka§dì
+adres r m“§e patriœ naraz iba do jedn‚ho nadadres ra,  ale  zato
+jeho nadadres rom m“§e byœ aj  on  s m,  pr¡padne  s  nieko–kìmi
+Ôalç¡mi adres rmi m“§e tvoriœ cyklick£ çtrukt£ru !
+
+ V ka§dom adres ri m“§e byœ –ubovo–ne ve–kì poŸet s£borov, ale z
+technickìch d“vodov je tento poŸet obm„dzenì na 65279 s£bov  pre
+jeden adres r. ¬i§e na jednom disku m“§e byœ teoreticky  celkovo
+a§ 256*65279 s£borov... (256*65279 = 16711424)
+
+ OperaŸnì  syst‚m  okrem  çtandartnìch  diskovìch  slu§ieb  eçte
+umo§åuje pomocou disku emulovaœ  be§n£  magnetof¢nov£  p sku  Ÿi
+kazetu. Len§e p ska ma na rozdiel  od  diskety  v§dy  definovan£
+polohu - miesto v ktorom je pr ve pretoŸen  a keÔ nap¡çete  load
+bez mena, nahr  sa prvì program na ktorì poŸ¡taŸ naraz¡.
+ Preto bol vytvorenì çpeci lny ukazovate– nazìvanì "load-kurzor"
+ktorì ukazuje miesto, na ktor‚ je "pretoŸen " disketou emulovan 
+p ska.  Disketa  teda  predstavuje  256-stopov£  (stopa=adres r)
+magnetick£ p sku ktor  je pretoŸen  tak, §e  program,  na  ktorì
+ukazuje "load-kurzor" sa  bude  ako  prvì  nahr vaœ  pri  zadan¡
+pr¡kazu LOAD bez mena.
+
+ Z kladn‚ p skov‚ (alebo kazetov‚) pr¡kazy LOAD,  SAVE,  VERIFY,
+MERGE norm lne volaj£ romkov‚  load-save  rutiny  #4c2  a  #556.
+Simul cia p sky pomocou disku v tìchto pr¡kazoch  nast va  a§  v
+spomenutìch load-save rutin ch.  Preto  vçetky  programy,  ktor‚
+korektne volaj£ romku (#4c2 a§ #4c6 pre save a #556 a§ #562  pre
+load) bud£ automaticky  bez  akìchko–vek  £prav  fungovaœ  aj  s
+diskom.
+
+
+                       Nov‚ pr¡kazy basicu
+                       -------------------
+ Vçade tam kde sa oŸak va Ÿ¡slo, je mo§n‚ p¡saœ akìko–vek vìraz,
+ktorì m  Ÿ¡selnì vìsledok. Tie§ vçade tam, kde sa vy§aduje  d ky
+reœazec alebo meno,  mo§no  p¡saœ  akìko–vek  vìraz  reœazcov‚ho
+charakteru.
+ Ak je nejakì parameter pr¡kazu nap¡sanì v <takìchto z tvork ch>
+znamen  to §e je nepovinnì a m“§ete ho vynechaœ.
+
+
+                1. Pr¡kazy pre nastavovanie cesty
+
+ USR 15522 - presmerovanie  pr¡kazov  LOAD,SAVE,VERIFY,MERGE  na
+magnetof¢n (magnetof¢n bude aktu lnym zariadn¡m).
+ USR 15524 - presmerovanie  pr¡kazov  LOAD,SAVE,VERIFY,MERGE  na
+disk (disk bude aktu lnym zariaden¡m).
+
+ @ Ÿ¡slo
+ @ reœazec
+ Nastavenie aktu lneho  disku.  Reœazec  je  meno  diskety,  ale
+h–adanie disku pod–a mena nie je implementovan‚. Ak Ÿ¡slo=0  tak
+sa load-save rutinky presmeruj£ na kazetu (presne ako USR 15522)
+ Ak sa m  vykonaœ @ s nenulovìm parametrom, tak okrem nastavenia
+danej mechaniky sa eçte vykon  USR 15524 - load-save rutinky  sa
+presmeruj£ na disk.
+
+ $ Ÿ¡slo
+ $ reœazec
+ Nastavenie aktu lneho adres ra na aktu lnom disku.  Reœazec  je
+meno adres ra, porovn va sa iba prvìch 10 znakov.
+
+ ` Ÿ¡slo
+ ` reœazec
+ Nastavenie load-kurzora na danì s£bor. [znak ` je libra]
+
+ ‘ubovo–n  kombin cia  tìchto  troch  pr¡kazov  tvor¡  parameter
+"cesta" v Ôalç¡ch pr¡kazoch.  Vyhodnocuje  sa  z–ava  do  prava.
+Napr: @ 3 $ 5 @ 8 $22 $"bubu" `  "ahoj"  znamen ,  §e  na  disku
+zasunut‚ho do mechniky 3 sa nastav¡ aktu lny adres r 5, na disku
+8 sa nastav¡ adres r 22, potom sa n jde prvì adres r po 22 ktorì
+m  meno "bubu" a load-kurzor sa  v  tomto  adres ri  nastav¡  na
+s£bor "ahoj".  Postupnosœ  tìchto  pr¡kazov  m“§e  byœ  ukonŸen 
+bodkoŸiarkou (ak to syntax d keho pr¡kazu potrebuje).
+
+
+             2. Pr¡kazy pre manipul ciu s disketou:
+
+ .FORMAT <cesta>
+ Zmazanie £plne vçetkìch s£borov a adres rov z diskety.  Disketu
+je eçte mo§n‚ obnoviœ, pokia– sa nesprav¡  SAVE.  Pred  samotnìm
+zmazan¡m sa eçte vyp¡çe dotaz, Ÿi  naozaj  chcete  tento  pr¡kaz
+pou§iœ. Zmazan‚ d ta sa eçte daj£ obnoviœ pr¡kazom UNERASE.
+
+ .ERASE <cesta> data
+ Logick‚ zmazanie s£borov. S£bory je eçte mo§n‚ obnoviœ. Fyzicky
+sa zma§£ a§ vtedy, keÔ sa  na  disketu  nieŸo  sejvne.  Zmazanie
+s£boru s  Ÿ¡slom  0  znamen   zmazanie  cel‚ho,  aj  nepr zdneho
+adres ra. Pred zmazan¡m  nepr zdneho  adres ra  sa  eçte  vyp¡çe
+dotaz, Ÿi naozaj chcete tento adres r zmazaœ  -  podobne  ako  v
+pr¡kaze .FORMAT
+
+ .UNERASE <cesta> data
+ Obnovenie zmazanìch s£borov alebo adres rov. ¬¡slo 0 znamen 
+obnovenie aktu lneho adres ra. Pozor, obnovuje sa len samotnì
+adres r, s£bory v åom je treba obnoviœ ruŸne.
+ Tìmto pr¡kazom je mo§n‚ obnovovaœ s£bory a adres re aj po zmazan¡
+celej diskety pr¡kazom FORMAT - a to tak, §e najprv treba obnoviœ
+adres r ako takì (.UNERASE 0) a potom vçetky potrebn‚ s£bory v åom.
+Pozor, s£bory s£ zdanlivo obnoven‚ u§ pri obnoven¡ adres ra, avçak
+samotne d tov‚ sektory nie s£ eçte obnoven‚, preto je potrebn‚ na ne
+aplikovaœ pr¡kaz UNERASE. S£bory, o ktor‚ nem te z ujem, mo§ete zmazaœ
+pr¡kazom ERASE, aby v adres ri nezavadzali.
+
+ .RENAME <cesta> Ÿ¡slo,reœazec
+ Premenovanie s£boru "Ÿ¡slo" na nov‚ meno "reœazec". Ak  Ÿ¡slo=0
+tak sa bude meniœ meno adres ra. Pozor ! Meno adres ra m“§e  byœ
+a§ 26-znakov‚.
+ .RENAME <cesta> Ÿ¡slo,Ÿ¡slo
+ Zmena zaŸiatoŸnej adresy dan‚ho s£boru.  Zmena  adresy  nult‚ho
+s£boru (to je ako§e celì  adres r)  znamen   defin¡ciu,  kam  m 
+tento adres r v stromovej çtrukt£re patriœ  (je  to  Ÿ¡slo  jemu
+nadraden‚ho adres ra).
+
+ .MOVE <cesta> Ÿ¡slo1,Ÿ¡slo2
+ Presunutie s£boru "Ÿ¡slo1" do adres ra  "Ÿ¡slo2".  Ak  Ÿ¡slo1=0
+tak sa bude pres£vaœ celì adres r.
+ .MOVE <cesta> Ÿ¡slo;data
+ Presunutie viacerìch s£borov çpecifikovanìch v  polo§ke  "data"
+do adres ra "Ÿ¡slo".
+ Pozn mka: Presunutie s£boru do toho ist‚ho adres ra znamen  iba
+jeho presun na koniec tohto adres ra.
+
+ .PRESS <cesta>
+ Utrasenie aktu lneho adres ra.
+
+ .KILL <cesta>
+ Zruçenie vn£tornìch CACHE pam„t¡. Tento pr¡kaz prakticky nie je
+potrebnì, preto§e operaŸnì syst‚m si vykon va spr vu  vn£tornìch
+CACHE pam„t¡ plne automaticky.
+
+ .SEARCH <!> <cesta> <local> <reœazec>
+ H–adanie dan‚ho reœazca na diskete. Preh–ad vaj£ sa vçetky men 
+adres rov (iba prvìch 10 znakov) a  men   vçetkìch  existuj£cich
+s£borov. VìkriŸn¡k znamen ,  §e  sa  bud£  preh–ad vaœ  aj  men 
+zmazanìch s£borov a vo–nìch adres rovìch polo§iek. Preh–ad vanie
+zaŸ¡na aktu lnym adres rom, pokraŸuje a§ po adres r 255, a potom
+zase od nult‚ho a§ po aktu lny.
+
+ CAT  <.> <!> <cesta> <local> <Ÿ¡slo>
+ COPY <.> <!> <cesta> <local> <Ÿ¡slo>
+ Katal¢g  aktu lneho  adres ra  alebo  adres ra  dan‚ho  Ÿ¡slom.
+VìkriŸn¡k  znamen   vìpis  aj  zmazanìch  s£borov   a    vo–nìch
+adres rovìch polo§iek.  Bodka  znamem   vìpis  nie  od  zaŸiatku
+adres ra, ale od aktu lnej poz¡cie load-kurzora.
+
+
+ Pozn mka: æpecifik cia s£borov £dajom "data" m  takìto tvar:
+
+          polo§ka <,polo§ka> <,polo§ka> <,polo§ka> ...
+
+ kde polo§ka m  takìto tvar:
+
+                      Ÿ¡slo1 <TO <Ÿ¡slo2>>
+ alebo:
+                           TO <Ÿ¡slo2>
+
+ kde Ÿ¡slo1 znamen  zaŸiatok intervalu (nezadan‚ znamen   vçetky
+s£bory od zaŸiatku adres ra a Ÿ¡slo2  znamen   koniec  intervalu
+(nezadan‚ znamen  s£bory a§ po koniec adres ra). Samotn‚  Ÿ¡slo1
+bez spojky TO predstavuje iba jeden çpecifikovanì  s£bor  (ako§e
+interval "Ÿ¡slo1 TO Ÿ¡slo1").
+
+ Napr (v adres ri je 32 s£borov):
+                TO 3 , 10, 20 , 13 TO 15 , 28 TO
+ znamen  tieto s£bory:
+                1,2,3,10,20,13,14,15,28,29,30,31
+
+
+ Polo§ka <local> znamen  lok lne  nastavenie  inej  mechaniky  v
+danom pr¡kaze a  zaŸ¡na  identifikaŸnìm  znakom  '#'  za  ktorìm
+nasleduje Ÿ¡selnì vìraz ktor‚ho  vìsledn   hodnota  identifikuje
+dan£ mechaniku. Za tìmto vìrazom m“§e na oddelenie nasleduj£ceho
+kontextu nasledovaœ Ÿiarka (ak je to potrebn‚ a vhodn‚).
+ Napr¡klad nech 4 je aktu lna mechanika. Potom pr¡kaz
+                            CAT #2,66
+ vyp¡çe katal¢g 66-teho adres ra na disku v mechanike 2.
+
+
+               3. Pr¡kazy pre manipul ciu s d tami:
+
+   SAVE <!> <*> <cesta> <Ÿ¡slo>  meno
+   SAVE <!> <*> <cesta> <Ÿ¡slo>  meno  SCREEN$
+   SAVE <!> <*> <cesta> <Ÿ¡slo>  meno  DATA var()
+   SAVE <!> <*> <cesta> <Ÿ¡slo>  meno  CODE adresa,d’§ka
+   LOAD <!> <*> <cesta> <Ÿ¡slo> <meno>
+   LOAD <!> <*> <cesta> <Ÿ¡slo> <meno> SCREEN$
+   LOAD <!> <*> <cesta> <Ÿ¡slo> <meno> DATA var()
+   LOAD <!> <*> <cesta> <Ÿ¡slo> <meno> CODE <adresa <,d’§ka>>
+  MERGE <!> <*> <cesta> <Ÿ¡slo> <meno>
+ VERIFY <!> <*> <cesta> <Ÿ¡slo> <meno>
+ VERIFY <!> <*> <cesta> <Ÿ¡slo> <meno> SCREEN$
+ VERIFY <!> <*> <cesta> <Ÿ¡slo> <meno> DATA var()
+ VERIFY <!> <*> <cesta> <Ÿ¡slo> <meno> CODE <adresa <,d’§ka>>
+ Be§n‚ kazetov‚ pr¡kazy. ¬¡slo znamen  nastavenie load-kurzora -
+je £plne rovnocenn‚ polo§ke  "`"  v  parametri  "cesta".  Vçetky
+tieto pr¡kazy pracuj£ v aktu lnom  adres ri,  alebo  v  adres ri
+çpecifikovanom v ceste (ktorì sa tìm st va aktu lny). SAVE  v§dy
+nahr va s£bory na koniec adres ra.  VìkriŸn¡k  a  hviezdiŸka  na
+zaŸiatku pr¡kazu sa ignoruj£ - k“li syntaxi pr¡kazov "LOAD !"  v
+basicu 128 a "LOAD *" v  D80.  Vçetky  pr¡kazy  VERIFY  skutoŸne
+porovn vaj£ obsah pam„ti a v pr¡pade nezhody o tom vyp¡çu riadne
+chybov‚ hl senie.
+
+ NEW <cesta> <local> parameter
+ Nahratie a spustenie s£boru çpecifikovan‚ho parametrom.  Ak  je
+parameter Ÿ¡slo tak sa nahr  danì spustite–nì s£bor z aktu lneho
+adres ra. Ak je parameter reœazec tak sa h–ad  s£bor  s  takìmto
+menom v aktu lnom adres ri. Ak sa nen jde v aktu lnom  adres ri,
+bude sa h–adaœ v nultom adres ri. Ak sa  nen jde  ani  tam,  tak
+chyba.
+ Spustite–n‚ s£bory s£ alebo "bytes" alebo "Program". Ak je danì
+s£bor basic tak sa norm lne nahr  a spust¡ (ak m   nejak‚  LINE)
+ako pr¡kazom LOAD. Ak je danì s£bor typu "Bytes" tak  sa  vykon 
+nasledovn  Ÿinnosœ:
+ Nech je AAA zaŸiatoŸn  adresa s£boru. Potom sa sprav¡:
+    IF AAA >= #5d00 THEN CLEAR AAA-1
+    LOAD parameter CODE AAA
+    CONTINUE AAA
+ Ak parameter nie je, tak sa vykon  klasickì basicovì NEW.
+
+
+                    4. Nov‚ basicov‚ funkcie
+
+ Cie–om  tìchto  funkci¡  je  poskytn£œ  programom   v    basicu
+inform cie, ktor‚ by boli pre basic inak nepr¡stupn‚ (bez pomoci
+stroj ku). Jedn  sa  o  inform cie  o  diskete,  o  jednotlivìch
+adres roch, o s£boroch v tìchto adres roch,...
+
+ FN ?
+ Vr ti Ÿ¡slo verzie syst‚mu.
+
+ FN @
+ Vr ti Ÿ¡slo aktu lneho drajvu.
+
+ FN $
+ Vr ti Ÿ¡slo aktu leho adres ra.
+
+ FN `
+ Vr ti polohu load-kurzora. [libra = SS+X]
+
+ FN #
+ Vr ti poŸet s£borov v aktu lnom adres ri.
+
+ FN %
+ Vr ti poŸet vo–nìch sektorov na aktu lnom disku.
+
+ FN *
+ Vr ti  32  znakovì  reœazec  v  ktorom  je  adres rov   polo§ka
+obsahuj£ca inform cie o s£bore  na  ktorì  ukazuje  load-kurzor.
+Napr¡klad FN *(7 TO 16) predstavuje meno s£boru a FN *(6 TO  22)
+vr ti klasick£ magnetof¢nov£ hlaviŸku tohto s£boru.
+ Ak load-kurzor ukazuje mimo adres ra, tak funkcia vr ti pr zdny
+reœazec.
+ Ak je HI(load-kurzor)=255 (vyçç¡ bajt  255)  tak  t to  funkcia
+vtedy vr ti 32 bajtov£ polo§ku obsahuj£cu meno diskety.
+
+ FN (c)
+ Toto  je  çpeci lna  funkcia,  ktorej  vìsledok   je    reœazec
+obsahuj£ci cel£ pam„œ od adresy 1 a§ po 65535.
+
+
+                   Popis "cdd" copy-disk-disk
+                   --------------------------
+ Tento kop¡rovac¡ program bol robenì çpeci lne  pre  viacdiskov‚
+syst‚my, ale d  sa pou§iœ aj na jednodiskovìch syst‚moch.
+ Po zadan¡ parametrov kopir k naŸ¡ta do  pam„ti  to–ko  s£borov,
+ko–ko sa mu zmest¡.  Pritom  vyu§¡va  aj  priestor  obrazovky  a
+priestor nad ramtopom. Po naloadovan¡  s£borov  si  testuje,  Ÿi
+cie–ov  mechanika je toto§n  so zdrojovou. Ak  nie,  hneÔ  zaŸne
+sejvovaœ a cel£ da–çiu Ÿinnosœ vykon va samostatne, tak§e  v“bec
+netreba zasahovaœ.
+ V pr¡pade, §e cie–ovì disk sa nach dza v  tej  istej  mechanike
+ako zdrojovì, tak kopir k hl sen¡m  "Insert  dest.  disk"  vyzve
+obsluhu, aby vlo§ila  cie–ovì  disk.  Podobne  hl senie  "Insert
+source disk" znamen , §e kopir k chce Ÿ¡taœ  data  zo  zdrojovej
+diskety. Ak treba nieŸo skop¡rovaœ na  tej  istej  diskete,  tak
+disk samozrejme meniœ netreba - staŸ¡ iba staŸiœ ENTER.  Kopir k
+si zapam„t , §e kop¡ruje vr mci jednej  diskety  a  potom  u§  o
+vìmenu ne§iada.
+ Ak sa kop¡ruje na  dvoch  r“znych  mechanik ch,  kopir k  poŸas
+oper cie s jednou mechanikou nech  be§aœ motor druhej mechaniky,
+aby sa potom nezdr§iaval rozt Ÿan¡m tohto motora.
+ æpecifik cia s£borov v parametroch sa rob¡ presne tak isto  ako
+v pr¡kazoch MOVE a ERASE - iba namiesto spojky  TO  treba  p¡saœ
+apostrof.
+ V pr¡pade, §e v zadanìch parametroch  bude  syntaktick   chyba,
+program  nezaŸne  kop¡rovaœ,  ale  vyp¡çe  HELP-str nku,  ktorej
+s£Ÿasœou je aj presnì popis syntaxe parametrov.
+
+
+                 ******************************
+
+________________________________________________________________
+Index 960331163202                           Writen by Busy soft

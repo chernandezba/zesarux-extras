@@ -1,0 +1,7 @@
+
+Programa m68kmake genera los siguientes archivos:
+
+
+m68kopac.c m68kopdm.c m68kopnz.c m68kops.c m68kops.h
+
+Se incluyen ya generados en el codigo fuente para facilitar el proceso de compilacion, por lo que no hay que ejecutar ya el m68kmake

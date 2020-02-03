@@ -1,0 +1,66 @@
+<HTML>
+
+<HEAD>
+<TITLE>QDOS Internals - Internal I/O Memory Map</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#ffffc6">
+<! IMG SRC="images/ql_black.bmp" ALT="QL">
+<H1 Align=LEFT></IMG>QDOS Internals</H1>
+<H2 Align=LEFT>Internal I/O Memory Map</H2>
+<P>On the original QL, there is an area from $18000 to $1BFFF in the <A HREF="memory.html">memory map</A> set aside for internal I/O.
+These memory addresses and decoded by the hardware devices attached and used to control these devices. The following gives details of which 'port' is used and for which device.
+Be aware that all ports are byte sized (unless I tell you diffferent) and that reading and writing them directly can cause problems.</P>
+<TABLE BORDER=2 BGCOLOR="#c6eff7">
+<TR><TH BGCOLOR=CYAN>Port</TH><TH BGCOLOR=CYAN>QDOS Mnemonic</TH><TH BGCOLOR=CYAN>SMS Mnemonic</TH><TH BGCOLOR=CYAN>Description</TH></TR>
+<TR><TD ALIGN=CENTER>$18000 </TD><TD>PC_CLOCK </TD><TD> </TD><TD>Real-time clock (Long word) </TD></TR>
+<TR><TD ALIGN=CENTER>$18002 </TD><TD>PC_TCTRL </TD><TD> </TD><TD>Transmit control register </TD></TR>
+<TR><TD ALIGN=CENTER>$18003 </TD><TD>PC_IPCWR </TD><TD> </TD><TD>IPC port - write only </TD></TR>
+<TR><TD ALIGN=CENTER>$18020 </TD><TD>PC_IPCRD </TD><TD> </TD><TD>IPC port - read only </TD></TR>
+<TR><TD ALIGN=CENTER>$18020 </TD><TD>PC_MCTRL </TD><TD> </TD><TD>Microdrive control register - write only </TD></TR>
+<TR><TD ALIGN=CENTER>$18021 </TD><TD>PC_INTR </TD><TD> </TD><TD>Interrupt register </TD></TR>
+<TR><TD ALIGN=CENTER>$18022 </TD><TD>PC_TDATA </TD><TD> </TD><TD>Transmit register - write only </TD></TR>
+<TR><TD ALIGN=CENTER>$18022 </TD><TD>PC_TRAK1 </TD><TD> </TD><TD>Read microdrive track 1 </TD></TR>
+<TR><TD ALIGN=CENTER>$18023 </TD><TD>PC_TRAK2 </TD><TD> </TD><TD>Read microdrive track 2 </TD></TR>
+<TR><TD ALIGN=CENTER>$18063 </TD><TD>MC_STAT </TD><TD> </TD><TD>Master chip status register </TD></TR>
+</TABLE></P>
+
+<H3>Problem areas</H3>
+<P>OK, I have a couple of problems with this documentation. 
+<P>The first is, if these ports are mapped onto a memory address, how come PC_CLOCK is a long word
+(4 bytes) and yet is mapped to 2 bytes $18000 and $18001 ?
+<P>The second may be explained by this. Note that PC_TDATA and PC_TRAK1 share an
+address. Is this the reason why you cannot use the serial ports when a
+microdrive is running ?
+<P>You will note that although only a few addresses are used for the hardware
+ports, the entire block of memeory from $18000 to $1BFFF is set aside - what has
+happened to the other (nearly) 16Kb of RAM ?
+<P>The answer is simple, in order to keep costs down, less address lines that
+were required were used to decode the port address and this causes 'shadows' to
+appear all through this 16Kb of RAM. The RAM is unusable as it will inflict
+serious hardships on the devices.
+
+
+<H3>Using the hardware</H3>
+<P>The hardware ports cannot really be used from within a user program. At
+least, not usefully (according to Andy Pennell).
+<P>There are of course, a couple of exceptions.</P>
+<P>The clock long word can be read and contains the date and time in seconds as a 32 bit integer. Zero represents January 1 1961 at 00:00:00.
+<P>If you attempt to write to the clock port, you will effectively reset it to zero. Use the proper QDOS routine, <A HREF="trap1.html">manager trap (MT_SCLCK)</A>, to set the clock.</P>
+
+<P>The other exception is the master chip status port which you can only write
+to. This controls the screen and the data written is as follows :</P>
+<TABLE BORDER=2 BGCOLOR="#c6eff7">
+<TR><TH BGCOLOR=CYAN>Bit </TH><TH BGCOLOR=CYAN>Purpose </TH></TR>
+<TR><TD ALIGN=CENTER>1 </TD><TD>0 = Screen on </TD></TR>
+<TR><TD ALIGN=CENTER> </TD><TD>1 = Screen off </TD></TR>
+<TR><TD ALIGN=CENTER>3 </TD><TD>0 = 4 colour (mode 4) </TD></TR>
+<TR><TD ALIGN=CENTER> </TD><TD>1 = 8 colour (mode 8) </TD></TR>
+<TR><TD ALIGN=CENTER>7 </TD><TD>0 = Use screen 0 (allegedly at $20000) </TD></TR>
+<TR><TD ALIGN=CENTER> </TD><TD>1 = Use screen 1 (allegedly at $280000) </TD></TR>
+</TABLE>
+
+<P>A copy of this register is stored at affset $34 in the <A HREF="svars.html">system variables</A>
+
+</BODY>
+</HTML>

@@ -1,0 +1,70 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>Developing software for the Z88</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="motherbd.html">Previous</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%"><a href="index.html">Contents</a></td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="glossary.html">Next</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>27. Developing software for the Z88</font></b>
+<br>&nbsp;
+<p>Although it is possible to use the BBC BASIC as a development environment
+for Z88 applications, the limited memory capacity of BASIC make this task
+somewhat arduous. Moreover during development the Z88 is likely to crash
+fairly often, so much time would be spent in backing up source files to
+EPROM or another computer. The Z88 however, is not easy to break down.
+We've managed to work for several months on software (using both a native
+Z80 assembler and a cross assembler) with plenty of soft resets and without
+loss of files. It depends on the type of crash. Software should always
+be developed on the original computer - this is our philosophy!
+<p>Finally, it is needed to have a unique application card id, if you are
+going to produce EPROM card application software. When Cambridge Computer
+still were manufactoring the Z88, they administrated the card id's. Since
+they moved their office to Scotland (and have stopped production and interest
+of Z88), the card id registrations were lost.
+<p>The Z88 development project at http://z88.linux.dk have made a substantial effort
+to produce a fully featured Z80 Assembler toolchain containing a Z80 cross assembler
+written in ANSI C, linker and library manager to compile large assembler application
+projects (including the next generation OZ operating system). The cross assembler
+can been compiled for Windows, Linux and other Unix operating systems, including Mac OSX.
+
+Further, a new Z88 emulator and debugging environment has been implemented that
+supports tracing, breakpoints and many other features to analyse your applications
+both on EPROM or in RAM. Finally, an application EPROM programming utility
+has been implemented to produce your own application cards.
+
+If you have ideas, bug reports, suggestions for new applications or features of the Z88
+operating system, or have an itch to develop software, dont't hesitate to join us at:
+<b>http:/z88.linux.dk</b>.
+<p>
+<hr WIDTH="100%">
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%">
+<tr>
+<td ALIGN=LEFT VALIGN=TOP WIDTH="33%"><a href="motherbd.html">Previous</a></td>
+<td ALIGN=CENTER VALIGN=TOP WIDTH="34%"><a href="index.html">Contents</a></td>
+<td ALIGN=RIGHT VALIGN=TOP WIDTH="33%"><a href="glossary.html">Next</a></td>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=TOP WIDTH="33%">Z88 Motherboard Hardware</td>
+<td ALIGN=CENTER VALIGN=TOP WIDTH="34%">Developing software for the Z88</td>
+<td ALIGN=RIGHT VALIGN=TOP WIDTH="33%">Glossary</td>
+</tr>
+</table>
+
+</body>
+</html>

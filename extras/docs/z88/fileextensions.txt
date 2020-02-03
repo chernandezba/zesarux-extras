@@ -1,0 +1,46 @@
+* .63, .62, 61 etc...
+
+http://www.rakewell.com/z88/z88software_r.shtml
+
+..
+Type of Files supplied
+
+Whether you download a single application or a compilation there are several sorts of files supplied in the zipped file that deserve a mention, 
+just in case you wanted to know what they do!
+
+Both ROMupdate and ROMcombiner work with 16K length files. The filename used gives the name of the program and the extension is used for its location.
+Applications reside at the top of the Flash cards or EPROMs. The top number is 63. So valid application filenames would include flashstore.63
+or eazylink.63. If they were combined, the filenames might be combined.62 and combined.63.
+
+->se cargan desde el numero de archivo menor, por ejemplo: .61, .62 y .63, desde offset 0 en slot (para el .61) , offset 16384 para .62 y hasta offset 32768 para el .63
+
+
+...
+
+
+
+
+* epr:
+
+EPR - Z88 Disk/ROM Image. Se carga tal cual en el slot , desde offset 0
+
+
+
+
+->Archivos .63 se pueden convertir en un solo .epr, empezando por el archivo de numero mas bajo e ir agregando, ejemplo:
+
+cat juego.61 > juego.epr
+cat juego.62 >> juego.epr
+cat juego.63 >> juego.epr
+
+Nota: El juego dstar se descarga de la misma web con dos formatos diferentes: .63 (un solo archivo de 16kb) y .epr (de 32 kb).
+Los dos funcionan bien, la diferencia interna entre uno y otro archivo no se cual sera...
+
+Nota2: El emulador incluye cartuchos rom iguales en los dos formatos
+
+
+->para pasar un solo archivo .63 (de 16kb) a dos (un .63 y .62) , dado que el emulador obliga minimo a 32kb, hay que hacer:
+generar archivo .62 vacio (con ceros), por ejemplo:
+
+dd if=/dev/zero of=juego.62 bs=1k count=16
+

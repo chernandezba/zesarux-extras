@@ -1,0 +1,151 @@
+segmento 0 (0-16383):
+
+This lower 8K may be bound either to bank 0 (ROM - this is the
+arrangement when the machine is hard-reset) or bank &20 (RAM -
+containing the restart routines and other MOS components, which is the
+normal state of affairs).
+
+->primera mitad del segmento 0: 8k de ram o 8k de rom (rom 0 o ram 0 solamente)
+
+segunda mitad del segmento 0: puede alojar cualquier segmento (par) de 8k de ram o rom. el bit 0 del numero de segmento decidira
+si se mapea el bloque inferior o superior de 8k
+
+
+Extraido de ozvm:
+
+    /**
+     * Decode Z80 Address Space to extended Blink Address (bank,offset).
+     *
+     * @param pc 16bit word that points into Z80 64K Address Space
+     * @return int 24bit extended address (bank number, bank offset)
+     */
+    public int decodeLocalAddress(int pc) {
+        int bankno;
+
+        if (pc > 0x3FFF) {
+            bankno = sR[(pc & 0xffff) >>> 14];
+        } else {
+            if (pc < 0x2000) // return lower 8K Bank binding
+            // Lower 8K is System Bank 0x00 (ROM on hard reset)
+            // or 0x20 (RAM for Z80 stack and system variables)
+            {
+                if ((COM & Blink.BM_COMRAMS) == Blink.BM_COMRAMS) {
+                    bankno = 0x20;  // RAM Bank 20h
+                } else {
+                    bankno = 0x00;  // ROM bank 00h
+                }
+            } else {
+                // 0x2000 <= pc <= 0x3FFF
+                bankno = sR[0] & 0xFE; // banks are always even in SR0..
+                if ((sR[0] & 1) == 0) {
+                    // lower 8K of even bank bound into upper 8K of segment 0
+                    // (relocate bank offset pointer to lower 8K)
+                    pc &= 0x1FFF;
+                }
+            }
+        }
+
+        return (bankno << 16) | (pc & 0x3FFF);
+    }
+
+
+
+
+    public final void outByte(final int addrA8, final int addrA15, final int outByte) {
+        switch (addrA8) {
+            case 0xD0: // SR0, Segment register 0
+            case 0xD1: // SR1, Segment register 1
+            case 0xD2: // SR2, Segment register 2
+            case 0xD3: // SR3, Segment register 3
+                blink.setSegmentBank(addrA8, outByte);
+                break;
+
+
+
+
+    /**
+     * Bind bank [0-255] to segments [0-3] in the Z80 address space.
+     *
+     * On the Z88, the 64K is split into 4 sections of 16K segments. Any of the
+     * 256 x 16K banks can be bound into the address space on the Z88. Bank 0 is
+     * special, however. Please refer to hardware section of the Developer's
+     * Notes.
+     */
+    public void setSegmentBank(final int segment, final int BankNo) {
+        sR[segment & 0x03] = BankNo;
+    }
+
+
+
+    public int getPcAddress() {
+        return blink.decodeLocalAddress(PC());
+    }
+
+
+
+    /**
+     * Read byte from Z80 virtual memory model. <addr> is a 16bit word that
+     * points into the Z80 64K address space.
+     *
+     * On the Z88, the 64K is split into 4 sections of 16K segments. Any of the
+     * 256 16K banks can be bound into the address space on the Z88. Bank 0 is
+     * special, however.
+     *
+     * Please refer to hardware section of the Developer's Notes.
+     *
+     * @param addr 16bit word that points into Z80 64K Address Space
+     * @return byte at bank, mapped into segment for specified address
+     */
+    public final int readByte(final int addr) {
+        try {
+            if (addr > 0x3FFF) {
+                return memory.getBank(sR[addr >>> 14]).readByte(addr & 0x3fff);
+            } else {
+                if (addr < 0x2000) // return lower 8K Bank binding
+                // Lower 8K is System Bank 0x00 (ROM on hard reset)
+                // or 0x20 (RAM for Z80 stack and system variables)
+                {
+                    return RAMS.readByte(addr);
+                } else {
+                    if ((sR[0] & 1) == 0) // lower 8K of even bank bound into upper 8K of segment 0
+                    {
+                        return memory.getBank(sR[0] & 0xFE).readByte(addr & 0x1FFF);
+                    } else // upper 8K of even bank bound into upper 8K of segment 0
+                    // addr <= 0x3FFF...
+                    {
+                        return memory.getBank(sR[0] & 0xFE).readByte(addr);
+                    }
+                }
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // PC is problably 0x10000
+            return 0;
+        }
+    }
+
+
+
+
+Class Bank:
+...
+
+
+    /**
+     * Get byte from bank, always.
+     *
+     * NB: Internal method. This method overrides all memory characteristics as
+     * defined by the Blink hardware and various memory chip hardware.
+     *
+     * @param addr is a 16bit word that points into the 16K address space of the
+     * bank.
+     */
+    public int getByte(final int addr) {
+        try {
+            return bankMem[addr];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // address is problably specified as 64K absolute address
+            return bankMem[addr & (Bank.SIZE - 1)];
+        }
+    }
+
+

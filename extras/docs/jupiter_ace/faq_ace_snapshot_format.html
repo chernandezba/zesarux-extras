@@ -1,0 +1,315 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<!-- Jupiter Ace Archive Project    -->
+<!-- www.jupiter-ace.co.uk          -->
+<!-- version    12.3.21             -->
+<!-- File Name: faq_ace_snapshot_format.html  -->
+<HEAD>
+	<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+
+	<TITLE>Jupiter Ace Resource Site - FAQs Jupiter Ace emulator ACE snapshot file format.</TITLE>
+
+ <meta name="keywords" content="Jupiter Ace ,Jupiter Ace Resource Site, Jupiter Cantab Ltd, Ace, Z80A, Forth, Forth-83 , Forth-79, Fig-Forth, Charles Moore, Elizabeth Rather, Steve Vickers, Richard Altwasser, Sinclair, ZX80, ZX81,ZX Spectrum, RAM, ROM, Memory, Computer, Retro, Programming, Stacks, reverse Polish notation">
+
+<meta name="description" content="Jupiter Ace Resource Site - FAQs Jupiter Ace emulator ACE snapshot file format.">
+
+	<link rel="stylesheet" title="Jupiter Ace default style" type="text/css" href="JADefult.css">
+	
+</HEAD>	
+<BODY> 
+
+<script type="text/javascript" src="milonic_src.js"></script>	
+
+<script	type="text/javascript">	
+<!--
+if(ns4)_d.write("<scr"+"ipt type=text/javascript src=mmenuns4.js><\/scr"+"ipt>");		
+else _d.write("<scr"+"ipt type=text/javascript src=mmenudom.js><\/scr"+"ipt>");
+// --> 
+</script>
+
+	
+
+
+<table class="mtable">
+		
+		<tr>
+			<td align="center">
+				<img src="graphics/jupiter_ace_logo.jpg" border="0" width="310" height="71" alt="">	 
+				<div style="text-align: center">www.jupiter-ace.co.uk</div>	 
+				
+			</td>
+		</tr>
+												 
+</table> 
+
+  <br>	 
+  
+<table class="mtable" cellspacing="0" cellpadding="0">
+    <tr >
+		<td class="tabs">
+		<script type="text/javascript" src="jupiter_menu_data.js">
+         </script>
+		</td>
+	</tr>
+
+
+<tr>
+	<td class="bar"> 
+	 <a class="index" href="index_faqs.html" onClick="history.back();return false;">Previous Page</a>
+    &gt; <A  class="index" href="index_faqs.html">Index FAQs</a> &gt;  ACE snapshot file format.
+
+	
+	
+		
+	</td>
+</tr>
+
+
+	<tr>
+		<td>
+			
+			<br>  
+			<div style="text-align: center">
+				<img src="graphics/jup_image_1.gif" border="0" width="182" height="110" alt="">
+			</div>
+			<hr width="60%" size="1">
+		</td>
+	</tr>
+</table>
+<table class="mtable" cellpadding="4">			 
+		<tr>
+		<td>
+		
+		
+		
+		<div class="paratitles">ACE snapshot file format.</div><br>
+		
+		<div class="indentjust">Many thanks to Edwin Blink for his work on finding this out information, after many hours of looking at the ACE32 emulators snapshots. It was thought that the ACE32 snapshot format information had been lost, but we know the following:</div>
+		
+		</td></tr>
+		
+	</table>
+	
+	<table class="mtable" cellpadding="4">
+	
+	<tr>
+		
+<td>
+
+ <div class="indentjust">The ACE snapshot file is a memory dump from address 2000h (8192 decimal) up to and inclusive
+3FFFh (16843 decimal), 7FFFh (32767 decimal) or BFFFh (49151 decimal) depending on the memory configuration that is being used. It uses a simple compression algorithm to reduce the snapshots file size. Three
+or more bytes of the same values are compressed into a three byte sequence.
+Byte ED has special meanings:</div>
+
+<pre>
+1) ED 00       end of file
+2) ED xx yy    repeat byte yy, xx times.</pre>	
+
+Note:
+<ul>
+  <li>one, two or three of more ED bytes are always stored in it's three byte form.</li>
+  <li>ACE32 uses a maximum repeat value of F0 so a maximum of 240 repeated bytes are
+ reduced to a three byte sequence. More repeats are stored in separate sequences.</li>
+</ul>
+
+	  </td>
+
+	</tr>
+	
+	<tr>
+		<td>	
+		<div class="paratitles">ACE32 configuration settings and Z80 Registers.</div><br>
+		
+		
+<div class="indentjust">In the ACEs memory map there are several shadows of other memory parts that are
+normally filled with 0s ( in emulation). However the first shadow at 2000-23FF
+is used to store ACE32 configurations and the Z80 registers.</div>
+
+<div class="indentjust">Because an ACE snapshot is compressed an offset seems out of place and the
+Ace memory addresses instead. All numbers used by ACE32 are 32-bit words in little Indian format.
+(Least significant byte first).</div>
+		
+		
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+		
+		<div class="paratitles">ACE32 Configuration.</div><br>
+
+<pre>
+Addr:   Defaults                Description
+
+2000    01, 80, 00, 00      ?
+
+2080    00, 80, 00, 00       Ramtop 4000 (3K), 8000(19K), C000(35K)
+2084    00, 00, 00, 00       Debugger Data Address
+2088    00, 00, 00, 00       Debugger Breakpoint Address
+208C    03, 00, 00, 00       Frame Skip Rate (3)
+2090    03, 00, 00, 00       Frames per TV Tick (3)
+2094    FD, FD, 00, 00       ? 
+2098    XX, XX, XX, XX       Time emulator is running probably in milliseconds
+209C    00, 00, 00, 00       Emulator Colours 0(white on Black),&nbsp;1(green on Black),
+                                             2(purple on Black),3(Black on White)
+</pre>
+		
+		</td>
+	</tr>
+	
+<tr>
+	<td>
+	
+	   	<div class="paratitles">Z80 Register dump.</div><br>
+	<pre>
+Addr:	last state             Registers
+
+2100	50, 04, 00, 00		AF
+	00, 00, 00, 00		BC
+	E2, 26, 00, 00		DE
+	28, 3C, 00, 00		HL
+	00, 3C, 00, 00		IX
+	C8, 04, 00, 00		IY
+	FE, 7F, 00, 00		SP
+	9D, 05, 00, 00		PC
+	40, 20, 00, 00		AF'
+	00, 01, 00, 00		BC'
+	60, 00, 00, 00		DE'
+	80, 26, 00, 00		HL'
+	01, 00, 00, 00		IM
+	01, 00, 00, 00		IFF1
+	01, 00, 00, 00		IFF2
+	00, 00, 00, 00		I
+	11, 00, 00, 00		R
+	80, 00, 00, 00		?
+	   </pre>
+	</td> 
+	</tr>
+	
+	
+	
+	<tr>
+		<td>
+	
+	<div class="paratitles">Creating ACE Snapshots.</div><br>
+
+<div class="indentjust">Using ACE snapshots is a good workaround for some emulators to get programs
+running as not all emulators can deal with TAP or WAV files.
+Besides this it is also a good way of omitting the sometimes awkward loading
+instructions as they are only needed once when the snapshot is created.
+To make it as user friendly as possible consider the following when making ACE
+snapshots:</div>
+
+<ul>
+  <li>Before loading your program you wan't to save make sure the emulator has been
+  reset. This ensures a clean and shorter ACE file.<br><br></li>
+
+
+
+<li>Load programs using their loading instructions but do not type the part that
+  will run them automatically. ie when the loading instructions say 'LOAD D D'
+  to load and start the game enter 'LOAD D' instead to just load the program.
+  After the program has loaded successfully. Type the command needed to start
+  the program. But instead of pressing enter you save the snapshot.
+  When a snapshot is loaded back. Enter needs to be pressed to start the
+  program. But the advantage is that you can see which command is used to start
+  the program. so you know what to type again in case the program stops.</li>
+  </ul>
+
+	<br><br>
+	</td>
+</tr>
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</table>
+  <!--
+ <table class="mtable" cellpadding="4">
+  	<tr>
+		<td>
+		<div class="paratitles">How to make an ACE format file.</div><br>
+
+The 3 steps to create an ACE file are:
+
+<ul>
+  <li>Make a wav sound recording.<br><br></li>
+
+  <li>Load the WAV file into <a href="http://www.chuntey.com/eightyone/">EightyOne</a> emulator.<br><br></li>
+
+  <li>Save a ACE file from the menu of EightyOne emulator.<br><br></li>
+</ul>-->
+     <!--
+	<div class="paratitles">Step 1. Make a wav sound recording.</div> <br>
+
+		<div class="indentjust">First you need to record the tape with the some Windows sound recorder software. We recommend using  <a href="http://audacity.sourceforge.net/">Audacity</a> its also Free! When you have installed  <a href="http://audacity.sourceforge.net/">Audacity</a> Connect your cassette recorder's Ear socket to the MIC socket of your sound card, using a 3.5" jack lead. Click on Audacities icon to start the program. Choose New from the file menu to start a new sound recording. Audacities default option is the record "what you here" which will be fine, but you can change this "Microphone" if you wish . Press play on your cassette player to run the tape as if you were loading it into a real Jupiter Ace.</div><br>
+
+<div class="indentjust">Next press the Audacities button with the red circle to start the recording the
+session from the tape. When the cassette tape has run to the end of the tape Audacity will have captured the sounds from the tape. Audacities window will look something like the image below.</div><br>
+
+<div style="text-align: center"><img src="graphics/AceFILE/audacity_1.jpg" border="0" width="600" height="217" alt=""></div><br>
+
+<div class="indentjust">To Save to wav file to you hard drive, from Audacities File menu choose "Export as WAV". A window will open for you to enter a save to location and file name.	Please note that these types of files can be very large. We suggest that you record two or three recordings and both sides of the tape, just incase there's a different version of the software on the other side! </div><br>
+
+  -->
+ 
+    <!--
+
+		</td>
+	</tr>
+
+
+
+<tr>
+ <td>-->
+        <!--
+ <div class="paratitles">Step 2. Load the Wav into EightyOne</div> <br>
+
+
+<div class="indentjust">First download and install <a href="http://www.chuntey.com/eightyone/">EightyOne</a> emulator and choose it to emulate the Jupiter Ace. To Load a wav file into EightyOne we nee to tell the emulator the
+source for the tape loading. From EightyOnes "Options" menu choose TAPE, then SAUCE and WAV. This means that when you type the Jupiter Aces LOAD command the emulator will look for a WAV file.</div><br>
+
+<div style="text-align: center"><img src="graphics/AceFILE/eightyone_1.jpg" border="0" width="500" height="428" alt=""> </div><br>
+
+<div class="indentjust">Next, in EightyOne's menu bar choose TOOLS, and	select the Wav Loader. A window will appear.You use the wav loader window to navigate to where your savedwav file is store on your hard drive which was recorded with Audacity. see the image below.</div><br>
+
+  <div style="text-align: center"> <img src="graphics/AceFILE/eightyone_2.jpg" border="0" width="500" height="426" alt=""></div><br>
+
+<div class="indentjust">Next, click on EightOne's main window, and type in the loading instructions as they appear on the original tapes inlay. In this example its <span class="bold">load gobblegook</span>. EightyOne will then load the wav as if was loading the program from a cassette recorder. </div><br>
+
+
+<div class="paratitles">Step 3. Save the ACE snapshot.</div> <br>
+ <div class="indentjust"> When the wav loader has finished type in the command to run the program, but DO NOT PRESS ENTER! Instead from the EightOne's FILE option on the menu bar select SAVE SNAPSHOT. A window will appear prompting you for a file name and a location. </div><br>
+
+  <div style="text-align: center"><img src="graphics/AceFILE/eightyone_3.jpg" border="0" width="500" height="425" alt=""></div><br>
+
+<div class="indentjust">
+Once entered the ACE Snapshot file will be saved. The ACE snapshot file can also be reloaded by choosing LOAD Snapshot, the same window will appear asking for a file name and its location. Once the snapshot file has been reloaded EightyOne carries on emulating the Jupiter Ace from exactly from the point the snapshot was saved. All you have to do to run the program is press enter.	Thats it now you have a wav file and an ACE snapshot file you can also <a href="faq_HowToTap.html">save a .tap file</a>
+</div>
+-->
+   <!--
+ </td></tr>
+
+
+
+
+  </table>-->
+	
+</BODY>
+</HTML>

@@ -1,0 +1,53 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Skc, skip character</font></b>
+<p><tt>RST 20H, DEFW $3209</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = value to bypass
+&nbsp;&nbsp;&nbsp;&nbsp; HL = Sequense index:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 => read from stream IX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 => read from filter IX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 = not allowed
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; > 255 = read at (HL)
+&nbsp;&nbsp;&nbsp;&nbsp; IX = optional handle</pre>
+OUT, if call succeeded:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; HL(in) > 255: (HL) points to character which stopped scanning, else
+&nbsp;&nbsp;&nbsp;&nbsp; HL(in).</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Error code ???</pre>
+Notes:
+<p>Bugs:
+<blockquote>It is reported to be useless due to too many bugs. If (HL)
+&lt; A then the error handler is called with A = (HL) OOPS!!! hence the
+routine bombs out when a character &lt; A is passed to it in (HL). From
+stream IX it is even worse. It skips over the character correctly but (IX)
+&lt; A or (IX) > A cause an error (always RC_QUIT!!!).</blockquote>
+Related calls:
+<blockquote><a href='gncls.html'>GN_Cls</a>, classify character
+<br><a href='gnskd.html'>GN_Skd</a>, skip delimiter
+<br><a href='gnskt.html'>GN_Skt</a>, skip to value</blockquote>
+
+</body>
+</html>

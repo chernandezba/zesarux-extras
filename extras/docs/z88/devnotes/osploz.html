@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><title>OS_Ploz, poll for running OZ</title>
+
+<link href="stylesheet.css" type="text/css" rel="stylesheet"></head>
+<body>
+<table style="font-size: 12px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<th colspan="3" align="center">Z88
+Developers' Notes</th>
+</tr>
+<tr>
+<td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+<td align="center" valign="bottom" width="80%">&nbsp;</td>
+<td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</tbody>
+</table>
+<hr width="100%">
+<p><b><font size="+1">OS_Ploz, poll for
+running OZ</font></b>
+</p>
+<p><tt>RST 20H, DEFW $C606</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = slot number (0 to 3)<br></pre>
+OUT, if call successfull:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fz = 0, OZ is running in slot<br>&nbsp;&nbsp;&nbsp;&nbsp; Fz = 1, OZ is not running in slot.<br><br></pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_ONF, no card found</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different</pre>
+Notes:
+<blockquote>OZ can only run in slot 0 or 1. Using this call for
+slots 2 and 3 will always return Fz = 1.<br>
+This call is used internally by OZ &nbsp;in the Flash card
+management sub-system, when it is necessary to turn off the screen
+during Flash hardware operations on the same card as a running OZ.<br><br>This system call is only available in OZ release 4.2 and newer.</blockquote>
+Bugs:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -<br></pre>
+Related system calls:
+</body></html>

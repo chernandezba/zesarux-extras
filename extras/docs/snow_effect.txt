@@ -1,0 +1,122 @@
+48k:
+
+Finally, there is an interesting bug in the ULA which also has to do with this split bus. After each instruction fetch cycle of the processor, the processor puts the I-R register "pair" (not the 8 bit internal Instruction Register, but the Interrupt and R registers) on the address bus. The lowest 7 bits, the R register, are used for memory refresh. However, the ULA gets confused if I is in the range 64-127, because it thinks the processor wants to read from lower 16K RAM very, very often. The ULA can't cope with this read-frequency, and regularly misses a screen byte. Instead of the actual byte, the byte previously read is used to build up the video signal. The screen seems to be filled with 'snow'; however, the Spectrum won't crash, and program will continue to run normally. One program which uses this to generate a nice effect is Vectron.
+
+128k:
+Note that this means that there are 70908 T states per frame, and the '50 Hz' interrupt occurs at 50.01 Hz, as compared with 50.08 Hz on the 48K machine. The ULA bug which causes snow when I is set to point to contended memory still occurs, and also appears to crash the machine shortly after I is set to point to contended memory.
+
+
+More ZX games can rain if you set on original ZX128/+2:
+
+CLEAR 4e4: OUT 0,48+7: LOAD "" and run any 48kB game.
+
+This OUT set slow memory page 7 and disable memory paging. If 48k game set register I to value #BF-#FF then raining effect will present. Game code running at 49152-65535 will slow-down by ULA.
+
+
+http://www.zxdesign.info/dynamicRam.shtml
+
+robocop3
+
+http://www.worldofspectrum.org/forums/showthread.php?t=20298&highlight=snow+bug
+I know about this games only: (tested on real ZX128+2 - grey)
+4x4 puzzle
+at4open
+black raven
+breditor
+death valley
+gambit
+hexagon 2
+imperia 3
+jackals
+netwalk
+sfort fxd
+snake demo
+spriter
+transword
+ufo 2
+viking quest 1, 2
+wolf demo 3
+sparrows
+deathmatch arena
+dizzy forever
+fast breed
+jackals
+shashki
+( download from: http://velesoft.speccy.cz/kmsoft.htm )
+
+I will remove raining in this games.(set register I to correct value)
+
+VELESOFT
+__________________
+http://velesoft.speccy.cz/ 
+
+
+----------
+
+Mas info:
+
+http://www.zxdesign.info/dynamicRam.shtml
+
+
+
+-snow effect se deberia parecer a:
+https://www.youtube.com/watch?v=Ix9Wy2jhDwI
+
+-mejorar snow effect con siguiente algoritmo usado en Spectra:
+The snow only affects the lower 8 address lines.
+
+Snow is visible when a refresh occurs to:
+- $4000-$7FFF
+- $C000-$FFFF and a Spectrum 128 and RAM bank 5 paged in
+- $C000-$FFFF and a Spectrum 128 and RAM bank 7 paged in
+
+if refresh then
+SpectraAddressLine(0) = PixelCountInCurrentScanLine(2) xor
+SpectrumAddressLine(0);
+SpectraAddressLine(1) = PixelCountInCurrentScanLine(4) xor
+SpectrumAddressLine(1);
+SpectraAddressLine(2) = PixelCountInCurrentScanLine(5) xor
+SpectrumAddressLine(2);
+SpectraAddressLine(3) = PixelCountInCurrentScanLine(6) xor
+SpectrumAddressLine(3);
+SpectraAddressLine(4) = PixelCountInCurrentScanLine(7) xor
+SpectrumAddressLine(4);
+SpectraAddressLine(5) = ScanLineCount(3) xor SpectrumAddressLine(5);
+SpectraAddressLine(6) = ScanLineCount(4) xor SpectrumAddressLine(6);
+SpectraAddressLine(7) = ScanLineCount(5) xor SpectrumAddressLine(7);
+else
+SpectraAddressLine(0) = PixelCountInCurrentScanLine(2);
+SpectraAddressLine(1) = PixelCountInCurrentScanLine(4);
+SpectraAddressLine(2) = PixelCountInCurrentScanLine(5);
+SpectraAddressLine(3) = PixelCountInCurrentScanLine(6);
+SpectraAddressLine(4) = PixelCountInCurrentScanLine(7);
+SpectraAddressLine(5) = ScanLineCount(3);
+SpectraAddressLine(6) = ScanLineCount(4);
+SpectraAddressLine(7) = ScanLineCount(5);
+end if
+
+
+where:
+- PixelCountInCurrentScanLine counts from 0 to 447 (for 48K) and 0 to 455
+(for 128K) for each scan line, where 0 is the start of the display file
+area.
+- ScanLineCount counts from 0 to 311, where 0 to 191 covering the display
+file area.
+
+The logic uses two counters the determine the horizontal and vertical
+position. If a refresh occurs to contended RAM then the the current state of
+the address lines corrupts the lower 8 address lines to SPECTRA's RAM.
+
+Hopefully that makes sense. If it will be difficult to emulate then do not
+worry about it as it does not accurately replicate the standard 'snow'
+anyway.
+
+-o con metodo usado en retrovirtualmachine:
+http://foro.speccy.org/viewtopic.php?f=11&t=4527#p47844
+
+
+
+*************
+
+
+

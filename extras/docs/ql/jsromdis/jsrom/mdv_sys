@@ -1,0 +1,237 @@
+       
+*******
+*
+* MDV_System MDV_SYS mdv_sys
+*
+**********
+
+
+L029FC SF      $0023(A2)   * mdv: motor on
+L02A00 MOVEQ   #$00,D1
+       MOVE.B  $0014(A2),D1
+       LEA     $00EE(A6),A3
+       ST      $09(A3,D1.W)
+       TST.B   (A3)
+       BNE.S   L02A38
+       MOVEQ   #$10,D0
+       JSR     L00420(PC)
+       MOVE.B  D1,(A3)
+       MOVE.B  #$FA,$00EF(A6)
+       LEA     $00018020,A3
+       JSR     L02C56(PC)
+       ORI.B   #$20,$0035(A6)
+       MOVE.B  $0035(A6),$00018021
+L02A38 RTS
+
+L02A3A MOVE.W  $0008(A7),D0  * update server-block mdv
+       LSL.W   #2,D0
+       ADDQ.W  #1,D0
+       MOVEA.L $0058(A6),A1
+L02A46 MOVEQ   #-$0F,D1
+       AND.B   (A1),D1
+       CMP.B   D1,D0
+       BNE.S   L02A52
+       MOVE.B  #$01,(A1)
+L02A52 ADDQ.W  #8,A1
+       CMPA.L  $005C(A6),A1
+       BLT.S   L02A46
+       LEA     $0228(A5),A1
+       MOVEQ   #$7F,D0
+L02A60 CLR.L   (A1)+
+       DBF     D0,L02A60
+       RTS
+
+L02A68 TST.B   $0023(A5) * Test sectortype
+       BLE.S   L02A9C
+       TST.B   $0022(A5)
+       BNE.S   L02A9C
+       TST.B   D7
+       BNE.S   L02A98
+       LEA     $0028(A5),A1
+       JSR     L0525C  * read sector 0
+       BRA.S   L02A98  * error
+       LEA     $0008(A7),A1
+       LEA     $0016(A5),A2
+       MOVE.L  (A1)+,(A2)+
+       MOVE.L  (A1)+,(A2)+
+       MOVE.L  (A1)+,(A2)+
+       BSR.S   L02A3A
+L02A94 SF      $0023(A5)
+L02A98 BRA     L02B84  * stop motor
+
+
+L02A9C LEA     $0016(A5),A1 * a1 = $16 of PDB
+       TST.B   (A1)
+       BEQ.S   L02AB2
+       SUBA.L  A0,A0
+       MOVEQ   #$0A,D2
+       JSR     L039B4(PC)   * append name
+       MOVEQ   #-$10,D0
+       JSR     L03968(PC)   * UT.ERR
+L02AB2 BSR.S   L02A3A       * update server block
+       ST      $0023(A5)
+       BRA     L02BE2
+
+L02ABC MOVEM.L D0-D6/A0-A4,-(A7)  * interrupt 2 of mdv
+       LEA     $00018020,A3
+       MOVEQ   #$00,D0
+       MOVE.B  $00EE(A6),D0
+       BEQ     L02B88
+       SUBA.W  #$000E,A7
+       MOVEA.L A7,A1
+       LEA     $00F0(A6),A5
+       SF      $07(A5,D0.W)
+       MOVE.B  -$01(A5,D0.W),D0
+       MOVE.W  D0,-(A7)
+       MOVEA.L $10(A5,D0.W),A5
+       MOVE.L  A5,-(A7)
+       MOVE.B  $00EF(A6),D2
+       BGE.S   L02AF2
+       ADDQ.B  #1,D2
+L02AF2 JSR     L0523A   * read header
+L02AF8 BRA.S   L02A9C   * error
+       BRA.S   L02A98   * mistake
+       MOVEQ   #$0B,D0
+       LEA     $0022(A5),A2
+L02B02 MOVE.B  -(A2),D1
+       CMP.B   -(A1),D1
+       BNE     L02A68
+       DBF     D0,L02B02
+       TST.B   $0023(A5)
+       BGT.S   L02A94
+       ADD.W   D7,D7
+       BNE.S   L02B24
+       ADDQ.B  #1,$0024(A5)
+       CMPI.B  #$08,$0024(A5)
+       BGT.S   L02AF8
+L02B24 ADDA.W  D7,A5
+       MOVEQ   #$00,D1
+       MOVE.W  $0228(A5),D1
+       BEQ     L02BC4
+       TST.B   D2
+       BLE.S   L02B36
+       SF      D2
+L02B36 MOVE.B  D2,$00EF(A6)
+       TST.W   D1
+       BLT     L02C1C
+       LSL.L   #3,D1
+       MOVEA.L $0058(A6),A4
+       ADDA.L  D1,A4
+       MOVE.L  A4,-(A7)
+       LSL.L   #6,D1
+       LEA     $00(A6,D1.L),A1
+       BTST    #$02,(A4)
+       BNE.S   L02BA6
+       BTST    #$01,(A4)
+       BNE.S   L02B66
+       JSR     L0525C
+       BRA.S   L02B82
+       BRA.S   L02B6E
+
+
+L02B66 JSR     L05262
+       BRA.S   L02B7E
+
+
+L02B6E MOVEQ   #$03,D0
+       CLR.W   $0228(A5)
+       MOVEA.L $0004(A7),A1
+       SF      $0024(A1)
+       BRA.S   L02BB8
+
+L02B7E MOVEQ   #$07,D0
+       BRA.S   L02BB8
+
+
+L02B82 ADDQ.W  #4,A7
+L02B84 ADDA.W  #$0014,A7
+L02B88 MOVE.B  $0035(A6),D7
+       ORI.B   #$01,D7
+       ANDI.B  #$DF,D7
+       MOVE.B  D7,$0001(A3)
+       MOVE.B  $0035(A6),$0001(A3)
+       MOVEM.L (A7)+,D0-D6/A0-A4
+       BRA     L003B6
+
+
+L02BA6 TST.B   D2       * rewrite-block
+       BMI.S   L02B82
+       MOVE.W  $0028(A5),-(A7)
+       JSR     L051B0
+       ADDQ.W  #2,A7
+       MOVEQ   #$0B,D0
+L02BB8 MOVEQ   #-$10,D1
+       MOVEA.L (A7)+,A4
+       AND.B   (A4),D1
+       OR.B    D0,D1
+       MOVE.B  D1,(A4)
+       MOVEQ   #$05,D2
+L02BC4 TST.B   D2
+       BMI.S   L02C14
+       ADDQ.B  #1,D2
+       CMPI.B  #$08,D2
+       BLT.S   L02C14
+       MOVEQ   #$00,D2
+       MOVEQ   #$00,D0
+       MOVEA.L (A7),A5
+       LEA     $0228(A5),A5
+L02BDA TST.W   (A5)+
+       BNE.S   L02C14
+       ADDQ.B  #1,D0
+       BNE.S   L02BDA
+L02BE2 JSR     L02C50
+       MOVEQ   #$08,D1
+       LEA     $00F8(A6),A5
+L02BEE TST.B   -$01(A5,D1.W)
+       BNE.S   L02C08
+       SUBQ.B  #1,D1
+       BNE.S   L02BEE
+       CLR.B   $00EE(A6)
+       ANDI.B  #$DF,$0035(A6) * mdv inactif
+       JSR     L00452(PC)     * 8049 - routine
+       BRA.S   L02C18
+
+L02C08 MOVE.B  D1,$00EE(A6)   * check for other mdv waiting
+       JSR     L02C56
+       MOVEQ   #-$06,D2
+L02C14 MOVE.B  D2,$00EF(A6)
+L02C18 BRA     L02B84
+
+
+L02C1C LEA     $0028(A5),A1  * do sectorjob -2 = verify -1 = read
+       ADDQ.W  #1,D1
+       BNE.S   L02C3A
+       TST.B   D2
+       BMI     L02B84
+       MOVE.W  #$8000,-(A7)
+       JSR     L051B0
+       ADDQ.W  #2,A7
+       MOVEQ   #-$02,D1
+       BRA.S   L02C48
+
+L02C3A JSR     L05262  * verify sector
+       BRA.S   L02C46  * error
+       MOVEQ   #$00,D1
+       BRA.S   L02C48
+L02C46 MOVEQ   #-$01,D1
+L02C48 MOVE.W  D1,$0228(A5)
+       BRA     L02B84   * 
+
+
+L02C50 MOVEQ   #$02,D2  * stop mdv-motor
+       MOVEQ   #$07,D1
+       BRA.S   L02C5A
+
+L02C56 MOVEQ   #$03,D2 * transmit for mdv-motor control
+       SUBQ.W  #1,D1
+L02C5A MOVE.B  D2,(A3)
+       MOVEQ   #$39,D0
+       ROR.L   D0,D0
+       BCLR    #$01,D2  * 1 = go 0 = stop
+       MOVE.B  D2,(A3)
+       MOVEQ   #$39,D0
+       ROR.L   D0,D0
+       MOVEQ   #$02,D2
+       DBF     D1,L02C5A
+       RTS
+*** END MDV_SYS mdv_sys

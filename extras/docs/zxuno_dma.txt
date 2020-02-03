@@ -1,0 +1,99 @@
+The DMA engine can do these types of transfer:
+- Memory to memory (both using incrementing addresses)
+- Memory to I/O (memory address incrementing)
+- I/O to memory (memory address incrementing)
+- I/O to I/O
+I/O address is never changed during an I/O involved transfer.
+
+The DMA module sits side by side with the Z80 CPU, so it "sees" the very same memory map that the Z80 sees. This means that DMA cannot transfer from or to memory that is not currently paged into the CPU address space.
+
+It can operate in foreground, halting the main CPU during the transfer, or in the background, allowing the CPU to continue working (although a bit slower than usual).
+
+DMA transfers can be burst transfers, in which data are transferred as fast as possible, normally halting the CPU in between, or timed, in which data is retrieved and transferred at a specified rate, controlled by an onchip timer. This last option is best suited for audio streaming directly from memory to a capable digital audio device, such a Specdrum or Covox (both integrated into the ZX-UNO)
+
+Transfers can be retriggerable, or one shot. A retriggerable DMA transfer is the one that when it ends, it starts from the beginning again without software intervention. A one shot DMA transfer is that which ends and doesn't start over again unless software ditactes it so. Halting CPU transfers can be only one shot.
+
+It's possible to know, for a non CPU halting DMA transfer, if certain source or destination address has been reached.
+
+Currently, the DMA engine doesn't trigger any interrupt signal to the CPU.
+
+I recommend reading the source code of dmaplayw . An ESXDOS command that streams a WAV file from SD to the Specdrum (I/O port $DF) device using DMA.
+http://svn.zxuno.com/svn/zxuno/software/dma/dmaplayw
+
+From the software point of view, the DMA engine is commanded by a group of registers. These are addressed and operated using two I/O ports from the ZXI address space:
+$FC3B : register number to address
+$FD3B : read or write to last addressed register. Note that the high order byte of this address is one more than the high order byte of the register number.
+
+DMA register number to follow.
+DMACTRL             equ 0a0h
+DMASRC              equ 0a1h
+DMADST              equ 0a2h
+DMAPRE              equ 0a3h
+DMALEN              equ 0a4h
+DMAPROB             equ 0a5h
+DMASTAT             equ 0a6h
+
+Description of each register:
+
+DMASRC :
+Holds the source address in memory for a memory to memory transfer, or memory to I/O transfer.
+Holds the I/O source address for a I/O to memory transfer, or I/O to I/O transfer.
+16 bit R/W register (it needs two reads or two writes to transfer a 16 bit value from/to this register).
+During and after a transfer, this register is not changed.
+Example:
+;Send 16 bit memory address in HL to DMASRC
+ld bc,$FC3B  ;select register number
+ld a,DMASRC  ;select DMASRC
+out (c),a    ;do it
+inc b        ;select register read/write
+out (c),l    ;send LSB
+out (c),h    ;send MSB
+;Read it back into DE
+in e,(c)     ;read LSB
+in d,(c)     ;read MSB
+
+DMADST :
+Holds the destination address in memory for a memory to memory transfer, or memory to I/O transfer.
+Holds the I/O destination address for a I/O to memory transfer, or I/O to I/O transfer.
+16 bit R/W register (it needs two reads or two writes to transfer a 16 bit value from/to this register).
+Example (see the DMASRC example)
+During and after a transfer, this register is not changed.
+
+DMALEN :
+Holds the transfer byte length. 0 means 65536 bytes to transfer (need to check this though)
+16 bit R/W register (it needs two reads or two writes to transfer a 16 bit value from/to this register).
+Example (see the DMASRC example)
+After a transfer, this register is not changed.
+
+DMAPRE :
+Holds a 16 bit preescaler value, which is used to determine the frequency rate for a timed transfer. The actual rate is determined by this formula:
+Transfers per second = 28000000 / preescaler_value (for memory to memory transfers)
+Transfers per second = 3500000 / preescaler_value (for transfers involving some sort of I/O address)
+16 bit R/W register (it needs two reads or two writes to transfer a 16 bit value from/to this register).
+Example (see the DMASRC example)
+During and after a transfer, this register is not changed.
+
+DMAPROB :
+Holds a 16 bit value which identifies a memory address involved in a DMA transfer (it can be a source or destination address). When the DMA reads from (if configured as a source address) or writes to (if configured as a destination address) this memory address, bit 7 of DMASTAT is set.
+16 bit R/W register (it needs two reads or two writes to transfer a 16 bit value from/to this register).
+Example (see the DMASRC example)
+During and after a transfer, this register is not changed.
+
+DMASTAT :
+8 bit status register. Currently, it uses only bit 7.
+Bit 7: set to 1 when DMAPROB address has been reached. It automatically reset to 0 after reading this register.
+8 bit, read only.
+
+DMACTRL :
+8 bit control register. Read/write. Reading it will give you the last written value. A DMA transfer is initiated from the "stop" condition, by writting any value other than 00 into the MODE bits. Stopping and initiating again a DMA transfer doesn't resume it. It starts from the beginning.
+The bitfield description is this:
+MODE : bits 1 and 0.
+ 00 = DMA is stopped. The software can stop a timed DMA at any time writting 00 to these bits.
+ 01 = burst DMA transfer. CPU is halted during the transfer. One shot.
+ 10 = timed DMA transfer. One shot.
+ 11 = timed DMA transfer, retriggerable.
+DST : bit 2. 0 = destination address is memory. 1 = destination address is I/O
+SRC : bit 3. 0 = source address is memory. 1 = source address is I/O
+PROB: bit 4. 0 = address in DMAPROB is related to source (read) memory address. 1 = address in DMAPROB is related to destination (write) memory address.
+Bits 5 to 7: Reserved. Written and read as 0.
+---------------------------------------------------------------------------

@@ -1,0 +1,163 @@
+BASIC Installer
+===============
+
+(c) Garry Lancaster, 2000
+
+
+Introduction
+------------
+Installer is a utility that allows you to run proper Z88 applications 
+and popdowns without having to go through the tedious process of 
+blowing them to EPROMs. Instead, it uses free space found in your Z88's 
+RAM to hold the applications, where they can be run exactly as if they 
+were on a ROM card.
+
+BASIC Installer is a cut-down version of the full "Installer" popdown
+provided on the Z88 Forever! compilation ROM. It performs some of the
+basic functions of Installer, and is intended for those people who don't
+have any EPROM cards at all, and so cannot use the full version.
+
+There are several limitations to this version, however. Firstly, there is
+no support for packages or other Z88 enhancements, so applications which
+require this will not be able to run (at the time of release, however,
+there are no such applications yet available!)
+
+Secondly, since Bootstrap is not provided with this version, if you
+perform a soft reset for any reason, any installed applications will be
+vulnerable to being overwritten by the operating system. Therefore, after
+a soft reset you should always uninstall all the applications you have
+previously loaded.
+
+
+Installing the Z88 Forever! compilation
+---------------------------------------
+A version of the "Z88 Forever!" compilation which includes the full
+versions of Installer and Bootstrap is now available. You can install this
+card using BASIC Installer, and then use the full version of Installer in
+future.
+
+Doing this will allow you to run applications that use the new
+operating system features included with Installer. However, once you have
+installed this particular card, you WILL NOT BE ABLE TO UNINSTALL IT
+AGAIN, so you should be sure that you have a lot of free RAM (the "Z88
+Forever!" compilation takes up 32K that you won't be able to get back
+again). The only way to uninstall this card is to backup all your files
+and then do a HARD RESET on your Z88...
+
+
+Installing an application
+-------------------------
+Applications which can be installed by the BASIC Installer are 
+supplied in two or more files, depending on the amount of free space 
+they require.
+
+The main application information file has an extension of .APP, and the 
+files containing the application itself have extensions from .AP0 up to
+a maximum of .AP7 (16K applications have only a .AP0 file, while 32K 
+applications have both an .AP0 and .AP1 file, etc).
+
+To install an application, choose option 1 and type in the name of the
+application file (without the .APP extension).  
+
+If you now look in the Index, you will see the application in the list, 
+and can start it by pressing ENTER in the usual way. There will 
+probably be no key listed by it - this is because the Z88 only 
+re-creates its hotkey list when a card is changed.
+
+You can install as many applications as you like, provided you have 
+enough free 16K banks in your RAM devices. If you have enough free space
+in total to install  an application, but not enough completely free banks,
+you will probably have to close some applications and delete some files
+until space is available in the right places.
+
+Please note that no applications can be installed in the internal 
+:RAM.0 memory (even if you have 128K or 512K available there). This is 
+because the Z88 only checks slots 1-3 for applications.
+
+
+Reserving banks for use with applications
+-----------------------------------------
+If you want to install a large number of applications in RAM, or if you 
+have limited available RAM (perhaps only a 128K card), you will 
+probably often find that although you have enough space in total to 
+install an application, you do not have any totally free banks. To 
+overcome this problem, BASIC Installer includes a menu option to reserve 
+banks for use with applications before you transfer the files to the 
+Z88.
+
+It is most effective to use this option just after a hard reset, when 
+the maximum free space is available. Simply choose option 3 and select the
+number of banks that you will require for your applications, and they will
+be reserved for application use. You can do this as many times as you like.
+
+It is now possible to transfer the application files and install them 
+in the usual way. During installation, reserved banks are used up first 
+before other free banks are sought. Note that if an error occurs during 
+installation, or when you uninstall the application, banks are not 
+reserved again; you must choose the reserve banks option again.
+
+
+Freeing reserved banks
+----------------------
+If you wish to release reserved banks back to the general Z88 memory, 
+use option 4.
+
+
+Uninstalling an application
+---------------------------
+To remove an application and reclaim the memory it uses, choose option 2
+and type in the application name.
+
+The program will not allow you to uninstall an application if there are 
+any applications active in the same slot. This is a safety feature,
+designed to prevent some nasty crashes! To be able to uninstall an 
+application, first KILL off any applications using the same slot in the 
+Index.
+
+
+Uninstalling all RAM applications
+---------------------------------
+If you accidentally delete an .APU file, the Installer program has no 
+way of knowing how to uninstall a particular application. In this case, 
+you can choose to uninstall every RAM application at the same time.
+
+To do this, simply choose option 5, which will attempt to remove all
+installed applications in the Z88. Only slots containing no active 
+applications or packages will be purged.
+
+
+Error messages
+--------------
+It is possible for various errors to occur when installing and 
+uninstalling applications. The most common errors are:
+
+Already Exists
+	The application is already installed (an .APU file was found)
+No Room
+	Not enough free 16K banks could be found for installation
+File Not Found
+	One of the installation files is missing
+End Of File
+	One of the installation files is invalid
+Cannot Satisfy Request
+	Could not find a valid application to uninstall; or application
+	or package was active in same slot
+
+
+Obtaining installable RAM applications
+--------------------------------------
+Most of the application ROMs on the Z88 Forever! website are now 
+available in RAM-installable format.
+
+Z88 software developers can also obtain a kit containing details of the 
+application file format, and a tool for creating .APP files quickly and 
+easily.
+
+
+Comments
+--------
+If you encounter any problems using BASIC Installer, or have any other 
+comments or suggestions to make, please contact me via the Z88 Forever!
+website.
+
+Garry Lancaster, 13th March 2000

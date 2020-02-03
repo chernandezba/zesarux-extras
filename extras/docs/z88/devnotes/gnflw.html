@@ -1,0 +1,52 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Flw, write character to filter</font></b>
+<p><tt>RST 20H, DEFW $2609</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = filter handle
+&nbsp;&nbsp;&nbsp;&nbsp; A = character to write to filter</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; A = A(in)</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad filter handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_FLF ($0A), filter is full</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different
+</pre>
+Notes:
+<p>Bugs:
+<br>&nbsp;
+<p>Related calls:
+<blockquote><a href='gnflc.html'>GN_Flc</a>, close filter
+<br><a href='gnflf.html'>GN_Flf</a>, flush filter
+<br><a href='gnflo.html'>GN_Flo</a>, open filter
+<br><a href='gnflr.html'>GN_Flr</a>, read from filter
+<br><a href='gnfpb.html'>GN_Fpb</a>, push back into filter</blockquote>
+
+</body>
+</html>

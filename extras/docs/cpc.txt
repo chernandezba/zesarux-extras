@@ -1,0 +1,16 @@
+Info Amstrad CPC
+
+Amstrad cpc, pcw
+http://www.irespa.eu/daan/lib/howtoCPCemu.htm
+464 simple de memoria
+http://www.cpcwiki.eu/index.php/Gate_Array
+http://www.cpcwiki.eu/index.php/CRTC
+http://www.cpcwiki.eu/index.php/Technical_documentation
+http://www.cpcmania.com/Docs/Programming/Painting_pixels_introduction_to_video_memory.htm
+
+http://www.cpcwiki.eu/index.php/Programming:Keyboard_scanning
+http://www.cpc-power.com/cpcarchives/index.php?page=articles&num=46
+http://www.irespa.eu/daan/lib/howtoCPCemu.htm
+
+
+

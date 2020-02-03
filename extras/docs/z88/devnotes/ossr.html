@@ -1,0 +1,167 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Sr, save &amp; restore operations</font></b>
+<p><tt>RST 20H, DEFB $6C</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = reason code:
+&nbsp;&nbsp;&nbsp;&nbsp; SR_SUS ($01)&nbsp;&nbsp; Save user screen
+&nbsp;&nbsp;&nbsp;&nbsp; SR_WPD ($03)&nbsp;&nbsp; Write parameter data (mailbox)
+&nbsp;&nbsp;&nbsp;&nbsp; SR_RPD ($04)&nbsp;&nbsp; Read parameter data (mailbox)
+&nbsp;&nbsp;&nbsp;&nbsp; SR_FUS ($05)&nbsp;&nbsp; Free user screen
+&nbsp;&nbsp;&nbsp;&nbsp; SR_CRM ($06)&nbsp;&nbsp; Remove card (not implemented)
+&nbsp;&nbsp;&nbsp;&nbsp; SR_CIN ($07)&nbsp;&nbsp; Insert card (not implemented)
+&nbsp;&nbsp;&nbsp;&nbsp; SR_PWT ($08)&nbsp;&nbsp; Page wait
+&nbsp;&nbsp;&nbsp;&nbsp; SR_RND ($09)&nbsp;&nbsp; Occasionally a random number (system use)
+
+&nbsp;&nbsp;&nbsp;&nbsp; BC, DE, HL, IX = arguments</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; returned values depend on A(in)</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_UNK ($03), unknown request
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad arguments
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ROOM ($07), no room
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ESC ($01), with SR_PWT
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_SUSP ($69), with SR_PWT
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_DRAW ($66), with SR_PWT
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_QUIT ($67), with SR_PWT
+
+</pre>
+<b>SR_SUS (A = $01), save user screen</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+OUT, if call succeeded:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = handle of saved screen</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = return code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), not sufficiently room for screen in memory.</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different
+
+</pre>
+<b>SR_RUS (A = $02), restore user screen</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = handle of previously saved screen image</pre>
+OUT, if call succeeded:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = 0</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = return code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), screen handle was not valid</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different
+</pre>
+<b>SR_FUS (A = $05), free user screen (not restoring screen image)</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = handle of previously saved screen image</pre>
+OUT, if call succeeded:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = 0</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = return code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), screen handle was not valid</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different
+
+</pre>
+<b>SR_PWT (A = $08), page wait</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+OUT, if call succeeded:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; A = &lt;BACKSPACE> ($08)</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = return code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ESC ($01), escape condition detected
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_SUSP ($69), process suspended or machine revived
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_DRAW ($66), process suspended or screen corrupted
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_QUIT ($67), KILL request</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different</pre>
+Notes:
+<blockquote>Although an <a href='osin.html'>OS_In</a> alike call is made that returns the proper
+return codes on pre-emption error codes, successful keyboard output is
+always &lt;BACKSPACE>.</blockquote>
+
+<pre></pre>
+<b>SR_RND (A = $09), random number</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+Out:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; DEBC = random number</pre>
+Notes:
+<blockquote>The return value (random number) only changes when certain
+operating system functions occur in between calls to OS_Sr. Repeated fetching
+a random number may well result in the same value being returned!<br>
+<br>
+<BR></blockquote>
+<b>SR_WPD ($03)&nbsp;&nbsp; Write parameter data (mailbox)<br>
+<br>
+</b>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; DE = name of information type (null-terminated)
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 0, clear mailbox
+&nbsp;&nbsp;&nbsp;&nbsp; BHL = extended pointer to information
+&nbsp;&nbsp;&nbsp;&nbsp; C = length of information</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0, successfull</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different</pre>
+Notes:
+<blockquote>Mailboxing functionality is explained in detail in "Application
+Static Structures".
+<br>&nbsp;</blockquote>
+<b>SR_RPD ($04)&nbsp;&nbsp; Read parameter data (mailbox)</b><b></b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; DE = name of information type (null-terminated)
+&nbsp;&nbsp;&nbsp;&nbsp; BHL = extended pointer to buffer for information read
+&nbsp;&nbsp;&nbsp;&nbsp; C = maximum size of buffer</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; C = actual data size</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; A = return code
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_FAIL ($16), information type is not present</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.B.DEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; .F.C..../.... different</pre>
+Notes:
+<blockquote>Mailboxing functionality is explained in detail in "Application
+Static Structures".</blockquote>
+
+</body>
+</html>

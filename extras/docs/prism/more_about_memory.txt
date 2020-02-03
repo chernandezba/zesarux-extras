@@ -1,0 +1,17 @@
+On the dev Prism, having only 512K of SRAM means that the DOCK, EX and DivMMC RAM is shared with the upper 256K.  There's also 4x8K pages of video RAM (which we'll name VRAM0 to VRAM3)
+
+We split the 512K into 8K blocks, (which we'll name SRAM0 to SRAM63) which are paged into 0xC000 in pairs by port 7FFD - if bits 7,6,2,1,0 = "00000" then SRAM0 is paged in at 0xC000 and SRAM1 is paged in at 0xE000. If bits 76210="00110" then SRAM12 is paged in at 0xC000 and SRAM13 is paged in at 0xE000 and so on. The only exceptions to this is "00101" where VRAM0 is paged in at 0xC000 and VRAM1 is paged in at 0xE000, and "00111" where VRAM2 and VRAM3 are paged in.
+
+This means that there are 4 pages of SRAM (pages SRAM10, SRAM11, SRAM14 and SRAM15) which can't be paged in at 0xC000/0xE000 ... SRAM15 is used in the Multiface implementation. When the VRAM aperture is 6K (the default) then VRAM0 is paged in between 0x4000 and 0x5AFF, SRAM11 is paged in at 0x6000 and the last 4FF bytes of SRAM10 is paged in between 0x5B00 and 0x5FF 
+
+OK, now we've go that out of the way...
+
+As mentioned right at the beginning of this blob of text, the higher 256K of the SRAM (SRAM32 to SRAM63)  can be paged in at 0xC000/0xE000 in pairs, but is also available as DOCK, EX or DivMMC RAM as well:
+
+SRAM32 to SRAM39 is also used as DOCK0 to DOCK7
+SRAM40 to SRAM47 is also used as EX0 to EX7
+SRAM48 to SRAM63 is also used as DivMMC memory pages 0-15
+
+There's nothing stopping you from using DOCK0 at 0x0000 whilst also having SRAM32 at 0xC000 (and SRAM33 would be at 0xE000 of course) 
+
+As I said to César, the "RAM Mirroring" or whatever you want to call that is implemented on the dev Prism because I only had 512K available and I wanted to implement both the 512 Pentagon (or is it Scorpion?) memory paging method AND the Chloe/SE/Timex sideways RAM paging AND a 128K DivMMC so I could (try to...) get DivMMC working with esxDOS. A "production" (or later prototype) Prism with more on-board SRAM may not operate in the same way - it would make more sense to keep the different banks of memory exclusive... so it's probably best not to rely on the "mirroring" effect... but it's there and a potential limitation/feature  

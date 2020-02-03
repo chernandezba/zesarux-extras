@@ -1,0 +1,42 @@
+I'm thinking on emulate the flash cards on my emulator, so tell me if the following is correct:
+1. Intel flash card were the first built. Amd and amic came after Intel card. I may only emulate Intel flash cards, amd and amic are not necessary
+
+Ans:
+Not correct. Intel flash needs vpp pin on slot 3 hardware. Amd does not need vpp and can therefore be erased and programmed in all slots.
+
+27x is 1st generation (UV)
+28x is 2nd generation, electrical erase and write via vpp pin
+29x is 3rd generation, erase and write via  command mode.
+
+
+2. Command operations on the flash card are executed by writing on the flash cards. For example, to program (write a value on memory) I have to write a 40h on the address I want to modify, then write the value to the same address 
+
+Ans:
+Intel command mode us via vpp and certain commands sent an read via databus.
+Amd is pure read array mode or command mode.
+
+3. If there is no command operation in progress (readarraymode variable on ozvm), a read operation on flash memory returns the value of the memory address being read. Otherwise, the read value depends on the command being executed
+
+Ans:
+Yes.
+
+4. As my emulator only handles eprom writing on slot 3 (but reading EPROMs can be done in any slot), and it's a bit difficult for me to change writing operations to support any slot number, I will first only support flash commands when inserted on slot 3. In slot 1 or 2 it will work as a Rom card
+
+Ans:
+Then only support Intel flash in slot 3 to begin with. Know this: An Intel flash ID can be polled in any slot with command sequence.
+
+5. Oz rom distinguishes an eprom or a flash card if the read identifier command returns some known manufacturer code: Intel, amd or amic. If another identifier code is read, it assumes it's an eprom 
+
+Ans:
+Yes. 
+
+6. Erasing operations are made on 64kb blocks
+
+Ans:
+Yes. They are called sectors by Intel and AMD. One AMD variation exists that has 16K sectors.. But disregard that. only two cards exists for the Z88
+
+7. As I read on the pdf, a read identifier command can be executed on any 64kb block. But what is the difference on doing it on the first or the second 64kb block? The manufacturer code, for example, will be the same...
+
+Ans:
+Yes In any address space, both card types, Intel and AMD.
+

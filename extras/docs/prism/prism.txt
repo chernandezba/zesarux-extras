@@ -1,0 +1,205 @@
+
+---
+
+with prism anyway... all unused ports return floating bus except 2ffd and 3ffd which always return 255 
+----
+
+
+Prism timings:
+
+OK I'm now home and have the VHDL in front of me so I can give you accurate details.
+
+The video pixel clock base is around 25MHz  (25.5MHz on Prism as it was as close as I could get. my monitor seems happy with it)
+
+There are 794 pixels per line, 525 lines just as you calculated.
+
+Prism's video circuit displays the video followed by the syncs/blanking
+
+
+Top border is from line 0 to line 47:
+    Pixels 0 to 639 are border
+    Pixels 640 to 794 are blanking (no RGB output)
+    Pixels 656 to 750 are HSYNC  (no RGB output)
+    Pixels 751 to 793 are blanking (no RGB output)
+
+Then video lines:
+    Left border is from pixel 0 to 65
+    then 512 pixels of screen
+    Right border starts at pixel 578 to pixel 639
+    Pixels 640 to 794 are blanking (no RGB output)
+    Pixels 656 to 750 are HSYNC
+    Pixels 751 to 793 are blanking (no RGB output)
+
+Then bottom border lines from line 432 to 479
+    Pixels 0 to 639 are border
+    Pixels 640 to 794 are blanking (no RGB output)
+    Pixels 656 to 750 are HSYNC 
+    Pixels 751 to 793 are blanking (no RGB output)
+
+Then blanking + Vsync:
+  lines 480 to 490 are blanking (no RGB output but Pixels 656 to 750 are HSYNC) 
+  lines 491 and 492 are vsync  and Pixels 656 to 750 are HSYNC 
+  lines 493 to 524 are blanking (no RGB output but Pixels 656 to 750 are HSYNC)
+
+
+(yes, left border's 2 pixels wider than expected and right border's 2 pixels shorter; mainly for legacy reasons now - but would need me to re-do a load of the video circuit to fix it, so it's going to stay this way for now and I don't really see much point in changing it to be honest!)
+ 
+That's how it's done in Prism's video (and how all the example VGA modules I referenced did it too). 
+For the emulator you may need to shift that logic around a little so that the frame starts at the vsync and the line starts with the hsync of course.
+
+
+
+----------
+
+modos video:
+
+Tamaño ventana prism
+
+Quizá modo 0 prism video se puede usar ventana normal spectrum, para normal, ulaplus, timex etc. Y luego otros modos ya crean ventana de 640...
+
+
+One quick question,
+
+On prism mode 0 is allowed timex modes? Like 512x192 monochrome?
+
+
+
+J: Yes, the timex screen modes are there
+
+So, to set timex mode 512x192, you have to set first prism mode 0, then set desired timex mode using ports f4/ff as usual, right?
+
+
+
+J: No, you don't need to set any particular mode in Prism - if you select a timex mode or a ULAplus mode, it switches to it.
+
+Ah
+
+
+
+J: You get the Prism mode when Timex mode is 0
+
+Ok
+
+
+
+
+
+
+
+Another one,
+
+In spectrum you have 310 scanlines,
+
+
+
+J: Same with ULAplus - you get the ULAplus colours when ULAplus mode 1 is enabled... If you then enable Radastan mode/mode 5/7/9 it takes over
+
+Every scanline a line is drawn on the screen
+
+In prism mode 512x384 you have 384 + border lines height
+
+So... How many scanlines you have in every mode?
+
+
+
+It's 800x600 VGA
+
+when using 256x192 res, then each line is doubled
+
+as is every pixel
+
+So 600 scanlines?
+
+
+
+I'll have to look in the code
+
+600 lines of picture (border+screen)
+
+I mean, in mode 384 pixels height, you have 216 pixels extra for the border?
+
+
+
+I'm certain... I'll have to look in the code  though.. I might have gone 640x480
+
+that makes more sense, thinking about it
+
+sorry - I did that bit over a year ago!
+
+Ok. I need to decide the window size, 800x600 or 640x480 for example
+
+
+
+Yep, I'm looking now
+
+Having a window fixed size, and then i draw all the different modes inside this window
+
+Doubling pixels in widht or height if needed
+
+The same I use on amstrad cpc... I set 640x400 and all the modes are inside the same window
+
+(Plus border)
+
+Thanks
+
+I wait 
+
+
+
+794 columns, 525 rows
+
+it's a 640x480 visible area
+
+Great. So I can say that prism has 480 scanlines?
+
+
+
+the additional rows/coloumns are vsync/hsync/blanking
+
+I'm think gin on hires colour demos, like overscan on spectrum, which is very important the timing and scanlines...
+
+
+
+yes 480 scanlines
+
+
+
+Quizá son 525 scanlines pero solo se ven 480
+
+Great
+
+
+
+spectrum demos that need accurate timing for border/rainbow effects don't work on prism
+
+(obviously!)
+
+Yes, I see
+
+
+
+as the VGA timing is so different to PAL
+
+
+
+So we need overscan demos for prism 
+
+Having the same frequency as spectrum, 3.5... MHz,
+
+With 480 scanlines,
+
+
+
+I'd love to see some prism specific software - I'm so busy working on the prototype I've not had time to sit down and write anything (let alone re-learn Z80)
+
+Gives approx 145 t-states per scanline
+
+
+
+what about 56MHz? 
+
+
+
+----------------
+
+

@@ -1,0 +1,66 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+  <td align="center" valign="bottom" width="80%">&nbsp;</td>
+  <td align="right" valign="bottom" width="10%"><a
+  href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+</table>
+
+<hr>
+
+<p><font size="4"><b>DC_Bye, exit current process</b></font> </p>
+
+<p><tt>RST 20H, DEFW $080C</tt> </p>
+
+<p>IN:&nbsp; </p>
+
+<blockquote>
+ <pre>A = return code&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp; Use RC_OK for a standard exit
+</pre>
+</blockquote>
+
+<p>OUT: -</p>
+
+<p>Notes:&nbsp; </p>
+
+<blockquote>
+ <p>Internal operating system usage.<br>
+ Does not return to caller.<br>
+ Applications use <a href="osbye.html">OS_Bye</a> to kill
+ itself.</p>
+</blockquote>
+
+<p>Bugs: -</p>
+
+<p>Related system calls: </p>
+
+<blockquote>
+ <p><a href="ospoll.html">OS_Poll</a>, poll for an application <br>
+ <a href="dcpol.html">DC_Pol</a>, poll for card usage <br>
+ <a href="osstk.html">OS_Stk</a>, stack the current process
+ (application) <br>
+ <a href="osent.html">OS_Ent</a>, enter an application <br>
+ <a href="dcent.html">DC_Ent</a>, enter process <br>
+ <a href="dcnam.html">DC_Nam</a>, name current application <br>
+ <a href="osexit.html">OS_Exit</a>, exit an application <br>
+ <a href="osbye.html">OS_Bye</a>, exit application <br>
+ <a href="osuse.html">OS_Use</a>, process card usage<br>
+ <a href="dcalt.html">DC_Alt</a>, pass an alternative character</p>
+</blockquote>
+</body>
+</html>

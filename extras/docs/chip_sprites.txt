@@ -1,0 +1,21 @@
+-Chip gestion sprites:
+*overlay de sprites en pantalla. modo standard, modos ulaplus
+*scroll en todas las direcciones, de pantalla completa o solo una seccion. hacer que cada movimiento de byte ocupe 2T estados
+
+
+-scroll. 1 byte por cada 2 T estados
+-overlay sprites. Límite máximo? Dibujarlo al final de cada frame entero? O dibujar cada scanline?
+
+Nombre: zgx
+
+Chip sprites podría ser fácil de implementar teniendo:
+-formato común independientemente de que modo de video este: estandard, ulaplus, spectra... Podría ser modo monocromo?
+O quizá códigos de colores comunes. También tener en cuenta un código de color que indique transparente 
+Quizá 16 colores por pixel independiente? Colores estándar, eso facilitaría la portabilidad a otros sistemas. Color 8 indicaría transparente 
+Así con cada byte de memoria del sprite se podría indicar dos pixeles 
+Quizá un modo monocromo también, pero entonces habría que tener otra zona del sprite para indicar zonas transparentes/mascara
+
+
+-al mostrar sprite solo tiene que hacer putpixel en pantalla con un color concreto (mejor dicho, meterlo en buffer rainbow) y dicho color puede estar en el rango estandard, rango ulaplus o rango spectra
+
+Otro tema diferente serán los scrolls de pantalla y quizá movimiento de zonas de pantalla, porque para eso si que depende el modo de video activo...

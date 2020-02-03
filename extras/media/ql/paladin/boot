@@ -1,0 +1,38 @@
+10 start=RESPR(6000)
+20 LBYTES mdv1_paladin_cde,start
+40 MODE 8
+50 OPEN#5,scr_512x256a0x0
+55 CLS #5
+60 r = 41
+70 CSIZE #5,2,0
+80 AT #5,23,0
+90 PRINT #5,"    S. Hollywood. and I. G. Williams."
+100 CSIZE #5,3,1
+110 CURSOR #5,190,190:a$="Paladin"
+120 FLASH #5,1
+130 FOR a = 1 TO 7
+140   INK #5,a
+150   PRINT #5,a$(a);
+160 NEXT a
+170 FLASH #5,0
+180 INK #5,2
+190 CIRCLE #5,70,50,r,.2,RAD(45)
+200 INK #5,4
+210 CIRCLE #5,70,50,r,.2,RAD(135)
+220 INK #5,7
+230 CIRCLE #5,70,50,r,.25,RAD(90)
+240 CURSOR #5,115,118
+250 a$ = "Arrakis Software"
+260 b = 0
+270 CURSOR #5,115,118
+280 FOR a = 1 TO LEN(a$)
+290   c = ((a+b) && 7)
+300   IF c = 0 THEN b = b + 1 : GO TO 290
+310   INK #5,c
+320   PRINT #5,a$(a);
+330 NEXT a
+340 b = b + 1
+350 IF INKEY$(0) = "" THEN GO TO 270
+351 CLOSE #5
+352 MODE 0
+360 CALL start

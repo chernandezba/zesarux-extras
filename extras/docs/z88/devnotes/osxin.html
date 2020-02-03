@@ -1,0 +1,57 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+   <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Xin, examine input</font></b>
+<p><tt>RST 20H, DEFB $30</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = stream handle</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0, input MAY BE available</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_EOF ($09), <a href='osin.html'>OS_In</a> will not return immediately if called
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad handle</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different
+</pre>
+Notes:
+<blockquote>The function of this call is not so much to tell you when input
+is available, but rather to indicate when it definitely is not. The call
+might be useful to examine if <a href='osin.html'>OS_In</a> is going to return a pre-emption error
+like RC_SUSP or RC_QUIT. Possible reasons are:<br>
+<BR>
+<br>pending character<br>
+exception code (e.g. RC_SUSP due to machine reviving)<br>
+input available<br>
+<BR></blockquote>
+Bugs:
+<br>&nbsp;
+<p>Related calls:
+<blockquote><a href='gnsip.html'>GN_Sip</a>, system input line routine
+<br><a href='osin.html'>OS_In</a>, read (wait for) character from standard input
+<br><a href='ospur.html'>OS_Pur</a>, purge keyboard buffer
+<br><a href='ostin.html'>OS_Tin</a>, read character from standard input, with timeout</blockquote>
+
+</body>
+</html>

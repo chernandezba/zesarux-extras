@@ -1,0 +1,76 @@
+﻿<html>
+	<head>
+		<title>ZX Spectrum ROM checksums</title>
+		<link href="/style.css" rel="stylesheet" type="text/css">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+			table {margin:1em; }
+			td, th {padding: 0.1em 1em 0.1em 1em; }
+			td:nth-child(1) {text-align:center; font-family:monospace; font-size:1.2em; }
+		</style>
+	</head>
+
+	<body>
+		<div id="container">
+			<div id="header">
+				<H1 class="title">ZX Spectrum ROM checksums</H1>
+			</div>
+			<div id="content">
+				<H4>This page is mainly intended to provide information to users of my ROM checksum utility. For a more detailed list of Spectrum ROMs and their checksums see the <a href="http://faqwiki.zxnet.co.uk/wiki/ROM_images">FAQ wiki</a>.</H4>
+				
+				<H3 id="checksum_utility">ROM checksum utility</H3>
+				<p>This program is designed to detect the paging architechture of the ZX Spectrum or clone that it is running on, and generate CRC32 checksums of the ROMs. The current version can recognise all the official Sinclair and Amstrad made ZX Spectrum computers. The TC/TS2068 is not yet supported.<br>Currently no attempt is made to detect any clone machines so they will be detected incorrectly as the Spectrum model their paging model resembles. Unfortunately the paging routines may cause a crash if the clone's paging architecture differs too much from the Spectrum.</p>
+				<p>The current version is v0.3 and can be <a href="checksumrom.tap">downloaded as a .tap file here</a>.</p>
+				<p>The program will autorun and generate CRC32 checksums for each 16kB page of the ROM. The program compares these against an internal list of checksums and prints the sum followed by either "Recognised" or "Un-Recognised".</p>
+				<p>To reduce the size of the program and hence the loading time, only the checksums themselves are stored. The list also only includes checksums for a subset of known ROMs as there are too many different versions of unofficial and clone ROMs for it to be practical to include them all (see <a href="#unrecognised_roms">Unrecognised ROMs</a> below).</p>
+				
+				<H3 id="recognised_roms">The Recognised ROMs</H3>
+				<p>The table below contains all of the checksums that the tool currently (v0.3) recognises, sorted alphanumerically, with a description of that ROM:</p>
+				<table>
+					<tr><th>Checksum</th><th style="width:100%">ROM Description</th></tr>
+					<tr><td>04448eaa</td><td>English +2A/+3 v4.0 ROM 3 (48K BASIC)</td></tr>
+					<tr><td>124ad9e0</td><td>Pentagon 128 ROM 0</td></tr>
+					<tr><td>17373da2</td><td>English +2A/+3 v4.0 ROM 0 (128K editor)</td></tr>
+					<tr><td>1f86147a</td><td>Spanish +2B/+3B v4.1 ROM 0 (128K editor)</td></tr>
+					<tr><td>30c9f490</td><td>English +2B/+3B v4.1 ROM 0 (128K editor)</td></tr>
+					<tr><td>3dbf351d</td><td>English +2A/+3 v4.0 ROM 2 (+3DOS)</td></tr>
+					<tr><td>41981d4b</td><td>Spanish +2 ROM 1 (48K BASIC)</td></tr>
+					<tr><td>453d86b2</td><td>Spanish 128 ROM 0 (128K editor and menu)</td></tr>
+					<tr><td>5b283177</td><td>Spanish +2A/+3 v4.0 ROM 0 (128K editor)</td></tr>
+					<tr><td>5d2e8c66</td><td>English +2 (grey) ROM 0 (128K editor and menu)</td></tr>
+					<tr><td>5ecf2e13</td><td>Revised Spanish 128 ROM0 (128K editor and menu)</td></tr>
+					<tr><td>6010e796</td><td>Spanish 128 ROM 1 (48K BASIC)</td></tr>
+					<tr><td>67c11fb9</td><td>Spanish +2A/+3 V4.0 ROM 3 (48K BASIC)</td></tr>
+					<tr><td>8ff7a4d1</td><td>48K ROM of Investrónica Inves Spectrum +</td></tr>
+					<tr><td>98b1320b</td><td>English +2 ROM 1 (48K BASIC)</td>
+					<tr><td>a7916b3f</td><td>English +2B/+3B v4.1 ROM 1 (128K syntax checker)</td></tr>
+					<tr><td>a8a41da5</td><td>48K ROM for Nordic countries by Beckman Innovation AB</td></tr>
+					<tr><td>a8ac4966</td><td>Spanish +2B/+3B v4.1 ROM 1 (128K syntax checker)</td></tr>
+					<tr><td>b88fd6e3</td><td>English +2B/+3B v4.1 ROM 3 (48K BASIC)</td></tr>
+					<tr><td>b96a36be</td><td>English 128 ROM 1 (48K BASIC) </td></tr>
+					<tr><td>c684c535</td><td>French +2 ROM 0 (128K editor and menu)</td></tr>
+					<tr><td>c9a0b748</td><td>English +2B/+3B v4.1 ROM 2 (+3DOS)</td></tr>
+					<tr><td>d1e6c2d1</td><td>Spanish +2A/+3 v4.0 ROM 1 (128K syntax checker)</td></tr>
+					<tr><td>ddee531f</td><td>ZX Spectrum ROM for 16K and 48K models</td></tr>
+					<tr><td>e76799d2</td><td>English 128 ROM 0 (128K editor and menu) </td></tr>
+					<tr><td>e807d06e</td><td>Spanish +2 ROM 0 (128K editor and menu)</td></tr>
+					<tr><td>f051746e</td><td>Spanish 48K ROM (with "FUERA DE PANTALLA" message)</td></tr>
+					<tr><td>f1b5fa67</td><td>TC2048 ROM</td></tr>
+					<tr><td>f1d1d99e</td><td>English +2A/+3 v4.0 ROM 1 (128K syntax checker)</td></tr>
+					<tr><td>f1d5c1d3</td><td>Spanish +2A/+3 v4.0 ROM 2 (+3DOS)</td></tr>
+					<tr><td>f5e509c5</td><td>French +2 ROM 1 (48K BASIC)</td></tr>
+					<tr><td>f6bb0296</td><td>Spanish +2B/+3B v4.1 ROM 2 (+3DOS)</td></tr>
+					<tr><td>f6d25389</td><td>Spanish +2B/+3B v4.1 ROM 3 (48K BASIC)</td></tr>
+				</table>
+			
+			<H3 id="unrecognised_roms">Unrecognised ROMs</H3>
+			<p>The checksum utility shows any ROM which is not in the list above as "Un-Recognised". This doesn't mean that the ROM is unknown however. A list of known ROMs which are <em>not</em> recognised by the utility is available on <a href="unrecognised.html">a separate page</a></p>
+			<p>If you have run the checksum utility on your Spectrum or Spectrum clone and recieved a checksum which is not on either of these lists then <a href="mailto://roms@zxnet.co.uk">please send me the details</a> as it may be a completely unknown and undocumented ROM.</p>
+			</div>
+			<div id="footer">
+				<P class="centred"><a href="/spectrum">ZX Spectrum Index</a></P>
+				<P class="centred"><a href="/">Return to Index Page</a></P>
+			</div>
+		</div>
+	</body>
+</html>

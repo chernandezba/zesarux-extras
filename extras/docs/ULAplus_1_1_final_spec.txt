@@ -1,0 +1,218 @@
+Official ULAplus Specification
+By Andrew Owen on Friday, 19 December 2014 at 13:14
+The ULAplus specification describes an enhanced ULA for the ZX Spectrum. It can be implemented as a plug-in replacement for the ULA, in emulators, or in modern hardware such as the ZX Spectrum Vega. It is designed for maximum compatibility with existing software. This information supersedes all existing versions of the specification, including those with later version numbers.
+
+The final official version of the specification is version 1.1.
+
+Revision History
+
+Version 1.1
+Revised for the release of ZXDS 1.3 incorporating changes from the OpenCores ULAplus implementation. This version rationalizes the specification. Software written for the standard mode of the new specification will run unmodified on earlier implementations.
+Includes the Timex video modes (optional)
+Changes the preferred way of multiplexing the 2-bit blue value to obtain a 3-bit blue value.
+Adds 256 greyscale support (optional)
+Deprecates HSL and CMYK support
+Version 1.0
+First published version of the specification.
+
+I/O ports
+
+ULAplus is controlled by two ports.
+
+0xBF3B is the register port (write only)
+
+The byte output will be interpreted as follows:
+
+Bits 0-5: Select the register sub-group
+Bits 6-7: Select the register group. Two groups are currently available:
+
+00 - palette group
+When this group is selected, the sub-group determines the entry in the palette table (0-63).
+
+01 - mode group
+
+The sub-group is (optionally) used to mirror the video functionality of Timex port #FF as follows:
+
+Bits 0-2: Screen mode. 000=screen 0, 001=screen 1, 010=hi-colour, 110=hi-res (bank 5)
+100=screen 0, 101=screen 1, 011=hi-colour, 111=hi-res (bank 7)
+Bits 3-5: Sets the screen colour in hi-res mode.
+000 - Black on White 100 - Green on Magenta
+001 - Blue on Yellow 101 - Cyan on Red
+010 - Red on Cyan 110 - Yellow on Blue
+011 - Magenta on Green 111 - White on Black
+
+0xFF3B is the data port (read/write)
+
+When the palette group is selected, the byte written will describe the color.
+
+When the mode group is selected, the byte output will be interpreted as follows:
+
+Bit 0: ULAplus palette on (1) / off (0)
+Bit 1: (optional) greyscale: on (1) / off (0) (same as turning the color off on the television)
+
+Implementations that support the Timex video modes use the #FF register as the primary means to set the video mode, as per the Timex machines. It is left to the individual implementations to determine if reading the port returns the previous write or the floating bus.
+
+GRB palette entries
+
+For a device using the GRB colour space, the palette entry is interpreted as follows
+
+Bits 0-1: Blue intensity.
+Bits 2-4: Red intensity.
+Bits 5-7: Green intensity.
+
+This colour space uses a sub-set of 9-bit GRB. The missing lowest blue bit is set to OR of the other two blue bits (Bb becomes 000 for 00, and Bb1 for anything else). This gives access to a fixed half the potential 512 colour palette. The reduces the jump in intensity in the lower range in the earlier version of the specification. It also means the standard palette can now be represented by the ULAplus palette.
+
+Greyscale palette entries
+
+In greyscale mode, each palette entry describes an intensity from zero to 255. This can be achieved by simply removing the colour from the output signal.
+
+Limitations
+
+Although in theory 64 colours can be displayed at once, in practice this is usually not possible except when displaying colour bars, because the four CLUTs are mutually exclusive; it is not possible to mix colours from two CLUTs in the same cell. However, with software palette cycling it is possible to display all 256 colours on screen at once.
+
+Emulation
+
+The 64 colour mode look-up table is organized as four palettes of 16 colours.
+
+Bits 7 and 6 of each attribute byte, normally used for FLASH and BRIGHT, are used as an index value (0-3) to select one of the four colour palettes.
+
+Each colour palette has 16 entries: eight for INK, and eight for PAPER. Bits 0 to 2 (INK) and 3 to 5 (PAPER) of the attribute byte are used as indexes to retrieve colour data from the selected palette.
+
+With the standard Spectrum display, the BORDER colour is the same as the PAPER colour in the first CLUT. For example BORDER 0 would set the border to the same colour as PAPER 0 (with the BRIGHT and FLASH bits not set).
+
+The complete index can be calculated as
+
+ink_colour = (FLASH * 2 + BRIGHT) * 16 + INK
+paper_colour = (FLASH * 2 + BRIGHT) * 16 + PAPER + 8
+
+When scaling 3-bits of colour data to more bits for emulators that operate in high colour mode, simply concatenate the bits repeatedly and then truncate to as many bits as needed. For example, for 8-bits the following conversion should be used:
+
+76543210
+hmlhmlhm
+
+where h is the high bit, m is the middle bit, and l is the low bit of the original 3-bit value.
+
+Extension to the ZX-State (SZX) format
+
+ZXSTPALETTE
+The state of the ULA registers found in the 64 colour replacement ULA. This block may be present for any machine.
+
+// Palette Block flags
+#define ZXSTPALETTE_DISABLED  0
+#define ZXSTPALETTE_ENABLED  1
+
+// Palette Block. Contains the palette register values
+typedef struct _tagZXSTPALETTEBLOCK
+{
+  ZXSTBLOCK blk;
+  BYTE chFlags;
+  BYTE chCurrentRegister;
+  BYTE chPaletteRegs[64];
+} ZXSTPALETTEBLOCK, *LPZXSTPALETTEBLOCK;
+
+Members
+
+blk
+The block header. The block id is ZXSTBID_PALETTE ('P', 'L', 'T', 'T').
+
+chFlags
+A flags that indicates if the palette is enabled or if the normal display mode is in use. This can be one of:
+
+Flag / Meaning
+ZXSTPALETTE_DISABLED / Normal palette mode with BRIGHT and FLASH
+ZXSTPALETTE_ENABLED / 64 colour palette mode
+
+chCurrentRegister
+The currently selected palette register (0-63).
+
+chPaletteRegs
+  The current values of the palette registers.
+
+Extension to the SCR format
+
+A 6912 byte .SCR file contains a standard Spectrum screen.
+A 6976 byte .SCR file contains a standard Spectrum screen followed by 64 colour registers.
+A 12288 byte .SCR file contains a Timex hi-colour screen.
+A 12352 byte .SCR file contains a Timex hi-colour screen followed by 64 colour registers.
+A 12289 byte .SCR file contains a Timex hi-res screen.
+A 12353 byte .SCR file contains a Timex hi-res screen followed by the hi-res colour information that was dumped from port 255, followed by 64 colour registers.
+
+Palette file format
+
+The palette format doubles as the BASIC patch loader. This enables you to edit patches produced by other people.
+
+; 64 colour palette file format (internal) - version 1.0
+; Copyright (c) 2009 Chloe Corporation
+;
+; The palette file is stored as a BASIC program with embedded machine code
+
+header:
+
+defb 0x00 ; program file
+defb 0x14, 0x01, "64colour" ; file name
+defw 0x0097 ; data length
+defw 0x0000 ; autostart line
+defw 0x0097 ; program length
+
+basic:
+
+; 0 RANDOMIZE USR ((PEEK VAL "2
+; 3635"+VAL "256"*PEEK VAL "23636"
+; )+VAL "48"): LOAD "": REM
+
+defb 0x00, 0x00, 0x93, 0x00, 0xf9, 0xc0, 0x28, 0x28
+defb 0xbe, 0xb0, 0x22, 0x32, 0x33, 0x36, 0x33, 0x35
+defb 0x22, 0x2b, 0xb0, 0x22, 0x32, 0x35, 0x36, 0x22
+defb 0x2a, 0xbe, 0xb0, 0x22, 0x32, 0x33, 0x36, 0x33
+defb 0x36, 0x22, 0x29, 0x2b, 0xb0, 0x22, 0x34, 0x38
+defb 0x22, 0x29, 0x3a, 0xef, 0x22, 0x22, 0x3a, 0xea
+
+start:
+
+di ; disable interrupts
+ld hl, 38 ; HL = length of code
+add hl, bc ; BC = entry point (start) from BASIC
+ld bc, 0xbf3b ; register select
+ld a, 64 ; mode group
+out (c), a ;
+ld a, 1 ;
+ld b, 0xff ; choose register port
+out (c), a ; turn palette mode on
+xor a ; first register
+
+setreg:
+
+ld b, 0xbf ; choose register port
+out (c), a ; select register
+ex af, af' ; save current register select
+ld a, (hl) ; get data
+ld b, 0xff ; choose data port
+out (c), a ; set it
+ex af, af' ; restore current register
+inc hl ; advance pointer
+inc a ; increase register
+cp 64 ; are we nearly there yet?
+jr nz, setreg ; repeat until all 64 have been done
+ei ; enable interrupts
+ret ; return
+
+; this is where the actual data is stored. The following is an example palette.
+
+registers:
+
+defb 0x00, 0x02, 0x18, 0x1b, 0xc0, 0xc3, 0xd8, 0xdb ; INK
+defb 0x00, 0x02, 0x18, 0x1b, 0xc0, 0xc3, 0xd8, 0xdb ; PAPER
+defb 0x00, 0x03, 0x1c, 0x1f, 0xe0, 0xe3, 0xfc, 0xff ; +BRIGHT
+defb 0x00, 0x03, 0x1c, 0x1f, 0xe0, 0xe3, 0xfc, 0xff ;
+defb 0xdb, 0xd8, 0xc3, 0xc0, 0x1b, 0x18, 0x02, 0x00 ; +FLASH
+defb 0xdb, 0xd8, 0xc3, 0xc0, 0x1b, 0x18, 0x02, 0x00 ;
+defb 0xff, 0xfc, 0xe3, 0xe0, 0x1f, 0x1c, 0x03, 0x00 ; +BRIGHT/
+defb 0xff, 0xfc, 0xe3, 0xe0, 0x1f, 0x1c, 0x03, 0x00 ; +FLASH
+
+terminating_byte:
+
+defb 0x0d
+
+License information
+
+ULAplus is a trademark of the Chloe Corporation. ULAplus is a royalty-free open format. The official ULAplus specification is released under the Creative Commons Attribution-Share Alike License.

@@ -1,0 +1,362 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Z80 Undocumented Instructions</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="z80instr.html">Previous</a></td>
+  <td align="center" valign="bottom" width="80%"><a
+  href="index.html">Contents</a></td>
+  <td align="right" valign="bottom" width="10%"><a
+  href="scrfiles.html">Next</a></td>
+ </tr>
+</table>
+
+<hr>
+
+<p><font size="4"><b>32. The Zilog Z80 Undocumented instructions</b></font>
+</p>
+
+<p>The undocumented Z80 instructions are corresponding to 'holes'
+in the opcodes. </p>
+
+<h4>1 - Undocumented index operations</h4>
+
+<p>In this section, IX operations will be described. <br>
+IY operations, obtained by replacing DDs with FDs, behave
+identically. <br>
+A DD preceding an instruction causes, in general, the following
+('main') instruction to be processed as normal, except that: </p>
+
+<p><tt>- any access to (HL) gets treated as an access to (IX+d)</tt>
+<br>
+<tt>- any access to HL gets treated as an access to IX</tt> <br>
+<tt>- any access to H gets treated as an access to IXh</tt> <br>
+<tt>- any access to L gets treated as an access to IXl</tt> </p>
+
+<p>If the main instruction does not access any of (HL), HL, H and
+L, then the DD effectively acts as a NOP.&nbsp; (In addition, a
+series of DDs and FDs acts as a series of NOPs with the DD/FD
+actually obeyed being the <br>
+last one in the series.) </p>
+
+<p>There are exceptions to the general rule, however.&nbsp; These
+are: </p>
+
+<p><i><tt>Main
+instruction&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Effect of preceding DD</tt></i> </p>
+
+<p><tt>LD
+H,(HL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Causes LD H,(IX+d)</tt> <br>
+<tt>LD
+(HL),H&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Causes LD (IX+d),H</tt> <br>
+<tt>LD
+L,(HL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Causes LD L,(IX+d)</tt> <br>
+<tt>LD
+(HL),L&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Causes LD (IX+d),L</tt> <br>
+<tt>EX
+DE,HL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+None (left as EX DE,HL)</tt> <br>
+<tt>EXX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+None (left as EXX)</tt> <br>
+<tt>EDxx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+None (left as EDxx)</tt> <br>
+<tt>CBxx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+See below</tt> </p>
+
+<p>DDCB sequences always cause the byte following the CB to be
+taken as a displacement, and always cause an access to
+(IX+d).&nbsp; If the sequence produces output other than in the
+flags (i.e. all except BIT), then the result gets placed both
+into (IX+d) and the register one would normally expect to be
+altered. </p>
+
+<p>For example, </p>
+
+<p><tt>DDCB0100 causes RLC (IX+1) and copies the result into B.</tt>
+<br>
+<tt>DDCB02FF causes SET 7,(IX+2) and copies the result into A.</tt>
+<br>
+<tt>DDCB0373 causes BIT 6,(IX+3).</tt> <br>
+&nbsp; </p>
+
+<h4>2 - Undocumented shift operations</h4>
+
+<p>There are 248 different CB opcodes. The block CB 30 to CB 37
+is missing from the official list. These instructions, usually
+denoted by the mnemonic SLL, Shift Left Logical, shift left the
+operand and make bit 0 always one.&nbsp; The effect is therefore
+like SLA except b0 is set instead of being reset. These
+instructions are quite commonly used. </p>
+
+<h4>3 - Undocumented EDxx operations</h4>
+
+<p>Instructions in the range ED00 to ED3F have no effect. <br>
+Instructions in the range ED80 to EDBF, except those documented
+as block loads, compares, ins or outs, have no effect. <br>
+Instructions in the range EDC0 to EDFF have no effect. <br>
+The holes in the range ED40 to ED7F typically duplicate
+documented instructions: </p>
+
+<p><tt>NEG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at ED4C, ED54,
+ED5C, ED64, ED6C, ED74, ED7C</tt> <br>
+<tt>NOP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at ED77, ED7F</tt> <br>
+<tt>RETN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at ED55, ED65, ED75</tt> <br>
+<tt>RETI&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at ED5D, ED6D, ED7D</tt> <br>
+<tt>IM ?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at ED4E, ED6E</tt> <br>
+<tt>IM 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at ED66</tt> <br>
+<tt>IM 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at ED76</tt> <br>
+<tt>IM 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at ED7E</tt> <br>
+<tt>IN F,(C)&nbsp; at ED70</tt> <br>
+<tt>OUT (C),0 at ED71</tt> </p>
+
+<p>IM ? sets the interrupt mode flip-flops to an undefined state,
+which seems to act like IM 0 or IM 1. <br>
+IN F,(C) performs the input operation, setting the flags as
+normal, but throws the input value away. <br>
+OUT (C),0 outputs $FF to the port. </p>
+
+<p>Note : it would output zero if the Z80 used were the NMOS
+variant rather than the CMOS variant used in the Z88. </p>
+
+<p><tt>The complete list: (* = not official)</tt> </p>
+
+<p><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED40&nbsp;&nbsp; IN
+B,(C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED60&nbsp;&nbsp; IN H,(C)</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED41&nbsp;&nbsp;
+OUT
+(C),B&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED61&nbsp;&nbsp; OUT (C),H</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED42&nbsp;&nbsp;
+SBC
+HL,BC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED62&nbsp;&nbsp; SBC HL,HL</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED43&nbsp;&nbsp;
+LD
+(nn),BC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED63&nbsp;&nbsp; LD (nn),HL</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED44&nbsp;&nbsp;
+NEG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED64 * NEG</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED45&nbsp;&nbsp;
+RETN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED65 * RET</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED46&nbsp;&nbsp;
+IM
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED66 * IM 0</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED47&nbsp;&nbsp;
+LD
+I,A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED67&nbsp;&nbsp; RRD</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED48&nbsp;&nbsp;
+IN
+C,(C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED68&nbsp;&nbsp; IN L,(C)</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED49&nbsp;&nbsp;
+OUT
+(C),C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED69&nbsp;&nbsp; OUT (C),L</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED4A&nbsp;&nbsp;
+ADC
+HL,BC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED6A&nbsp;&nbsp; ADC HL,HL</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED4B&nbsp;&nbsp;
+LD
+BC,(nn)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED6B&nbsp;&nbsp; LD HL,(nn)</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED4C *
+NEG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED6C * NEG</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED4D&nbsp;&nbsp;
+RETI&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED6D * RET</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED4E * IM
+0/1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED6E * IM 0/1</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED4F&nbsp;&nbsp;
+LD
+R,A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED6F&nbsp;&nbsp; RLD</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED50&nbsp;&nbsp;
+IN
+D,(C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED70 * IN (C)</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED51&nbsp;&nbsp;
+OUT
+(C),D&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED71 * OUT (C),0</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED52&nbsp;&nbsp;
+SBC
+HL,DE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED72&nbsp;&nbsp; SBC HL,SP</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED53&nbsp;&nbsp;
+LD
+(nn),DE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED73&nbsp;&nbsp; LD (nn),SP</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED54 *
+NEG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED74 * NEG</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED55 *
+RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED75 * RET</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED56&nbsp;&nbsp;
+IM
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED76 * IM</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED57&nbsp;&nbsp;
+LD
+A,I&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED77 * NOP</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED58&nbsp;&nbsp;
+IN
+E,(C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED78&nbsp;&nbsp; IN A,(C)</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED59&nbsp;&nbsp;
+OUT
+(C),E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED79&nbsp;&nbsp; OUT (C),A</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED5A&nbsp;&nbsp;
+ADC
+HL,DE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED7A&nbsp;&nbsp; ADC HL,SP</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED5B&nbsp;&nbsp;
+LD
+DE,(nn)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED7B&nbsp;&nbsp; LD SP,(nn)</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED5C *
+NEG&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED7C * NEG</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED5D *
+RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED7D * RET</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED5E&nbsp;&nbsp;
+IM
+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED7E * IM 2</tt> <br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ED5F&nbsp;&nbsp;
+LD
+A,R&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ED7F * NOP</tt> </p>
+
+<h4>4 - About the R register</h4>
+
+<p>This is not really an undocumented feature, although I have
+never seen any thorough description of it anywhere. The R
+register is a counter that is updated every instruction, where
+DD, FD, ED and CB are to be regarded as separate instructions. So
+shifted instruction will increase R by two. There's an
+interesting exception: doubly-shifted opcodes, the DDCB and FDCB
+ones, increase R by two too. LDI increases R by two, LDIR
+increases it by 2 times BC, as does LDDR etcetera. The sequence
+LD R,A/LD A,R increases A by two, except for the highest bit:
+this bit of the R register is never changed. This is because in
+the old days everyone used 16 Kbit chips. Inside the chip the
+bits where grouped in a 128x128 matrix, needing a 7 bit refresh
+cycle. Therefore ZiLOG decided to count only the lowest 7 bits. <br>
+&nbsp; </p>
+
+<h4>5 - Undocumented flags F3 and F5</h4>
+
+<p>Bits 3 and 5 of the F register are not used. They can contain
+information, as you can readily figure out by PUSHing AF onto the
+stack and then POPping some it into another pair of registers.
+Furthermore, sometimes their values change. The values of bits 7,
+5 and 3 follow the values of the corresponding bits of the last 8
+bit result of an instruction that changed the usual flags. <br>
+For instance, after an ADD A,B those bits will be identical to
+the bits of the A register (Bit 7 of F is the sign flag, and fits
+the rule exactly). An exception is the CP x instruction
+(x=register, (HL) or direct argument). In this case the bits are
+copied from the argument. If the instruction is one that operates
+on a 16 bit word, the 8 bits of the rule are the highest 8 bits
+of the 16 bit result - that was to be expected since the S flag
+is extracted from bit 15. </p>
+
+<h4>6 - Interrupt flip-flops IFF1 and IFF2</h4>
+
+<p>There seems to be a little confusion about these. These flip
+flops are simultaneously set or reset by the EI and DI
+instructions. IFF1 determines whether interrupts are allowed, but
+its value cannot be read. The value of IFF2 is copied to the P/V
+flag by LD A,I and LD A,R. When an NMI occurs, IFF1 is reset,
+thereby disallowing further [maskable] interrupts, but IFF2 is
+left unchanged. This enables the NMI service routine to check
+whether the interrupted program had enabled or disabled maskable
+interrupts. </p>
+
+<h4>7 - Interrupt Modes (IM x)</h4>
+
+<p>Interrupt modes can be set with the IM x instructions. They
+only affect mask-able interrupts. When a mask-able interrupt
+occurs, the interrupting device must supply a value. The Z88 only
+uses the IM1. All maskable interrupts are managed by the RST $38.
+The Non-Maskable Interrupt causes a jump to $0066. </p>
+
+<p>IM 0: The value the interrupting device supplies is
+interpreted as an 8 bit opcode which is executed (usually RST p) <br>
+IM 1: A call is made to address 38h. The value the interrupting
+device supplies is ignored. <br>
+IM 2: A call is made to an address read from address (register I
+× 256 + value from interrupting device). <br>
+&nbsp; </p>
+
+<h4>8 - Z80 hardware bugs</h4>
+
+<p>There are several bugs in the NMOS version of the CPU. One of
+them is with regard to the buggy IFF2-&gt;parity flag performance
+in the LD A,I and LD A,R instructions. An error can occur when an
+INTACK runs near these instructions, the parity flag will be
+showing 0 when it should have been 1. We are not sure but this
+bug concerns the CMOS Z80 too. A Zilog app. note is around
+somewhere talking about this. </p>
+
+<p>This document is based on combined information from articles
+written by : </p>
+
+<p>Sean Young, syoung@cs.vu.nl <br>
+Mark Rison, mrison@acorn.co.uk <br>
+Marat Fayzullin, fms@freeflight.com </p>
+
+<hr>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <td valign="top" width="33%"><a href="z80instr.html">Previous</a></td>
+  <td align="center" valign="top" width="34%"><a
+  href="index.html">Contents</a></td>
+  <td align="right" valign="top" width="33%"><a
+  href="scrfiles.html">Next</a></td>
+ </tr>
+ <tr>
+  <td valign="top" width="33%">The Z80 instruction set
+  reference</td>
+  <td align="center" valign="top" width="34%">The Z80
+  undocumented instructions</td>
+  <td align="right" valign="top" width="33%">The Screen
+  Files</td>
+ </tr>
+</table>
+
+<p><br>
+&nbsp; <br>
+&nbsp; </p>
+</body>
+</html>

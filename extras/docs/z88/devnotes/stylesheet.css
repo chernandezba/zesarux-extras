@@ -1,0 +1,97 @@
+body
+{
+	background-color: #ffffff;
+	font-size: 12px;
+	font-family: Arial, Helvetica, sans-serif;
+}
+TABLE.frames
+{
+	width: 640px;
+	border-collapse: collapse;	 
+}
+TABLE.frames TD
+{
+	vertical-align: top;
+	border-right: black 2px solid;
+	border-top: black 2px solid;
+	border-left: black 2px solid;
+	border-bottom: black 2px solid;
+	padding-right: 4px;
+	padding-left: 4px;
+	padding-bottom: 2px;
+	padding-top: 2px;
+}
+TABLE.illustration
+{
+	width: 640px;
+	border-collapse: collapse;
+}
+TABLE.illustration TD
+{
+	vertical-align: top;
+	width: 25%;
+}
+TABLE.transperent
+{
+	width: 640px;
+	border-collapse: collapse;
+}
+TABLE.transperent TD 
+{
+	vertical-align: top;
+	border: none;
+	padding-right: 4px;
+	padding-left: 4px;
+	padding-bottom: 16px;
+	padding-top: 2px;
+}
+H1
+{
+    font-size: 30px;
+    border-top: black 2px solid;
+    border-bottom: black 2px solid;
+    padding-bottom: 12px;
+    padding-top: 14px;
+    margin-top: 60px;
+    margin-bottom: 60px;
+}
+H2
+{
+    font-size: 20px;
+    border-top: black 2px solid;
+    padding-top: 14px;
+    margin-top: 40px;
+    margin-bottom: 10px;
+}
+H3
+{
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+LI
+{
+	padding-bottom: 10px;
+	padding-top: 10px;
+}
+.screen
+{
+	font-weight: bold;
+	font-family: Courier,monospace;
+	font-size: 12px;
+}
+.type
+{
+	font-family: Courier,monospace;
+}
+.key
+{
+	border-right: #000000 1px solid;
+	padding-right: 1px;
+	border-top: #000000 1px solid;
+	padding-left: 1px;
+	font-size: 12px;
+	font-weight: normal;
+	border-left: #000000 1px solid;
+	border-bottom: #000000 1px solid;
+}

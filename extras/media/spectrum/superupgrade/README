@@ -1,0 +1,27 @@
+SPECCY SUPERUPGRADE - ROM/RAM AND AY UPGRADING FOR THE SPECTRUM 16K
+
+To activate Superupgrade Mode please follow the following steps:
+
+- Select Spectrum 16K/48k in the machine menu.
+- Select "Storage/Speccy Superupgrade/Flash File", and select a valid ROMSET. An example ROMSET called "superupgrade.flash" is supplied at media/spectrum/superupgrade folder.
+- Set "Storage/Speccy Superupgrade/Superupgrade Enabled".
+
+
+A ROMManager is supplied in order to let you adapt the content of the flash.
+
+To be able to use it you have to enable MMC:
+
+- Select "Storage/MMC/MMC File", and choose "superupgrade.mmc" (at media/spectrum/superupgrade)
+- Set "MMC Emulation" and "ZXMMC Enabled"
+- "Debug/Hard reset" and choose "3" + "ENTER" to select +3e mmc ROM.
+- Go to BASIC and type LOAD"C:" and then LOAD"RMAN.BAS"
+- Use the available menu options.
+- In the mmc disk supplied there are a copy of all ROMs installed in the flash.
+
+NOTE: It is not possible to use TAPE as source or destination due to a bug in the RMAN program, please use only DISCS.
+
+
+It is possible to handle the mmc files with Strowsaw with 3e.exe program in order to add, extract files or write the entire image to a real card.
+
+
+

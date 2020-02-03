@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html><head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr>
+<th colspan="3" align="center">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+<td align="center" valign="bottom" width="80%">&nbsp;</td>
+<td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</tbody></table>
+
+<hr width="100%">
+<p>
+
+<b><font size="+1">GN_Fex, expand a filename</font></b>
+</p><p><tt>RST 20H, DEFW $5009</tt>
+</p><p>IN:
+</p><pre>&nbsp;&nbsp;&nbsp;&nbsp; BHL = source pointer (HL&gt;255, B=0 means local pointer).<br>&nbsp;&nbsp;&nbsp;&nbsp; HL = 0,1,2; not allowed.<br>&nbsp;&nbsp;&nbsp;&nbsp; Source string should be terminated by a control character<br><br>&nbsp;&nbsp;&nbsp;&nbsp; DE = destination pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0:&nbsp;output to IX stream handle<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1:&nbsp;output to IX filter handle<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &gt;255 place string at (DE)<br>&nbsp;&nbsp;&nbsp;&nbsp; IX = destination handle (if DE = 0,1)<br>&nbsp;&nbsp;&nbsp;&nbsp; C = limit of space to use</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp; DE = points to the character after the last one written<br>&nbsp;&nbsp;&nbsp;&nbsp; (If DE(in) &gt; 255)<br><br>&nbsp;&nbsp;&nbsp;&nbsp; B = number of filename segments returned<br>&nbsp;&nbsp;&nbsp;&nbsp; C = number of characters in compressed space<br><br>&nbsp;&nbsp;&nbsp;&nbsp; A =<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A7 = 1, wildcards were used<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A6 = 1, device name specified<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A5 = 1, wild directory specified ("//")<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A4 = 1, parent directory specified ("..")<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A3 = 1, current directory specified (".")<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A2 = 1, explicit directory specified<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A1 = 1, filename specified<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A0 = 1, extension specified</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp; A = error code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_IVF ($17), invalid filename<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_EOF ($09), blank filename<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad parameters</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......HL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AFBCDE../.... different</pre>
+Notes:
+<blockquote>The routine does not process wildcards *, ? and //, but passes
+them to the output buffer.
+<br><b>..</b> is expanded to parent directory
+<br><b>.</b> or no directory is expanded to current directory.</blockquote>
+Bugs:
+<blockquote>If the source is in segment 2 and B=0 then problems may occur
+(but not for extended address). If the source is in segment 3 and BHL as
+extended pointer then this call will also fail.</blockquote>
+Related calls:
+<blockquote><a href="gnesa.html">GN_Esa</a>, read &amp; write to filename segments
+<br><a href="gnfcm.html">GN_Fcm</a>, compress a filename
+<br><a href="gnopw.html">GN_Opw</a>, Open wildcard handler
+<br><a href="gnpfs.html">GN_Pfs</a>, parse filename segment
+<br><a href="gnprs.html">GN_Prs</a>, parse filename
+<br><a href="gnwcl.html">GN_Wcl</a>, close wildcard handle
+<br><a href="gnwfn.html">GN_Wfn</a>, fetch next match for wildcard string (handle)
+<br><a href="gnwsm.html">GN_Wsm</a>, match filename segment to wildcard string</blockquote>
+
+</body></html>

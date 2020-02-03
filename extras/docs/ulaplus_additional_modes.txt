@@ -1,0 +1,54 @@
+List of modes supported on ulaplus:
+
+0: disabled. Normal spectrum display
+1: RGB mode. 64 colours. Normal Spectrum organization display. Bits 7 and 6 of each attribute byte, normally used for FLASH and BRIGHT, are used as an index value (0-3) to select one of the four colour palettes.
+
+Additional modes are enabled using register 40H from zxuno. See http://www.zxuno.com/wiki/index.php/ZX_Spectrum , register 40H RADASCTRL
+
+When selecting a machine different from zxuno, the register 40H is handled the same way, we have port FC3BH (64571) for register selection and port FD3BH (64827) for register value, but in this case, only changing register 40H has sense.
+
+Meaning of register 40H:
+
+Bit 0 if enabled, enables ulaplus.
+
+Bit 1 indicates that radastan mode is enabled. When this bit is on, bits from 2 to 7 are reserved.
+If bit 1 is disabled, we are using ZEsarUX video modes.
+
+So:
+
+                                Register 40H from zxuno
+
+                                Radastan 128x96
+                                7 6 5 4 3 2 1 0
+                                R R R R R R 1 1
+
+                                R: Reserved
+
+
+                                ZEsarUX modes:
+                                7 6 5 4 3  2  1 0
+                                R R R R Z1 Z0 0 1
+
+                                R: Reserved
+                                Z0, Z1: Low and high bits which indicates ZEsarUX video mode: 
+				0: 256x96  (register value: 1)
+                                1: 128x192 (register value: 5)
+                                2: 256x192 (register value: 9)
+                                3: undefined
+
+
+
+
+Modes 0, 1, 2 were proposed and defined by the author of ZEsarUX (Cesar Hernandez Bano). ZEsarUX modes are supported on ZEsarUX emulator, Prism machine and X128 emulator.
+ZEsarUX video modes and Radastan mode have linear organization of memory, uses 4 bits per pixel. So independent pixel can have 16 colours, using the ulaplus palette 0-15.
+So, the total size of each mode is:
+
+Radastan mode: 6144 bytes
+ZEsarUX video mode 0: 12288 bytes 
+ZEsarUX video mode 1: 12288 bytes
+ZEsarUX video mode 2: 24576 bytes
+
+All modes except ZEsarUX video mode 2 use RAM 5 or 7 depending on the bit 3 of port 7FFDh on Spectrum 128k models, or address 4000H on 48k/16k models.
+ZEsarUX mode 2 uses ram 5 for the top-half section of the screen, and ram 7 for the lower-half section of the screen, so this is a 128k-only model
+On Prism machine, the top-half section starts at vram0, and the lower-half at vram2
+

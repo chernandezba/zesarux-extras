@@ -1,0 +1,55 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Lab, link an alarm block into
+the alarm chain</font></b>
+<p><tt>RST 20H, DEFW $6C09</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BHL = pointer to alarm block (to be linked). Must have been
+&nbsp;&nbsp;&nbsp;&nbsp; previously allocated by <a href='gnaab.html'>GN_Aab</a>.
+</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1, time/date already passed
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad parameters
+</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different
+</pre>
+Notes:
+<blockquote>A badly formed block is likely to crash the machine. The routine
+does not check the vality of the alarm block.</blockquote>
+Bugs:
+<p>Related calls:
+<blockquote><a href='gnaab.html'>GN_Aab</a>, allocate alarm block
+<br><a href='gnalp.html'>GN_Alp</a>, process an expired alarm (internal OZ usage)
+<br><a href='gnfab.html'>GN_Fab</a>, free alarm block
+<br><a href='gnuab.html'>GN_Uab</a>, unlink an alarm block from the alarm chain
+<br><a href='osalm.html'>OS_Alm</a>, alarm manipulation (internal OZ usage)</blockquote>
+
+</body>
+</html>

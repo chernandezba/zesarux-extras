@@ -1,0 +1,171 @@
+
+   Tr-Dos v5.xx - programmer's manual
+ --------------------------------------
+
+   1.Internal Tr-Dos functions
+   2.Tr-Dos error codes
+   3.History of changes
+   4.To do
+   5.Copyright
+
+
+  1.Internal Tr-Dos functions
+ -----------------------------
+
+  To have access to desired Tr-Dos function you have to load  C  register with
+ function number, load other used registers with necessary data ( see function
+ description ) and do CALL #3D13.
+
+ #00 - Interface initialization. This  resets  FDC  chip  ( WD1793 in original
+       Beta 128 Disk interface, KR1818WG93  in Soviet  clone of  Beta 128 Disk
+       interface ), moves drive heads to physical 00 track and waits for INTRQ
+       signal. BREAK key pressing is also checked.
+
+ #01 - Disk drive initialisation. Drive  number must  be loaded to A register.
+       If  DOS variable in  range  23802...23805  for  defined  drive  is  not
+       initialized  yet ( equal  to #FF ) then it will be  set  to  #08. After
+       that  DOS set  some variables. 23752...23755:  #00 for 40 track or  #80
+       for 80 track drives. Then  number of drive  from  A  register  will  be
+       written to 23798 ( current drive number ), and to  the  23830  will  be
+       saved copy of system register.
+
+ #02 - Seek track. Track number must be loaded to A register ( in range 0-179,
+       i.e. 1-st  physical track  has 0 and 1 logical track numbers - 0 bottom
+       side, 1 top side ).
+
+ #03 - Set sector  number. Sector number  should be  loaded to  the A register
+       ( 1-16 ) - this number will be written to 23807 DOS variable.
+
+ #04 - Define buffer address. Buffer address must be loaded to the HL register
+       pair. This writes HL contents to 23808 DOS variable.
+
+ #05 - Read group of sectors. In HL must be  loaded address where  sector data
+       should  be readed, B must be  loaded with  number of sectors to read, D
+       must be loaded  with track number and E with sector number. If B loaded
+       with  #00 then interface will only read sector address mark - useful if
+       you only want check is there sector with defined number on the track.
+
+ #06 - Write group of sectors. Everything same  as for  #05  function,  except
+       B=#00 of course ;)
+
+ #07 - Send  disk catalogue to the stream. Stream number must be loaded to the
+       A  register ( 2-screen, 3-printer ). Disk  number will  be  taken  from
+       ( 23798 ) DOS variable. You  have to write  contents  of 23798 to 23800
+       and 23801 variables too. Function #18 will  be automatically  executed.
+
+ #08 - Read file descriptor to DOS  variable  area. This read  file descriptor
+       ( #0F bytes ) with  number from A ( from 0 to 127 include  deleted ) to
+       #5CDD-#5CEC address.
+
+ #09 - Write file descriptor from DOS variable area to disk. This  will  write
+       file  descriptor ( #0F bytes ) starting  from #5CDD address to the disk
+       catalogue.  Number  of  descriptor  to  replace  must  be  loaded  in A
+       register.
+
+ #0A - Find file. File name and file type must  be specified  in DOS variables
+       #5CDD-#5CE5, number  of bytes  to check must  be  written to  23814. If
+       file  found  then C  register,  #5D1E  and  #5D0F  DOS  variables  will
+       contain number  of file  descriptor. If no file found the in C register
+       will be #FF.
+ 
+ #0B - Save CODE file to disk. Address must be loaded to HL registers pair and
+       length must be loaded to DE register pair. Name  and type must  already
+       be  in #5CDD address. No  checking for existing file will be done. Also
+       function #18 executed automatically.
+
+ #0C - Save BASIC  program to  disk. File name  must  already be  in #5DCC. At
+       #5CD1 must be specified number of BASIC auto-start line.
+
+ #0D - Exit from Tr-Dos ( reserved ).
+
+ #0E - Load or Verify. File descriptor  must already be  in  #5DCC. Write  #00
+       to  #5CF9 if you want Load  or #FF if you want Verify file. For loading
+       BASIC  program  #5D10 must  have  #00! If there will  be  #FF then  old
+       BASIC program will  be  removed  but  new  one  would  not  be  readed.
+       According to contents of  A  register this  function  acts in different
+       ways:
+
+        A=#00 - take address and length from disk catalogue;
+        A=#03 - take address in HL length in DE;
+        A=#FF - take address in HL but length taken from disk catalogue;
+
+ #0F - Exit from Tr-Dos ( reserved ).
+
+ #10 - Exit from Tr-Dos ( reserved ).
+
+ #11 - Exit from Tr-Dos ( reserved ).
+
+ #12 - Delete file. Name  and file type  must be  specified in  #5CDD address.
+       Please note that ALL files  with such attributes  will be  deleted from
+       disk. In  #5D08 will be saved first symbol of name of last deleted file
+       and  first symbol of file name on disk will be changed to #01 ( deleted
+       file mark ).
+
+ #13 - Copy data to file descriptor area. This function copies #0F  bytes from
+       address in HL to #5CDD.
+
+ #14 - Copy file descriptor information.  This function copies file descriptor
+       information ( #0F bytes ) from #5CDD to address in HL register.
+
+ #15 - Test track. This function reads whole track which number must be loaded
+       to the D register. If  there was  any errors  then  DOS  variable #5D0F
+       will  contain "7" error  code and  in  variable  #5CD6  number  of  bad
+       sectors.
+
+ #16 - Select  bottom  disk  side. This  changes  "disk side"  bit  in  system
+       register to '0'.
+
+ #17 - Select  top disk side. This changes "disk side" bit in  system register
+       to '1'.
+
+ #18 - Read system track from disk. This will try read 9th logical sector from
+       disk and set DOS system variables.
+
+
+  2.Tr-Dos error codes
+ ----------------------
+
+  Error codes returned in BC register pair of Z80 CPU.
+
+    0 - No errors
+    1 - No files
+    2 - File exists
+    3 - No space
+    4 - Directory full
+    5 - Record number overflow
+    6 - No disk
+    7 - Disk errors
+    8 - Syntax errors
+   10 - Stream already opened
+   11 - Not disk file
+   12 - Stream not open
+
+
+  3.History of changes
+ ----------------------
+ 
+  · 28 Nov 1999 - First version completed
+  · 02 Mar 2000 - Minor mistakes fixed; description of function #00 corrected;
+                  'History of changes'  and  'To  do' sections  added all "0x"
+                  changed to "#"
+
+
+  4.To do
+ ---------
+
+  · description of possible error codes for every function
+  · how to disable BREAK key checking
+  · examples of system-friendly programming
+  · list of differences in Tr-Dos version 5.xx range
+  · basics of direct FDC programming and list of addresses of useful  routines
+    in Tr-Dos of version 5.xx range
+  · how to read Beta 128 formatted disks on other machine - Amiga or PC
+
+
+  5.Copyright
+ -------------
+
+ Beta 128 Disk Interface and Tr-Dos (c) 1984-1986 Technology Research Ltd.
+ Tr-Dos Functions description (c) 1990 by Andrew MOA and Mac Buster^Extreme
+ English "translation" (c) 1999 by Mac Buster^Extreme
+

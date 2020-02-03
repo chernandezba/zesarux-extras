@@ -1,0 +1,1203 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Application Static Structures</title>
+  <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+
+ <tr>
+
+   <th colspan="3" align="center">Z88
+Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="sysintfc.html">Previous</a></td>
+
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="bottom" width="10%"><a href="errhandl.html">Next</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+
+<hr width="100%">
+<p><b><font size="+1">4. Application Static
+Structures</font></b>
+</p>
+
+<p>Before you can begin to write an application it is necessary
+to include
+certain information in the ROM card which tells the system what the
+card
+contains. This section explains how to set up the static structures,
+including
+menu topic help, which define your application. Following this, actual
+programming techniques and facilities can be examined.
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Introduction</b>
+</p>
+
+<p>The most unusual facet of the Z88 is its ability to deal with
+many applications
+and suspend and reactivate them as required. An application may be set
+up on a ROM or EPROM card and inserted into one of the slots at the
+front
+of the machine. If the appropriate data structures are set up on the
+card,
+then the operating system can make application appear like the in built
+programs, such as Pipedream. Applications are rather confusingly
+divided
+into 'Applications' and 'Popdowns'. When we talk about applications in
+general this includes popdowns, but when talking about the two together
+an application is distinct from a popdown. The actual difference
+between
+the two, when a contrast is being drawn, is that a popdown will receive
+a KILL request from the system whenever the user attempts to switch
+applications.
+A popdown is useful for functions like the clock and calculator which
+on
+ce they have been used do not really need to remember what they were
+doing
+before, so it is perfectly allright to close them down completely and
+start
+them up from scratch when they are required again. An application, as
+opposed
+to a popdown, can be returned to after application switching, so that
+the
+user can continue to use it as before.
+</p>
+
+<p>Applications are further divided into good and bad types. Most
+applications
+are 'good': they only take RAM as they need it, using the memory
+management
+routines, and do not demand more than 256 bytes of continuous RAM.
+'Bad'
+applications, demanding larger blocks of memory, can use up to a 40K of
+continuous RAM - this feature was included in order to be able to run
+standard
+BBC BASICZ80 - a binary image designed for a normal Z80 system. There
+is
+also an 'ugly' application type, which is similar to 'bad' but refers
+only
+to popdowns ie. a bad popdown. None of the built in applications is of
+this type. Applications types are, therefore:&nbsp;</p>
+<table style="font-size: 12px; text-align: left; width: 70%;" border="0" cellpadding="1" cellspacing="1">
+  <tbody>
+ <tr>
+   <td style="font-family: monospace;" valign="top">Good</td>
+   <td style="vertical-align: top;">An application application not requiring large continuous workspace.</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">Bad</td>
+   <td valign="top">An application application requiring large continuous workspace.<br>
+   </td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">Popdown</td>
+   <td valign="top">A popdown application not requiring large continuous workspace.<br>
+   </td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">Ugly</td>
+   <td valign="top">A popdown application requiring large continuous workspace.</td>
+ </tr>
+  </tbody>
+</table>
+<br>
+<p>
+<b>ROM Headers and Front DORs</b>
+</p>
+<p>Applications are set up as linked lists of DORs, an object
+linking structure
+which is explained in 'DORs', one list for each ROM card (including the
+internal one in Slot 0). The application DORs contain such vital
+information
+as where the application entry point is and whether caps lock should be
+set on entry; more of this below. The root of each link is the 'front
+DOR'.
+The first application is linked as a son to this DOR, and subsequent
+applications
+are linked together as brothers. For instance, in the internal ROM, the
+arrangement of application DORs is as follows:
+</p>
+
+<p style="text-align: center;"><span style="font-family: monospace;">Front DOR --&gt; Index DOR --&gt; Diary DOR --&gt; PipeDream DOR --&gt;
+Terminal DOR
+--&gt; Imp/Export DOR</span>
+</p>
+
+<p>When the operating system searches for applications it looks
+at each
+slot in turn, starting with the internal ROM or slot 0. The top bank of
+each slot is examined for the presence of 'OZ' in the uppermost two
+bytes
+- if this is found then the card is identified as containing
+applications.
+Filing system EPROMs are identified by 'oz' in the top two bytes. The
+full
+header which an application card should incorporate at the top of its
+highest
+bank is as follows:
+
+</p>
+<table style="font-size: 12px; text-align: left; width: 60%;" border="0" cellpadding="1" cellspacing="1">
+  <tbody>
+ <tr>
+   <td style="vertical-align: top; font-family: monospace;">$3FF8</td>
+   <td style="vertical-align: top; font-family: monospace;">@0xxxxxxx</td>
+   <td style="vertical-align: top;">Low byte of card ID</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">$3FF9</td>
+   <td style="font-family: monospace;" valign="top">@0xxxxxxx</td>
+   <td valign="top">High byte of card ID</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">$3FFA</td>
+   <td style="font-family: monospace;" valign="top">@0000xxxx</td>
+   <td valign="top">4 bit country code</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">$3FFB</td>
+   <td style="font-family: monospace;" valign="top">$80</td>
+   <td valign="top">Marks external application</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">$3FFC</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td valign="top">Size of card in banks, eg. $02 for a 32K card</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">$3FFD</td>
+   <td style="font-family: monospace;" valign="top">$00</td>
+   <td valign="top">Subtype of card - future expansion</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">$3FFE</td>
+   <td style="font-family: monospace;" valign="top">'OZ'</td>
+   <td valign="top">Card holds applications</td>
+ </tr>
+  </tbody>
+</table>
+<span style="font-family: monospace;"><br>
+</span>The country codes is as follows: The high nibble of the country code
+byte
+must be 0 (@0000). The low nibble indicates the language variant of the
+application, and is coded as follows:<br>
+<br>
+<table style="font-size: 12px; text-align: left; width: 50%;" border="0" cellpadding="1" cellspacing="1">
+  <tbody>
+ <tr>
+   <td style="vertical-align: top; font-family: monospace; width: 15%;">0000</td>
+   <td style="vertical-align: top;">(0) USA</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">0001</td>
+   <td valign="top">(1) France</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">0010</td>
+   <td valign="top">(2) Germany</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">0011</td>
+   <td valign="top">(3) UK&nbsp;</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">0100</td>
+   <td valign="top">(4) Denmark</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">0101</td>
+   <td valign="top">(5) Sweden</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">0110</td>
+   <td valign="top">(6) Italy</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">0111</td>
+   <td valign="top">(7) Spain&nbsp;</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1000</td>
+   <td valign="top">(8) Japan</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1001</td>
+   <td valign="top">(9) Iceland</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1010</td>
+   <td valign="top">(A) Norway</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1011</td>
+   <td valign="top">(B) Switzerland</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1100</td>
+   <td valign="top">(C) Turkey</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1101</td>
+   <td valign="top">(D) reserved...</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1110</td>
+   <td valign="top">(E) reserved...</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1111</td>
+   <td valign="top">(F) reserved...</td>
+ </tr>
+  </tbody>
+</table>
+<br>
+Before commercial release it is necessary to obtain a card ID. If two
+commercially
+released cards shared an ID, then inserting both into the machine could
+cause serious problems for the card manager, and it is most important
+that
+this should not happen. The bits explicitly given above will be true
+for
+all external IDs - alternative settings of these bits are reserved for
+future internal applications.
+<p>Next, the card manager expects to find the application front
+DOR starting
+in the top bank of the slot, at bank offset $3FC0. This section should
+be identical for all application cards, apart from the address of the
+first
+application DOR.</p>
+<table style="font-size: 12px; text-align: left; width: 70%;" border="0" cellpadding="1" cellspacing="1">
+  <tbody>
+ <tr>
+   <td style="font-family: monospace;" valign="top">3 bytes</td>
+   <td style="font-family: monospace;" valign="top">0 0 0</td>
+   <td style="vertical-align: top;">Link to parent</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">3 bytes</td>
+   <td style="font-family: monospace;" valign="top">0 0 0&nbsp;</td>
+   <td valign="top">Link to brother - this may point to the HELP front DOR</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">3 bytes</td>
+   <td style="font-family: monospace;" valign="top">x x x</td>
+   <td valign="top">Link to son - this points to the first application DOR</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1 byte</td>
+   <td style="font-family: monospace;" valign="top">$13</td>
+   <td valign="top">DOR type, ROM Front DOR</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1 byte</td>
+   <td style="font-family: monospace;" valign="top">8</td>
+   <td valign="top">DOR length</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1 byte</td>
+   <td style="font-family: monospace;" valign="top">'N'</td>
+   <td valign="top">Key for name field (DT_NAM)</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1 byte</td>
+   <td style="font-family: monospace;" valign="top">5</td>
+   <td valign="top">Length of name and terminator</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">5 bytes</td>
+   <td style="font-family: monospace;" valign="top">'APPL', 0</td>
+   <td valign="top">NULL-terminated name</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1 byte</td>
+   <td style="font-family: monospace;" valign="top">$FF</td>
+   <td valign="top">DOR terminator</td>
+ </tr>
+  </tbody>
+</table>
+<br>
+The 3 byte links consist of a 2 byte offset within a bank (low byte,
+high
+byte) followed by a bank number. It is recommended but not necessary
+that
+all the application header information, including menus and help, are
+placed
+in the top one or two banks. The space between the application front
+DOR
+and the card header above it should be padded with zeros. Note: The
+bank
+numbers should be offset from the top bank. ie. the top bank should be
+$3F, the one below $3E etc. In a 128K EPROM the lowest bank should be
+thought
+of as $38 and not as $00.
+<br>
+
+&nbsp;
+<p><b>The Application DOR</b>
+</p>
+
+<p>The application DOR(s) may now be placed wherever is
+convenient (the
+contain relative data structure pointers), and if there is more than
+one,
+chained together via the brother links. An application DOR contains
+various
+information relevant to running the application, and may also contain
+pointers
+to menu topic help information. The format of an application DOR is as
+follows:</p>
+<table style="font-size: 12px; text-align: left; width: 100%;" border="0" cellpadding="3" cellspacing="2">
+  <tbody>
+ <tr>
+   <td style="vertical-align: top; font-family: monospace; width: 10%;">3&nbsp;bytes</td>
+   <td style="vertical-align: top; font-family: monospace; width: 10%;">0&nbsp;0&nbsp;0</td>
+   <td valign="top">Link to parent</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">3&nbsp;bytes</td>
+   <td style="font-family: monospace;" valign="top">x&nbsp;x&nbsp;x</td>
+   <td valign="top">Link to brother (this will be 0 0 0 if this is the only application on the card or the last in a chain)</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">3&nbsp;bytes</td>
+   <td style="font-family: monospace;" valign="top">0&nbsp;0 0</td>
+   <td valign="top">Link to son</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1&nbsp;byte</td>
+   <td style="font-family: monospace;" valign="top">$83</td>
+   <td valign="top">DOR type, application ROM</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">l&nbsp;byte</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td valign="top">Total DOR length</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1&nbsp;byte</td>
+   <td style="font-family: monospace;" valign="top">'@'</td>
+   <td valign="top">Key to info section</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1&nbsp;byte</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td valign="top">Length of info section</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">2&nbsp;bytes</td>
+   <td style="font-family: monospace;" valign="top">0&nbsp;0</td>
+   <td valign="top">Reserved for future expansion<br>
+   </td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1&nbsp;byte</td>
+   <td style="font-family: monospace;" valign="top">'x'</td>
+   <td valign="top">Application key letter, i.e. the letter used in the square sequence to enter the application. If several<br>
+applications share a letter, then the first is entered by []x, the next by []Zx, the next by []ZZx, etc. A<br>
+maximum of ZZZZ is possible. However, a bug in v3.0 of the operating system doesn't allow for more than []ZZx.</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1&nbsp;byte</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td valign="top">continuous RAM size required, in 256-byte pages (eg. 32 for
+8K). This is relevant only to bad applications. This byte ranges from 1
+to 160 (160*256=40K). See the section below on bad applications. Use 0
+to make your application the default size, which is 8K on an unexpanded
+machine and 40K on an expanded one, or if your application is good.</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">2&nbsp;bytes</td>
+   <td style="font-family: monospace;" valign="top">0&nbsp;0</td>
+   <td valign="top">This is an estimate of environment overhead, ie. how much
+memory is needed to save the state of the application each time it is
+exited. OZ will 'learn' from experience how much is actually required
+anyway, so this feature is best ignored.</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">2&nbsp;bytes</td>
+   <td style="font-family: monospace;" valign="top">x&nbsp;x</td>
+   <td valign="top">Unsafe (ie. not preserved over pre-emption) workspace size required in bytes (low byte, high byte).</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">2&nbsp;bytes</td>
+   <td style="font-family: monospace;" valign="top">x&nbsp;x</td>
+   <td valign="top">Safe (ie. preserved over pre-emption) workspace size required
+in bytes. These workspaces are allocated from the system half of
+segment 0, downwards from $1FFD, unsafe workspace at the top. They are
+used when it is important that the workspace is not bound to awkward
+segments, but rather remains stable in the logical address space. Note
+that both safe and unsafe workspace draw from the 2K area of memory
+from $1800 to $2000. This area is also used for the application stack,
+mailboxes, and some system stack. Therefore you must make sure that all
+these demands do not exceed the limited supply of available memory. It
+is probably advisable to limit safe and unsafe workspace to not much
+more than a couple of pages at the most.</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">2&nbsp;bytes</td>
+   <td style="font-family: monospace;" valign="top">x&nbsp;x</td>
+   <td valign="top">Entry point for application code (logical). Must be in segment 3. Remember low byte, high byte order.</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1&nbsp;byte</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td valign="top">Desired binding of Segment 0 on entry.</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1&nbsp;byte</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td valign="top">Desired binding of Segment 1 on entry.</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1&nbsp;byte</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td valign="top">Desired binding of Segment 2 on entry.</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1&nbsp;byte</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td valign="top">Desired binding of Segment 3 on entry.<br>
+   <br>
+Usually you will want to bind the bank containing the code for your
+application to segment 3 and probably set the other banks to zero. If
+the application is a bad one, then certain segments will be bound to
+RAM on entry, depending on the size of continuous RAM selected. The
+desired binding of such segments must be set to zero to avoid conflict
+(RAM is paged in after application is created therefore overriding
+explicit bank references).</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1&nbsp;byte</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td style="vertical-align: top;">Application type byte 1. Set it
+to a combination of the following bits. Note the bits are not all
+orthogonal, eg. if 4 is set 8 must be too.<br>
+   <br>
+   <table style="font-size: 12px; text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+  <tbody>
+    <tr>
+   <td style="vertical-align: top; font-family: monospace;">AT_GOOD=1</td>
+   <td style="vertical-align: top;">Good application</td>
+    </tr>
+    <tr>
+   <td style="font-family: monospace;" valign="top">AT_BAD=2</td>
+   <td valign="top">Bad application</td>
+    </tr>
+    <tr>
+   <td style="font-family: monospace;" valign="top">AT_UGLY=4</td>
+   <td valign="top">Ugly application, bad popdown</td>
+    </tr>
+    <tr>
+   <td style="font-family: monospace;" valign="top">AT_POPD=8</td>
+   <td valign="top">Popdown, kill on pre-emption</td>
+    </tr>
+    <tr>
+   <td style="font-family: monospace;" valign="top">AT_ONES=16&nbsp;</td>
+   <td valign="top">Only one instantiation is allowed (e.g. Diary).</td>
+    </tr>
+    <tr>
+   <td style="font-family: monospace;" valign="top">AT_DRAW=32</td>
+   <td valign="top">OZ should attempt to preserve screen over pre-emption (ranging
+from right edge of topic window to left edge of OZ window). This should
+not be set unless absolutely necessary, ie. when the application cannot
+reasonably redraw its own screen in response to an RC_DRAW return.
+Programmer laziness is not sufficient grounds! Note that when memory is
+low OZ will fail to preserve the screen anyway and will return RC_DRAW
+after screen corruption.</td>
+    </tr>
+    <tr>
+   <td style="font-family: monospace;" valign="top">AT_FILM=64</td>
+   <td valign="top">File manager ID, used by the Filer, DO NOT SET.</td>
+    </tr>
+    <tr>
+   <td style="font-family: monospace;" valign="top">AT_BOOT=128</td>
+   <td valign="top">Application auto-boot, used by the Index, DO NOT SET.</td>
+    </tr>
+  </tbody>
+   </table>
+   <br>
+   </td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1 byte</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td valign="top">Application type byte 2. Given by combination of:<br>
+   <br>
+   <table style="font-size: 12px; text-align: left; width: 100%;" border="0" cellpadding="1" cellspacing="1">
+  <tbody>
+    <tr>
+   <td style="vertical-align: top; font-family: monospace;">AT2_CL=1</td>
+   <td valign="top">Set CAPS lock on entry</td>
+    </tr>
+    <tr>
+   <td style="font-family: monospace;" valign="top">AT2_ICL=2</td>
+   <td valign="top">Set inverted CAPS lock on entry (should not be set without bit 1 set too or the effect is undefined).</td>
+    </tr>
+    <tr>
+   <td style="font-family: monospace;" valign="top">AT2_IE=128</td>
+   <td valign="top">Ignore error returns - internal use only, DO NOT SET.</td>
+    </tr>
+  </tbody>
+   </table>
+   </td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1 byte</td>
+   <td style="font-family: monospace;" valign="top">'H'</td>
+   <td valign="top">Key to help section</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1 byte</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td valign="top">Length of help section</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">3 bytes</td>
+   <td style="font-family: monospace;" valign="top">x x x</td>
+   <td valign="top">Extended pointer to topics</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">3 bytes</td>
+   <td style="font-family: monospace;" valign="top">x x x</td>
+   <td valign="top">Extended pointer to commands</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">3 bytes</td>
+   <td style="font-family: monospace;" valign="top">x x x</td>
+   <td valign="top">Extended pointer to application help</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">3 bytes</td>
+   <td style="font-family: monospace;" valign="top">x x x</td>
+   <td valign="top">Extended pointer to token base.</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top"></td>
+   <td style="font-family: monospace;" valign="top"></td>
+   <td valign="top">If no menus, help or diamond sequences are required then
+the above should all point to three zeros. E.g. an extended pointer to
+the beginning of the current application DOR would be suitable (it
+always contains three zeros).<br>
+   </td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1 byte</td>
+   <td style="font-family: monospace;" valign="top">'N'</td>
+   <td valign="top">Key to name section</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1 byte</td>
+   <td style="font-family: monospace;" valign="top">x</td>
+   <td valign="top">Length of name</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">x bytes</td>
+   <td style="font-family: monospace;" valign="top">'xxxx',0</td>
+   <td valign="top">Null-terminated application name. If this too
+long then it will look rather odd in the Index. 12 characters is about
+the maximum sensible length. Screen driver codes is allowed in the name
+(e.g. bold).</td>
+ </tr>
+ <tr>
+   <td style="font-family: monospace;" valign="top">1 byte</td>
+   <td style="font-family: monospace;" valign="top">$FF</td>
+   <td valign="top">DOR terminator byte.</td>
+ </tr>
+  </tbody>
+</table>
+<p><br>
+
+<b>Menu, Topic, Help (MTH)</b>
+</p>
+
+<p>Each application can have a set of 'topics' associated with
+it. These
+topics appear in the topic window on the left hand edge of the screen,
+below the application name. Normally all the topics are in grey but
+when
+the menu key is pressed a topic name is highlighted and a menu display
+is brought up. The menu consists of up to three columns of commands,
+which
+may be selected with a highlight bar or by using a special keyboard
+sequence
+also shown on the menu. Each topic and each command may have a page of
+help text associated with it and in addition the application itself may
+have a page of help text, perhaps for a general description of its
+function.
+An extra information topic, not displayed in the topic window, may be
+added
+to provide access to a series of help pages which are not directly
+associated
+with keyboard commands. This is useful to explain general features of
+the
+application or tips of command usage.
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Topic information</b>
+</p>
+
+<p>The 'pointer to topics' is of the form of a 2 byte offset in a
+bank,
+followed by a bank number. The pointer should point to a series of
+topic
+definitions arranged like this:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Start marker<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;first definition&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;second definition&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;last definition&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End marker</pre>
+
+Where each definition has the following form:
+<pre>a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b-a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; length byte<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; n bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'xxxxx'&nbsp;&nbsp;&nbsp;&nbsp; topic name<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; optional null-terminator (see below)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional pointer to topic help page, if<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; any. This is a 2-byte pointer relative to<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the start of the help text. NOTE: it is<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stored as high byte, low byte sequence<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (reverse of the conventional order).<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; topic attribute byte<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b-a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; length byte</pre>
+
+b
+<p>The topic attribute byte:
+</p>
+
+<pre>bit 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; set for an 'An' topic eg. 'An Edit topic' - default is 'A'<br>bit 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; set for an information topic - see below<br>bits 2-3&nbsp;&nbsp;&nbsp; should be 0<br>bit 4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; set if topic entry has a pointer to a help page<br>bits 5-7&nbsp;&nbsp;&nbsp; should be 0</pre>
+
+The topic name terminator can simply be a null, but in fact any control
+character (ie. $00-$1F) will serve perfectly well. Therefore it is
+possible
+to use the attribute byte, or the high byte of the help pointer (hence
+the high byte, low byte ordering - although this won't apply if the
+help
+text length is more than 8K - the high byte becoming $80) to terminate
+the name. The system looks at the attribute and help pointers by
+counting
+back from the end of the topic entry, so there is no confusion between
+a term inator and an attribute byte or help pointer.
+<p>NOTE: Due to a bug in OZ it is necessary when creating
+information topics
+(bit 1), that the definitions must be placed before any command topics
+otherwise they are not recognized by the system.
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Command Information</b>
+</p>
+
+<p>The 'pointer to commands' is of the form of a 2 byte offset in
+a bank,
+followed by a bank number. The pointer should point to a series of
+command
+definitions arranged like this:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Start marker<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; def(1,1)&nbsp;&nbsp;&nbsp; first command of first topic<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; def(1,2)&nbsp;&nbsp;&nbsp; second command of first topic<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; def(1,x)&nbsp;&nbsp;&nbsp; last command of first topic<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End of this topic<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; def(2,1)&nbsp;&nbsp;&nbsp; first command of second topic<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; def(2,x)&nbsp;&nbsp;&nbsp; last command of second topic<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End of this topic<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; def(x,1)&nbsp;&nbsp;&nbsp; first command of last topic<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; def(x,y)&nbsp;&nbsp;&nbsp; last command of last topic<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End of all topics</pre>
+
+Each of these definitions should have the following form:
+<pre>a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b-a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; length byte<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; command code (see below)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'xxx',0&nbsp;&nbsp;&nbsp;&nbsp; null-terminated keyboard sequence for<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; command.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'xxxxx'&nbsp;&nbsp;&nbsp;&nbsp; Command name. The total length of the name<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and keyboard sequence must be 25 characters<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; or less. Any control characters which you<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; need to use must be brought in via tokens.<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; optional null-terminator (see below)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional pointer to command help page, if<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; any. This is a 2-byte pointer relative to<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the start of the help text. NOTE: it is<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stored as high byte, low byte sequence<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (reverse of the conventional order).<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; command attribute byte<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b-a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; length byte</pre>
+
+b
+<p>The command attribute byte:
+</p>
+
+<pre>bit 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; set to make this entry the first in a new column. Note: the last<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; entry in a column has no special attribute. Set this bit even<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; though the previous column is used up, otherwise the system gets<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; confused in displaying the entries.<br><br>bit 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; should be set to 0<br><br>bit 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; set to make a hidden entry. The command name and key sequence will<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; not appear on the menu display. This is useful for commands which<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; need to key sequences. eg. in PipeDream &lt;&gt;TAB is a hidden entry<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; which does the same thing as &lt;&gt;CFC, by having the same command<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; code. Hidden entries may have Help text, but this text will never<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; be displayed. Note: A hidden entry must never be the last in a<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; topic. If it is the Help system will not be fully traversable and<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the system will crash if the user moves through help in a certain<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; way.<br><br>bit 3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; set to make safe. Setting this bit forces to use the user to use<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the keyboard sequence rather than selecting the command with the<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; highlight bar in the menu display. This is used by the system for<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the Index commands &lt;&gt;KILL and &lt;&gt;PURGE. An attempt to access these<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; commands through the highlight bar results in a double bleep. These<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; entries should have their command name in tiny text, by convention.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This has to be done using a token, since control characters will<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; terminate a command name.<br><br>bit 4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; set if command entry has a pointer to a help page.<br><br>bit 5-7&nbsp;&nbsp;&nbsp;&nbsp; should be set to 0</pre>
+
+NOTE: The same trick of treating the attribute byte, or high byte of
+the
+help pointer as a terminator, can be used in menu entries. The command
+name terminator simply needs to be in the range ($00 - $1F).
+<p>The format of the keyboard sequence is as follows:
+</p>
+
+<p>For a conventional diamond sequence, simply use the upper case
+letters
+of the sequence, eg. for the PipeDream New command the entry would be
+the
+following bytes "BNEW" &amp; 0 . For commands using other keys the
+keyboard
+decoder codes are used. For example
+&lt;SHIFT&gt;&lt;UP&gt;&lt;ARROW&gt; is
+represented
+by a key sequence consisting of one byte. IN_SUP ($FB) and the
+terminator,
+$00. The system automatically generates the graphic sequence from this
+code. The menu exceptions, which correspond to the screen driver codes,
+are:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Key</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Symbol</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Code<br></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;SPACE&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MU_SPC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $E0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;ENTER&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MU_ENT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $E1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;TAB&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MU_TAB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $E2<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;DEL&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MU_DEL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $E3</pre>
+
+When an application reads the keyboard then valid keyboard sequences
+are
+intercepted so instead of returning the raw characters, the routine
+will
+return a zero, indicating a command - note this means the NUL can never
+be read in as a normal character. The next keyboard read will then
+return
+the relevant command code as specified in the above definition. One way
+of dealing with this behaviour is for the user to set up a 'read
+character'
+routine which will return normal characters without change, but
+intercept
+and obey command sequences. The following code fragment indicates a
+possible
+arrangement, although you will need to have read "Error handling and
+related
+issues" and "Input and the keyboard decoder" to follow it properly.
+<pre>.rdch&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osin.html">OS_In</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; perform <a href="osin.html">OS_In</a><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; nc, rdch2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; if no error, continue<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cp&nbsp;&nbsp; RC_SUSP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; check RC_SUSP<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; z, rdch&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; and ignore if it occurs<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SCF<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; return with system error enabled<br>.rdch2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; or&nbsp;&nbsp; a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; reflect on input<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret&nbsp; nz&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; return if character is not NUL<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osin.html">OS_In</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; read command code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; or&nbsp;&nbsp; a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; set flags<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret&nbsp; z&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; return if a NUL has been read<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;deal with command code in A&gt;</pre>
+<p><br>
+
+<b>Help Information</b>
+</p>
+
+<p>The 'pointer to commands' is of the form of a 2 byte offset in
+a bank,
+followed by a bank number. The pointer should point to a series of help
+page definitions arranged like this:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; help page for the application (or 0 for a blank page)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; help entry (see below)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; last help entry</pre>
+
+Each help entry will produce one page of help text. It consists of a
+series
+of lines, where DEL ($7F) is used for newline, terminated by a NUL
+($00).
+The DEL character is used for newline to facilitate embedding screen
+driver
+codes into the help text. For example you can use special keyboard
+icons,
+arrow symbols or box characters, eg. for the 'ENTER' icon use the
+sequence
+1 &amp; SD_ENT. The help page is displayed with centred
+justfification
+switched on, but you could include a command to switch off centering in
+your help strings. This should only be done where necessary, to avoid
+disrupting
+the overall style of the help pages. The pointer to the help text,
+which
+is an offset from the base of the help text, defined in the application
+DOR, in topic and command entries, should point to the first character
+of the first line. A help entry might look like this:
+<pre>.helppage&nbsp;&nbsp; defm "This is a simple help page" &amp; $7F<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defm "and this is the second line" &amp; 0</pre>
+<p><br>
+
+<b>Token information</b>
+</p>
+
+<p>The 'pointer to token base' is of the form of a 2 byte offset
+in a bank,
+followed by a bank number. The token table format is shown below.
+</p>
+
+<pre>base&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Recursive token boundary (1 - 127)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Number of tokens (1 - 127)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; first-base&nbsp; pointer to first token<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; second-base pointer to second token<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; last-base&nbsp;&nbsp; pointer to last token<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; end-base&nbsp;&nbsp;&nbsp; pointer to byte after nth token<br><br>.first&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defm "xxx"&nbsp; first string (no terminators)<br>.second&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defm "yyy"&nbsp; second string<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>.last&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defm "zzz"&nbsp; last string</pre>
+
+.end
+<p>NOTE: the token table must not be allowed to cross a bank
+boundary (16K).
+</p>
+
+<p>Tokens may be embedded in the help text or within the text for
+topic
+and command names. The first token has a code of $80 and subsequent
+tokens
+count up from here. Recursive tokens may contain tokens in their text.
+Tokens above the boundary level set by the 'first recursive token' may
+contain tokens themselves, providing those tokens are below the
+boundary.
+The example below is in assembly format to improve clarity:
+</p>
+
+<pre>.tok_base&nbsp;&nbsp; defb $04&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; recursive token boundary<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defb $05&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; number of tokens<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defw tok0 - tok_base<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defw tok1 - tok_base<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defw tok2 - tok_base<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defw tok3 - tok_base<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defw tok4 - tok_base<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defw end - tok_base<br><br>.tok0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defm "file"<br>.tok1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defm " the "<br>.tok2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defm "EPROM"<br>.tok3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defb $01, 'T'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Tiny text token<br>.tok4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; defm ' ', $80, "s "</pre>
+
+.end
+<br>
+
+&nbsp;
+<p><b>Information topics</b>
+</p>
+
+<p>The information topic is selected by pressing
+&lt;HELP&gt; from within
+the application. If the topic is present then a menu of commands will
+be
+brought up. In an application with no other topics, pressing
+&lt;MENU&gt;
+will bring up the information topic name in the topic window. The
+command
+entries for an information topic topic differ from ordinary commands in
+that there is no keyboard sequence associated with them. The command
+entries
+should look like this:
+</p>
+
+<pre>a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b-a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; length byte<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NULL command code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NULL keyboard sequence<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'xxxxx'&nbsp;&nbsp;&nbsp;&nbsp; Command name. The total length of the name<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; must be 25 characters<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; optional null-terminator<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pointer to help page<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; command attribute byte<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; b-a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; length byte</pre>
+
+b
+<p>The attribute byte should always be $10 (help page) or $11
+(help page
+and first entry in a new column).
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Help Front DOR</b>
+</p>
+
+<p>If the brother link in the application front DOR is not set to
+zero
+it is taken as pointing to a help front DOR. The help front DOR looks
+like
+this:
+</p>
+
+<pre>3 bytes&nbsp;&nbsp;&nbsp;&nbsp; 0 0 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link to parent<br>3 bytes&nbsp;&nbsp;&nbsp;&nbsp; 0 0 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link to brother<br>3 bytes&nbsp;&nbsp;&nbsp;&nbsp; x x x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link to son, this points to the first Help DOR<br><br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $13&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOR type, application Front DOR<br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOR length<br><br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'N'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Key for name field<br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Length of name and terminator<br>5 bytes&nbsp;&nbsp;&nbsp;&nbsp; 'HELP', 0&nbsp;&nbsp;&nbsp;&nbsp; NULL-terminated name<br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $FF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOR terminator</pre>
+
+A help DOR entry looks like an application DOR entry, but without the
+information
+record:
+<pre>3 bytes&nbsp;&nbsp;&nbsp;&nbsp; 0 0 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link to parent<br>3 bytes&nbsp;&nbsp;&nbsp;&nbsp; x x x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link to brother (points to another Help DOR or set to<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; zero)<br>3 bytes&nbsp;&nbsp;&nbsp;&nbsp; 0 0 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Link to son<br><br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $83&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOR type, application ROM<br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; total DOR length<br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'H'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Key to help section<br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Length of help section<br>3 bytes&nbsp;&nbsp;&nbsp;&nbsp; x x x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Extended pointer to topics<br>3 bytes&nbsp;&nbsp;&nbsp;&nbsp; x x x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Extended pointer to commands<br>3 bytes&nbsp;&nbsp;&nbsp;&nbsp; x x x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Extended pointer to application help<br>3 bytes&nbsp;&nbsp;&nbsp;&nbsp; x x x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Extended pointer to token base.<br><br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'N'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Key to name section<br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Length of name<br>x bytes&nbsp;&nbsp;&nbsp;&nbsp; 'xxxx',0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Null-terminated application name. Must be the name of<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; an existing application.<br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $FF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DOR terminator byte.</pre>
+
+The Help in a Help DOR takes priority over the Help in the application
+DOR, but for ROM applications it is not necessary to use a separate
+DOR.
+The use of the Help DOR is mainly in providing Help for internal
+applications
+or applications in other ROM cards. If you intend to provide Help for
+an
+internal application you will need to provide all the same command
+codes
+for the commands. Therefore, it will be necessary to examine the
+structure
+of the internal application carefully. This is readily achieved by
+opening
+the application with <a href="gnopf.html">GN_Opf</a>
+and A = OP_DOR to get a DOR handle, and reading
+the addresses of the Help structures out of the Help record. The
+application
+name can be retrieved by letting FILER provide the filename: try
+listing
+all application names with the ":ROM.*//*" wildcard.
+<br>
+
+&nbsp;
+<p><b>Limitations and conventions</b>
+</p>
+
+<p>There are some limitations and conventions regarding menu
+topics and
+help; the limitations are:
+</p>
+
+<ol>
+
+  <li>Diamond sequences should consist of no more than 5
+characters, although
+these may be special characters like arrow keys and Delete.</li>
+
+  <li>The first possible match will be selected, so if a diamond
+sequence 'AB'
+exists, there is no point having 'ABC' as it cannot be selected.</li>
+
+  <li>No command code should be zero, as two zeroes from '<a href="osin.html">OS_In</a>' are used to
+represent NUL. Note also that the &lt;SPACE&gt;,
+&lt;TAB&gt;, &lt;ENTER&gt; and
+the arrow keys all return command codes and you must make sure you do
+not
+clash with these. See "Input and the Keyboard Decoder" for details of
+these
+codes.</li>
+
+  <li>There should be no more than 7 topics per application and
+no more than
+24 commands per topic. Each command name should consist of no more than
+25 characters.</li>
+
+  <li>If any commands in a topic have help, then it is strongly
+recommended that
+all the topics have help, even if this is just a blank page (set the
+help
+pointer to point to a NUL) and the topic itself must have help.</li>
+
+&nbsp;
+</ol>
+
+The conventions, we recommend you subscribe to, are:
+<ol>
+
+  <li>Make the first letter of a diamond sequence the first
+letter of the topic
+name (eg. PipeDream has BNEW in the Blocks topic).</li>
+
+  <li>If topic names coincide with the internal ones, then the
+order should be
+the same, eg. 'CURSOR' before 'FILES'.</li>
+
+  <li>Commands associated with the arrow keys should be in the
+order: Right,
+Left, Up and Down.</li>
+
+  <br>
+
+&nbsp;
+</ol>
+
+<b>Bad Applications</b>
+<p>An application can be made 'bad' (or a popdown 'ugly') if it
+requires
+a large area of continuous memory since the Z88 cannot allocate more
+than
+256 bytes to an application at any time. Although this appears to be
+very
+restrictive, most programs can be made to work under this regime. All
+the
+internal applications, bar BBC BASIC, are 'good', and BBC BASIC is only
+bad because it was not written for the Z88 but simply imported. If,
+however,
+you are simply unable to write an application without large continuous
+areas, you may have to make your application bad. Similarly if your
+application
+is intended to be the only one running on the Z88, there is no problem
+with it being bad.
+</p>
+
+<p>Bad application memory is provided from address $2000 onwards.
+The amount
+given depends on the value of the 'continuous RAM size' byte in the
+application
+DOR header. This byte should be set to the number of 256 byte pages
+required.
+If it is set to zero then the default value is used (40K in an expanded
+machine, 8K in an unexpanded machine). The value of the default can be
+changed, via the PANEL, but bear in mind this is something which
+affects
+the whole system, and should not be undertaken lightly. When a bad
+application
+is first entered, the IX register points to an information block as
+follows:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $03&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Number of information bytes<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Start page of continuous memory, $20<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End page of continuous memory, this cannot<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; be used, for example $C0 for a 40K bad<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; application.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Ususally zero. Reserved for future<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; expansion.</pre>
+
+Whenever BBC BASIC is exited an area of unused memory, between the
+program
+and the stack, is given back to the system. When BBC BASC is re-entered
+memory is found to fill this hole back up again. It is this mechanism
+that
+allows several 40K BBC BASIC's to co-exist on a 128K Z88 computer. All
+the BBC BASIC's have a 40K continuous space while they are active and
+running,
+but when inactive (pre-empted) they occupy considerably less memory. To
+give memory back to the system, the enquiry entry point is used. The
+enquiry
+entry point is three bytes above the application entry point and must
+be
+in segment 3, which effectively forces all entry points into segment 3.
+Normally the enquiry entry point should simply return with Fc = 1.
+However,
+if Fc = 0 the memory starting from the address specified in register BC
+and ending at the address specified in register DE (not including the
+byte
+at (DE)) is given back to the system. The following code might be used:
+<pre>.app_entry&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jp&nbsp;&nbsp; main_entry&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; JP instruction 3 bytes long<br>.app_enquiry&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; bc, (hole_start)&nbsp;&nbsp; ; enquiry entry point<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; de, (hole_end)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; or&nbsp;&nbsp; a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret</pre>
+
+Bad applications not giving memory back to the system (and all other
+application)
+should use the following code for the enquiry entry point:
+<pre>.app_entry&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jp&nbsp;&nbsp; main_entry<br>.app_enquiry&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>scf</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; enquiry entry point<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret</pre>
+
+<i>Z88 Developers Team: We've had no problems with good applications &amp;
+popdowns </i>that ignores the above &lt;<b>SCF</b>&gt;
+header, even though
+the original documentation explicitly specifies it to be coded.
+<p>Bad applications place a lot of strain on the system, by using
+large
+areas of memory. A 40K bad application which gives no memory back to
+the
+system is unlikely to co-exist well with other applications, so it is
+strongly
+recommended that if you must write bad applications you give memory
+back
+to the system. It is almost always possible to design data structures
+so
+that a continuous block can be kept empty. Programmer laziness is not
+an
+excuse to use a 40K bad application by default!
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Mailboxes</b>
+</p>
+
+<p>The Z88 provides a facility for applications to pass on
+information
+to the next application started up. This is used by PipeDream and the
+Diary
+to read the name of a marked file from the Filer. The way this works is
+that the Filer drops the address and length of the name of the last
+marked
+file into a mailbox from time to time. When the Filer is exited (eg. by
+pressing &lt;ESC&gt;) the system looks at the mailbox and if
+there is something
+there, it copies the information to a safe area of memory. When another
+application is started it can ask the system if there is any mail. All
+mail is tagged by an name, which describes the type of information, and
+an application must give the system the name of the information it is
+after.
+If information is present then the system copies it from the safe area
+into the bottom stack area of the application's memory. The interface
+for
+mailboxing is provided by the <a href="ossr.html">OS_Sr</a>
+call with the reason codes SR_WPD (write
+parameter data) and OS_RPD (read parameter data). See <a href="ossr.html">OS_Sr</a> reference for
+details of parameter specification.
+</p>
+
+<p>The system uses two information types; filenames and dates.
+These have
+the information type names of "NAME" and "DATE", both null-terminated.
+If you transfer information of one of these types, then you must use
+the
+appropriate name, otherwise the internal appliations will not be able
+to
+collect your mail. Similarly you won't be able to receive mail from the
+Filer, Calendar, Diary, etc., unless you try and read mail with these
+names.
+If you do use the mail system please inform the programmers in your
+documentation
+of the information type name you use (which should be a mnemonic upper
+case alpha string), so other applications can share data with yours.
+The
+internal applications use mail as follows:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exports filenames<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Diary&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; imports filenames, imports dates, exports dates<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PipeDream&nbsp;&nbsp;&nbsp;&nbsp; imports filenames<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Calendar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; imports dates, exports dates<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Alarm&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; imports dates</pre>
+
+The mailboxing system can be seen in operation using PipeDream and the
+Filer. Use &lt;&gt;FL from PipeDream and enter the Filer from
+this menu. Mark
+a file (eg. with &lt;TAB&gt;) and press &lt;ESC&gt; to
+return to PipeDream. The
+marked file will then be copied into the 'Name of file to load' field.
+Similarly selecting the Diary from the Calendar will set the Diary date
+to the date which was highlighted by the Calendar. When you go to the
+Calendar
+from the Diary, the Calendar moves to the Diary date.
+<br>
+
+&nbsp;
+<p><b>Environment on entry to an application</b>
+</p>
+
+<p>When you enter an application the stack pointer is established
+and you
+will have a stack space of the order of 1.5K. The memory used for the
+stack
+is a shared resource, however. The 2K space between address $1800 and
+address
+$2000 is used for the following purpose:
+</p>
+
+<ol>
+
+  <li>As the system stack. This will usually be quite lightly
+used, but can be
+quite big in some circumstances.</li>
+
+  <li>For the safe and unsafe workspace which applications
+request. The bigger
+these are, the less stack you will have.</li>
+
+  <li>For storing mailbox information between application
+switches. If a lot
+of lengthy mail is being passed around, the maximum stack size is
+reduced.
+We recommend that mail is restricted to a maximum of 64 bytes.</li>
+
+</ol>
+
+The stack space looks like this:
+<br>
+
+&nbsp;
+<pre>$2000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +------------------+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | System use&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |------------------|<br>$1FFD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Unsafe workspace |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |------------------|<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Safe workspace&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |------------------|<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Stack pointer&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |------------------|<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Stack expands&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | downwards...&nbsp;&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |------------------|<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Mailbox data&nbsp;&nbsp;&nbsp;&nbsp; |<br>$1800&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | from here...&nbsp;&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |------------------|<br>$17FF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | System use&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>$0000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +------------------+</pre>
+
+Even with all these demands it is unlikely that you will have much less
+than 1.5K to use for the stack, but clearly if you might need more
+space
+you will need to make your own arrangements, such as allocating memory
+and implementing you own stack procedures, or if really necessary using
+a bad application to provide continuous memory for a stack.
+<p>If you change the stack pointer within your application you
+must save
+the old stack pointer and restore it (below $2000 in segment 0) before
+making any system calls. This is because system calls swap memory banks
+during execution; the stack may get 'paged' out and a system crash
+would
+then most likely occur.
+</p>
+
+<p>If your applications requires access to other banks in your
+card then
+you can use the bank switching call, <a href="osmpb.html">OS_Mpb</a>,
+to bind them in. However,
+your card could be placed in any of the three slots so you need to
+determine
+where your card is. This can simply be done by using <a href="osmgb.html">OS_Mgb</a> while running
+ROM'ed code and then using bank offsets relative to this value.
+</p>
+
+<p>
+</p>
+
+<hr width="100%">
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+
+ <tr>
+
+   <td align="left" valign="top" width="33%"><a href="sysintfc.html">Previous</a></td>
+
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="top" width="33%"><a href="errhandl.html">Next</a></td>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="top" width="33%">Interfacing
+with the system</td>
+
+   <td align="center" valign="top" width="34%">Application
+Static Structures</td>
+
+   <td align="right" valign="top" width="33%">Error
+handling and related issues</td>
+
+ </tr>
+
+  </tbody>
+</table>
+
+</body>
+</html>

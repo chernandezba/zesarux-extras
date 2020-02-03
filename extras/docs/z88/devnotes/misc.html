@@ -1,0 +1,380 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Miscellaneous useful routines</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="map.html">Previous</a></td>
+
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="bottom" width="10%"><a href="miscinfo.html">Next</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p><b><font size="+1">22. Miscellaneous useful routines</font></b>
+</p>
+<p>This section explains how to manipulate system parameters, i.e. from
+the Panel, the Printer Editor and other system resources. The rest of this
+section displays useful routines which does not conveniently fit in any
+of the other sections.
+<br>
+&nbsp;
+</p>
+<p><b>System resource parameters</b>
+</p>
+<p>These parameters are divided into 5 groups. Their mnemonic identifier
+is a 16bit identifier code where the high byte of the code identifies the
+related group:
+</p>
+<pre>$80xx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PANEL system parameters (timeout, baud rates, date format...)<br>$83xx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Window management parameters.<br>$86xx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Process management parameters.<br>$89xx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Memory management parameters.<br>$8Cxx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Director/CLI parameters.</pre>
+
+<b>Enquiries</b>
+<p>The <a href="osnq.html">OS_Nq</a> call is used to read the system parameters,
+including information on the screen, memory, available streams and settings
+from the Panel and Printer Editor. A call is made by loading the BC register
+with a reason code (the system parameter mnemonic) and the other registers
+with values specific to that reason code. Register changes and output specifications
+are different for each reason code.
+</p>
+<p>Here is the call specification for OS_Nq:
+</p>
+<p>
+</p>
+<hr width="100%">
+<br>
+<b><font size="+1">OS_Nq, enquire</font></b>
+<p><tt>RST 20H, DEFB $66</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BC = reason code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ADEHLIX parameters</pre>
+
+OUT if call succeeded:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Depends on BC and other arguments</pre>
+
+Out if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = return code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), incorrect reason code or parameters<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_UNK ($03), unknown request<br><br><hr width="100%"></pre>
+
+<b>Window Management</b>
+<p>The following enquiry calls are for fetching low level window information:
+</p>
+<p>NQ_WBOX (BC = $8300), return window information NQ_WCUR (BC = $8303),
+return cursort information NQ_RDS (BC = $8306), read text from the screen
+</p>
+<p>The above window enquiry calls are described in detail in the <a href="osnq.html">OS_Nq</a>
+call specification.
+<br>
+&nbsp;
+</p>
+<p><b>Process Management</b>
+</p>
+<p>The following codes return system handles in IX:
+</p>
+<pre>NQ_Ain ($8600)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Application enquiry (system use only)<br>NQ_Khn ($8603)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read keyboard handle (use ":INP" device instead)<br>NQ_Shn ($8606)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read screen handle (use ":SCR" device instead)<br>NQ_Phn ($8609)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read printer indirected handle<br>NQ_Nhn ($860C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read null handle (use ":NUL" device instead)<br>NQ_Wai ($860F)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Who am I? (system use only)<br>NQ_Com ($8612)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read comms handle (use ":COM" device instead)<br>NQ_Ihn ($8615)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read IN handle (use ":INP" device instead)<br>NQ_Ohn ($8618)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read OUT handle (use ":OUT" device instead)<br>NQ_Rhn ($861B)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read direct printer handle<br><br></pre>
+
+<b>Memory Management</b>
+<pre>NQ_Mfs ($8900)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read free space information (system use only)<br>NQ_Slt ($8903)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read slot type information (system use only)<br>NQ_Mfp ($8906)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; get total of free RAM pages in slot (OZ 4.2 and newer)</pre>
+
+<b>Director and CLI</b>
+<p>These enquiries return extended pointers of a null-terminated string
+in BHL:
+</p>
+<pre>NQ_Dev ($8C00)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fetch current device<br>NQ_Dir ($8C03)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fetch current directory<br>NQ_Fnm ($8C06)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fetch current filename match string</pre>
+
+<b>Director and CLI handles</b>
+<p>The following calls return system handles in IX
+</p>
+<pre>NQ_Dmh ($8C09)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fetch Director special memory handle (system use only)<br>NQ_Inp ($8C0C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read std. input handle<br>NQ_Out ($8C0F)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read std. output handle<br>NQ_Prt ($8C12)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read printer stream handle<br>NQ_Tin ($8C15)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read input-T handle<br>NQ_Tot ($8C18)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read output-T handle<br>NQ_Tpr ($8C1B)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read printer-T stream handle<br>NQ_Chn ($8C1E)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read comms handle<br><br></pre>
+
+<b>Specifies</b>
+<p>The <a href="ossp.html">OS_Sp</a> call is a companion to the <a href="osnq.html">OS_Nq</a>
+and is used to set system parameters, notably the Panel and the PrinterEd
+settings. A call is made by loading register pair BC with a reason code
+and the other registers with values specific to that reason code. Register
+changes and output specifications are different for each reason code. The
+<a href="ossp.html">OS_Sp</a> interface call is as follows:
+</p>
+<p>
+</p>
+<hr width="100%">
+<br>
+<b><font size="+1">OS_Sp, specify</font></b>
+<p><tt>RST 20H, DEFB $69</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BC = reason code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HL = pointer to data<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = length (size) of data</pre>
+
+OUT, if call succeeded:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0</pre>
+
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = return code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), incorrect reason code or parameter<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_UNK ($03), unknown request<br><br><hr width="100%"></pre>
+
+<b>System Values</b>
+<pre><i>Symbol (reason code)</i>&nbsp;&nbsp;&nbsp; <i>Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Gfi ($8000)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Install changed settings<br>PA_Mct ($8001)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Timeout in minutes<br>PA_Rep ($8002)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Repeat rate<br>PA_Kcl ($8003)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Keyclick 'Y' or 'N'<br>PA_Snd ($8004)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sound 'Y' or 'N'<br>PA_Bad ($8005)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Default bad process size in K<br><br></pre>
+
+<b>Application values</b>
+<pre><i>Symbol (reason code)</i>&nbsp;&nbsp;&nbsp; <i>Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Iov ($8010)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Insert/Overtype 'I' or 'O'<br>PA_Dat ($8011)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date format 'E' or 'A' (European, American)<br>PA_Map ($8012)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PipeDream map 'Y' or 'N'<br>PA_Msz ($8013)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Map size in pixels<br>PA_Dir ($8014)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 12&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Default directory<br>PA_Dev ($8015)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 16&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Default device<br><br></pre>
+
+<b>Serial port values</b>
+<pre><i>Symbol (reason code)</i>&nbsp;&nbsp;&nbsp; <i>Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Txb ($8016)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 (or 1)&nbsp;&nbsp;&nbsp; Transmit baud rate - binary<br>PA_Rxb ($8017)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 (or 1)&nbsp;&nbsp;&nbsp; Receive baud rate - binary<br>PA_Xon ($8018)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Xon/Xoff 'Y' or 'N'<br>PA_Par ($8019)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parity 'O', 'E', 'M', 'S' or 'N'<br><br></pre>
+
+<b>Printer Editor values (highlights &amp; translation tables)</b>
+<pre><i>Symbol (reason code)</i>&nbsp;&nbsp;&nbsp; <i>Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Ptr ($8020)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Printer name<br>PA_Alf ($8021)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Allow Linefeed, 'Y' or 'N'<br>PA_Pon ($8022)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp;&nbsp;&nbsp; Printer On sequence<br>PA_Pof ($8023)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp;&nbsp;&nbsp; Printer Off sequence<br>PA_Eop ($8024)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp;&nbsp;&nbsp; End of page sequence<br><br>PA_Mip ($8025)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp;&nbsp;&nbsp; HMI prefix sequence<br>PA_Mis ($8026)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp;&nbsp;&nbsp; HMI suffix sequence<br>PA_Mio ($8027)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp;&nbsp;&nbsp; HMI offset sequence</pre>
+
+The format of each highlight sequence is as follows:
+<pre>PA_On&lt;n&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp;&nbsp;&nbsp; Highlight ON sequence<br>PA_On&lt;n&gt;+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp;&nbsp;&nbsp; Highlight OFF sequence<br>PA_On&lt;n&gt;+2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OFF at CR 'Y' or 'N'<br>PA_On&lt;n&gt;+3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Highlight n special character</pre>
+
+The printer editor has a facility for overprinting characters, which is
+most often used to implement underlining on certain printers, by printing
+a character followed by a backspace and an underline character. The user
+enter a ? (query), to represent the character being printed, in the ON
+sequence (the OFF sequence being blank), and this sequence is output for
+every character with the current character being substituted for the query.
+Internally the Printer Editor usually represents the current character
+as an $FF (it will show up like this in the Printer Editor, if a string
+is installed, updated, and the Printer Editor is KILL'ed and re-entered).
+However, because it might be necessary to use an $FF in your overprinting
+sequence, it is possible to change the internal representation of the current
+character to some other value. If you want to use an overprinting sequense
+you must set up PA_SP&lt;n&gt; yourself and use your value in the ON string
+to represent the current character. To implement backspace underlining
+you might set the ON sequence and special character like this:
+<pre>PA_ON1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 255,8,95&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; eg. ?, BS, "_"<br>PA_SP1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 255&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; special highlight character<br><br></pre>
+
+<b>Highlight bases</b>
+<pre>PA_On1 ($8028)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Underline<br>PA_On2 ($802C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bold<br>PA_On3 ($8030)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Extended sequence<br>PA_On4 ($8034)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Italics<br>PA_On5 ($8038)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Subscript<br>PA_On6 ($803C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Superscript<br>PA_On7 ($8040)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Alternate font<br>PA_On8 ($8044)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; User Defined<br><br></pre>
+
+<b>Translations</b>
+<p>The format of each translation code sequence is as follows:
+</p>
+<pre><i>Symbol (reason code)</i>&nbsp;&nbsp;&nbsp; <i>Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Fr&lt;n&gt; (base+0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp;&nbsp;&nbsp; Translate from character<br>PA_To&lt;n&gt; (base+1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp;&nbsp;&nbsp; Translate to sequence<br><br><i>Symbol (reason code)</i>&nbsp;&nbsp;&nbsp; <i>Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Tr1 ($8048)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Row 1, Entry A<br>PA_Tr2 ($804A)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B<br>PA_Tr3 ($804C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C<br>PA_Tr4 ($804E)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Row 2, Entry A<br>PA_Tr5 ($8050)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B<br>PA_Tr6 ($8052)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C<br>PA_Tr7 ($8054)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Row 3, Entry A<br>PA_Tr8 ($8056)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B<br>PA_Tr9 ($8058)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C</pre>
+
+PA_Fr&lt;n&gt; will normally be one character long. If there are more characters
+in this sequence then the first character is replaced by the translation
+string, nut the others are printed as well.
+<p>International versions of the machine have an extra page of 28 translations
+(using the &lt;&gt;ISO command). The reason codes for these translations start
+at $8080 up to $80B6.
+</p>
+<p>The settings do not come into effect until <a href="ossp.html">OS_Sp</a>
+is called with the reason code PA_GFI and A = 0, which installs both the
+Panel and Printer Editor values. No error checking is done, so make sure
+the values are valid.
+</p>
+<p>In addition to the Panel and Printer Editor, the following parameters
+can be set. They expect HL to point to a null-terminated string:
+</p>
+<pre>SP_Dev ($8C00)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set current device<br>SP_Dir ($8C03)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set current directory<br>SP_Fnm ($8C06)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set current name match<br><br></pre>
+
+<b>Interrupts</b>
+<p>Two system calls are available to enable and disable interrupts. It
+is very important to use these calls and not use the Z80 interrupt instructions
+because of a hardware bug in the Z80, which allows for interrupts to occur
+while reading the interrupt status. Note that disabling interrupts should
+be avoided if possible and that NMI (Non Maskable Interrupts) will still
+occur. If a HALT is executed when interrupts are disabled the system will
+stop. HALT should not be used anyway, nor should EI, DI or IM &lt;n&gt;.
+</p>
+<p>
+</p>
+<hr width="100%">
+<br>
+<b><font size="+1">OZ_DI, disable interrupts</font></b>
+<p><tt>CALL $0051</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = old I register<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = old interrupt status (Fc = 1 disabled; Fc = 0 enabled)</pre>
+
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different<br><br><hr width="100%"></pre>
+
+<b><font size="+1">OZ_EI, restore old interrupt state</font></b>
+<p><tt>CALL $0054</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = old I register<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = old interrupt status (Fc = 1 disabled; Fc = 0 enabled)<br><br>OUT:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br><br>Registers changed after return:</pre>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ......../.... different<br><br><hr width="100%"></pre>
+
+Thus one might do:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call OZ_DI<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; push af<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; operations requiring disabled interrupts<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pop&nbsp; af<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call OZ_EI</pre>
+
+and be assured for the interrupt status is preserved.
+<br>
+&nbsp;
+<p><b>Save and restore</b>
+</p>
+<p>The <a href="ossr.html">OS_Sr</a> call was designed for internal use,
+but has a three rather handy features which can be used by applications:
+</p>
+<p>
+</p>
+<hr width="100%">
+<br>
+<b><font size="+1">OS_Sr</font></b>
+<p><tt>RST 20H, DEFB $6C</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = reason code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SR_SUS ($01)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Save user screen<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SR_RUS ($02)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Restore user screen<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SR_WPD ($03)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Write parameter data (mailbox)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SR_RPD ($04)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Read parameter data (mailbox)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SR_FUS ($05)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Free user screen<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SR_CRM ($06)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Remove card (system use only)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SR_CIN ($07)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Insert card (system use only)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SR_PWT ($08)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Page wait<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SR_RND ($09)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Occasionally a random number (system use)<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BC = arguments<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DE = arguments<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HL = arguments<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IX = arguments</pre>
+
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; returned values depend on A(in)</pre>
+
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = error code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_UNK ($03), unknown request<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad arguments<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad handle<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ROOM ($07), no room<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_SUSP ($69), with SR_PWT<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_DRAW ($66), with SR_PWT<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_QUIT ($67), with SR_PWT<br><br><hr width="100%">
+<b>SR_SUS ($01)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Save user screen</b></pre>
+
+This is a very powerful call, but should not be over used. Most of the
+time it is perfectly possible to regenerate a screen without resorting
+to this kind of sledge-hammer approach, requiring around 2K a time. It
+is probably preferable to use this call, rather than making your application
+one which has its screen saved automatically (as BBC BASIC), if there are
+only a few situations in your application where saving the screen is essential.
+One final point is that it is essential to check that the call was successful
+and to try and cope if it fails, as it is likely to do on an unexpanded
+heavily used machine. Please refer to <a href="ossr.html">OS_Sr</a> reference
+for parameter call details.
+<br>
+&nbsp;
+<pre><b>SR_RUS ($02)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Restore user screen</b></pre>
+
+Restores the previously saved image and releases the corresponding memory.
+Please refer to <a href="ossr.html">OS_Sr</a> reference for parameter call
+details.
+<br>
+&nbsp;
+<pre><b>SR_FUS ($05)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Free user screen</b></pre>
+
+This performs the function of freeing the memory that was used to save
+a screen but without actually affecting the screen image. Please refer
+to <a href="ossr.html">OS_Sr</a> reference for parameter call details.
+<br>
+&nbsp;
+<pre><b>SR_WPD ($03)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Write parameter data (mailbox)<br>SR_RPD ($04)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Read parameter data (mailbox)</b></pre>
+
+Please refer to <a href="ossr.html">OS_Sr</a> reference for parameter call
+details. Mailboxing is explained in greater detail in "Application Static
+Structures".
+<br>
+&nbsp;
+<pre><b>SR_PWT ($08)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Page wait</b></pre>
+
+This call displays the page-wait message at the edge of the screen and
+then does the equivalent of <a href="osin.html">OS_In</a>. It is very important
+that you check for all pre-emption codes, especially RC_QUIT, when using
+this call if they are not coped within an error handler. Please note that
+a successfull return only return keyboard output with A = &lt;BACKSPACE&gt;
+($08), and otherwise the error return codes. When output is redirected,
+page waits are conveniently surpressed. Please refer to <a href="ossr.html">OS_Sr</a>
+reference for parameter call details.
+<br>
+&nbsp;
+<pre><b>SR_RND ($09)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Occasionally a random number (system use)</b></pre>
+
+The return value (random number) only changes when certain operating system
+functions occur in between calls to <a href="ossr.html">OS_Sr</a>. Repeated
+fetching a random number may well result in the same value being returned!
+<br>
+&nbsp;
+<p><b>Fast code</b>
+</p>
+<p>Some operations, such as bank switching, can take up quite a lot of
+processing time. In order to speed up such tasks the operating system provides
+a facility for making certain system calls operate more rapidly. The fast
+code interface call provides a fragment of code to perform a particular
+task and places it an address supplied by the application. The current
+version of the Z88 has only one fast code routine which is to rapidly switch
+bank bindings.
+</p>
+<p>
+</p>
+<hr width="100%">
+<br>
+<b><font size="+1">OS_Fc, select fast code (fast bank switching)</font></b>
+<p><tt>RST 20H, DEFB $8A</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = 1, for fast bank switching<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DE = address to copy fast bank code into<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HL = 0, for code to terminate with RET<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HL &lt;&gt; 0, for code to terminate with JP (HL)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C = segment for bank switching (MS_Sx)</pre>
+
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = code size</pre>
+
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different</pre>
+<pre><hr width="100%"></pre>
+
+The <a href="osfc.html">OS_Fc</a> fast bank switching code has now been
+established. Subsequent calls to <a href="osfc.html">OS_Fc</a> with:
+<pre>IN:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = bank to bind to segment specified by <a href="osfc.html">OS_Fc</a> initialization</pre>
+
+<tt>OUT:</tt>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/IXIY/afbcdehl same<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ......../..../........ different</pre>
+
+Notes:
+<blockquote><a href="osfc.html">OS_Fc</a> has only been implemented with
+the above bank switching routine.</blockquote>
+<hr width="100%">
+<p>The bank switching code can now be accessed at the address supplied
+in DE(in). If HL(in) = 0 then use CALL DE(in), else use JP DE(in).
+</p>
+<p>Bank switching is a fairly simple process of updating a softcopy and
+writing to a hardware register. The reason for using the fast-code interface
+is that on any future versions of the machine the application will still
+work even though the bank switching process may be different. For this
+reason at least 30 bytes should be available for the code. Since the actual
+length is returned, memory can be reclaimed if necessary. One final point
+to bear in mind is that you must not place the fast code in the segment
+which it is rebinding! Think of cutting the branch you are sitting on...
+</p>
+<p>
+</p>
+<hr width="100%">
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <td align="left" valign="top" width="33%"><a href="map.html">Previous</a></td>
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+   <td align="right" valign="top" width="33%"><a href="miscinfo.html">Next</a></td>
+
+ </tr>
+ <tr>
+
+   <td align="left" valign="top" width="33%">The Map Area</td>
+   <td align="center" valign="top" width="34%">Miscellaneous useful routines</td>
+   <td align="right" valign="top" width="33%">Miscellaneous useful information</td>
+
+ </tr>
+
+  </tbody>
+</table>
+</body>
+</html>

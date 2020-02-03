@@ -1,0 +1,753 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>BBC BASIC and the in-line assembler</title>
+  <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tbody>
+
+ <tr>
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+   <td align="left" valign="bottom" width="10%"><a href="miscinfo.html">Previous</a></td>
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+   <td align="right" valign="bottom" width="10%"><a href="hardware.html">Next</a></td>
+ </tr>
+
+  </tbody>
+</table>
+
+<hr width="100%">
+<p>
+
+<b><font size="+1">24. BBC BASIC and the in-line assembler</font></b>
+</p>
+
+<p><b>BASIC Summary</b>
+</p>
+
+<p>The Z80 in-line assembler is not covered explicitly in the Z88 User
+Guide, so a short explanation is provided here. The definitive source of
+information about the assembler, and BBC BASIC in general, is the BBC BASIC
+(Z80) manual by Richard Russell, which is available from M-Tec. Before
+moving on to the assembler properly, we cover a few unusual features of
+BBC BASIC. Some useful BASIC commands are:
+<br>
+
+&nbsp;
+</p>
+
+<pre>LOAD "filename"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; loads a BBC BASIC program<br>SAVE "filename"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; saves a BASIC program<br>NEW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; clears out BASIC workspace for a new program<br>OLD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; attempts to recover a program lost through NEW<br>RUN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; execute a BASIC program<br>LIST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; list out a BASIC program to the screen<br>RENUMBER [a,[b]]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; renumbers the lines of a BASIC program<br>DELETE a,b&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; delete the lines between a and b<br>CALL x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; execute a machine code routine at address x<br><br><br></pre>
+<b>BASIC's Workspace</b>
+<p>In its Z88 incarnation, BASIC occupies a memory map with the following
+form:
+<br>
+
+&nbsp;
+</p>
+
+<pre>$0000 - $1FFF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Operating system use (and occasional application stack)<br>$2000 - $3FFF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BASIC program/workspace<br>$4000 - $BFFF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (additional 32K of program/workspace, expanded Z88)<br>$C000 - $FFFF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BBC BASIC interpreter application<br><br></pre>
+BASIC's program/workspace is arranged in the following manner:
+<br>
+
+&nbsp;
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-------------------+&nbsp;&nbsp; $FFFF<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | BASIC interpreter |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<br>HIMEM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-------------------+&nbsp;&nbsp; $BFFF or $3FFF<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Stack&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-------------------+&nbsp;&nbsp; Current limit of the stack<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .&nbsp;&nbsp; (Stack expands downwards)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; . Unused memory&nbsp;&nbsp;&nbsp;&nbsp; .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-------------------+&nbsp;&nbsp; Current limit of the heap<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Heap&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp; (Heap expands upwards)<br>LOMEM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-------------------+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<br>TOP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-------------------+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Program&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>PAGE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-------------------+&nbsp;&nbsp; $2300<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Workspace for&nbsp;&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | interpreter&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-------------------+&nbsp;&nbsp; $2000<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Operating system&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | system usage&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; +-------------------+&nbsp;&nbsp; $0000</pre>
+HIMEM, LOMEM and PAGE are pseudo variables whose values can be read and
+also set. TOP is a read-only pseudo-variable. If you intend to change the
+values of these pseudo-variables, then you must bear in mind that the "Unused
+Memory" area in BASIC's memory map will not necessarily be constant. If
+task switching occurs, this memory may be used for other purposes and when
+you return to BASIC its contents may have changed. Therefore any memory
+which you want to stay constant through task switching must either be in
+or below this heap. This memory is readily allocated within the heap using
+the DIM statement, explained below. LOMEM, the start of the heap, defaults
+to the value of TOP, the end of the program, although it is possible to
+increase LOMEM, thus providing some safe memory between the end of the
+program and the start of the variables. The value of PAGE is always set
+on a page (256 byte) boundary, ie. the less significant byte is ignored.
+<p>By changing the value of PAGE, it is possible to have more than one
+program resident at once, within the same instantiation of BASIC. The difficulty
+with this technique on the Z88 is the inconstancy of the unused memory.
+It is possible to set LOMEM to some high value, but extreme care is required,
+because whenever a program is RUN, LOMEM is reset to TOP. TOP, however,
+is not reset when PAGE is changed unless part of the program is altered
+or OLD is used. If you attempt this technique, keep in mind that whenever
+task switching could occur, all the memory used for programs should be
+allocated to BASIC and therefore safe.
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Numbers and Indirection Operators</b>
+</p>
+
+<p>BBC BASIC provides the '&amp;' symbol to prefix a hexadecimal number,
+as distinct from the more usual '$' used in these notes, which is used
+in BBC BASIC for string indirection. For printing an expression in hex
+form, prefix it with '~', eg.
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PRINT &amp;AF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; gives 175</pre>
+while
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PRINT ~27&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; gives 1B<br><br></pre>
+The indirection operators provided by BBC BASIC are used to find the contents
+of a cell or cells at a given address. The ? (query) operator represents
+byte indirection, so:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ?pointer</pre>
+represents the byte addressed by 'pointer'. This can be used either on
+the right or left of an expression; the statement:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ?address = contents</pre>
+sets the contents of the byte-sized cell addressed by 'address' to the
+value 'contents'. In most BASIC's this would have been written as:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; POKE address,contents</pre>
+whereas the statement
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; contents = ?address</pre>
+is equivalent to
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; contents = PEEK(address)</pre>
+The ! ('pling') operator represents word (32bit and not 16bit) indirection,
+so the expression:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; !pointer</pre>
+represents the value of the 32bit word, the address of whose first byte
+is 'pointer'. Thus, !a (on the righthand side of an expression) is equivalent
+to:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a?0 + 256*a?1 + 256*256*a?2 + 256*256*256+a?3</pre>
+Notice that the least significant byte comes first; this is generally true
+for the Z88 system, an extension to four bytes of the standard two byte
+Z80 order.
+<p>The query and pling operators may also be used in a dyadic context,
+which is often more natural (cf. array indexing, which actually works similarly)
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; base?offset&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; equivalent of ?(base+offset)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; base!offset&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; equivalent of !(base+offset)</pre>
+In this case 'base' must be a simple variable, but 'offset' may be any
+expression. Thus "!x" will not work. Remember also that the operators in
+a dyadic context are symmetric, so a!1 addresses a word starting at a+1
+and NOT a+4, as some people might expect. Finally, note that ! and ? have
+the highest level of priority in an expression, equal to unary plus, minus
+and the logical NOT, above binary arithmetical, relational and logical
+operators, so for example a?1^2 will be interpreted as (a?1)^2.
+<p>The operator $ ('dollar') implements string indirection: $a refers to
+a string which begins at address 'a' and is terminated by carriage return
+(CR). Thus:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $a = "hello"</pre>
+sets up successive bytes, starting at address 'a', with these five letters
+and a 13.
+<p>Note that the maximum length of a string in BBC BASIC is 255 characters.
+This is not because the string storage uses a length byte - it does not
+- but simply for convenience of internal manipulation on an 8bit machine.
+</p>
+
+<p>Space for a machine code routine, strings and memory to be used with
+indirection operators may conveniently be reserved using a special form
+of the DIM statement, without any brackets. The BASIC statement:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DIM code 255</pre>
+reserves a block of 256 continuous bytes of memory and sets the variable
+'code' to point to the start of this block. The elements of the block therefore
+start at address 'code' and finish at 'code+255'. This is quite distinct
+from the statement:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DIM code(255)</pre>
+which reserves space for 256 floating point variables - which will be considerably
+more than 256 bytes, actually 256*5 bytes!
+<br>
+
+&nbsp;
+<p><b>The Assembler</b>
+</p>
+
+<p>We can now move to the assembler itself. Some oddities worth mentioning
+are that the brackets around the port number for the IN and OUT Z80 instructions
+mnemonics are optional (ie. OUT 5,A and OUT (5),a are equivalent). The
+instruction IN F,(C) is not accepted, but the source code IN (HL),(C) produces
+the equivalent object code. It is conventional (but not necessary) to use
+lower case for labels and manifests, as this avoids lexical pitfalls and
+improves readability. It is also important to put spaces between the instruction
+mnemonic and its operands.
+</p>
+
+<p>Assembler source may simply be placed within the BASIC program, surrounded
+by square brackets. The assembler uses the BASIC variable P% as a program
+counter, which advances as the assembler moves through the source code
+(note that P%, as with any BASIC variable with a % suffix, is a 4-byte
+signed (2. complement) integer rather than a floating point variable).
+The user must, therefore, set P% to the desired start point for the machine
+code output before invoking the assembler. The program might look like
+this:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 10 REM Trivial example of how to use Z80 assembler<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 20 DIM code 50<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 30 P%=code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 40 [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 50 ld bc, 50<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 60 ret<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 70 ]</pre>
+When this BASIC program is RUN, it assembles the two-line assembler program
+into the first four bytes of the reserved memory, but does not execute
+the code itself. As the BASIC is RUN, an assembly listing is provided.
+This may be surpressed by using option flags, set by using the assembler
+directive OPT &lt;n&gt; at the start of the code; 0 will supress a listing,
+ie. insert line 45 with:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 45 OPT 0</pre>
+A number given by any combination of the following bit settings may follow
+OPT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BIT 0 = 1&nbsp;&nbsp; (1) give a listing<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BIT 1 = 1&nbsp;&nbsp; (2) report errors<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BIT 2 = 1&nbsp;&nbsp; (4) place assembled code starting at O% rather than P%</pre>
+The above options may be combined. The last option means that the code
+is actually placed starting at O%, but labels have values as if the code
+started at P% (see below for details of labels declarations). This allows
+one to assemble code into on space which is designed to fit somewhere else.
+For instance, in the following code fragment:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 100 DIM code 50<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 110 P%=&amp;C000: O%=code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 130 [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 140 OPT 6<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 150 .codestart<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 160 dec a<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 170 cp (hl)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 180 jp codestart<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ..<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 200 ]</pre>
+then although the code will actually go into the 'code' array, the label
+'codestart' has the value $C000, and so the address in the JP statement
+will appear as such. This facility could be used to assemble code that
+will ultimately appear in an application card.
+<p>Comments may be inserted in the assembler source by preceeding them
+with either semicolon or backslash, viz:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 42 ; This is a comment<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 55 \ and so is this</pre>
+Note, however, that a comment ends at the end of a BASIC statement. This
+will normally be the end of the line, but a colon will have the same effect.
+Hence any characters after a colon will be regarded as a new assembler
+statement:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 54; The following will be regarded as an assembler statement: RST 0</pre>
+This practice is, of cource, very confusing and is not recommended.
+<p>Labels may be used in the assembler code; simply precede each label
+with a full stop (the full stop is NOT part of the label). A label may
+or may not be followed by an assembler statement on the same line, but
+if it is, then at least one space must be left between them, eg.:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 10 ld c,15<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 20 .loop1 ld b,30<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 30 .loop2<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 40 call misc<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 50 djnz loop2<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 60 call wrn1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 70 dec c<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 80 jr nz, loop1</pre>
+When the assembler encounters a label, it sets a BASIC variable of that
+name to the current value of P%. Assembler labels and BASIC variables are
+thus interchangeable; so the assembler code could use:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; JP code</pre>
+to jump back to the very start of the program (beginning of the allocated
+area by the DIM statement). Also, this allows BASIC variables to be used
+to define manifest constants for use in the assembler listing:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5 maxsize = 62<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 40 [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 56 cp maxsize<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 80 ]</pre>
+The assembler simply passes once through the source from start to finish,
+and so will not know the values of labels before they are defined. It would
+be inconvenient to have to define every label before it is used, so the
+way around this problem is to make two passes through the code. The first
+will, in general, encounter errors, so set OPT 0 to suppress their reporting.
+This pass will set up all the labels correctly, so that a second pass (with
+OPT 2, or OPT 3 if a listing is desired, to make sure there are no 'genuine'
+errors) will complete the assembly process. For example:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 100 DIM code 100<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 110 FOR pass%=0 TO 2 STEP 2<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 120 P%=code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 130 [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 140 OPT pass%<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 150 ld bc,13<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 160 jr label<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 170 ld bc,26<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 180 .label<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 190 ret<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 200 ]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 210 NEXT pass%</pre>
+Two rough edges in the assembler regarding labels are:
+<ol>
+  <li>
+If a label is re-declared, no warning is given.</li>
+
+  <li>
+If a label which is undeclared is the operand of a JR (jump relative) instruction,
+then the error issued is 'out of range' rather than 'label not found'.</li>
+</ol>
+In-line data definition is possible in the assembler source using the directives
+DEFB (define byte), DEFW (define word) and DEFM (define message).
+<pre>DEFB &amp;12&nbsp;&nbsp;&nbsp; ; sets up a byte of storage and initialises it to 12H (18 decimal)<br><br>DEFW 16385&nbsp; ; sets up a 16bit word of storage and initialises it to 123, less<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; significant byte first, eg.: 1,64<br><br>DEFM "hey"&nbsp; ; sets up space initialised with this string, one character per<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; byte</pre>
+The DEFM directive does not introduce any magic characters, so if you want
+a string to be null or carriage return terminated, you must explicitly
+append the terminator byte(s), eg.:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFM "This string is null-terminated"<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFB 0</pre>
+Contrast the BASIC string indirection which when used thus:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $pointer = "This string is CR-terminated"</pre>
+will automatically carriage-return (13) terminate the string.
+<p>Unfortunately, there is no define-storage directive. A second DIM statement
+may be used, or small spaces, one could use DEFM with a dummy string. This
+may conveniently be done as follows:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFM STRING$(100,"A")</pre>
+This demonstrates a useful consequence of the close intertwining of the
+assembler with BASIC: the arguments to assembler operands and pseudo-operands
+may include many forms of BASIC expressions (though brackets may lead to
+ambiguity as they often indicate an extra level of indirection in Z80 assembler).
+Two other handy incidences of this are the use of ASC"x" as a character
+constant, viz:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp; a, ASC"Q"</pre>
+and the use of user-defined functions to provide macro and conditional
+assembly facilities. Suppose we are using the (non-local) variable 'pass'
+to represent the current assembler option. Then:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OPT pass</pre>
+will have no effect. Taking this a stage further, if the user-defined function
+'macro' always evaluates to 'pass', then:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OPT FNmacro(arguments...)</pre>
+will have no effect, except that it will execute the body of the function,
+if any. For instance, suppose we define:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEF FNsave_regs(savearea)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OPT pass<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld (savearea),hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld (savearea+2),de<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld (savearea+4),bc<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =pass</pre>
+then including:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OPT FNsave_regs(space)</pre>
+in the main code would reproduce the above three lines of code with 'savearea'
+set to 'space'. Another useful example is a macro to automatically generate
+a DEFB or a DEFW depending on the size of an operating system call code.
+This would look like this:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEF FNcall_oz(arg)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IF arg&gt;255 THEN [OPT pass: RST &amp;20: DEFW arg] :=pass<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [OPT pass: RST &amp;20: DEFB arg] :=pass</pre>
+Note that an OPT must reappear in the function and that closing square
+bracket in the function body does not exit assembler mode in the main program.
+<p>Finally, to call the machine code program once it has been assembled,
+do:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL code</pre>
+or
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a = USR(code)</pre>
+which returns the contents of the HL H'L' register pairs (forming a 32bit value)
+set at termination (HL most significant; H'L' least significant).
+<p>There is a mechanism for initialising the contents of registers from
+the CALL or USR statements: the registers A, F, B, C, D, E, H, L on entry
+are set to the values of the BASIC variables A%, F%, B%, C%, D%, E%, H%
+and L% respectively.
+</p>
+
+<p>The CALL statement also allows the user to set up a parameter block
+on entry by appending the required parameters to the CALL statement, ie.:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CALL code, par1, par2, par3, ... parx</pre>
+On entry IY is identical to the calling address, and IX will point to a
+parameter block with the following format:
+<pre>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; number of parameters<br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parameter 1 type<br>2 bytes&nbsp;&nbsp;&nbsp;&nbsp; parameter 1 address<br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parameter 2 type<br>2 bytes&nbsp;&nbsp;&nbsp;&nbsp; parameter 2 address</pre>
+... ...
+<pre>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parameter x type<br>2 bytes&nbsp;&nbsp;&nbsp;&nbsp; parameter x address</pre>
+The parameter type byte may be any of:
+<pre>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; byte, eg. ?x<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 32bit word, eg. !x or x%<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Floating point (40bit), eg. x<br>128&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String eg. "Hello"<br>129&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Four byte string descriptor containing the current length of the<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; string, the number of bytes allocated to the string and its address<br><br><br></pre>
+<b>Using system calls from BBC BASIC</b>
+<p>When using system calls from BBC BASIC there are various important things
+to bear in mind. The main restart code itself needs to page memory banks
+in and out of the address space; for instance one of the first things it
+does is bind bank 0 (which contains the vector table for the OZ calls)
+to segment 3; but it expects the stack to perform properly when it has
+done so. So in general, any program, the BASIC interpreter included, should
+not place its stack where it is liable to be paged out. To be safe, it
+should be in the bottom 8K of the logical address space, which is never
+paged out. The BBC BASIC application stack has to be fairly large as it
+is used for parameter-passing during BASIC execution, and so cannot be
+placed in the bottom 8K by default. It is in a very vulnerable position,
+typically at the top of segment 2, and so it is advisable to select a safer
+stack if any system calls are to be used. This may reliably be done by
+loading the stack pointer from the location $1FFE. For example, if the
+main user code starts at 'main' then the program as a whole might look
+like:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; use alternate registers<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; hl,0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; to preserve hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add&nbsp; hl,sp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get current stack pointer in HL<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; sp,(&amp;1FFE)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; load new (safe) stack pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; push hl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; preserve old stack pointer on new stack<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; back to main registers<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call main&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; execute main machine code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; back to alternate registers<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pop&nbsp; hl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get old BASIC stack pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; sp,hl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; and restore it<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; back to main registers<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; return to BBC BASIC interpreter<br><br>.main&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; main machine code...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret</pre>
+The use of the alternate register set avoids corrupting the main set, thus
+allowing parameter passing with HL (by using the BASIC variables H% and
+L%), but this may be dispensed with, if the contents of HL are not important.
+The old stack pointer is pushed onto the new stack so it can be re-called
+at the end. The old stack pointer could also be saved in a static memory
+location and this technique is used in some of the other examples.
+<br>
+
+&nbsp;
+<p><b>Saving and loading of machine code in BBC BASIC</b>
+</p>
+
+<p>The simplest method of loading a machine code is having it stored in
+DATA statements as byte opcode sequenses. However, this emplies a lot of
+work, converting an assembled code into DATA statements (you could make
+a BASIC program that generates a simple text file that later could could
+be typed in by CLI). Another way is simply to have the in-line assembler
+source included together with the rest of the BBC BASIC program. However,
+large assembler source tends to use much memory, especially if it is well-commented.
+It is usually sufficient with small assembler routines.
+</p>
+
+<p>When you use pre-compiled code ready to execute, you face another obstacle;
+you must always place the code at the same location. Using DIM will probably
+not return the same address of allocated memory, so it is needed to move
+down HIMEM to ensure a static position for your code. If you have the source
+in-line then it is no problem, since you always can re-compile for a specifically
+allocated memory area.
+</p>
+
+<p>The two BASIC procedures below implements a simple interface to both
+load and save machine code in binary files. Both procedures use a small
+machine code routine to save/load the code in BASIC's memory. To ensure
+compact BASIC procedures, the machine code have been put into DATA statements,
+placed inside the procedures. The mnemonic assembler source are found below
+the procedures. Both procedures locate the machine code routine at the
+bottom of the stack, beginning at $1800. This area is not touched by BBC
+BASIC and is therefore safe. However, when BBC BASIC has been pre-empted
+the bottom of the stack might have changed. Please note that both routines
+null-terminate the filename strings.
+</p>
+
+<p><tt>65515 DEF PROC_lbytes(f$,addr%)</tt>
+<br>
+
+<tt>65516 LOCAL b%,i% 65517 f$=f$+CHR$0</tt>
+<br>
+
+<tt>65518 RESTORE 65520: FOR i%=0 TO 66: READ b%: ?(&amp;1800+i%)=b%:
+NEXT i%</tt>
+<br>
+
+<tt>65519 CALL &amp;1800,f$,addr%</tt>
+<br>
+
+<tt>65520 DATA &amp;21,0,0,&amp;39,&amp;ED,&amp;7B,&amp;FE,&amp;1F,&amp;E5,&amp;CD,&amp;0F,&amp;18,&amp;E1,&amp;F9,&amp;C9</tt>
+<br>
+
+<tt>65521 DATA &amp;DD,&amp;E5,&amp;FD,&amp;E1,&amp;FD,&amp;6E,2,&amp;FD,&amp;66,3,&amp;23,&amp;23,&amp;5E,&amp;23,&amp;56,&amp;62</tt>
+<br>
+
+<tt>65522 DATA &amp;6B,1,2,0,&amp;3E,1,&amp;E7,9,&amp;60,&amp;38,&amp;15,&amp;FD,&amp;6E,5,&amp;FD,&amp;66,6</tt>
+<br>
+
+<tt>65523 DATA
+&amp;5E,&amp;23,&amp;56,&amp;21,0,0,1,&amp;FF,&amp;FF,&amp;E7,&amp;45,&amp;E7,9,&amp;62,&amp;C9,&amp;E7,9,&amp;4A,&amp;C9
+65524 ENDPROC</tt>
+</p>
+
+<p><tt>65525 DEF PROC_sbytes(f$,addr%,length%)</tt>
+<br>
+
+<tt>65526 LOCAL b%,i% 65527 f$=f$+CHR$0</tt>
+<br>
+
+<tt>65528 RESTORE 65530: FOR i%=0 TO 73: READ b%: ?(&amp;1800+i%)=b%:
+NEXT i%</tt>
+<br>
+
+<tt>65529 CALL &amp;1800,f$,addr%,length%</tt>
+<br>
+
+<tt>65530 DATA &amp;21,0,0,&amp;39,&amp;ED,&amp;7B,&amp;FE,&amp;1F,&amp;E5,&amp;CD,&amp;0F,&amp;18,&amp;E1,&amp;F9,&amp;C9</tt>
+<br>
+
+<tt>65531 DATA &amp;DD,&amp;E5,&amp;FD,&amp;E1,&amp;FD,&amp;6E,2,&amp;FD,&amp;66,3,&amp;23,&amp;23,&amp;5E,&amp;23,&amp;56,&amp;62</tt>
+<br>
+
+<tt>65532 DATA &amp;6B,1,2,0,&amp;3E,2,&amp;E7,9,&amp;60,&amp;38,&amp;1C,&amp;FD,&amp;6E,5,&amp;FD,&amp;66,6</tt>
+<br>
+
+<tt>65533 DATA &amp;5E,&amp;23,&amp;56,&amp;FD,&amp;6E,8,&amp;FD,&amp;66,9,&amp;4E,&amp;23,&amp;46,&amp;EB,&amp;11,0,0</tt>
+<br>
+
+<tt>65534 DATA &amp;E7,&amp;45,&amp;E7,9,&amp;62,&amp;C9,&amp;E7,9,&amp;4A,&amp;C9</tt>
+<br>
+
+<tt>65535 ENDPROC</tt>
+</p>
+
+<p>
+</p>
+
+<hr width="100%">
+<p><tt>MODULE Lbytes</tt>
+<br>
+
+&nbsp;
+</p>
+
+<pre>include "fileio.def"&nbsp;    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; standard file I/O definitions<br>include "error.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; error code definitions<br><br>ORG $1800&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; subroutine resided at $1800<br><br></pre>
+<tt>;****************************************************************************</tt>
+<br>
+
+<tt>; BBC BASIC 'load bytes' machine code routine. The routine always loads
+the</tt>
+<br>
+
+<tt>; complete file (length),</tt>
+<br>
+
+<tt>; which is not specified in the CALL parameter list.</tt>
+<br>
+
+<tt>;</tt>
+<br>
+
+<tt>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1st
+parameter is the string pointer<br>
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2nd parameter
+is the start address integer</tt>
+<br>
+
+<tt>;</tt>
+<br>
+
+<tt>; IN: IX = pointer to BASIC parameter block:</tt>
+<pre>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; number of parameters:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type of 1st parameter:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 129 (mov. string)<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+2,3)&nbsp;&nbsp;&nbsp; address of movable string:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xx<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type of 2nd parameter:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4 (32bit integer)<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+5,6)&nbsp;&nbsp;&nbsp; address of 2nd parameter:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xx</pre>
+
+<pre>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The movable string parameter block:<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (xx+0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; current length<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (xx+1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; max. length<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (xx+2,3)&nbsp;&nbsp;&nbsp; start address of string</pre>
+
+<pre>.InitLbytes ld&nbsp;&nbsp; hl,0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add&nbsp; hl,sp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get current BASIC stack pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; sp,($1FFE)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; install safe stack pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; push hl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; preserve BASIC stack pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call Lbytes<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pop&nbsp; hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; sp,hl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; restore BASIC stack<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; return to BASIC interpreter<br><br>.Lbytes&nbsp;&nbsp;&nbsp;&nbsp; push ix<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pop&nbsp; iy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; iy points at CALL parameter block<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; l,(iy+2)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; h,(iy+3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get pointer to moveable string par. block<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inc&nbsp; hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inc&nbsp; hl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; point at string start address pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; e,(hl)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inc&nbsp; hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; d,(hl)<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; h,d&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; HL &amp; DE = pointer to start of filename<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; l,e<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; bc,2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; local pointer, C = 2 byte scratch buffer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, OP_IN<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnopf.html">GN_Opf</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; c, file_err&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Ups, file couldn't be opened<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; l,(iy+5)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; IX = file handle<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; h,(iy+6)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; e,(hl)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inc&nbsp; hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; d,(hl)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; start address to load machine code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; hl,0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; bc, $FFFF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; max. file length (probably much snaller!)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osmv.html">OS_Mv</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; load file image at (DE) onwards...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gncl.html">GN_Cl</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; close file<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret<br><br>.file_err&nbsp;&nbsp; call_oz(<a href="gnerr.html">GN_Err</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; display error box...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret</pre>
+
+<hr width="100%">
+<p><tt>MODULE Sbytes</tt>
+<br>
+
+&nbsp;
+</p>
+
+<pre>include "fileio.def"&nbsp;&nbsp;&nbsp;    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; standard file I/O definitions<br>include "error.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;&nbsp;&nbsp; ; error code definitions<br><br>ORG $1800&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; subroutine resided at $1800<br><br></pre>
+<tt>;****************************************************************************</tt>
+<br>
+
+<tt>; BBC BASIC 'save bytes' machine code routine.</tt>
+<pre>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1st parameter is the string pointer<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2nd parameter is the start address integer<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3rd parameter is length of memory block</pre>
+<tt>;</tt>
+<br>
+
+<tt>; IN: IX = pointer to BASIC parameter block:</tt>
+<pre>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; number of parameters:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type of 1st parameter:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 129 (mov. string)<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+2,3)&nbsp;&nbsp;&nbsp; address of movable string:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xx<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type of 2nd parameter:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4 (32bit integer)<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+5,6)&nbsp;&nbsp;&nbsp; address of 2nd parameter:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xx<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+7)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; type of 3rd parameter:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4 (32bit integer)<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (IX+8,9)&nbsp;&nbsp;&nbsp; address of 3rd parameter:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xx</pre>
+;
+<pre>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The movable string parameter block:<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (xx+0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; current length<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (xx+1)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; max. length<br>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (xx+2,3)&nbsp;&nbsp;&nbsp; start address of string</pre>
+;
+<pre>.InitSbytes ld&nbsp;&nbsp; hl,0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add&nbsp; hl,sp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get current BASIC stack pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; sp,($1FFE)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; install safe stack pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; push hl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; preserve BASIC stack pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call Sbytes<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pop&nbsp; hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; sp,hl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; restore BASIC stack<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; return to BASIC interpreter<br><br>.Sbytes&nbsp;&nbsp;&nbsp;&nbsp; push ix<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pop&nbsp; iy&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; iy points at CALL parameter block<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; l,(iy+2)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; h,(iy+3)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get pointer to moveable string par. block<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inc&nbsp; hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inc&nbsp; hl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; point at string start address pointer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; e,(hl)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inc&nbsp; hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; d,(hl)<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; h,d&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; HL &amp; DE = pointer to start of filename<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; l,e<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; bc,2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; local pointer, C = 2 byte scratch buffer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, OP_OUT<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnopf.html">GN_Opf</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; c, file_err&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Ups, file couldn't be created<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; l,(iy+5)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; IX = file handle<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; h,(iy+6)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; HL = pointer to pointer to start address<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; e,(hl)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inc&nbsp; hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; d,(hl)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; DE = start addr. of memory block to save<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; l,(iy+8)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; h,(iy+9)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; HL = pointer to pointer to length<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; c,(hl)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; inc&nbsp; hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; b,(hl)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; BC = length of memory block to save<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ex&nbsp;&nbsp; de,hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; de,0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osmv.html">OS_Mv</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; save memory block from (HL) onwards...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gncl.html">GN_Cl</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; close file<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret<br><br>.file_err&nbsp;&nbsp; call_oz(<a href="gnerr.html">GN_Err</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; display error box...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret</pre>
+
+<hr width="100%">
+<p><b>Using relocatable code in BBC BASIC</b>
+</p>
+
+<p>Using machine code in BBC BASIC is best suited with allocating dynamic
+memory with DIM and then storing (assembling) the code to that area. If
+you don't assemble but have code ready, eg. loaded directly with PROC_lbytes,
+it is necessary that your machine code is relocatable, ie. contains no
+absolute address references (the machine code assumes that it is located
+at a certain ORG position in memory). You can relocatable code by omitting
+CALL and JP instructions and only use JR and DJNZ (jump relative) instruction.
+However, your program cannot be very large since relative jumps only range
++/- 128 bytes in either direction from the instruction.
+</p>
+
+<p>You can make truly relocatable machine code with the <b>Z80asm</b> application
+that is part of the Z88 Assembler Workbench. By using the '-R' option a
+small header is generated together with your code. The header contains
+a relocater routine and a relocation table. When your code is executed,
+it is automatically relocated to the current position in memory (just once).
+Subsequent calls to the code will just execute your code and not the relocater.
+With this option you can always store your machine code utilities with
+<tt>PROC_sbytes</tt> and at a later time allocate space with DIM for your
+code, and just load it into appropriate BBC BASIC memory. The code may
+be placed anywhere (in RAM).
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Example program in BBC BASIC's assembler</b>
+</p>
+
+<p>We present here a short example program in BASIC. The error handler
+copes with pre-emption, responding to RC_QUIT by calling BASIC's own error
+handler. This will not close files, filters wildcards, or memory however,
+so if you use these features you must modify the error handler to close
+these things first before calling BASIC. The program here does something
+which BASIC cannot normally do, which is to read the update date of a file.
+When the program is run it assembles the code and asks for a filename.
+It attempts to open the file for DOR access, indicating failure with a
+system error box, and then reads the update date. Finally, having released
+the DOR handle, the program displays the explicit filename, expanded by
+<a href="gnopf.html">GN_Opf</a>, and the update date.
+</p>
+
+<p>This listing can be 'loaded' by CLI. Mark a block for the program only
+in column A below, and save it as a text file. Then execute eg. from the
+FILER. .J
+</p>
+
+<pre>1000 DIM code 512&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ space for program</pre>
+
+<pre><tt>1010 REM</tt></pre>
+
+<pre>1020 <a href="gnesp.html">GN_Esp</a>=&amp;4C09&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ return pointer to system error message<br>1040 <a href="gnnln.html">GN_Nln</a>=&amp;2E09&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ carriage return, linefeed to std. output<br>1050 <a href="gnsop.html">GN_Sop</a>=&amp;3A09&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ output string to std. output<br>1060 <a href="gnopf.html">GN_Opf</a>=&amp;6009&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ open file<br>1070 <a href="oserh.html">OS_Erh</a>=&amp;75&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ install error handler<br>1080 <a href="osesc.html">OS_Esc</a>=&amp;6F&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ examine special condition<br>1090 <a href="gnerr.html">GN_Err</a>=&amp;4A09&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ standard system error box<br>1100 <a href="gnsdo.html">GN_Sdo</a>=&amp;0E09&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ date and time to standard output<br>1110 <a href="osdor.html">OS_Dor</a>=&amp;87&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ DOR interface<br>1120 dr_rd=&amp;09&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ read DOR record<br>1130 dr_fre=&amp;05&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ free DOR handle<br>1140 op_dor=&amp;06&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ open file for DOR access<br>1150 rc_quit=&amp;67&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ KILL request error code<br><tt>1160 rc_esc=&amp;01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </tt>\ <tt>escape detection error code</tt></pre>
+
+<pre><tt>1170</tt></pre>
+
+<pre><tt>1180 FOR pass=0 TO 2 STEP 2</tt></pre>
+
+<pre><tt>1190 P%=code</tt></pre>
+<tt>1200 [</tt>
+<br>
+
+<tt>1210 OPT pass</tt>
+<br>
+
+<tt>1220 LD HL,0</tt>
+<br>
+
+<tt>1230 ADD&nbsp;
+HL,SP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ get stack pointer<br>
+1240 LD&nbsp;&nbsp; (bstk),HL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ save current BASIC stack pointer<br>
+1250 LD&nbsp;&nbsp; SP,(&amp;1FFE)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ install safe stack pointer</tt>
+<br>
+
+<tt>1260</tt>
+<br>
+
+<tt>1270 XOR A</tt>
+<br>
+
+<tt>1280 LD B,A</tt>
+<pre>1290 LD&nbsp;&nbsp; HL,errhan&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>\ </tt>address of error handler<br>1300 OPT&nbsp; FNsys(<a href="oserh.html">OS_Erh</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>\ </tt>install new error handler<br>1310 LD&nbsp;&nbsp; (obou),A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>\ </tt>save old error handler call level<br>1320 LD&nbsp;&nbsp; (oerr),HL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>\ </tt>save old error handler address<br>1330 CALL main&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>\ </tt>call main routine</pre>
+<tt>1340 .exit</tt>
+<pre>1350 LD&nbsp;&nbsp; HL,(oerr)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>\ </tt>address of old error handler<br>1360 LD&nbsp;&nbsp; A,(obou)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>\ </tt>old call level</pre>
+<tt>1370 LD B,0</tt>
+<pre>1380 OPT&nbsp; FNsys(<a href="oserh.html">OS_Erh</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>\ </tt>restore old error handler<br>1390 LD&nbsp;&nbsp; SP,(bstk)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>\ </tt>install BASIC stack pointer<br>1400 RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tt>\ </tt>return to BBC BASIC interpreter</pre>
+<tt>1410</tt>
+<br>
+
+<tt>1420 .errhan</tt>
+<br>
+
+<tt>1430 RET Z</tt>
+<pre><tt>1440 CP&nbsp;&nbsp; rc_esc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ ESC pressed?</tt></pre>
+<tt>1450 JR NZ,err1</tt>
+<pre><tt>1460 OPT&nbsp; FNsys(<a href="osesc.html">OS_Esc</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ acknowledge ESC</tt></pre>
+<tt>1470 LD A,rc_esc</tt>
+<pre><tt>1480 OR&nbsp;&nbsp; A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ return rc_esc back to main program<br>1490 RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ Fc = 0, Fz = 0</tt></pre>
+<tt>1500 .err1</tt>
+<pre><tt>1510 CP&nbsp;&nbsp; rc_quit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ KILL request?</tt></pre>
+<tt>1520 JR NZ,err2</tt>
+<pre><tt>1530 LD&nbsp;&nbsp; HL,(oerr)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ re-install old error handler<br>1540 LD&nbsp;&nbsp; A,(obou)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ old call level</tt></pre>
+<tt>1550 OPT FNsys(<a href="oserh.html">OS_Erh</a>)</tt>
+<pre><tt>1560 LD&nbsp;&nbsp; SP,(bstk)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ install BASIC stack pointer</tt></pre>
+<tt>1570 LD HL,(oerr)</tt>
+<pre><tt>1580 LD&nbsp;&nbsp; A, rc_quit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ reload A with RC_QUIT<br>1590 OR&nbsp;&nbsp; A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ Fz = 0<br>1400 SCF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ Fc = 1<br>1410 JP&nbsp;&nbsp; (HL)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ jump to BASIC's error handler</tt></pre>
+<tt>1420</tt>
+<pre><tt>1430 .err2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ write error message if possible<br>1440 OR&nbsp;&nbsp; A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ Fc = 0</tt></pre>
+<tt>1450 RET 1460</tt>
+<pre><tt>1470 .bstk DEFW 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ storage for BASIC stack pointer<br>1480 .obou DEFB 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ storage for old call level<br>1490 .oerr DEFW 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ storage for old error handler address</tt></pre>
+<tt>1500</tt>
+<br>
+
+<tt>1510 \ main routine starts here 1520 .main</tt>
+<pre><tt>1530 LD&nbsp;&nbsp; HL,scratch_1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ holds address of file to open<br>1540 LD&nbsp;&nbsp; DE,scratch_2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ explicit name buffer<br>1550 LD&nbsp;&nbsp; C,40&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ size of explicit name buffer<br>1560 LD&nbsp;&nbsp; B,0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ HL string pointer is local<br>1570 LD&nbsp;&nbsp; a, op_dor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ get DOR handle<br>1580 OPT&nbsp; FNsys(<a href="gnopf.html">GN_Opf</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ open...</tt></pre>
+
+<pre><tt>1590 JR NC,opened_OK</tt></pre>
+<tt>1600 OPT&nbsp; FNsys(<a href="gnerr.html">GN_Err</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ report error in standard window</tt>
+<br>
+
+<tt>1610 RET 1620 .opened_OK</tt>
+<br>
+
+<tt>1630 LD&nbsp;&nbsp;
+A,dr_rd&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ read DOR record<br>
+
+1640 LD&nbsp;&nbsp;
+B,ASC"U"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ read update information<br>
+1650 LD&nbsp;&nbsp;
+C,6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ 3 byte internal date, 3 byte int. time<br>
+1660 LD&nbsp;&nbsp; DE,scratch_1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ store returned information at (DE)<br>
+1670 OPT&nbsp; FNsys(<a href="osdor.html">OS_Dor</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ fetch update date</tt>
+<br>
+
+<tt>1680 LD A,dr_fre</tt>
+<br>
+
+<tt>1690 OPT&nbsp; FNsys(<a href="osdor.html">OS_Dor</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ free DOR handle<br>
+1700 LD&nbsp;&nbsp; HL,scratch_2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ display explicit filename<br>
+1710 OPT&nbsp; FNsys(<a href="gnsop.html">GN_Sop</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ to standard output</tt>
+<br>
+
+<tt>1720 LD HL,tab_str</tt>
+<br>
+
+<tt>1730 OPT&nbsp; FNsys(<a href="gnsop.html">GN_Sop</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ tab to column 40</tt>
+<br>
+
+<tt>1740 LD HL,scratch_1</tt>
+<br>
+
+<tt>1750 OPT&nbsp; FNsys(<a href="gnsdo.html">GN_Sdo</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ output returned update date<br>
+1760 OPT&nbsp; FNsys(<a href="gnnln.html">GN_Nln</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ display newline<br>
+1770
+RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\ back to BASIC</tt>
+<br>
+
+<tt>1780</tt>
+<br>
+
+<tt>1790 .scratch_1 DEFM STRING$(40,"X")</tt>
+<br>
+
+<tt>1800 .scratch_2 DEFM STRING$(40,"X")</tt>
+<br>
+
+<tt>1810 .tab_str DEFM CHR$1+"2X"+CHR$(32+40)+CHR$0</tt>
+<br>
+
+<tt>1820 ]</tt>
+<br>
+
+<tt>1830 NEXT pass</tt>
+<br>
+
+<tt>1840</tt>
+<br>
+
+<tt>1850 CLS</tt>
+<br>
+
+<tt>1860 PRINT "Read File Update Date and Time"</tt>
+<br>
+
+<tt>1870 INPUT "Filename:"A$</tt>
+<br>
+
+<tt>1880 IF LEN(a$)&gt;40 THEN PRINT "String too long": END</tt>
+<pre><tt>1890 A$=A$+CHR$0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \ null-terminate filename string</tt></pre>
+<tt>1900 $scratch_1=A$</tt>
+<br>
+
+<tt>1910 CALL code</tt>
+<br>
+
+<tt>1920 END</tt>
+<br>
+
+<tt>1930 DEF FNsys(arg)</tt>
+<br>
+
+<tt>1940 IF arg&gt;255 THEN [OPT pass: RST &amp;20: DEFW arg] :=pass</tt>
+<br>
+
+<tt>1950 [OPT pass: RST &amp;20: DEFB arg] :=pass</tt>
+
+<p>
+</p>
+
+<hr width="100%">
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tbody>
+
+ <tr>
+   <td align="left" valign="top" width="33%"><a href="miscinfo.html">Previous</a></td>
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+   <td align="right" valign="top" width="33%"><a href="hardware.html">Next</a></td>
+ </tr>
+ <tr>
+   <td align="left" valign="top" width="33%">Miscellaneous useful information</td>
+   <td align="center" valign="top" width="34%">BBC BASIC &amp; in-line assembler</td>
+   <td align="right" valign="top" width="33%">Z88 Hardware</td>
+ </tr>
+
+  </tbody>
+</table>
+
+</body>
+</html>

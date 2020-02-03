@@ -1,0 +1,103 @@
+* ipcmd : IPC link commands
+        nolist
+
+* command nibbles sent to IPC:
+
+*rset_cmd equ    0       resets the IPC software
+
+stat_cmd equ    1       report input status
+* returns a byte, the bits of which are:
+ipc..kb equ     0       set if data available in keyboard buffer, or key held
+ipc..so equ     1       set if sound is still being generated
+*               2       set if kbd shift setting has changed, with key held
+*               3       set if key held down
+ipc..s1 equ     4       set if input is pending from RS232 channel 1
+ipc..s2 equ     5       set if input is pending from RS232 channel 2
+ipc..wp equ     6       return state of p26, currently not connected
+*               7       was set if serial transfer was being zapped, now zero
+
+ops1_cmd equ    2       open RS232 channel 1
+ops2_cmd equ    3       open RS232 channel 2
+cls1_cmd equ    4       close RS232 channel 1
+cls2_cmd equ    5       close RS232 channel 2
+* These open/close RS232 channels, affecting handshaking.
+
+rds1_cmd equ    6       read RS232 channel 1
+rds2_cmd equ    7       read RS232 channel 2
+* These return a byte with a count in the ls 6 bits of how many received
+* serial channel bytes are to follow. The ms 2 bits contain status info...
+* Silly, but the following implies that the IPC must never send more than...
+sbsize  equ     25      minimmum space needed to receive whole IPC RS232 buffer
+
+rdkb_cmd equ    8       read keyboard
+* This returns one nibble, plus up to 7 nibble/byte pairs:
+* first nibble, ms bit: set if final last keydef is still held
+* first nibble, ls 3 bits: count of keydefs to follow.
+* then, for each of the 0..7 keydefs:
+* nibble, bits are 3210=lsca: lost keys (last set only), shift, ctrl and alt.
+* byte, bits are 76543210=00colrow: column and row as keyrow table.
+* There is a version of the IPC used on the thor that will also return keydef
+* values for a keypad. This needs looking up.
+
+kbdr_cmd equ    9       keyboard direct read
+* kbdr_cmd requires one nibble which selects the row to be read.
+* The top bit of this is ignored (at least on standard IPC's...).
+* It responds with a byte whose bits indicate which of the up to eight keys on
+* the specified row of the keyrow table are held down.
+
+inso_cmd equ    10      initiate sound process
+* This requires no less than 64 bits of data. it starts sound generation.
+* Note that the 16 bit values below need to have their ls 8 bits sent first!
+* 8 bits pitch 1
+* 8 bits pitch 2
+* 16 bits interval between steps
+* 16 bits duration (0=forever)
+* 4 bits signed step in pitch
+* 4 bits wrap
+* 4 bits randomness (none unless msb is set)
+* 4 bits fuziness (none unless msb is set)
+
+kiso_cmd equ    11      immediately stop sound generation
+
+*mdrs_cmd equ    12      microdrive reduced sensitivity
+* This expects one nibble, of which only the lsb is significant. This was
+* intended for allowing marginal tapes to be handled, but had a strange side
+* effect of causing permanent level 2 interrupts! the QView capsled kit steals
+* This bit of h/w (on leg of the chip) to drive the led.
+* Hermes uses a parameter value of 9 to switch on its clever handling, when the
+* reset command becomes an extended functionally command and the test command
+* will return the complemented byte value.
+
+baud_cmd equ    13      change baud rate
+* This expects one nibble, of which the 3 lsbs select the baud rate for both
+* serial channels. The msb is ignored. Values 7 down to zero correspond to baud
+* rates 75/300/600/1200/2400/4800/9600/19200.
+* The actual clock rate is supplied from the PC to the IPC, but this command is
+* also needed in the IPC for timing out transfers!
+
+*rand_cmd equ    14      random number generator, returns a sixteen bit number.
+
+*test_cmd equ    15      test, expects a byte, which it then sends back.
+
+* Communication with the IPC is done using the following bit serial protocol.
+
+* Commands and data are sent msb first, by writing a byte containg %11x0 to
+* location pc_ipcwr ($18003), where the "x" is one data bit. Bit 6 at location
+* pc_ipcrd ($18020) is then examined, waiting for it to go zero to indicate
+* that the bit has been received by the IPC.
+
+* Receiving data from the IPC is done by writing %1110 to pc_ipcwr for each bit
+* of the data, once again waiting for bit 6 at pc_ipcrd to go to zero, and
+* then reading bit 7 there as the data bit. The data is received msb first.
+
+* The reason behind effectively sending a one bit for each read is the way the
+* hardware functions. There are only two wires between the PC and IPC to work
+* with, and only one is bi-directional. Even this is limited, in that either
+* end can force it to zero, but both ends must agree to make it a one. Hence
+* when the PC is trying to read data from the IPC, it must be asserting a one
+* in order to see whether the IPC is returning a one or zero bit.
+
+* Note: pc_tdata ($18022) is where full 8 bit data bytes are sent for serial
+* output, with the PC interrupting whenever it is ready for more.
+
+        list

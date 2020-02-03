@@ -1,0 +1,60 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Err, display an interactive error
+box</font></b>
+<p><tt>RST 20H, DEFW $4A09</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = system error code to display equivalent message</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = return code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_QUIT ($67), error fatal
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_SUSP ($69), error not fatal
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_DRAW ($66), error not fatal, windows corrupted
+</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different
+</pre>
+Notes:
+<blockquote>See also <a href='gnesp.html'>GN_Esp</a> which just displays the error message to standard
+output. Calling GN_Err with an invalid or fatal error message will cause
+a box with the error message and "Press Q to Quit - fatal error" to be
+displayed, and subsequently will generate a RC_QUIT system error. If you
+have an error handler in place, which handles RC_QUIT, then that code will
+be called.<br>
+<br>
+The system call stacks the screen underneath the error window. RC_QUIT
+is returned if the user wants to quit. RC_DRAW is returned if the user
+wants to resume and screen needs re-drawing. RC_SUSP is returned the user
+wants to resume and the screen is preserved.</blockquote>
+Bugs:
+<p>Related calls:
+<blockquote><a href='gnesp.html'>GN_Esp</a>, return an extended pointer to a system error message
+<br><a href='oserc.html'>OS_Erc</a>, get error context
+<br><a href='oserh.html'>OS_Erh</a>, set error handler
+<br><a href='osesc.html'>OS_Esc</a>, examine special condition</blockquote>
+
+</body>
+</html>

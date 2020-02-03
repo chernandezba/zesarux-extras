@@ -1,0 +1,474 @@
+Prism Registers:
+
+These registers control ULA2, the CPU Clock generator etc etc etc. There's lots here, so feel free to ask anything you need.
+ 
+ 
+ 
+8E3B (36411) read - RESERVED
+8E3B (36411) write - 16 x 4 bit control registers.
+IO port 36411 is used to write to sixteen registers which control much of ULA2's functionality.
+
+The register to be changed is selected by the most significant nibble of the data output to 0x8E3B, and the register's new contents is contained in the least significant nibble eg OUT 36411,BIN "00000010" changes the CPU speed to 7MHz, OUT 36411,BIN"00000000" changes it back to 3.5MHz and OUT 36411,BIN"00100011" changes the screen resolution to 512x384.
+ 
+OUT 36411,BIN "RRRRxxxx" where RRRR is a 4-bit number selecting the register and xxxx is the value you're setting it to. This method was chosen to reduce the number of IO ports Prism uses but still give single-OUT control over the majority of Prism/ULA2 functionality.
+ 
+ 
+The sixteen registers are as follows
+
+******
+0000 - Register 0 - CPU Speed:
+
+0000 - Slowest (always 3.5MHz)
+
+0001 - 6.375MHz
+
+0010 - 7MHz
+
+0011 - 12.75MHz
+
+0100 - 14MHz
+
+0101 - 25.5MHz
+
+0110 - 28MHz
+
+0111 - 51MHz
+
+1000 to 1111 - 56MHz
+
+1111 - Fastest (proposed to be 56MHz on Prism but other implementations can differ)
+
+SO:
+
+OUT 36411,0 - normal speed CPU
+
+OUT 36411,1 - 6.375MHz
+
+OUT 36411,2 - double speed CPU *etc* 7MHz
+
+OUT 36411,3 - 12.75MHz
+
+OUT 36411,4 - quad speed CPU 14MHz
+
+OUT 36411,5 - 25.5MHz
+
+OUT 36411,6 - 8X Speed CPU 28MHz
+
+OUT 36411,7 - 51MHz
+
+OUT 36411,8 to 15 - 16x speed CPU 56MHz
+
+OUT 36411,15 - fastest supported speed
+
+Even numbered values give CPU speeds which are derived from the ZX Spectrum's CPU speed (multiples of 3.5MHz).
+Odd numbered values give CPU speeds which are derived from the VGA base clock, so that it is possible to create code which synchronises with the display.
+ 
+I'm still experimenting with the way INT and frame are generated and trying to ascertain if keeping frame size the same despite CPU speed increasing is the best way to go (eg at 7MHz the interrupts are 100Hz not 50...) or if the frame length should multiply with CPU speed (so interrupts with a 7MHz CPU clock would stay 50Hz)... I have stability issues when interrupts are enabled at higher CPU speeds (runs fine with interrupts disabled...)
+CURRENTLY however, I've been quite happy with the following:
+When using a CPU speed derived from the spectrum clock, Interrupts are issued at the beginning of every 'FRAME' (every 68888 t states).
+When using a CPU speed derived from the video clock, Interrupts are issued at the beginning of every 'FRAME' (every 104211 t states).
+I'm experimenting with the INT length - at the moment I've got INT staying low for 16 t-states, though the Spectrum keeps it low for 32. I do know that the T80 CPU I use in FPGA handles INT a little differently to a real Z80, so that's possibly why I have to tune this to be more stable at higher CPU speeds... 
+ 
+As Prism only supports speeds up to 56MHz, ALL values from 8 to 15 both odd and even give a 56MHz clock and Interrupts derived from a 69888 t-state frame size.
+ 
+
+****** 
+0001 - Register 1 - Compatiblity Options
+At bootup, Prism's memory mapping is a little different to that on a Spectrum, Spectrum 128 or Timex. For most applications this won't matter, but some software requres the memory map/MMU to be a little more traditional...
+
+Prism has 512K of SRAM and 32K of dual ported RAM which is used as Video RAM.
+
+In 256x192 resolution modes, Prism has 3 'shadow' screens, selected by using both the Spectrum 128's "shadow" screen selection bit in port 7FFD, and the Timex/Chloe/SE's shadow screen selection bit in port FF:
+
+Screen 0 is stored in VRAM0 and displayed when neither 128 or Timex shadow screen is selected.
+
+Screen 1 is stored in VRAM1 and is displayed when the Timex shadow screen is selected and the 128 shadow screen is not.
+
+Screen 2 is stored in VRAM2 and is displayed when the 128 shadow screen is not selected and the Timex shadow screen is not.
+
+Screen 3 is stored in VRAM3 and is displayed when the both shadow screens are selected.
+
+This is the same way that screens are selected in the Chloe 280SE.
+
+Much like the 128K Spectrum models, which memory page resides between addresses 0xC000 and 0xFFFF can be selected using IO port 7FFD. As well as bits 0, 1 and 2 of this port like the 128K Spectrums, Prism also uses bits 6 and 7 of this port (which are unused on 128K machines). As bits 6 and 7 were unused on 128K Spectrums, some programmers didn't care what data got written to them so a small number of games crash unless the MMU is instructed to limit memory to 128K. This does NOT disable the Timex/Spectrum SE/Chloe sideways RAM MMU.
+
+Prism's VRAM is presented to the CPU as 4 8K banks of memory. I'll refer to these pages as VRAM0, VRAM1, VRAM2 and VRAM3.
+
+If the value of register 7FFD is "00xxx101" then VRAM0 is presented to the CPU at 0xC000 and VRAM1 is presented to the CPU at 0xE000 (like the 128K spectrum's "PAGE 5"). If the value of register 7FFD is "00xxx111" then VRAM2 is presented to the CPU at 0xC000 and VRAM3 is presented to the CPU at 0xE000 (like the 128's "PAGE7")
+
+Traditionally on a Spectrum (and Timex, Spectrum SE, Chloe etc), VRAM is also presented to the CPU between 0x4000 and 0x7FFF (on a 128K Spectrum this is always "PAGE5" unless in one of the +2A/+3's special all-RAM modes). On Prism, by default VRAM is only presented to the CPU between 0x4000 and 0x5AFF. The remaining memory between 0x5B00 and 0x7FFF is comprised an extra page of SRAM which is otherwise unused (ie it cannot be paged in at 0xC000). This means that system variables, the printer buffer and the beginning of BASIC no longer take up video memory so some of Prism's extra screen modes can be used safely from BASIC without overwriting system variables and causing crashes or lock-ups.
+
+Again, some software (mainly software which uses the Timex/Chloe/Spectrum SE screen modes) expects VRAM1 to be paged in at 0x6000 - to retain compatibility with this, it is possible to present a full 16K of VRAM (VRAM0 followed by VRAM1) at 0x4000
+
+This register's settings are as follows:　
+
+0000 - Normal ULA2 Operation
+
+xxx1 - Map VRAM0 at 0x4000 and VRAM1 at 0x6000
+
+xx1x - Disable port F4 (disable Timex/Chloe/SE sideways RAM paging)
+Disabling port F4 resets register F4 to "00000000" and prevents further writes (until a reset or you set the compatibility register to xx0x
+
+x1xx - Disable Timex screen modes selected using port FF
+Disabling timex screen modes turns off high res or high colour mode if either is selected. It also resets the timex shadow screen if it had been selected. It then stops you from setting any of those bits
+however bit 7 (dock/ex) still works
+so if you ONLY disable timex screen modes, you can still use sideways memory paging.
+setting that register to x11x basically turns off all the timex additions
+
+
+1xxx - Limit memory paging using IO 0x7FFD to 128K
+
+These can be combined, so OUT 36411,25 maps in 16K of VRAM between 0x4000 and 0x7FFF and limits memory paging at 0xC000 to 128K.
+
+　
+******
+0010 - Register 2 - Screen type (Pixel clock, address generator and screen data FIFO control)
+
+0000 - 256x192, 8x8 Attributes (ie, normal Spectrum)
+
+0001 - 512x192, 8x8 Attributes (2 normal Spectrum screens next to each other: either VRAM0+VRAM1 or VRAM2+VRAM3 - NOT interpolated monochrome like Timex)
+
+0010 - 256x384, 8x8 Attributes (2 normal Spectrum screens one on top of the other: either VRAM0+VRAM2 or VRAM1+VRAM3)
+
+0011 - 512x384, 8x8 Attributes 4 normal spectrum screens: VRAM0 to the left of VRAM1 on top of VRAM2 to the left of VRAM3
+
+0100 - 256x192, 8x1 Attributes (Same as Timex 8x1 mode)
+
+0101 - RESERVED
+
+0110 - 256x384, 8x1 Attributes (Two Timex 8x1 mode screens stacked one above the other: VRAM0 pixel data with attrs from VRAM1 above VRAM2 pixel data with attrs from VRAM3)
+
+0111 - RESERVED
+
+1000 - Set linear screenres
+
+
+
+
+1001 to 1111 reserved
+
+　
+******
+0011 - Register 3 - Screen data decoding method
+
+
+0000 – SPECTRUM ATTR: D0-D2 ink, D3-D5, paper, D6 bright, D7 Flash
+
+
+0001 – 16+16 Colour: ATTR: D0-D2 ink, D3-D5, paper, D6 ink bright, D7 paper bright
+
+
+0010 - 32 Colour ATTR: D0-D2 ink, D3-D5 paper, D6-D7 "CLUT". In the standard palette, colours 0-15 are the same as the normal Spectrum palette and colours 16-31 are darker versions of the normal spectrum palette)
+
+
+0011 - "chunk-o-blend" mode. Same concept as
+1110 - Chunk-o-vision 128x192 mode
+but:
+Colour 00 = paper and 11 = ink. Colours 01 and 10 are a mix of the paper and ink colour (the same way gigascreen mode mixes the colours). 
+
+
+0100 - 256 Colour mode 1 - D0-D7 = ink colour. Paper colour is determined by ULA2 BORDER (IO 0x9E3B)
+
+
+0101 - 256 Colour mode 2 (256 colour overlay mode - 3 colours in each 8x8 square):
+
+VRAM0 or VRAM1 - D0-D7 = ink colour overlaid upon
+
+VRAM2 or VRAM3 - D0-D7 = ink colour
+
+Paper Colour determined by ULA2 BORDER (IO 0x9E3B)
+ 
+If the pixeldata in VRAM0/VRAM1 is '0' ("paper") and pixeldata in VRAM2/VRAM3 is '0' then the true pixel colour is the ULA2 border colour.
+If the pixeldata in VRAM0/VRAM1 is '1' (ink) then the pixel colour is the colour 0-255 dictated by the attribute byte for that 8x8 pixel square in VRAM0/VRAM1.
+ 
+If the pixeldata in VRAM0/VRAM1 is '0' and the pixeldata in VRAM2/VRAM3 is '1' then the pixel colour 0-255 is dictated by the attribute byte for that 8x8 pixel square in VRAM2/3 
+This decode method works with 256 or 512 pixel width screens, but ignores the "double height" setting (so setting 256x384 mode results in 256x192, and 512x384 results in 512x192). All other screen type (register 1) settings are ignored.
+ 
+
+0110 - 4 Plane planar mode (16 colour "clashless" mode)
+
+Pixel colour determined by if it is lit on each plane. VRAM3 is MSB of logical colour VRAM0 is LSB of logical colour. For example if the pixel at 10,10 is lit on the screen data stored in VRAM0, unlit in VRAM1, lit in VRAM2 and lit in VRAM3, then the logical colour of the pixel displayed at 10,10 is 13 ("1101")
+
+The bitplane data is stored in the usual spectrum order (it is not linear). When this decode method is selected, any screen type settings (register 1) are ignored.
+ 
+In STANDARD palette, plane 0 = blue element, plane 1 = red element, plane 2 = green element, plane 3 = bright element. In PALETTED mode, colour number 0-15 is derived with plane 3 as msb, plane 0 as lsb.
+
+
+0111 - 3 Plane planar mode (Cheveron Mode)
+
+The same as the 4 plane mode, but with one less plane (to avoid system variables etc if VRAM is mapped in the whole space 0x4000 to 0x7FFF) giving 8 colour "clashless" mode.
+
+The pixel colour is determined by examining VRAM0, VRAM2 and VRAM3 but not VRAM1 which is used by BASIC etc. The MSB of the 4 bit logical colour is explicitly set to '1', the next MSB is determined by the bitplane in VRAM3, next VRAM2 and LSB is in VRAM0 (the MSB is set to '1' so that in the default palette, colours are 'bright')
+
+The bitplane data is stored in the usual spectrum order (it is not linear). When this decode method is selected, any screen type settings (register 1) are ignored.
+ 
+
+1000 - Overlay mode 1 - VRAM2 and/or VRAM3 overlay VRAM0 and/or VRAM1. Any pixels which are colour 0 or 8 on VRAM2 and/or VRAM3 are treated as transparent, allowing the screen(s) stored in VRAM0 and/or VRAM1 show through. VRAM2 always overlays VRAM0, VRAM3 always overlays VRAM1 - which pair(s) get used depends on the resolution (single or double width) or which screen is selected for display (screen 0-3 as selected by the Spectrum 128 and Timex/Chloe/SE shadow screen selection registers)
+
+This decode method works with 256 or 512 pixel width screens, but ignores the "double height" setting (so setting 256x384 mode results in 256x192, and 512x384 results in 512x192). All other screen type (register 1) settings are ignored.
+
+
+1001 - Overlay mode 2 - VRAM2 and/or VRAM3 overlay VRAM0 and/or VRAM1. Any pixels which are colour 0 on VRAM2 and/or VRAM3 are treated as transparent, allowing the screen(s) stored in VRAM0 and/or VRAM1 show through.
+
+This decode method works with 256 or 512 pixel width screens, but ignores the "double height" setting (so setting 256x384 mode results in 256x192, and 512x384 results in 512x192). All other screen type (register 1) settings are ignored.
+
+
+
+1010 - Gigablend mode - blends the screen(s) stored in VRAM0 and/or VRAM1 with the screens stored in VRAM2 and/or VRAM3.
+
+* it's an 8x8 attribute mode
+* Can be 256x192 or 512x192
+* Standard decode method (FL BR Ppp Iii)
+* flash is supported
+
+Here's how it works (at the moment; this might change a little):
+
+The logical colour for the pixel in VRAM0/1 is looked up in the current palette (palette 0) = REDa,GREENa,BLUEa 
+
+The logical colour for the pixel in VRAM2/3 is looked up in the current palette (palette 0) = REDb,GREENb,BLUEb 
+
+
+The output pixel colour is worked out as "a b b a":
+
+RED= REDa(3) & REDb(2) & REDb(1) & REDa(0)
+GREEN = REDa(3) & REDb(2) & REDb(1) & REDa(0)
+BLUE = REDa(3) & REDb(2) & REDb(1) & REDa(0)
+
+
+So if the pixel in VRAM0 was black and the pixel in VRAM2 was white, the resulting colour would be grey:
+
+REDa="0000"
+GREENa="0000"
+BLUEa="0000"
+
+REDb="1111"
+GREENb="1111"
+BLUEb="1111"
+
+the final output red would be "0110"
+the final output green would be "0110"
+the final output blue would be "0110"
+
+
+
+The things that might change in the future:
+
+* I might change the "blend calculation" from "a b b a" ... that was just the first thing I tried and I didn't get around to trying anything else (eg "a b b b" or "a a b b" etc). I didn't test the resulting blended colours against the real output of a "gigascreen" demo etc, I just looked to see if white and black made a grey and red and yellow made an orange.
+
+
+
+
+
+1011 - Brainebow Mode
+
+it's attribute decode mode BIN 1011 (out 36411,59 to enable). It's a 3 plane planar mode, just like decode mode BIN 0111 (Cheveron mode) with a twist:
+
+VRAM0 pixel data for blue pixels. ATTRIBUTE data gives the blue level.
+VRAM2 pixel data for red pixels. ATTRIBUTE data gives the red level.
+VRAM3 pixel data for green pixels. ATTRIBUTE data gives the green level.
+
+so if the pixel data on VRAM0 is 0, there's no blue. If it's 1, then the amount of blue in the pixel is given by the attribute byte (level 0 to 255 which is converted to 4 bit in the prototype prism of course)
+
+So on the prototype Prism, this is a 4096 colour mode (with the limitation that each 8x8 pixel square can only select from 8 colours, at least one of which is always black). On any implementation of Prism that does 24 bit colour, the palette's larger.
+
+
+1100 - 4 Plane planar mode (256 colour "clashless" mode)
+In the planar modes, the bitplane data from VRAM0,1,2 and 3 combine to establish a logical colour 0-15 for each pixel. This mode's the same - but additionally each 8x8 square of pixels can come from a different part of the 256 colour palettes - the lower 4 bits of what would usually be the attribute data in VRAM0 is used as the msb of the logical colour number.
+So if the "attribute" data was "0" then the bitplane data would select pixels of colours 0-15 (just the same as the normal 4 plane mode), if the attribute data was "1" then the bitplane data would select pixels of colours 16-31, and if the attribute data was "15" then the bitplane data would select pixels of colours 240-255
+
+
+1101 - Jowett mode - as requested by Roger Jowett, a mode where the pixel colour is determined only by the border colour. When the CPU speed is fast enough and synchronised with the video clock, this mode allows a number of interesting effects.
+
+
+1110 - Chunk-o-vision 128x192 mode
+
+Similar to the C64's low-res 4 colours in a 4x8 square mode. Each pair of bits in the pixel data denotes pixel state:
+
+00 = logical colour = paper colour
+
+01 = logical colour = ink colour + 16 (ink intensity 1 in default palette)
+
+10 = logical colour = ink colour + 24 (ink intensity 2 in default palette)
+
+11 = logical colour = ink colour + 8 (ink intensity 3 in default palette)
+
+The *standard* version of the mode 128x192 only uses VRAM0
+
+128x192 - VRAM0 only (or VRAM1 only, VRAM2 only, VRAM3 only if using one of the shadow screens)
+128x384 - VRAM0+VRAM2 (or VRAM1+VRAM3 if using the port FF shadow screen)
+256x192 - VRAM0+VRAM1 (or VRAM2+VRAM3 if using the port 7FFD shadow screen)
+256x384 - VRAM0+VRAM1+VRAM2+VRAM3  (no shadow screens available)
+
+
+
+1111 - chunk-o II mode - implement exactly the same as the first chunk-o mode but it's selected by OUT 36411,63 (whereas the first mode is 36411,62). Colour "00" is paper, colour "11" is ink. Colour "01" is colour register 1, Colour "01" is colour register 2.
+
+Default value of colour register 0 (the one which controls the prism border colour) is BIN "00000000". Default vaulue of colour register 1 is "11000111"    Default value of colour register 2 is "11000100".
+
+
+
+
+
+****** 
+0100 - Register 4 - Palette select
+
+0000 - Default (hard-coded) colour palette.
+
+Colours 0-7 as per Spectrum, "bright 0" (intensity 1)
+
+Colours 8-15 as per Spectrum "bright 1" (intensity 3)
+
+Colours 16-23 as per spectrum but intensity 0
+
+Colours 24-31 as per spectrum but intensity 2
+
+Colours 32-255 yet to be "officially" defined (but let me know when you implement this and I can send you what's currently hard-coded on the prototype)
+
+0001 - Colours 0-255 calculated using the same "GGGRRRBB" formulae as when defining a ULAplus colour (so colour 1 is a very dark blue, colour 255 is white). Potentially useful for converting MSX graphics in 256 colour modes, but mainly included as a curiosity (was used by an early implementation of ULAplus)
+
+0010 - ULA2 256 colour user-redefinable palette. Power-on defaults for this palette are yet to be "officially" established (but default the same values as hard-coded in palette 0).
+
+0011 to 1111 - RESERVED
+
+******
+0101 - Register 5 - VRAM write mask options
+
+Implemented to make planar modes quicker to write to, but potentially useful for screen mirroring/overlay modes etc too) This register controls which VRAM page or combination of pages the CPU writes to when writing to memory addresses between 0x4000-0x5AFF:
+
+0000 – CPU writes to plane 0 (VRAM0)
+
+0001 – CPU writes to plane 0 (VRAM0)
+
+0010 – CPU writes to plane 1 (VRAM1)
+
+0011 – CPU writes to both plane 1 and 0
+
+0100 – CPU writes to plane 2 (VRAM2)
+
+0101 - CPU writes to both plane 2 and 0
+
+0110 - CPU writes to both plane 2 and 1
+
+0111 - CPU writes to planes 2, 1 and 0
+
+1000 - CPU writes to plane 3 (VRAM3)
+
+1001 – CPU writes to both plane 3 and 0
+
+etc etc
+
+1111 - CPU writes to all 4 planes
+
+ 
+
+******
+0110 - Register 6 - Linear options
+
+0010 - 128x128 res, 8 bits per pixel (256 colour). First 64 lines from VRAM0, next 64 from VRAM1
+
+0011 - 256x128 pixels, one byte per pixel, linear. first 32 lines from VRAM0, next 32 from VRAM1, next 32 from VRAM2, final 32 from VRAM3
+
+
+
+
+******
+0111 - Register 7 - Overlay mode options
+
+0000 - Both layers use STANDARD attribute decoding
+
+xx01 - Upper layer uses 16+16 attribute decoding
+
+xx10 - Upper layer uses 32 colour attribute decoding
+
+xx11 - Upper layer uses STANDARD attribute decodign but colours 16-31
+
+01xx - Lower layer uses 16+16 attribute decoding
+
+10xx - Lower layer uses 32 colour attribute decoding
+
+11xx - Lower layer uses STANDARD attribute decodign but colours 16-31
+
+　
+******
+1000 - RESERVED
+
+******
+1001 - RESERVED
+
+******
+1010 - RESERVED
+
+******
+1011 - RESERVED
+
+******
+1100 - RESERVED
+
+******
+1101 - RESERVED
+
+******
+1110 - RESERVED
+
+
+******
+1111 - Register 16 - Enable FLASH programming mode
+
+0000 to 1001 - NORMAL mode (Flash is paged at 0x0000, FLASH nWR is disabled)
+
+1010 - Enable programming mode (flash is paged in at 0x8000, onboard ROM at 0x0000, FLASH nWR signal is enabled)
+
+1011	to 1111 - NORMAL mode (Flash is paged at 0x0000, FLASH nWR is disabled)
+
+　
+
+9E3B - old
+0x9E3B (read) - returns Prism microcode version (I'd suggest returning '0' to indicate emulation)
+
+0x9E3B (write) - ULA2's 256 colour BORDER
+
+The border is set to this colour when the "BORDER 0" command has been issued (BORDER 1, BORDER 2 etc all work as expected on a normal Spectrum). This register defaults to '0' so Spectrum software setting a black border acts as expected unless this registe is explicitly changed by the user/software.
+
+
+
+
+
+AE3B - old 
+0xAE3B (read,write) - RESERVED  (no need to reserve this in emulation at the moment, it's not likely to be needed all going well)
+
+
+
+port AE3B (register select) and 9E3B (data) implement up to 256 x 8 bit registers  (currently 3 are implemented):
+OUT 44603,register - selects register
+	(OUT 44603,0 selects 256 colour border register
+	OUT 44603,1 selects chunk-o mode II colour 1  register
+	OUT 44603,2 selects chunk-o mode II colour 2 register)
+OUT 40507,x Set register selected above to value X
+
+
+
+
+ 
+0xBE3B ULA2 Palette control - Colour #
+
+Output a logical colour number to this port to select it for definition.
+ 
+0xFE3B (read) - RESERVED
+
+0xFE3B (write) Palette control - RGB Data
+
+Write 3 times to redefine red then green then blue levels for the colour selected with 0xBE3B. Accepts an 8 bit value for each colour element (different implementations of ULA2 may resample these values to lower bit-depths depending on the hardware - Prism converts this to 4 bits per element for example).
+
+After the 3rd value has been written, the colour selected for redefinition increments to reduce the number of OUTs needed to redefine consecutive colours.
+
+ 
+0xCE3B (read, write) - RESERVED (no need to reserve this in emulation at the moment, it's not likely to be needed all going well)
+0xDE3B (read, write)- RESERVED (no need to reserve this in emulation at the moment, it's not likely to be needed all going well)
+
+ 
+0xEE3B (read)- RESERVED
+0xEE3B (write) - (Flash) ROM select
+Select which 16K page of the FLASH ROM is paged in at 0x0000.
+
+ 
+　

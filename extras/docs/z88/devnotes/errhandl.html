@@ -1,0 +1,260 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Error handling and related issues</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="aplstrct.html">Previous</a></td>
+
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="bottom" width="10%"><a href="memmanag.html">Next</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p><b><font size="+1">5. Error handling and related issues</font></b>
+</p>
+<p>Before we can look at the details of constructing applications it is
+necessary to look at the way in which the Z88 deals with errors. System
+calls are accessed by using a Z80 RST instruction followed by one or two
+bytes which determine the system function to be accessed. If an error occurs
+the routine will return with the Carry of the flags register F (Fc) to
+be set = 1 and a return code in register A. The return codes are symbolically
+represented by "RC_xxxx", where "xxxx" is a mnemonic for the error. Most
+errors may be handled in a straightforward way, with the Carry flag being
+examined and appropriate action being taken depending on the value of register
+A. However, a mechanism exists to trap errors before they return to the
+part of code from which they were called. This mechanism is called an 'error
+handler' and the programmer may install one or more of these for use with
+the application. More than one error handler could be used if different
+parts of the application had different error handling requirements. An
+error handler will in general ignore most errors, returning to the code
+from which the call originated with Fc = 1 and the error code intact in
+A, however other errors may be trapped, dealt with and whatever return
+code is thought fit can be returned to the running program. The error handler
+should perform a RET instruction when it has finished it's work. Note that
+this returns control to the operating system and not to the program which
+made the original call.
+</p>
+<p>If an error occurs in a system call, then after the call has finished,
+insofar as it is able, the error handler is called with Fc = 1, and a return
+code in A, and possibly Fz = 1 to indicate a fatal error. Fatal errors,
+such as RC_HAND, are so called because the system can take no reasonable
+action to recover. On exit from the error handler a fatal error will generate
+an interactive error box and following this RC_QUIT will be returned. For
+non-fatal errors the error handler may take whatever action it wishes,
+such as displaying an error message, but must always return control to
+the error handler supervisor, with Fc = 0, by a RET instruction. This will
+then pass control back to the program just after the call.
+</p>
+<p>NOTE: The error handler is programmer defined. The reference section
+of these notes describes in detail which registers will be affected by
+system calls on return to your application. When you install an error handler,
+possibly other registers will be affected as well (which you use in the
+error handler). If you wish the error handler to act neutral, then preserve
+the Z80 registers before executing your error handler, and restore them
+when the error handler has finished its work.
+</p>
+<p>Some errors occur because of some action by the user, such as pressing
+the &lt;ESC&gt; key or switching between applications. The causes of these
+kind of errors are:
+</p>
+<p>An Escape condition occurs.
+</p>
+<blockquote>The &lt;ESC&gt; key has been pressed while Escape detection is
+enabled, eg. file transfer calls can be interrupted by &lt;ESC&gt;. This condition
+gives rise to the RC_ESC code.</blockquote>
+
+Possibility of pre-emption or suspension.
+<blockquote>This can happen when the SQUARE or DIAMOND keys are used, menu
+or help access has occurred, the machine has been switched off and back
+on, or genuine pre-emption has occurred, ie. the user has switched tasks
+and subsequently returned. This condition can give rise to RC_SUSP,RC_DRAW
+or RC_QUIT.</blockquote>
+
+RC_SUSP
+<blockquote>Suspicion of pre-emption, the computer was switched off. This
+code indicates that the screen is intact, but unsafe workspace may be changed.</blockquote>
+
+RC_DRAW
+<blockquote>Similar to RC_SUSP except that the application's screen has
+been corrupted and the application should attempt to redraw it. Applications
+which might find it very difficult to redraw a screen can ask the operating
+system to preserve it for them before they are pre-empted. This can only
+take place if there is enough memory to do so - some way of dealing with
+RC_DRAW is still required. Note, it is also possible for applications to
+save a particular screen image and restore it later - see <a href="ossr.html">OS_Sr</a>
+in "Miscellaneous useful routines".</blockquote>
+
+RC_QUIT
+<blockquote>The process has been pre-empted and a KILL request made for
+it from the INDEX (or by own suicide request). The reader may have noticed
+from the screen that a KILL request causes the relevant process to be re-entered
+momentarily - processes are always expected to kill themselves off in resonse
+to this error; they are not killed BY the INDEX. RC_QUIT may also be returned
+when after a fatal error has occurred.</blockquote>
+
+RC_ESC
+<blockquote>An Escape condition has been detected. This means &lt;ESC&gt;
+has been pressed while Escape Detection is enabled. Note the Escape condition
+must be acknowledged by <a href="osesc.html">OS_Esc</a>, otherwise the Escape
+condition will continue to flag errors - acknowledging Escape is an ideal
+job for an error handler.</blockquote>
+
+<b>Pre-emptable Calls</b>
+<p>Only calls which read the keyboard can be pre-empted. Since the keyboard
+is usually bound to standard input the most common pre-emptable calls are:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="osin.html">OS_In</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; get character from standard input<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="ostin.html">OS_Tin</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; as <a href="osin.html">OS_In</a>, but with timeout<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="gnsip.html">GN_Sip</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; get line from standard input<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="ossr.html">OS_Sr</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; used to generate a "Page Wait"</pre>
+
+However, if file I/O is bound to the keyboard, then file read operations
+will also be pre-emptable. Primarily the suspendable calls are all file
+I/O and the delay routine (<a href="osdly.html">OS_Dly</a>), but again other
+calls may be if they take their input from a stream which is opened to
+the keyboard device. Remember some re-binding may be done by the user using
+the CLI, covered later in "Standard I/O and the CLI".
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="osgb.html">OS_Gb</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; get byte from file or stream<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="osgbt.html">OS_Gbt</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; get byte from file or stream, with timeout<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="ospb.html">OS_Pb</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; put byte to file or stream<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="ospbt.html">OS_Pbt</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; put byte to file or stream, with timeout<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="osmv.html">OS_Mv</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; move bytes between memory and file or stream<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="osdly.html">OS_Dly</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; delay a certain period<br><br></pre>
+
+<b>System error routines</b>
+<p>The system provides four routines to handle errors:
+</p>
+<p><tt><a href="oserh.html">OS_Erh</a></tt>
+</p>
+<blockquote>Set error handler. This call installs a new error handler,
+returnning the address of the old handler so that it may be re-installed
+at a later date if required.</blockquote>
+
+<tt><a href="osesc.html">OS_Esc</a></tt>
+<blockquote>Examine special conditions. This call covers the details of
+working with the Escape key, which can generate errors if required.</blockquote>
+
+<tt><a href="gnesp.html">GN_Esp</a></tt>
+<blockquote>Return a pointer to a system error message. A subset of error
+codes have messages associated with them. This call returns an extended
+pointer to an error message in the operating system ROM, if it exists.</blockquote>
+
+<tt><a href="gnerr.html">GN_Err</a></tt>
+<blockquote>Display system error box. This draws an error box on screen
+which asks the user to press ESCAPE to continue, RC_DRAW or RC_SUSP will
+be returned. In the case of fatal errors, eg. RC_BAD or RC_HAND, the user
+is asked to press Q to quit and the routine exits with an RC_QUIT error.
+The routine always exits with Fc = 1, ie. an error condition.</blockquote>
+
+An error handling routine may be set up by using the system <a href="oserh.html">OS_Erh</a>
+whose specification is:
+<p>
+</p>
+<hr width="100%">
+<br>
+<b><font size="+1">OS_Erh, set error handler</font></b>
+<p><tt>RST 20H, DEFB $75</tt>
+</p>
+<p><tt>In:</tt>
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = 0, other values reserved for system use<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B = 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HL = address of new error handler<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HL = 0, use default system error handler (in segment 0)<br><br>OUT:</pre>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = old call level<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HL = address of old error handler</pre>
+
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...CDE../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AFB...HL/.... different</pre>
+<hr width="100%">
+<p>We can now consider the code the error handler should include. Fatal
+errors may be ignored (include a RET Z at the start), because there is
+no reasonable action to take anyway except termination of this instantiation
+of the application. An RC_SUSP error code will generally be completely
+ignored by the error handler whereas RC_ESC may want to be acknowledged
+using <a href="osesc.html">OS_Esc</a>, or left pending for the main part
+of the application to acknowledge. RC_DRAW could be responded to by calling
+a routine to regenerate the screen and then quitting the error handler
+with A = RC_SUSP and Fc = 0 as though nothing had ever happended. Other
+errors may want to be reported, by outputting an error message.
+</p>
+<p>Finally, the error handler, rather than the main application, will generally
+respond to a KILL request in the form of the RC_QUIT code. It must close
+down it's application using <a href="osbye.html">OS_Bye</a>, but it is first
+essential to close open resources like files, filters, streams and de-allocate
+memory. If an application has not properly closed resources, in the form
+of memory, handles and buffers, will be lost to the system. Files left
+open will be permantently marked as "In Use" and so cannot be deleted or
+opened for updating. To regain lost handles and resources to the system,
+a soft reset must be issued.
+<br>
+&nbsp;
+</p>
+<p><b>Example</b>
+</p>
+<p>The following example illustrates the structure of an error handler
+with a few responding error codes:
+</p>
+<p>
+</p>
+<hr width="100%">
+<pre>include "errors.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; error call/code definitions<br>include "stdio.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; standard input/output definitions<br>inlcude "director.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; director call definitions<br><br>.install&nbsp;&nbsp;&nbsp; xor&nbsp; a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; zero A<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; b,a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; zero B<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; hl,error_han&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; address of error handler<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="oserh.html">OS_Erh</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; install new error handler...</pre>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; main application goes here...</pre>
+
+<tt>;</tt>
+<br>
+<tt>; error handler entry:</tt>
+<pre>.error_han&nbsp; ret&nbsp; z&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; error is fatal, so exit back to system<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cp&nbsp;&nbsp; RC_ESC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; check for &lt;ESC&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; nz, not_escape<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, SC_ACK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; acknowledge RC_ESC = SC_ACK<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osesc.html">OS_Esc</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; escape processing call<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, RC_ESC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; error code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnesp.html">GN_Esp</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get extended address to error message<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnsoe.html">GN_Soe</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; write message to standard output<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; or&nbsp;&nbsp; a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Fc = 0, Fz = 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret<br><br>.not_escape cp&nbsp;&nbsp; rc_quit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; check for KILL request<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; nz, not_quit<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; code to close files and de-allocate<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; memory goes here...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xor&nbsp; a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; no error message on exit...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osbye.html">OS_Bye</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; force remove application from system<br><br>.not_quit&nbsp;&nbsp; or&nbsp;&nbsp; a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Fc = 0, Fz = 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret</pre>
+<hr width="100%">
+<p>The error handler above responds to an Escape condition and a KILL request.
+All other errors are 'ignored' with a display of the system message corrseponding
+to the error code. Please note that no registers are changed, except Fc
+(Carry) and Fz (Zero) flags. Your error handler might respond to RC_DRAW
+and issue a routine to redraw the application windows. Remember that your
+routines might change registers that they're not supposed to regarding
+the outside world of the error handler.
+</p>
+<p>NOTE: When an error handler is installed, the system relies on having
+it available in the corresponding segment (which the address of the error
+handler identifies). If you change the bank binding state in the segment
+of the error handler, thereby removing the original code, a call to that
+address by the system would most likely crash the machine (executing random
+instructions)!
+</p>
+<p>Further, we suspect a bug in OZ that crashes popdowns if the error handler
+is resided in segment 2. Always keep error handlers in segment 3 - all
+system applications do it.
+</p>
+<p>
+</p>
+<hr width="100%">
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <td align="left" valign="top" width="33%"><a href="aplstrct.html">Previous</a></td>
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+   <td align="right" valign="top" width="33%"><a href="memmanag.html">Next</a></td>
+
+ </tr>
+ <tr>
+
+   <td align="left" valign="top" width="33%">Application Static Structures</td>
+   <td align="center" valign="top" width="34%">Error handling and related issues</td>
+   <td align="right" valign="top" width="33%">Memory Management</td>
+
+ </tr>
+
+  </tbody>
+</table>
+</body>
+</html>

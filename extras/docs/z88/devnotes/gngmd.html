@@ -1,0 +1,52 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Gmd, Get (read) the current machine
+system date in internal format</font></b>
+<p><tt>RST 20H, DEFW $1809</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; DE = 0, not allowed.
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 1, not allowed.
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 2, return system date in ABC.
+&nbsp;&nbsp;&nbsp;&nbsp; DE > 255, pointer to write machine date at (DE).
+</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; If DE(in)>255 then DE = DE(in) + 3; ABC = ABC(in)
+&nbsp;&nbsp;&nbsp;&nbsp; If DE(in)&lt;255 then DE = DE(in); ABC = result
+</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......../IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/.... different
+</pre>
+Notes:
+<p>Bugs:
+<br>&nbsp;
+<p>Related calls:
+<blockquote><a href='gndei.html'>GN_Dei</a>, convert zoned format date to internal format
+<br><a href='gndie.html'>GN_Die</a>, convert internal format date to zoned format
+<br><a href='gngdt.html'>GN_Gdt</a>, convert an ASCII string to an internal binary date
+<br><a href='gnpdt.html'>GN_Pdt</a>, write internal date as ASCII string
+<br><a href='gnpmd.html'>GN_Pmd</a>, put (set) machine date</blockquote>
+
+</body>
+</html>

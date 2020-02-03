@@ -1,0 +1,122 @@
+
+***************
+*
+*     SYS_MESS sys_mess
+*
+***************
+
+L0B71C  DC.L $4AFB003C
+        DC.W $004C
+        DC.W    $005A
+        DC.W $006A
+        DC.W $007A
+        DC.W    $0088
+        DC.W    $009C
+        DC.W    $00A8
+        DC.W    $00BA
+        DC.W    $00C4
+        DC.W    $00D2
+        DC.W $00E0
+        DC.W    $00EC
+        DC.W    $00FA
+        DC.W    $010A
+        DC.W    $011A
+        DC.W    $0132
+        DC.W    $0148
+        DC.W    $0154
+        DC.W $0166
+        DC.W    $0172
+        DC.W    $017E
+        DC.W    $0188
+        DC.W    $0194
+        DC.W    $01AC
+        DC.W    $01CC
+        DC.W    $01E6
+        DC.W    $01F8
+        DC.W    $020E
+        DC.W $000D
+        DC.B 'not complete'
+        DC.W $0A00
+        DC.W $000C 
+        DC.B 'invalid Job'
+        DC.B $0A
+        dc.w $000E 
+        DC.B 'out of memory'
+        DC.B $0A
+        DC.W $000D 
+        DC.B 'out of range'
+        dc.w $0A00
+        DC.W $000C 
+        dc.b 'buffer full'
+        DC.B $0a
+L0B7A4  dc.w $0011 
+        dc.b 'channel not open'
+        dc.w $0a00
+        dc.w $000A 
+        dc.b 'not found'
+        dc.b $0a
+        dc.w $000F 
+        dc.b 'already exists'
+        dc.w $0A00 
+        dc.w $0007 
+        dc.b 'in use'
+        dc.w $0A00
+        dc.w $000c        
+        dc.b 'end of file'
+        dc.b $0a
+        dc.w $000B
+        dc.b 'drive full'
+        dc.w $0a00
+        dc.w $0009
+        dc.b 'bad name'
+        dc.w $0a00
+        dc.w $000b
+        dc.b 'Xmit error'
+        dc.w $0A00
+        dc.w $000E 
+        dc.b 'format failed'
+        dc.b $0a
+        dc.w $000E 
+        dc.b 'bad parameter'
+        dc.b $0a
+        dc.w $0016 
+        dc.b 'bad or changed medium'
+        dc.b $0a
+        dc.w $0014
+        dc.b 'error in expression'
+        dc.b $0a
+L0B864   dc.w $0009
+        dc.b 'overflow'
+        dc.w $0a00
+        dc.w $0010
+        dc.b 'not implemented'
+        dc.b $0a
+        dc.w $000a
+        dc.b 'read only'
+        dc.b $0a
+        dc.w $0009
+        dc.b 'bad line'
+        dc.w $0A00
+        dc.w $0008
+        dc.b 'At line '
+        dc.w $0009
+        dc.b ' sectors'
+        dc.w $0a00
+        dc.w $0015
+ob8b0   dc.b 'F1...monitor'
+        dc.b $0a
+        dc.b 'F2...TV'
+        dc.w $0A00
+        dc.w $001E
+        dc.b '  1983 Sinclair Research Ltd '
+        dc.w $0017
+        dc.b 'during WHEN processing'
+        dc.w $0a00
+        dc.w $0010
+        dc.b 'PROC/FN cleared'
+        dc.b $0a
+oB914   dc.b 'SunMonTueWedThuFriSat'
+        dc.b $00
+        Dc.b 'JanFebMarAprMayJunJulAugSepOctNovDez'
+
+***** END SYS_MESS  sys_mess

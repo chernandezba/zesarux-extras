@@ -1,0 +1,12 @@
+Documentar mínimamente cómo va refresco de pantalla:
+
+-En máquinas spectrum y no Prism, después de cada opcode se guarda en un buffer temporal de scanlines los valores de pantalla de pixeles y atributos de donde "ha pasado el electrón" al ejecutar el último opcode
+
+-Al final de un scanline, si está real video activado, y si es máquinas con soporte rainbow, guardan en rainbow_buffer la línea de pixeles con sus colores de ese scanline. Las máquinas que usen el buffer temporal de scanlines explicado en el punto anterior, lo leen desde ahí. Las que no, lo leen de memoria de pantalla. Es aquí donde se genera la línea final de pixeles según el modo de vídeo en cuestión: hay que interpretar si es modo normal, o ulaplus, o spectra, o Prism, etc
+
+-Para el border, se tiene un buffer aparte de la longitud de un scanline y guarda las modificaciones que se hace en el borde mediante out
+
+-Al final de un frame de pantalla (50 veces por segundo):
+*si está real vídeo, se lee todo el rainbow_buffer y se vuelca en pixeles en pantalla. Aquí no se interpreta el modo de vídeo, solo el tamaño de ventana, pues la interpretación ya se ha hecho al final del scanline. Se trata de leer los pixeles que hay en el rainbow_buffer y traspasarlos a la ventana. Zx8081 y spectrum tienen misma función de dibujado desde rainbow. Otras máquinas tienen otras funciones pero se debería poder usar solo 1 para todos si se hiciese bien
+*si no está real vídeo, se dibuja en pantalla según el modo de vídeo activo, leyendo la memoria de pantalla en este momento. Lógicamente aquí no funcionan los efectos de scanlines: nada de overscan, ni border con más de un color, etc
+

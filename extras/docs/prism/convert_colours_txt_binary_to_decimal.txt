@@ -1,0 +1,9 @@
+Quitar caracteres que sobran
+
+cat palette_0.txt |sed 's/"&"//g'|sed 's/--.*//'|sed 's/,"/,\'$'\n"/'|sed 's/ //g'|sed 's/"//g'|sed 's/,//' > palette_0_parsed.txt 
+
+
+Editar a mano y quitar lineas vacias
+
+Pasar txt resultante a script de conversion de binario a decimal
+binary_to_decimal.sh palette_0_parsed.txt

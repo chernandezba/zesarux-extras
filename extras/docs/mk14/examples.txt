@@ -1,0 +1,13 @@
+duck shoot
+
+command> wmm 0f20h 00H 00H 00H c4H 0dH 35H c4H 00H 31H c4H 01H c8H f4H c4H 10H c8H
+
+command> wmm 0f30h f1H c4H 00H c8H eeH c4H 08H 01H c0H e7H 1eH c8H e4H 94H 04H c4H
+
+command> wmm 0f40h 61H 90H 02H c4H 00H c9H 80H 8fH 01H c0H d8H 9cH 0eH c1H 80H e4H
+
+command> wmm 0f50h ffH 98H 08H c8H ceH c0H caH e4H 80H c8H c6H 40H 03H fcH 01H 94H
+
+command> wmm 0f60h d6H b8H bfH 98H c8H c4H 07H 90H ceH 
+
+

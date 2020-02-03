@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>The floating point package</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="prfilter.html">Previous</a></td>
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+   <td align="right" valign="bottom" width="10%"><a href="alarms.html">Next</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p><b><font size="+1">15. The floating point package</font></b>
+</p>
+<p>Floating point numbers in the Z88 are stored as a 4-byte mantissa and
+a 1 byte exponent. The exponent byte is simply the exponent plus 127. The
+mantissa is a binary fraction in a standard form where the most significant
+bit is assumed 1 (ie. the number is greater than or equal to 0.5 and less
+than 1). This is analogous to a base 10 standard from where the mantissa
+is of the form 0.xyz... (the usual choice is x.yz... but this is a matter
+of human convention) - x cannot be zero, as if it were then the number
+would be represented with a mantissa of 0.yz... and the exponent incremented.
+Hence the most significant bit of the mantissa may be taken to be 1 when
+calculating its magnitude, and can actually store other information. It
+is used as the mantissa sign bit, where 1 means a negative number. For
+example the decimal number 13 is binary 1101 or 0.1101*10^100; this would
+be represented as a mantissa of 01010000.....0000 (32bits - note the zero
+msb for positive number) and an exponent of 10000011 (131 decimal).
+</p>
+<p>An exponent of zero is taken to mean that the mantissa is an integer
+- this allows integers which will fit in four bytes to be manipulated differently,
+avoiding irritating features such as 10 becomming 9.999998, whilst retaining
+the ability to cope with the large ranges which come with the floating
+point representative.
+</p>
+<p>Floating point numbers are conventionally stored with the least significant
+bit of the mantissa at the lowest address, and the exponent at the highest.
+However, since numbers are represented to and returned from the floating
+point package in registers, this convention may be flouted at the programmer's
+discretion.
+</p>
+<p>As mentioned earlier, the floating point package (hereinafter referred
+to as the FPP) uses a different RST call from the main system calls, the
+format of a floating point call is as follows:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RST&nbsp; $18<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFB &lt;function code&gt;</pre>
+
+so apart from the different restart number, much the same as the OS calls.
+In the text we use the following <b>Z80asm</b> command:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FPP(&lt;function symbol&gt;)</pre>
+
+Parameters are passed to and from the FPP in a rather bizarre collection
+of registers. The main register group is HLhlC (remember, lower case for
+alternate set), and where a second parameter is required it is passed in
+DEdeB. These divide into mantissa and exponent as follows:
+<pre><i>Param1</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Param2</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Significance<br></i>H&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Most significant byte of mantissa<br>L&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; E<br>h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; d<br>l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; e&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Least significant byte of mantissa<br>C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exponent byte</pre>
+
+There are certain exceptions, which are explained where relevant (for instance
+one operation returns the numeric value of a string, so takes a pointer
+to the string in HL as its parameter). Please refer to "System calls reference"
+for details of the specific function calls.
+<br>
+&nbsp;
+<p><b>Example</b>
+</p>
+<p>The following is a simple example program, which prints out the mathematical
+constant PI. It makes two FPP calls, one <a href="fppref.html">FP_PI</a>
+to get the value, then a <a href="fppref.html">FP_STR</a> to convert it
+to a string. This is then printed via the standard
+<a href="gnsop.html">GN_Sop</a>
+routine.
+</p>
+<p>
+</p>
+<hr width="100%">
+<br>
+<tt>include "stdio.def"&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; standard I/O definitions</tt>
+<br>
+<tt>include "fpp.def" &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; floating point definitions</tt>
+<p><tt>; routine assumes that IY points to small buffer on entry</tt>
+<br>
+<tt>; buffer size at least 15 bytes</tt>
+</p>
+<pre>.print_pi&nbsp;&nbsp; fpp(<a href="fppref.html">FP_PI</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get value of PI in HLhlC<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; push iy<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pop&nbsp; de&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; buffer address in DE<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; swap to alternate registers<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; de, $000A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; format control variable (10 digits)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; exx<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fpp(FP_STR)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; convert number to ASCII string<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xor&nbsp; a<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; (de),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; null-terminate string<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; push iy<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pop&nbsp; hl&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; buffer address in HL<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnsop.html">GN_Sop</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; display number to standard output<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnnln.html">GN_Nln</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; newline<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; finished (return to caller)</pre>
+<hr width="100%">
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <td align="left" valign="top" width="33%"><a href="prfilter.html">Previous</a></td>
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+   <td align="right" valign="top" width="33%"><a href="alarms.html">Next</a></td>
+
+ </tr>
+ <tr>
+
+   <td align="left" valign="top" width="33%">The Printer filter</td>
+   <td align="center" valign="top" width="34%">The floating point package</td>
+   <td align="right" valign="top" width="33%">Handling Alarms</td>
+
+ </tr>
+
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,9 @@
+Juegos que fallan por culpa de retornar 255 un bus idle en Inves:
+
+Arkanoid, Cobra, Terra Cresta, Short Circuit: en pantalla de juego, no se mueve nada. El retorno del bus idle port sirve para dar movimiento. Si se desactiva en juego, se congela
+
+
+Commando, Bomb Jack, Top Gun.:
+-commando: no he encontrado version que falle
+-bomb jack: no he encontrado version que falle
+-top gun: debido al bus idle

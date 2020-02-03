@@ -1,0 +1,470 @@
+===================================
+Romantic Robot presents Multiface 3
+===================================
+Document created by rstuart@ukonline.co.uk on 18th Oct 1999 for:
+World of Spectrum: http://www.void.demon.nl/spectrum.html
+
+------
+Manual
+------
+
+Contents
+--------
+
+Connecting the MULTIFACE        1.1 - 1.9
+Loading programs                2.0 - 2.1
+Saving programs                 2.2 - 2.6
+Reloading saved programs        3.1 - 3.3
+Print and Alter screens         4.1 - 4.2
+DOS use on MULTIFACE 3          4.3 - 4.5
+Toolkit                         5.1 - 5.9
+The use of extra 8K RAM         6.0
+
+Introduction
+------------
+
+MULTIFACE 3 is a multi-purpose interface designed exclusively for the
+SPECTRUM+3. It provides fully automatic and universal back-up/transfer of
+48/128K programs from tape to disk, disk to tape, tape to tape and disk to
+disk. It also incorporates a comprehensive toolkit enabling you to
+study/modify/develop software. MULTIFACE 3 can copy screens to printer in
+hi-res modes and it extends the use of DOS in 48 SPECTRUM mode. MULTIFACE
+is menu-driven, fully error-trapped with on-screen prompts and it largely
+uses a system of one-touch commands. It is very easy to use and does not
+really need a separate written manual. Nonetheless, the following few pages
+should help you to understand every aspect of MULTIFACE 3 operations so that
+you can use it to its fullest possible potential.
+
+1. Connecting Multiface
+-----------------------
+
+1.1   Switch off and unplug your computer and any peripherals which have
+      independent power supplies. Remove any peripherals attached to the
+      expansion port.
+1.2   Firmly push the MULTIFACE connector onto the expansion port.
+1.3   Attach the other peripherals, if any, making sure they are pushed
+      well home. Check all connections carefully.
+1.4   Plug in the computer and peripherals and switch on.
+1.5   Test that all is working by pressing the Red STOP button. If a 2-line
+      menu comes up at the bottom of the screen, all is well and you can
+      explore MULTIFACE further or press r to return and carry on with
+      whatever you wish.
+1.6   If you get random coloured squares, or other garbage, switch off,
+      disconnect everything from the mains, clean both sides of the
+      expansion port and repeat 1.2-1.5.
+1.7   In the unlikely event that the screen remains corrupted or menu does
+      not come up, switch off, remove all other peripherals, reread the
+      instructions and retry 1.2-1.5
+
+1.9   Turning MULTIFACE 'o'n and 'o'ff:
+      MULTIFACE 3 has a software operated switch to prevent it clashing with
+      other software or hardware products. The switch is also vital to
+      enable loading programs saved by any previous MULTIFACE model. As a
+      rule, upon switching the Spectrum+3 on, the MULTIFACE is OFF and
+      therefore "invisible". It is automatically switched ON anytime when
+      you press the red button which has in fact a dual function: it both
+      switched ON (but not OFF) and acts the MULTIFACE. Once the MULTIFACE
+      is active, it remains ON as confirmed at the bottom right. To turn it
+      off again, press o - when in the main menu - to change on to off; when
+      you return to program, MULTIFACE will remain OFF. Remember, that
+      MULTIFACE can always be activated by the red button, irrespective if
+      it was ON or OFF before.
+
+NB: Sale of this product is not designed to encourage piracy! You may not use
+it to infringe copyright by selling or giving away copies, or origionals of
+which you have kept copies. Piracy is theft and Romantic Robot wishes to make
+its position absolutely clear on this matter. If you are in any doubt about
+as to whether it is legal to make backup copies of a particular commercial
+program even if solely for your own use, please contact the copyright owners.
+In order to protect copyright, back up copies taken with MULTIFACE THREE will
+not then reload unless MULTIFACE is connected.
+
+SPECTRUM is a reg. trademark of AMSTRAD Consumer Electronics
+MULTIFACE 3 is designed, manufactured and trademarked by ROMANTIC ROBOT UK
+Ltd., 54 Deanscroft Avenue, London NW9 8EN
+
+2. Loading
+----------
+
+MULTIFACE does not save or transfer or change programs as such, it saves an
+image, a snapshot (in a compressed form) of the computer memory, frozen at
+the instant the red button was pressed. It does not therefore matter how
+you loaded a program in the first place, whether it was protected or not -
+as long as you LOAD a program, MULTIFACE will save it. Upon reloading,
+everything is fully automatically restored and the program autostarts from
+the point at which it was stopped - make sure you have your hands at the
+fire button...
+
+2.1   How to LOAD programs before saving:
+      It is essential to understand the differences between the 4 options
+      available on the Spectrum+3, namely the +3 BASIC 128/48 mode and
+      48 BASIC locked mode. When you switch on or reset the Spectrum+3, you
+      can select:
+2.1.1 LOADER - goes into 128K mode, attempts to autoboot from disc and if
+      it fails it proceeds to load from tape. In order to autoboot, the
+      program must either be called "DISK" or the disk must contain a special
+      "bootstrap" sector. This is important to remember and, when using
+      MULTIFACE for saving, use the name "DISK" for the program you wish
+      to autoboot (see 2.4).
+
+2.1.2 +3 BASIC - defaults to 128K mode and DOS: you can then
+2.1.2.1 load from disc - type LOAD "name" and press <ENTER>
+2.1.2.2 load from tape - type LOAD "T:name" (or LOAD "T:" and LOAD "") and
+        press <ENTER>
+2.1.2.3 change to 48 BASIC - type SPECTRUM and press ENTER; to load from
+        tape - press J to obtain LOAD, then type "" (or "name") and
+        <ENTER>
+
+IMPORTANT: Although the above 48 BASIC is unlocked, it does not itself give
+you any access to the disc operating ststem in BASIC. MULTIFACE, on the other
+hand, CAN even in this mode fully use the DOS which is extremely useful. Thus
+to load from disc - press dos in the main menu and then load a program.
+
+2.1.3 Calculator - not really suitable for MULTIFACE use.
+
+2.1.4 48 BASIC - locks the Spectrum into 48K mode where the disc operating
+      system is NEVER available. This means that while you can use the
+      MULTIFACE, you will only be able to save to tapes: the disc option
+      (just as the DOS option in the main menu) will not even be displayed.
+      If you still wish to save to disc, you must first save to tape, switch
+      off/reset, select +3 BASIC or LOADER, re-load the saved program from
+      tape and then save to disc.
+
+In summary, you can use
+2.1.5 LOADER to 1) load from tape & later save to tape/disc
+                2) load autobooting programs from disc and later save to
+                   tape or disc
+2.1.6 +3 BASIC to load any 48/128K program from tape or disc and save to
+      tape/disc, even in 48 SPECTRUM mode
+2.1.7 48 BASIC but load/save 48K programs from/to tape only. Or, in other
+      words, if you have a
+2.1.8.1 48K programs on tape, use LOADER or +3 BASIC, but not 48 "locked"
+        BASIC (it can't save to disc)
+2.1.8.2 128K program on tape, use LOADER or +3 BASIC
+2.1.8.3 48/128K program on disc, use +3 BASIC - or LOADER if the program
+        autoboots; do not use 48 BASIC
+
+2.2 Saving
+----------
+
+2.2.1 At any instant you wish to save a program or screen, press the RED
+      button.
+2.2.2 The main menu will appear at the bottom of the screen with 5-6
+      options, depending on which mode you are in. In LOADER and +3 BASIC
+      in 128 and SPECTRUM mode:
+
+           return save tool print dos alter clear
+                                               on
+
+      In 48 locked mode:
+
+           return save tool print          LOCKED
+                                               on
+
+2.3   'C'learing before saving:
+      Before you proceed to save, decide first wether you wish to save the
+      entire RAM, incl. the additional RAM banks, or not - this will
+      influence the saving/loading time and the amount of code saved. When
+      the Spectrum is switched on or reset, RAM banks 1,3,4,6 are marked
+      throughout by E5 characters for RAM disc use (M Drive). It is good
+      practice to clear these banks before loading (see also 2.5.3) to make
+      sure that a program will load into a 'clean' computer. Obvoiusly, with
+      128K programs, the extra RAM banks are important, but not all may
+      be used - hence clear before loading. In 48K programs, the entire
+      RAM banks are irrelevent and you can clear them any time, even after
+      loading (except for the 48 locked mode with nothing to clear). Please
+      note, that bank 7 is never cleared as the SPECTRUM +3 uses it as
+      workspace.
+
+2.4   Saving a program:
+      Having pressed s to proceed to saving, the prompt will change by
+      asking for a filename. Unlike on normal disc files, UP TO 7 letters/
+      digits ONLY can be used. Letters can be typed both in upper and lower
+      case but will be always taken as upper case only. Usual rules for
+      filenames apply, with the exception that you cannot use extensions.
+      The following are all illegal filenames:
+
+           DISK    NEVER12   WRIGGLE
+
+      These are not:-
+
+           Disk.bin   (no extensions allowed)
+           Never m    (no spaces allowed)
+           Wriggler   (too long)
+           my,prog    (no punctuation marks allowed)
+
+      Remember, that the name "DISK" will autoboot a disk.
+2.4.1 If you suddenly decide NOT to save the program at this stage, pressing
+      abort will take you back to the Main Menu, whilst r will return you
+      to the program.
+
+2.5   Saving menu options:
+      Upon ENTERing the filename, the display will change and you will see
+      the following prompts:-
+
+            abort tape disk                  128K (or 48K)
+            (screen or program)       compress ON (or OFF)
+
+      Once again, you can abort to return to the main menu.
+
+2.5.1 'P'rogram or 'S'creen saving:
+      Pressing p or s lets you save the whole program or just the screen
+      (see 4.2). Program is saved by default.
+
+2.5.2 'C'ompressing:
+      MULTIFACE automatically compresses the whole RAM. The compression can
+      be disabled by pressing c, but the only reason for doing so is for
+      disassembling the actual files saved by the MULTIFACE (true RAM image)
+      - for m/code enthusiasts only! Please note then when saving screens,
+      the compression is automatically turned off to preserve screens in
+      their traditional - and compatible - format.
+
+2.5.3 Selecting the 48/128 'K' format:
+      You do not really need to select the above option, but it can save
+      loading/saving time and room on disc/tape.
+
+      MULTIFACE can at this stage, no matter if you cleared in the main
+      menu or not, save either the origional 48K Spectrum blocks 5,2,0 or
+      the entire 128K (block 0-7). Obviously choosing the 48K option in a
+      128K program would not make sense, but with 48K programs this will
+      ensure that absolutely minimal amount of bytes will be saved. It must
+      be noted though, that while it's safe to use the 48K option with most
+      48K programs (always with the pre-Spectrum+3 programs or with pure
+      m/code ones), you cannot use it when saving BASIC programs written in
+      Spectrum+3 BASIC - these use RAM 7 without "letting you know" and the
+      48K option cuts bank 7 completely.
+
+      The main difference between the clear option in the main menu and the
+      48K option is, that clear does not clear bank 7 but it clears banks
+      1,3,4,6 (which are always used - either as RAM disc or as RAM banks in
+      128K programs - and would therefore be saved by the MULTIFACE with the
+      rest). If you clear and then use 128K option, MULTIFACE will compress
+      the entire RAM, incl. the extra banks, and this may take a bit of
+      time and room. If you use 48K option, it does not matter whether you
+      cleared before or not; the MULTIFACE will wate no time in compressing
+      anything else but the BASIC banks 5,2,0 and save just these - it is
+      faster and more effective.
+
+      There are two reasons to use clear:
+      a) before LOADING a 128K program - the program may not use all 8 RAM
+      banks and it is best to clear these first
+      b) when you have a 48K BASIC program and are not sure if it uses RAM
+      block 7 or not - it is safer to clear and use 128K option.
+      Please note, that in the locked 48 BASIC mode there is no 128K option
+      and thus 48K option is not switchable.
+
+2.5.4 Saving to 't'ape or 'd'isc:
+      Having decided to save a program or screen, compress or not and use
+      48 or 128K mode (the defaults are a compressed program in 128K mode -
+      or 48K in the locked mode), you can save to tape or disk.
+2.5.4.1 To save to disc, press d: please ensure the disc is formatted and
+        has sufficient space. MULTIFACE combines a thorough error-trapping
+        with on-screen prompts - thus for instance, DRIVE NOT READY appears
+        if the disk is not formatted or inserted, FILE TOO BIG if there is
+        not enough space for the file to be saved in which case the amount of
+        K needed as opposed to available on disk flashes above. WRITE PROTECT
+        warns that protection tab on the disk prevents it to be used for
+        saving. In all of these cases just insert another suitable disk and
+        press ENTER to continue.
+2.5.4.2 If moving to tape, make sure the tape is in position and is long
+        enough. Press Play & Record on your tape recorder, then press
+        <ENTER>.
+2.6     When saving is complete, you will be returned to the Main Menu and
+        you can then either return to continue the program or use any other
+        function of MULTIFACE 3.
+
+3 Reloading Programs
+--------------------
+
+3.1   MULTIFACE must be attached to reload programs it saved. It also needs
+      to be ON (see 1.9). If it is OFF, you will be reminded to turn it ON
+      once the program starts loading: message M3 LOADING will change to
+      M3 NOT ON!. Just press the red button and return - M3 LOADING will
+      come up again and the program will soon load.
+
+3.2   Selecting Spectrum+3 modes for loading:
+      You can use LOADER or +3 BASIC (128K and Spectrum mode) to reload
+      programs saved by the MULTIFACE. The programs will automatically
+      configure themselves - you can even load a 128K program into the
+      Spectrum (48K) mode and it will adjust itself. You cannot, however,
+      load a 128K program into the 48 BASIC mode and are not advised to use
+      this mode anyway - you can use it to load 48K MULTIFACE programs, but
+      cannot save them to disc then!
+
+3.3   Loading multi-part programs from disc:
+      MULTIFACE 3 allows you to load a program from within a program - this
+      can be very convenient for loading multi-part programs. Generally, you
+      have to save this type of programs at various stages (mostly when they
+      take another part from tape or disc), Say you do this at the beginning
+      of each part and end up with 4 parts, or rather 4 programs saved by the
+      MULTIFACE. When you re-load the first, play it and reach part No. 2,
+      you can press the red button, go into the DOS option and load: when
+      asked for a filename, use the 2nd part name and MULTIFACE will load
+      it and overwrite the current part.
+
+4 Print and Alter
+-----------------
+
+4.1   'P'rint command:
+       Pressing p dumps a screen to a printer via the Spectrum printer port
+       provided your printer has EPSON graphics compatability. By using the
+       TOOLKIT to poke the relevant addresses, you can choose a large or
+       shaded copy, set line feed, all margins and even line spacing:
+
+       2008H (8200 decimal): B1 - Large Copy with CR and LF (carriage return
+                                  + line feed)
+                             F1 - Shaded copy with CR and LF
+                             00 - Large copy with CR only
+                             F0 - Shaded copy with CR only
+       200BH (8203 decimal): 08 - sets left margin (0-255)
+       200CH (8204 decimal): 23 - sets bottom margin (0-23)
+       200DH (8205 decimal):  0 - sets top margin (0-23)
+       200E-2010H (8206-8):  27,51,23 (ESC "3" n) - sets line spacing in
+                             n/216: some printers require a different syntax
+                             say 27,65,3 (ESC "A" n - in n/32)  for Brother
+                             HR5
+       2011-2014H (8209-12): 27,78,0,3 (ESC "L" n m) - sets the graphic mode
+
+4.2    'A'lter screens (in 128K mode only!):
+       SPECTRUM+3 allows the use of two different screens - in addition to
+       the standard 16384-23296 screen, there is a provision for a second
+       screen at 49152-56064. MULTIFACE allows you to use/save/print both
+       screens (see 2.5.1, 4.1) and the a key lets you swap them at will. The
+       screen shown is the one that can be saved or copied. Since the 2nd
+       screen area may not always be used as a screen, you may end up getting
+       a black square or garbage - just press a again to call back the
+       origional screen.
+
+DOS and Toolkit
+---------------
+
+4.3    'D'OS (Disc Operating System):
+       MULTIFACE can access the DOS any time except when you are in 48 BASIC.
+       There are two main reasons to use it:
+
+4.4    'L'oading from disc:
+       You can load any program from disc here, even when you are in the
+       +3 BASIC SPECTRUM mode! You may simply find it more convenient upon
+       switching the SPECTRUM+3 on to press the MULTIFACE red button, choose
+       dos and load a program - rather than selecting Loader or +3 BASIC and
+       then typing in all necessary Spectrum system, etc. Also see 3.2 for
+       loading multi-part programs - invaluable!
+
+4.5    'E'rasing files:
+       You may find it necessary to erase files from disk at times:-
+       MULTIFACE may say that FILE is TOO BIG to save and display the amount
+       of K required. You can at such stages use dos to erase: MULTIFACE will
+       show you a file at a time in the bottom line with its name and length
+       and ask you yes/no to erase it or not. You can in a way catalogue
+       discs by saying no all the time, as files will infinately scroll in
+       the bottom line. You can abort erasing and then abort again to go to
+       the main menu.
+
+5.1    Accessing the Toolkit:
+       Press t from the main menu to obtain the toolkit menu:
+
+            quit ENTpoke SPCaddr reg win hx txt pr a
+
+5.2    Quit:
+       You can quit any time back to the main menu.
+
+5.3    ENTER key:
+       ENTER has a twofold role - it lets you both PEEK & POKE:
+5.3.1  If you type in a number (0-255 Decimal, &00 - &FF Hex), pressing
+       ENTER will POKE it into the current address.
+5.3.2  If you wish to PEEK only, do NOT input any number, just press ENTER.
+       By pressing ENTER repeatedly, you can step through successive
+       addresses. You can again POKE any time by inputting a number before
+       pressing ENTER.
+
+5.3.3  SPACE key:
+       Pressing the SPACE key enables you to enter an address (in Hex or
+       Decimal - see 5.4) which you wish to inspect or alter. You will now
+       be able to alter and inspect successive addresses as detailed in
+       5.3.1-5.3.2 above.
+
+5.4    'H'ex or Decimal:
+       This toggles the bottom display and input line between Hex and
+       Decimal. When you input a number, please ensure which mode you are in:
+       MULTIFACE has no way of knowing whether a number was meant to be in
+       Hex or Decimal and thus 10 will be 10 in Decimal but 16 in Hex, etc.
+
+5.5    'R'egisters:
+       At the moment of pressing the red button, MULTIFACE stores the
+       contents of all the registers in its own RAM. Pressing r allows you
+       to inspect and alter them at will. Each successive location stores
+       the contents of a sinble 8 bit register or of half a 16 bit register.
+       In all cases, registers are stored in INTEL format with the low byte
+       first, followed by the high byte. The order in which they are stored
+       is the following:
+
+       PC IY IX BC' DE' HI' AF' BC DE R- I- HL AF SP
+
+       Thus on pressing R, you will see the memory location 16356 (&3FE4),
+       its contents and letters 'pC' - the low byte of the PC pair. Press
+       <ENTER> to see the next address (16357). Its value and letters 'Pc',
+       i.e. the high byte of the PC register.
+
+5.6    'W'indow:
+       Pressing w opens a window with 16 lines of 8 bytes each. The window
+       opens 'around' the current address used in the bottom line and shows
+       it flashing in the 5th line.
+
+5.6.1  Window Full Screen Editing:
+       The window is not just a passive display. Full screen editing is
+       possible, making peeking and poking so much easier. When you scroll/
+       move through the window in any direction, the cursor movement is
+       reflected in the bottom line and the address and value (corresponding
+       to the flashing window cursor) changes accordingly. Thus if you find
+       an address in the window by moving the flashing cursor, it will be
+       simultaneously shown at the bottom. Similarly, if you input an address
+       by using SPACE/ENTER, the window will open around it. You can use the
+       cursor keys for moving a byte or a line at a time. The left & right
+       cursor keys move the cursor as you would expect, but the up and down
+       cursors scroll the whole display, keeping the cursor where it is. In
+       other words, by using the up cursor you actually decrement addresses,
+       whilst the down cursor increments. There are two more 'hidden keys'
+       for editing:
+
+       minus moves the whole page (128 bytes) backwards
+       next moves the whole page forwards (see also 5.8)
+
+5.7    'T'ext:
+       The window contents are by default shown in Hex, irrespective of the
+       status of the bottom line - the h key has no effect on the window.
+       However, the TOOLKIT has another powerful feature in translating the
+       window into ASCII codes - which is what the t key does. By toggling
+       it you can view everything as text - this is very handy in revealing
+       messages (and easily modifying them) or just showing the code makes
+       no sense as text.
+
+5.8    'P'rint:
+       You can print out the window contents: MULTIFACE uses ASCII DUMP here
+       and prints out characters/numbers only. To print out a longer section
+       of code, use SPACE/ENTER to input the start address, print the window,
+       go to next window, print again, etc. Line feed can be turned on/off
+       by poking 8200 with 1/0.
+
+5.9    'S'elect a RAM bank:
+       The TOOLKIT operates within a 64K area of which the bottom 48K is
+       strictly defined but the remaining top 16K is switchable and can be
+       used as a viewing/working area for all 8 RAM banks. (Nos. 0-7). As
+       a rule:
+
+           0- 8191 (&0000-&1FFF) is the old Spectrum BASIC ROM
+        8192-16383 (&2000-&3FFF) is the MULTIFACE's 8K RAM
+       16384-32767 (&4000-&7FFF) is Spectrum RAM block No.5
+       32768-49151 (&8000-&BFFF) is Spectrum RAM block No.2
+       49152-65535 (&C000-&FFFF) defaults to showing RAM No.0
+
+       but pressing s followed by a number 0-7 will page the corresponding
+       RAM here and you can inspect/alter it. Upon leaving the toolkit RAM
+       No.0 will be automatically paged back here (see also Spectrum manual
+       p. 182, etc.).
+
+6.0 The Use of Extra 8K RAM
+---------------------------
+
+The MULTIFACE's 8K RAM extension can be accessed and used for other purposes.
+This, however, requires a good knowledge of machine code plus further
+information on how to access the RAM extension.

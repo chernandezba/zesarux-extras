@@ -1,0 +1,3 @@
+This is a rolling demonstration of the various features and applications of the Z88, and is a useful introduction to the power of the Z88. It also features a rather nice picture of Sir Clive!
+
+This is not actually an application, but a Filer EPROM which autoboots. Therefore, when you have created this ROM, you should insert it into slot 3, do a soft reset and then sit back and enjoy the show!

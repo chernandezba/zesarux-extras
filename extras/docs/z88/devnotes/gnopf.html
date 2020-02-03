@@ -1,0 +1,84 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+<b><font size=+1>GN_Opf, Open file/resource (wildcard
+search)</font></b>
+<p><tt>RST 20H, DEFW $6009</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; HL = 0,1,2; not allowed (B=0)
+&nbsp;&nbsp;&nbsp;&nbsp; BHL = pointer to name of filename to open
+&nbsp;&nbsp;&nbsp;&nbsp; (B = 0, identified as local pointer)
+
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 0,1,2; not allowed
+&nbsp;&nbsp;&nbsp;&nbsp; DE = pointer to space to insert explicit filename
+&nbsp;&nbsp;&nbsp;&nbsp; C = maximum space to fill with this explicit filename (e.g. 18)
+
+&nbsp;&nbsp;&nbsp;&nbsp; A = access mode
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OP_IN ($01)&nbsp; = open for input
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OP_OUT ($02) = open for output
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OP_UP ($03)&nbsp; = open for update (read/write)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OP_MEM ($04) = open memory (internal usage - not for applications)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OP_DIR ($05) = create directory - returns DOR handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OP_DOR ($06) = return DOR information - returns DOR handle</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = file handle for open file
+&nbsp;&nbsp;&nbsp;&nbsp; B = number of segments in the explicit filename
+&nbsp;&nbsp;&nbsp;&nbsp; C = number of characters in returned, expanded filename at (DE)
+&nbsp;&nbsp;&nbsp;&nbsp; DE = points beyond the last character of explicit filename</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad arguments
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_IVF ($17), invalid filename, eg. ".wrong"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ONF ($12), file not found
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_USE ($15), file already in use
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_FTM ($18), file type mismatch
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_UNK ($03), unknown request, eg. A(in) invalid</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......HL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBCDE../IX.. different
+</pre>
+Notes:
+<blockquote>Please refer to <a href='gnfex.html'>GN_Fex</a> for details of what might happen to
+the filename. Using GN_Opf with A=OP_DOR, you only get a DOR handle. The
+file is not opened. If the file exists, <a href='osdor.html'>OS_Dor</a> &amp; A=DR_FRE must be used
+to release the DOR handle before the file is opened/created with GN_Opf,
+otherwise RC_USE ("file in use") is returned.</blockquote>
+Related calls:
+<blockquote><a href='gncl.html'>GN_Cl</a>, close file
+<br><a href='gndel.html'>GN_Del</a>, delete a file from memory
+<br><a href='gnren.html'>GN_Ren</a>, rename file
+<br><a href='oscl.html'>OS_Cl</a>, internal close (OZ usage)
+<br><a href='osdel.html'>OS_Del</a>, file delete (internal OZ usage)
+<br><a href='osfrm.html'>OS_Frm</a>, file read miscellaneous
+<br><a href='osfwm.html'>OS_Fwm</a>, file write miscellaneous
+<br><a href='osgb.html'>OS_Gb</a>, get byte from file (or device)
+<br><a href='osgbt.html'>OS_Gbt</a>, get byte from file (or device) with timeout
+<br><a href='osmv.html'>OS_Mv</a>, move bytes between stream and memory
+<br><a href='osop.html'>OS_Op</a>, internal open (OZ usage)
+<br><a href='ospb.html'>OS_Pb</a>, write byte to file, device
+<br><a href='ospbt.html'>OS_Pbt</a>, write byte to file, device with timeout
+<br><a href='osren.html'>OS_Ren</a>, file rename (internal OZ usage)</blockquote>
+
+</body>
+</html>

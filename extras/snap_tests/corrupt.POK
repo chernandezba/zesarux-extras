@@ -1,0 +1,16 @@
+ZEsarUX - ZX Second-Emulator And Released for UniX 
+
+
+It's a ZX Machines Emulator for Unix, including:
+-ZX Spectrum
+-ZX-Uno
+-ZX80
+-ZX81
+-Z88
+
+This is my second spectrum emulator after ZXSpectr
+http://sourceforge.net/projects/zxspectr/
+
+I recommend you to read FEATURES, INSTALL and HISTORY files, as well as other documents in this emulator.
+You can open them from the help menu or from an external viewer
+

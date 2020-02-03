@@ -1,0 +1,70 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+  <td align="center" valign="bottom" width="80%">&nbsp;</td>
+  <td align="right" valign="bottom" width="10%"><a
+  href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+</table>
+
+<hr>
+
+<p><font size="4"><b>OS_Fth, free tri-handle</b></font> </p>
+
+<p><tt>RST 20H, DEFW $DE06</tt> </p>
+
+<p>IN: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = Tri-handle subtype
+   TH_FILT ($F0), free filter handle
+&nbsp;&nbsp;&nbsp;&nbsp;  TH_WMG ($F1), free wildcard manager handle
+&nbsp;&nbsp;&nbsp;&nbsp;  TH_ALM ($F2), free alarm handle
+&nbsp;&nbsp;&nbsp;&nbsp; IX = tri-handle</pre>
+
+<p>OUT, if call successful: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0, handle freed
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IX = 0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BHL = Tri-handle contents</pre>
+
+<p>OUT, if call failed: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_HAND, bad handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ...CDE../..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFB...HL/IX.. different</pre>
+
+<p>Notes: </p>
+
+<blockquote>
+ <p>Internal operating system usage.</p>
+</blockquote>
+
+<p>Bugs: </p>
+
+<p>Related system calls: </p>
+
+<blockquote>
+ <p><a href="osvth.html">OS_Vth</a>, verify tri-handle <br>
+ <a href="osgth.html">OS_Gth</a>, get tri-handle</p>
+</blockquote>
+</body>
+</html>

@@ -1,0 +1,28 @@
+dd if=/dev/zero of=pruebasdivmmc.mmc bs=1M count=64
+
+fdisk pruebasdivmmc.mmc 
+
+
+Create the partition as: (use all space, partition type 4)
+
+Command (m for help): p
+Disk pruebasdivmmc.mmc: 64 MiB, 67108864 bytes, 131072 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x00000000
+
+Device             Boot Start    End Sectors Size Id Type
+pruebasdivmmc.mmc1       2048 131071  129024  63M  4 FAT16 <32M
+
+
+
+
+losetup -o1048576 /dev/loop1 pruebasdivmmc.mmc 
+(1048576 is obtained by 2048*512)
+
+mkfs.vfat /dev/loop1
+
+
+losetup -d /dev/loop1

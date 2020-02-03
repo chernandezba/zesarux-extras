@@ -1,0 +1,3 @@
+Prism 4 plane image created with bmp_to_prism_4_planar.c
+You need to have an input image:
+-BMP, 256x192, 16 indexed colours, saved with non compression

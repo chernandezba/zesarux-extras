@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+
+<b><font size="+1">OS_Bix, Bind in extended address
+for availability</font></b>
+</p>
+<p><tt>RST 20H, DEFB $60</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; B = 0, bind in physical address in HL<br>&nbsp;&nbsp;&nbsp;&nbsp; BHL = extended pointer to bind into physical address space<br>&nbsp;&nbsp;&nbsp;&nbsp; IY points at OSPUSH frame (preserved by previous OZ call) containing:<br><br>&nbsp;&nbsp;&nbsp;&nbsp; offset:&nbsp; contents:<br>&nbsp;&nbsp;&nbsp;&nbsp; 10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;RETurn address to caller&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp; 0E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;original bank bindings for segment 2 &amp; 3&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp; 0C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;HL&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp; 0A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;DE&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp; 08&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;BC&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp; 06&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;AF&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp; 04&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;pointer to OZ call address&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp; 02&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;original bank bindings for segment 2 &amp; 3&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp; 00&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;IY&gt;<br><br>OUT:</pre>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; DE = old binding of segment 1 in E, and segment 2 in D.<br>&nbsp;&nbsp;&nbsp;&nbsp; B = 0, always, identifying a converted local pointer<br>&nbsp;&nbsp;&nbsp;&nbsp; HL = (possibly modified) address for segment 1.</pre>
+
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A..C..../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .FB.DEHL/.... different</pre>
+<pre></pre>
+
+Notes:
+<blockquote>Internal operating system usage.<br>
+
+  <br>
+
+OS_Bix and <a href="osbox.html">OS_Box</a> are called from GN_ or OS_ 2 byte calls. Binds in extended
+or local address, identified by BHL (B=0 local) into segment 1. The (offset)
+address is automatically forced to segment 1, if necessary. If the address
+already are in segment 1 or 0, no binding occur (the bindings are still
+returned in DE). B = 0 always returned to indicate a local address in segment
+1 or segment 0.<br>
+
+  <br>
+
+If request address was in segment 3 then segment 2 was not affected.<br>
+
+  <br>
+</blockquote>
+
+Related calls:
+<blockquote><a href="file:///H:/SVN/documentation/devnotes/osbix.html"></a><a href="osbox.html">OS_Box</a>, restore bindings after <a href="file:///H:/SVN/documentation/devnotes/osbix.html">OS_Bix</a>
+  <br>
+
+  <a href="osfc.html">OS_Fc</a>, select fast code (fast bank switching)
+  <br>
+
+  <a href="osmal.html">OS_Mal</a>, allocate memory
+  <br>
+
+  <a href="osmcl.html">OS_Mcl</a>, close memory (free memory pool)
+  <br>
+
+  <a href="osmfr.html">OS_Mfr</a>, free (previously allocated block) memory
+  <br>
+
+  <a href="osmgb.html">OS_Mgb</a>, get current bank binding in segment
+  <br>
+
+  <a href="osmop.html">OS_Mop</a>, open memory (allocate memory pool)
+  <br>
+
+  <a href="osmpb.html">OS_Mpb</a>, set new bank binding in segment<br>
+
+  <a href="ozmgb.html">OZ_Mgb</a>, get current bank binding in segment<br>
+
+  <a href="ozmpb.html">OZ_Mpb</a>, set new bank binding in segment</blockquote>
+</body>
+</html>

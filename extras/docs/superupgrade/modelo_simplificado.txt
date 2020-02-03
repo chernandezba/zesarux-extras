@@ -1,0 +1,38 @@
+
+Resumiendo lo que hemos hablado por teléfono , y para que quede claro lo que voy a hacer. Luego en el futuro lo podremos complicar mas, pero de momento empezaremos con lo sencillo.
+
+Tendré dos estados para el chip, protegido y desprotegido. En modo desprotegido, cualquier escritura que vaya al espacio de rom (0-3fffh) provocará una escritura directa a la flash, teniendo en cuenta que parte de los 16kb según el slot seleccionado (puerto 43b,32765 y 8189).
+-Luego, para poner el chip en modo desprotegido, escribo las direcciones desde el punto de vista del Z80 y el slot activo:
+
+Escribir AA en la dirección $1555 , con slot 1 activo
+Escribir 55 en la dirección $2AAA, con slot 0 activo
+Escribir 80 en la dirección $1555 , con slot 1 activo
+Escribir AA en la dirección $1555, con slot 1 activo
+Escribir 55 en la dirección $2AAA, con slot 0 activo
+Escribir 20 en la dirección $1555, con slot 1 activo
+
+Entiendo que a partir de aqui, el usuario activa el slot que realmente querrá escribir, dado que en este punto tenemos siempre el slot 1 activo (que es el que indica la ultima escritura del comando)
+Y como decía, aquí el chip está desprotegido y el usuario puede escribir en cualquier zona de 0-3fffh.
+
+
+-Luego, para poner el chip en modo protegido, la secuencia de direccion del z80+slot seria:
+
+Escribir AA en la dirección $1555 , con slot 1 activo
+Escribir 55 en la dirección $2AAA, con slot 0 activo
+Escribir A0 en la dirección $1555 , con slot 1 activo
+Y escribir 256 bytes de datos.
+Entendemos pues, tal y como dice la especificación del chip, que para protegerlo hay que enviar esa secuencia de 3 bytes y extrañamente escribir 256 bytes de datos a la flash para que finalmente se proteja.
+
+
+Con todo esto simplificado, lo único que estaba dudando ahora, que aunque ya hemos hablado por teléfono , es que si recibo una secuencia de escritura de:
+
+Escribir AA en la dirección $1555 , con slot 1 activo
+
+Cómo puedo distinguir si es el comienzo de uno de esos dos comandos o es una escritura real en el chip, que casualmente (muy remota casualidad) es el byte AA en direccion 1555 y con slot1? Bueno pues lo que haré es realmente usar un buffer intermedio de 256 bytes, y voy a suponer que el usuario siempre me escribe en bloques de 256 bytes. Si está el ordenador acabado de arrancar (o al  final de una escritura de 256 bytes) supondré que si hay una primera escritura en 1555h va a ser siempre un comando… Porque? Pues porque si va a ser una escritura real espero que empiece a escribir en una dirección múltiple de 256 (0, 256, 512, etc) y 1555h no es múltiple. Por tanto, una primera escritura en esa dirección siempre la interpretaré como comando. 
+Si realmente el usuario me quiere escribir en la dirección de la flash 1555h, supondré que empezará escribiendo en la 1500h, un bloque de 256 bytes, y así hasta la última dirección del bloque de 256 bytes (15FFH).
+Así con ese buffer intermedio de 256 bytes, cuando se esté escribiendo me lo guardo en el buffer y sólo lo escribiré físicamente en la flash cuando haya recibido esos 256 bytes.
+
+
+Con esta simplificación, como ves, no uso ningún tipo de timeout ni lectura de tiempos. Además supongo que el usuario me escribe siempre en bloques de 256 bytes. Cualquier intento de escribir menos de 256 bytes tendrá un efecto “no deseado”.
+
+

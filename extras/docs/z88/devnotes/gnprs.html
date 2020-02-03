@@ -1,0 +1,66 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Prs, parse filename</font></b>
+<p><tt>RST 20H, DEFW $5809</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; HL = 0,1,2; not allowed (B=0)
+&nbsp;&nbsp;&nbsp;&nbsp; BHL = points to filename
+&nbsp;&nbsp;&nbsp;&nbsp; (B = 0 is interpreted as local pointer)
+&nbsp;&nbsp;&nbsp;&nbsp; Filename must be terminated by a control character.</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; A0 = 1, extension used
+&nbsp;&nbsp;&nbsp;&nbsp; A1 = 1, filename used
+&nbsp;&nbsp;&nbsp;&nbsp; A2 = 1, explicit directory used
+&nbsp;&nbsp;&nbsp;&nbsp; A3 = 1, current directory (".") used
+&nbsp;&nbsp;&nbsp;&nbsp; A4 = 1, parent directory ("..") used
+&nbsp;&nbsp;&nbsp;&nbsp; A5 = 1, wildcard directory ("//") used
+&nbsp;&nbsp;&nbsp;&nbsp; A6 = 1, device specified
+&nbsp;&nbsp;&nbsp;&nbsp; A7 = 1, wildcards used
+
+&nbsp;&nbsp;&nbsp;&nbsp; B = number of segments in filename
+&nbsp;&nbsp;&nbsp;&nbsp; C = length of filename including terminator</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_IVF ($17), poor syntax</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ....DEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBC..../.... different
+</pre>
+Notes:
+<p>Bugs:
+<br>&nbsp;
+<p>Related calls:
+<blockquote><a href='gnesa.html'>GN_Esa</a>, read &amp; write to filename segments
+<br><a href='gnfcm.html'>GN_Fcm</a>, compress a filename
+<br><a href='gnfex.html'>GN_Fex</a>, expand a filename
+<br><a href='gnopw.html'>GN_Opw</a>, Open wildcard handler
+<br><a href='gnpfs.html'>GN_Pfs</a>, parse filename segment
+<br><a href='gnwcl.html'>GN_Wcl</a>, close wildcard handle
+<br><a href='gnwfn.html'>GN_Wfn</a>, fetch next match for wildcard string (handle)
+<br><a href='gnwsm.html'>GN_Wsm</a>, match filename segment to wildcard string</blockquote>
+
+</body>
+</html>

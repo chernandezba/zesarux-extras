@@ -1,0 +1,20 @@
+Manual del QemuLator escribió:
+QL files have a special piece of information associated with them, called the ‘QDOS file header’. The header stores such information as the file name and whether the file is an executable program.
+
+Q-emuLator for Windows stores part of the header at the beginning of files. The header is present only when it is useful, ie. only if it contains non-default information.
+
+The header has the following format:
+CÓDIGO: SELECCIONAR TODO
+OFFSET LENGTH(bytes)       CONTENT
+0      18                  “]!QDOS File Header“
+18     1                   0 (reserved)
+19     1                   total length_of_header, in 16 bit words
+20 length_of_header*2-20   QDOS INFO
+
+The first 18 bytes are there to detect whether the header is present (ID string).
+
+The headers Q-emuLator supports can be 30 bytes or 44 bytes long (the value of the corresponding byte at offset 19 is either 15 or 22). In the first case, there are 10 bytes with the values present in bytes 4 to 13 of the 64 bytes QDOS header. In the second case the same piece of information is followed by 14 bytes containing a microdrive sector header, useful for emulating microdrive protection schemes. Additional header information (file length, name, dates) is obtained
+directly from the file through the host file system.
+
+Some QL programs to translate between QDOS and Q-emuLator for Windows file formats are included in the Q-emuLator package.
+The translation is transparently performed when you move files between QDOS floppy disks and Windows directories through Q-emuLator.

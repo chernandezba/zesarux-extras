@@ -1,0 +1,58 @@
+Title:          Z88 Lemmings v1.0
+Author:         Psygnosis (converted by D Morris)
+Uploader:       Dominic Morris <dom@jb.man.ac.uk>
+Type:           Z88 Application
+Short:          Conversion of *the* classic game
+
+
+Well, I just can't keep away can I? The lure of the slick black object
+grabbed me once more and here I am writing another document file after
+I was "giving up computers for good" hmmm, next time I'll be more
+convincing!!!
+
+So, here we have another conversion from the Spectrum to that other
+rubber keyed friend and it's not a platform game. Wow, myself and
+Garry really need to take our medication and get back to converting
+platform games.
+
+Now, I'm not gonna insult your intelligence by describing what the
+game is about, I'm sure that every sentient body on the planet knows
+about, has seen and played Lemmings, so here's the controls:
+
+
+1       - Decrease release rate
+2       - Increase release rate
+3-0     - Select Lemming types
+
+ESC     - Armageddon!!! [hehe]
+<       - Scroll level left
+>       - Scroll level right
+
+Q       - Cursor Up
+A       - Cursor Down
+O       - Cursor Left
+P       - Cursor Right
+[SPACE] - Select Lemming
+M       - Track Lemming
+H       - Pause
+
+Sorry for not making the keys redefinable but I just ran out of memory in
+sensible places - hence the lack of cheesy in-game music as well.
+
+Levels should be stored in z88 memory on the default device/directory,
+you don't have to keep all 60 of them on the z88 just the ones you
+want to play and drag over more when required.
+
+A nice acknowledgement goes out to Garry here for his compression code
+which is used on the levels to keep the size down, thanks to him for
+kicking me up the backside during this as well - wouldya believe that
+I started on this at the same time as he started on Bounder? I'm a lazy
+good for nothing, sloppy coder I is!
+
+The sample playing code is based on some TI86 code that was lurking around
+on ticalc.org. The samples come from the Amiga version of the game - I
+apologise for the quality, but there's only so much a beeper can do!
+
+Lemmings was "Made with Amiga"
+
+dom, 7.2.2000

@@ -1,0 +1,267 @@
+Old Kent Road
+Rent £2
+     With 1 House 	£10
+     With 2 Houses 	 £30
+     With 3 Houses 	 £90
+     With 4 Houses 	 £160
+With HOTEL £250
+
+Mortgage Value £50
+Houses cost £30 each
+Hotel, £30 plus 4 Houses
+---------------------------------------
+Whitechapel Road
+Rent £4
+     With 1 House 	£20
+     With 2 Houses 	 £60
+     With 3 Houses 	 £180
+     With 4 Houses 	 £360
+With HOTEL £450
+
+Mortgage Value £50
+Houses cost £30 each
+Hotel, £30 plus 4 Houses
+--------------------------------------------
+The Angel Islington
+Rent £6
+     With 1 House 	£30
+     With 2 Houses 	 £90
+     With 3 Houses 	 £270
+     With 4 Houses 	 £400
+With HOTEL £550
+
+Mortgage Value £50
+Houses cost £50 each
+Hotel, £50 plus 4 Houses
+--------------------------------------------
+Euston Road
+Rent £6
+     With 1 House 	£30
+     With 2 Houses 	 £90
+     With 3 Houses 	 £270
+     With 4 Houses 	 £400
+With HOTEL £550
+
+Mortgage Value £50
+Houses cost £50 each
+Hotel, £50 plus 4 Houses
+--------------------------------------------
+Pentonville Road
+Rent £8
+     With 1 House 	£40
+     With 2 Houses 	 £100
+     With 3 Houses 	 £300
+     With 4 Houses 	 £450
+With HOTEL £600
+
+Mortgage Value £60
+Houses cost £50 each
+Hotel, £50 plus 4 Houses
+--------------------------------------------
+Pall Mall
+Rent £10
+     With 1 House 	£50
+     With 2 Houses 	 £150
+     With 3 Houses 	 £450
+     With 4 Houses 	 £625
+With HOTEL £750
+
+Mortgage Value £70
+Houses cost £100 each
+Hotel, £100 plus 4 Houses
+------------------------------------------------
+Whitehall
+Rent £10
+     With 1 House 	£50
+     With 2 Houses 	 £150
+     With 3 Houses 	 £450
+     With 4 Houses 	 £625
+With HOTEL £750
+
+Mortgage Value £70
+Houses cost £100 each
+Hotel, £100 plus 4 Houses
+---------------------------------------------------
+Northumberland Avenue
+Rent £12
+     With 1 House 	£60
+     With 2 Houses 	 £180
+     With 3 Houses 	 £500
+     With 4 Houses 	 £700
+With HOTEL £900
+
+Mortgage Value £80
+Houses cost £100 each
+Hotel, £100 plus 4 Houses
+------------------------------------------------
+Bow Street
+Rent £14
+     With 1 House 	£70
+     With 2 Houses 	 £200
+     With 3 Houses 	 £550
+     With 4 Houses 	 £750
+With HOTEL £950
+
+Mortgage Value £90
+Houses cost £100 each
+Hotel, £100 plus 4 Houses
+---------------------------------------------------
+Marlborough Street
+Rent £14
+     With 1 House 	£70
+     With 2 Houses 	 £200
+     With 3 Houses 	 £550
+     With 4 Houses 	 £750
+With HOTEL £950
+
+Mortgage Value £90
+Houses cost £100 each
+Hotel, £100 plus 4 Houses
+------------------------------------------------
+Vine Street
+Rent £16
+     With 1 House 	£80
+     With 2 Houses 	 £220
+     With 3 Houses 	 £600
+     With 4 Houses 	 £800
+With HOTEL £1,000
+
+Mortgage Value £100
+Houses cost £100 each
+Hotel, £100 plus 4 Houses
+-----------------------------------------------
+The Strand
+Rent £18
+     With 1 House 	£90
+     With 2 Houses 	 £250
+     With 3 Houses 	 £700
+     With 4 Houses 	 £875
+With HOTEL £1,050
+
+Mortgage Value £110
+Houses cost £150 each
+Hotel, £150 plus 4 Houses
+-----------------------------------------------
+Fleet Street
+Rent £18
+     With 1 House 	£90
+     With 2 Houses 	 £250
+     With 3 Houses 	 £700
+     With 4 Houses 	 £875
+With HOTEL £1,050
+
+Mortgage Value £110
+Houses cost £150 each
+Hotel, £150 plus 4 Houses
+-----------------------------------------------
+Trafalgar Square
+Rent £20
+     With 1 House 	£100
+     With 2 Houses 	 £300
+     With 3 Houses 	 £750
+     With 4 Houses 	 £925
+With HOTEL £1,100
+
+Mortgage Value £120
+Houses cost £150 each
+Hotel, £150 plus 4 Houses
+--------------------------------------------------
+Leicester Square
+Rent £22
+     With 1 House 	£110
+     With 2 Houses 	 £330
+     With 3 Houses 	 £800
+     With 4 Houses 	 £975
+With HOTEL £1150
+
+Mortgage Value £150
+Houses cost £150 each
+Hotel, £150 plus 4 Houses
+--------------------------------------------------
+Coventry Street
+Rent £22
+     With 1 House 	£110
+     With 2 Houses 	 £330
+     With 3 Houses 	 £800
+     With 4 Houses 	 £975
+With HOTEL £1150
+
+Mortgage Value £150
+Houses cost £150 each
+Hotel, £150 plus 4 Houses
+----------------------------------------------------
+Piccadilly
+Rent £22
+     With 1 House 	£120
+     With 2 Houses 	 £360
+     With 3 Houses 	 £850
+     With 4 Houses 	 £1025
+With HOTEL £1200
+
+Mortgage Value £150
+Houses cost £140 each
+Hotel, £140 plus 4 Houses
+-------------------------------------------------
+Regent Street
+Rent £26
+     With 1 House 	£130
+     With 2 Houses 	 £390
+     With 3 Houses 	 £900
+     With 4 Houses 	 £1100
+With HOTEL £1275
+
+Mortgage Value £200
+Houses cost £150 each
+Hotel, £150 plus 4 Houses
+----------------------------------------------
+Bond Street
+Rent £28
+     With 1 House 	£150
+     With 2 Houses 	 £450
+     With 3 Houses 	 £1000
+     With 4 Houses 	 £1200
+With HOTEL £1400
+
+Mortgage Value £200
+Houses cost £160 each
+Hotel, £160 plus 4 Houses
+------------------------------------------------
+Oxford Street
+Rent £26
+     With 1 House 	£130
+     With 2 Houses 	 £390
+     With 3 Houses 	 £900
+     With 4 Houses 	 £1100
+With HOTEL £1275
+
+Mortgage Value £200
+Houses cost £150 each
+Hotel, £150 plus 4 Houses
+-------------------------------------------------
+Park Lane
+Rent £35
+     With 1 House 	£175
+     With 2 Houses 	 £500
+     With 3 Houses 	 £1100
+     With 4 Houses 	 £1300
+With HOTEL £1500
+
+Mortgage Value £175
+Houses cost £200 each
+Hotel, £200 plus 4 Houses
+-------------------------------------------------
+Mayfair
+Rent £50
+     With 1 House 	£200
+     With 2 Houses 	 £600
+     With 3 Houses 	 £1400
+     With 4 Houses 	 £1700
+With HOTEL £2000
+
+Mortgage Value £200
+Houses cost £200 each
+Hotel, £200 plus 4 Houses
+------------------------------------------------
+Water Works
+Electric Company
+H=RND(75)

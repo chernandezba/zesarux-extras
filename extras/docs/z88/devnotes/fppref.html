@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <TITLE>The floating point package reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</HEAD>
+<BODY>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<TR>
+<TH ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</TH>
+</TR>
+
+<TR>
+<TD ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><A HREF="sysref.html">Previous</A></TD>
+
+<TD ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%"><A HREF="index.html">Contents</A></TD>
+
+<TD ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><A HREF="z80instr.html">Next</A>&nbsp;</TD>
+</TR>
+</TABLE>
+
+<HR WIDTH="100%">
+<P><B><FONT SIZE=+1>30. The floating point package reference</FONT></B>
+<P>The floating point package (hereinafter referred to as the FPP) uses
+a different RST call from the main system calls, the format of a floating
+point call is as follows:
+<PRE>    RST  $18
+   DEFB &lt;function code></PRE>
+so apart from the different restart number, much the same as the OS calls.
+In the text we will assume a macro has been defined and use the following:
+<PRE>    FPP(&lt;function symbol>)</PRE>
+Parameters are passed to and from the FPP in a rather bizarre collection
+of registers. The main register group is HLhlC (remember, lower case for
+alternate set), and where a second parameter is required it is passed in
+DEdeB. These divide into mantissa and exponent as follows:
+<PRE><I>Param1</I>  <I>Param2</I>    <I>Significance
+</I>H   D   Most significant byte of mantissa
+L   E
+h   d
+l   e   Least significant byte of mantissa
+C   B   Exponent byte</PRE>
+There are certain exceptions, which are explained where relevant (for instance
+one operation returns the numeric value of a string, so takes a pointer
+to the string in HL as its parameter). Here is the full list of parameter
+bytes and the FPP functions which they invoke. First number is the index
+number of the operation for FP_BAS. Second number is the RST 18H function
+code:<PRE><A NAME="and"></A>
+FP_AND (0,$21)   (Integer only) bitwise logical AND.
+      Input parameters in HLhlC and DEdeB. Result in HLhlC.
+<A NAME="idv"></A>
+FP_IDV (1,$24)   (Integer only) quotient after division.
+      Input parameters in HLhlC and DEdeB (returns HLhlC /
+      DEdeB). Result in HLhlC.
+<A NAME="eor"></A>
+FP_EOR (2,$27)   (Integer only) bitwise logical excusive OR.
+      Input parameters in HLhlC and DEdeB. Result in HLhlC.
+<A NAME="mod"></A>
+FP_MOD (3,$2A)   (Integer only) remainder after division.
+      Input parameters in HLhlC and DEdeB (returns the
+      remainder of HLhlC / DEdeB). Result in HLhlC.
+<A NAME="or"></A>
+FP_OR (4,$2D)   (Integer only) bitwise logical OR.
+      Input parameters in HLhlC and DEdeB. Result in HLhlC.
+<A NAME="leq"></A>
+FP_LEQ (5,$30)   Test for less than or equal to.
+      Input parameters in HLhlC and DEdeB (test is HLhlC &lt;=
+      DEdeB). Result in HLhlC (-1 for TRUE; 0 for FALSE).
+<A NAME="neq"></A>
+FP_NEQ (6,$33)   Test for not equal to.
+      Input parameters in HLhlC and DEdeB. Result in HLhlC
+      (-1 for TRUE; 0 for FALSE).
+<A NAME="geq"></A>
+FP_GEQ (7,$36)   Test for greater than or equal to.
+      Input parameters in HLhlC and DEdeB (test is HLhlC >=
+      DEdeB). Result in HLhlC (-1 for TRUE; 0 for FALSE).
+<A NAME="lt"></A>
+FP_LT (8,$39)   Test for less than.
+      Input parameters in HLhlC and DEdeB (test is HLhlC &lt;
+      DEdeB). Result in HLhlC (-1 for TRUE; 0 for FALSE).
+<A NAME="eq"></A>
+FP_EQ (9,$3C)   Test for equality.
+      Input parameters in HLhlC and DEdeB. Result in HLhlC
+      (-1 for TRUE; 0 for FALSE).
+<A NAME="mul"></A>
+FP_MUL (10,$3F)   Multiplication.
+      Input parameters in HLhlC and DEdeB. Result in HLhlC.
+<A NAME="add"></A>
+FP_ADD (11,$42)   Addition.
+      Input parameters in HLhlC and DEdeB. Result in HLhlC.
+<A NAME="gt"></A>
+FP_GT (12,$45)   Test for greater than.
+      Input parameters in HLhlC and DEdeB (test is HLhlC >
+      DEdeB). Result in HLhlC (-1 for TRUE; 0 for FALSE).
+<A NAME="sub"></A>
+FP_SUB (13,$48)   Subtraction.
+      Input parameters in HLhlC and DEdeB (returns HLhlC -
+      DEdeB). Result in HLhlC.
+<A NAME="pwr"></A>
+FP_PWR (14,$4B)   Raise to power.
+      Input parameters in HLhlC and DEdeB (returns HLhlC ^
+      DEdeB). Result in HLhlC.
+<A NAME="div"></A>
+FP_DIV (15,$4E)   Division.
+      Input parameters in HLhlC and DEdeB (returns HLhlC /
+      DEdeB). Result in HLhlC.
+<A NAME="abs"></A>
+FP_ABS (16,$51)   Magnitude (ABSolute value).
+      Input parameters in HLhlC. Result in HLhlC.
+<A NAME="acs"></A>
+FP_ACS (17,$54)   Inverse cosine (Arc CoSine).
+      Input parameters in HLhlC. Result in HLhlC, in radians.
+<A NAME="asn"></A>
+FP_ASN (18,$57)   Inverse sine (Arc SiNe).
+      Input parameters in HLhlC. Result in HLhlC, in radians.
+<A NAME="atn"></A>
+FP_ATN (19,$5A)   Inverse tangent (Arc TaNgent).
+      Input parameters in HLhlC. Result in HLhlC, in radians.
+<A NAME="cos"></A>
+FP_COS (20,$5D)   Cosine.
+      Input parameters in HLhlC, in radians. Result in HLhlC.
+<A NAME="deg"></A>
+FP_DEG (21,$60)   Convert radians to degrees.
+      Input parameters in HLhlC, in radians. Result in HLhlC,
+      in degrees.
+<A NAME="exp"></A>
+FP_EXP (22,$63)   Exponentiation (raise 'e' [2.718...] to power of.
+      Input parameters in HLhlC. Result in HLhlC.
+<A NAME="int"></A>
+FP_INT (23,$66)   Integer truncation (floor truncation, not rounding).
+      Input parameters in HLhlC. Result in HLhlC.
+<A NAME="lln"></A>
+FP_LN (24,$69)   Natural (Naperian or base 'e') logarithm.
+      Input parameters in HLhlC. Result in HLhlC.
+<A NAME="log"></A>
+FP_LOG (25,$6C)   Common (base 10) logarithm.
+      Input parameters in HLhlC. Result in HLhlC.
+<A NAME="not"></A>
+FP_NOT (26,$6F)   (Integer only) bitwise logical NOT.
+      Input parameters in HLhlC. Result in HLhlC.
+<A NAME="rad"></A>
+FP_RAD (27,$72)   Convert degrees to radians.
+      Input parameters in HLhlC, in degrees. Result in HLhlC,
+      in radians.
+<A NAME="sgn"></A>
+FP_SGN (28,$75)   Sign (signum).
+      Input parameters in HLhlC. Result in HLhlC.
+<A NAME="sin"></A>
+FP_SIN (29,$78)   Sine.
+      Input parameters in HLhlC, in radians. Result in HLhlC.
+<A NAME="sqr"></A>
+FP_SQR (30,$7B)   Square root.
+      Input parameters in HLhlC. Result in HLhlC.
+<A NAME="tan"></A>
+FP_TAN (31,$7E)   Tangent.
+      Input parameters in HLhlC, in radians. Result in HLhlC.
+<A NAME="zer"></A>
+FP_ZER (32,$81)   Return the constant zero (as an integer).
+      Input irrelevant. Result in HLhlC (all zero).
+<A NAME="one"></A>
+FP_ONE (33,$84)   Return the floating point representation of constant 1.
+      Input irrelevant. Result in HLhlC (HL=hl=0, C=$80)
+<A NAME="tru"></A>
+FP_TRU (34,$87)   Return the integer representation of constant -1.
+      Input irrelevant. Result in HLhlC (HL=hl=$FFFF, C=$00)
+<A NAME="pi"></A>
+FP_PI (35,$8A)   Returns the floating point representation of pi
+      Input irrelevant. Result in HLhlC.
+<A NAME="val"></A>
+FP_VAL (36,$8D)   Returns the numeric vaule of a string. HL points to
+      start of string (null-terminated).
+      Result in HLhlC, and DE points to last character read;
+      if the call succeeded, this will be the terminator
+      byte. If the call failed, HLhlC = 0.
+<A NAME="str"></A>
+FP_STR (37,$90)   Return the string representation of a number, in HLhlC;
+      DE points to space to insert string. DE points to
+      character after string when call returns.
+      The de (alternate) register pair contains a format
+      control variable which has the effect of the two middle
+      bytes of the BBC BASIC format control variable @%:
+
+      1) The contents of e determine the maximum number of
+      digits (ie. number of characters apart from decimal
+      point or 'E') to be printed. The allowed range of
+      values depends on the format selected (see below):
+
+      General format
+      Exponential format: 1-255 (leading zeros added beyond
+      the 10th significant figure).
+      Fixed format: 0-10 (in this case the number of digits
+      printed after the decimal point).
+
+      2) The contents of d determine the format of the
+      resultant string for a given number; the options are:
+
+      d=0: General format
+      Integers are printed without a decimal point or
+      exponent. Numbers between 0.1 and 1 will be printed
+      with a decimal point but no exponent. Numbers less than
+      0.1 will be printed with a decimal point and exponent.
+      Numbers greater than 1 will be printed without exponent
+      unless this would involve more digits than allowed by
+      the contents of the 'e' register (se above), and
+      outside this range, will be printed with an exponent.
+
+      d=1: Exponential format
+      All numbers printed in exponential notation, eg. 1.0E0.
+
+      d=2: Fixed format
+      All numbers are printed with a fixed number of decimal
+      places.
+<A NAME="fix"></A>
+FP_FIX (38,$93)   Round a number to integer.
+      Input parameters in HLhlC (the call has no effect with
+      C=0). Result in HLhlC.
+<A NAME="flt"></A>
+FP_FLT (39,$96)   Convert from integer to floating point format.
+      Input parameters in HLhlC (the call has no effect with
+      C&lt;>0). Result in HLhlC.
+<A NAME="tst"></A>
+FP_TST (40,$99)   Test a number for zero and sign.
+      Input parameters in HLhlC. Result in A (0 for zero; $40
+      for positive; $C0 for negative).
+<A NAME="cmp"></A>
+FP_CMP (41,$9C)   Compare two numeric values.
+      Input parameters in HLhlC (left) and DEdeB (right).
+      Result in A:
+      0 if HLhlC = DEdeB.
+      $40 if HLhlC > DEdeB.
+      $C0 if HLhlC &lt; DEdeB.
+<A NAME="neg"></A>
+FP_NEG (42,$9F)   Negate number, ie. result = -input.
+      Input parameters in HLhlC. Result in HLhlC.
+<A NAME="bas"></A>
+FP_BAS ($A2)   Perform one of the above functions using the operation
+      index number in A, eg.:
+
+         ld  a, 33
+         fpp(FP_BAS)
+
+      should call FP_ONE and return 1 (floating point). This
+      facility can be useful if the operation depends on some
+      parameter, to avoid writing selfmodifying code.</PRE>
+
+<P>If an FPP operation has completed successfully, it returns with Fz =
+1 and Fc = 0. If the call failed for some reason, it returns Fz = 0 and
+Fc = 1 with and error code in A which may be one of the following:
+
+<PRE>    <I>Symbol</I>  <I>Value</I>    <I>Meaning
+</I>   RC_DVZ  $46   Division by zero
+   RC_TBG  $47   Too big
+   RC_NVR  $48   Negative root
+   RC_LGR  $49   Log range
+   RC_ACL  $4A   Accuracy lost
+   RC_EXR  $4B   Exp range
+   RC_BDN  $4C   Bad number</PRE>
+
+<HR WIDTH="100%">
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<TR>
+<TD ALIGN=LEFT VALIGN=TOP WIDTH="33%"><A HREF="sysref.html">Previous</A></TD>
+
+<TD ALIGN=CENTER VALIGN=TOP WIDTH="34%"><A HREF="index.html">Contents</A></TD>
+
+<TD ALIGN=RIGHT VALIGN=TOP WIDTH="33%"><A HREF="z80instr.html">Next</A>&nbsp;</TD>
+</TR>
+
+<TR>
+<TD ALIGN=LEFT VALIGN=TOP WIDTH="33%">System calls reference</TD>
+
+<TD ALIGN=CENTER VALIGN=TOP WIDTH="34%">The floating point package reference</TD>
+
+<TD ALIGN=RIGHT VALIGN=TOP WIDTH="33%">The Z80 instruction set reference</TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>

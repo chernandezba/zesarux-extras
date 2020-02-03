@@ -1,0 +1,11 @@
+Command SPEAKCZ (v0.1 - Czech version) for ESXDOS
+=================================================
+
+SPEAKCZ is command for speak text in Czech pronunciation.
+(In future will exist also command SPEAKENG with correct english pronunciation)
+
+Author unknown
+Disassembly by Cygnus
+ESXDOS port by VELESOFT
+Accept only upper case chars
+Usage: speak "TEXT"

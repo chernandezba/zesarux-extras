@@ -1,0 +1,896 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html><head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<title>OS_Fep, Flash Card Interface</title><link href="stylesheet.css" type="text/css" rel="stylesheet"></head>
+
+<body>
+
+<table style="font-size: 12px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+
+ <tr>
+
+   <th colspan="3" align="center">Z88
+Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+
+<hr width="100%">
+<p><b><font size="+1">OS_Fep, Flash Card
+Interface</font></b>
+</p>
+
+<p><tt>RST 20H, DEFW $C806</tt>
+</p>
+
+<pre>IN:</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = reason code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#FEP_CDID">FEP_CDID = $00</a> - Identify Flash Memory Chip in slot<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#FEP_CDDT">FEP_CDDT = $03</a> - Get Flash Card Data<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#FEP_SCER">FEP_SCER = $06</a> - Erase sector in Flash Memory<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#FEP_CDER">FEP_CDER = $09</a> - Erase entire Flash Memory<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#FEP_FFMT">FEP_FFMT = $0C</a> - Flash Memory File Area Formatting<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#FEP_WRBT">FEP_WRBT = $0F</a> - Write byte to the Flash Memory<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#FEP_WRBL">FEP_WRBL = $12</a> - Write a block of bytes to Flash Memory<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#FEP_CPFL">FEP_CPFL = $15</a> - Copy file entry between two File Areas<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="osfep.html#FEP_RDFA">FEP_RDFA = $18</a> - Reduce an existing "oz" File Area<br><br>&nbsp;&nbsp;&nbsp;&nbsp; BC, DE, HL, IX arguments.</pre>
+
+<pre>OUT:<br>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1, A = error code.<br>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0, reason code action successfully ended.<br><br><span style="font-weight: bold;"></span></pre>
+
+The OS_Fep is a new operating system interface implemented to manage
+the new Flash Card hardware. Two chip generations were used to build
+the 1MB cards. During 1996 the first generation prototype 1Mb Flash
+Cards were built by Thierry Peycru, and driven using a BBC BASIC
+program with
+embedded driver software to manage the Intel 28F series chip soldered
+to an original 32K EPROM card PCB. The program was designed to be a
+simple file manager to format a file area and to save/backup files to
+the
+cards inserted in slot 3. Later, in 1997, Rakewell licensed the
+technology, and the software to drive the card was open sourced by
+Thierry Peycru. The FlashStore code base was re-written and separated
+as an end-user application which linked to&nbsp;a set of standard
+library routines to manage the chip hardware and to implement high
+level File Card routines using the <a href="miscinfo.html#File_EPROM_format">File Eprom format</a>.
+This enabled all Z88 applications to be able to&nbsp;use the Flash
+Cards through <a href="https://bitbucket.org/cambridge/z88/src/5d717c8f8032/stdlib">the
+standard library</a> (which is still maintained and available
+today). Around 2001, Intel decided to stop the manufacturing of the 1Mb
+flash chip. Luckily, AMD 29F generation Flash chip technology was
+available that was pin compatible which enabled Rakewell to keep
+manufacturing costs down and continue production of the 1Mb Flash Cards
+for the Z88. Further, this 3rd generation flash technology only
+required 5V to erase and blow bytes to the memory which allows the card
+to be manipulated in all slots of the Z88 hardware (Intel flash chip
+required 12V and VPP pin only available in slot 3). Rakewell is still
+using this hardware today (2007). The new OS_Fep interface is based
+upon the code base of the standard flash library routines, and tightly
+integrated into OZ for compactness and speed efficiency. The complete
+reference documentation for the Intel I28F008S5 (1Mb) chip can be read
+in <a href="I28F008S5.pdf">this PDF document</a>.
+The complete reference documentation for the AMD AM29F080B (1Mb) chip
+can be read in <a href="AM29F080B.pdf">this PDF document</a>.
+The software to drive the Intel and Amd chips were implemented on the
+basis of these two documents.<br>
+
+<br>
+
+All OS_Fep mnemonic defintions are found in the "flashepr.def" file.
+All OS_Fep routines are used in&nbsp;<a href="http://z88.svn.sourceforge.net/viewvc/z88/trunk/oz/apps/flashstore/">FlashStore
+popdown</a> which is now integrated into OZ V4.2.<br>
+
+<br>
+
+<hr style="width: 100%; height: 2px;"><br>
+
+<a name="FEP_CDID"></a><span style="font-weight: bold;">FEP_CDID ($00) - Identify
+Flash Memory Chip in slot C<br>
+
+<br>
+
+</span><span style="font-family: monospace;">In:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = slot number (0, 1, 2 or 3)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">Out:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Success:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0, Fz = 1</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = FE_28F or FE_29F, defining the Flash Memory chip generation</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HL = Flash Memory ID</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+H = Manufacturer Code (FE_INTEL_MFCD, FE_AMD_MFCD)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+L = Device Code (refer to flashepr.def)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+B = total of 16K banks on Flash Memory Chip.</span><br style="font-family: monospace;">
+
+<br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Failure:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_NFE (not a recognized Flash Memory Chip)</span><br style="font-family: monospace;">
+
+<br style="font-family: monospace;">
+
+<span style="font-family: monospace;">Registers changed on
+return:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+...CDE../IXIY af...... same</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFB...HL/.... ..bcdehl different</span><br style="font-family: monospace;">
+
+<br>
+
+<hr style="width: 100%; height: 2px;">
+<br>
+
+<span style="font-weight: bold;"><a name="FEP_CDDT"></a>FEP_CDDT ($03) - Get
+Flash Card Data</span><br>
+
+<br>
+
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+HL = Polled from Flash Memory Chip (see&nbsp;FEP_CDID):</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Manufacturer &amp; Device Code</span><br style="font-family: monospace;">
+
+<br style="font-family: monospace;">
+
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ID was found (verified):</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = chip generation (FE_28F or FE_29F)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+B = total of 16K banks on Flash Memory</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+CDE = extended pointer to null-terminated string description of chip</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;
+ID was not found</span><br style="font-family: monospace;">
+
+<br style="font-family: monospace;">
+
+<span style="font-family: monospace;">Registers changed on
+return:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;
+......HL/IXIY same</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;
+AFBCDE../.... different</span><br>
+
+<br>
+
+<hr style="width: 100%; height: 2px;"><br>
+
+<a name="FEP_SCER"></a><span style="font-weight: bold;">FEP_SCER ($06) - Erase
+sector in Flash Memory</span><br>
+
+<br>
+
+Erase sector defined in B (00h-0Fh), on Flash Memory Card inserted in
+slot C.<br>
+
+<br>
+
+The routine will internally ask the Flash Memory for identification and
+intelligently use the correct erasing algorithm. All known Flash Memory
+chips from INTEL, AMD &amp; STM (see flashepr.def) uses 64K
+sectors, except the AM29F010B/ST29F010B 128K chip, which uses 16K
+sectors.<br>
+
+<br>
+
+<span style="font-style: italic;">Important</span>:<br>
+
+INTEL I28Fxxxx series Flash chips require the 12V VPP pin in slot 3 to
+successfully erase a block/sector on the memory chip. If the Flash
+Eprom card is inserted in slot 1 or 2, this routine will automatically
+report a sector erase failure error.<br>
+
+<br>
+
+It is the responsibility of the application (before using this call) to
+evaluate the Flash Memory (using the OS_Fep, FEP_CDID API) and warn the
+user that an INTEL Flash Memory Card requires the Z88 slot 3 hardware,
+so this type of unnecessary error can be avoided.<br>
+
+<br>
+
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+B = block/sector number on chip to be erased (00h - 0Fh)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(available sector size and count depend on chip type)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = slot number (0, 1, 2 or 3) of Flash Memory Card</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Success:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Failure:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_NFE (not a recognized Flash Memory Chip)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_BER (error occurred when erasing block/sector)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_VPL (Vpp Low Error)</span><br style="font-family: monospace;">
+
+<br style="font-family: monospace;">
+
+<span style="font-family: monospace;">Registers changed on
+return:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+..BCDEHL/IXIY ........ same</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AF....../.... afbcdehl different</span><br>
+
+<br>
+
+<hr style="width: 100%; height: 2px;">
+<span style="font-family: monospace;"><br>
+
+</span><span style="font-weight: bold;"><a name="FEP_CDER"></a>FEP_CDER
+($09) - Erase entire Flash Memory</span><br>
+
+<br>
+
+The routine will internally ask the Flash Memory for identification and
+intelligently use the correct erasing algorithm.<br>
+
+<br>
+
+Important:<br>
+
+INTEL I28Fxxxx series Flash chips require the 12V VPP pin in slot 3 to
+successfully erase the memory chip. If the Flash Memory card is
+inserted in slot 1 or 2, this routine will automatically report a
+sector erase failure error.<br>
+
+<br>
+
+It is the responsibility of the application (before using this call) to
+evaluate the Flash Memory (using the FlashEprCardId routine) and warn
+the user that an INTEL Flash Memory Card requires the Z88 slot 3
+hardware, so this type of unnecessary error can be avoided.<br>
+
+<br>
+
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = slot number (0, 1, 2 or 3) of Flash Memory</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Success:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Failure:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_NFE (not a recognized Flash Memory Chip)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_BER (error occurred when erasing block/sector)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_VPL (Vpp Low Error)</span><br style="font-family: monospace;">
+
+<br style="font-family: monospace;">
+
+<span style="font-family: monospace;">Registers changed on
+return:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+..BCDEHL/IXIY ........ same</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AF....../.... afbcdehl different</span><br style="font-family: monospace;">
+
+<br>
+
+<hr style="width: 100%; height: 2px;">
+<span style="font-family: monospace;"><br>
+
+<a name="FEP_FFMT"></a></span><span style="font-weight: bold;">FEP_FFMT
+($0C) - Flash Memory File Area Formatting</span><br>
+
+<br>
+
+Create/reformat an "oz" File Area below application Rom Area, or on
+empty Flash Cards to create a normal "oz" File Eprom that is also
+recognized by Filer popdown in slot 3. Also reformat file areas that
+are embedded as part of application cards, located at top of card above
+the application area (automatically preserving 'OZ' header during
+reformat of file area).<br>
+
+<br>
+
+An 'oz' file card header or 'OZ' application card header with embedded
+'oz' file area watermark is 64 bytes large, and is located at the top
+(last bank) of the file area at offset $3FC0.<br>
+
+<br>
+
+Defining 8 banks in the ROM Front DOR for applications will leave 58
+banks for file storage in a 1Mb Flash Card. This scheme is however
+always<br>
+
+performed with only formatting the Flash Eprom in free modulus 64K
+blocks, ie. having defined 5 banks for ROM would "waste" three banks
+for applications. Hence, ROM Front DOR definitions should always define
+bank reserved for applications in modulus 64K, eg. 4 banks, 8, 12,
+etc...<br>
+
+<br>
+
+The screen is turned off while the file area is being formatted if it
+is in the
+same slot as the OZ ROM. During formatting, no interference should
+happen
+from Blink, because the Blink reads the font bitmaps each 1/100 second:<br>
+
+<br>
+
+<div style="margin-left: 40px;">If the screen were enabled
+while formatting a 64K sector that is part of the&nbsp;OZ ROM
+address space,
+the font bitmaps would suddenly be unavailable which would create
+violent screen flickering during chip command mode. Further, and most
+importantly, to avoid the Blink doing read-cycles while chip is in
+command mode.<br>
+
+</div>
+
+<br>
+
+By switching off the screen, the Blink doesn't read the font bit maps
+in OZ ROM, and the Flash chip can be in command mode without being
+disturbed by the Blink.<br>
+
+<br>
+
+<span style="font-style: italic;">Important</span>:<br>
+
+Third generation AMD Flash Memory chips may be erased/programmed in all
+available slots (0-3). Only INTEL I28Fxxxx series Flash chips require
+the 12V VPP pin in slot 3 to successfully erase or blow data on the
+memory chip. If the Intel Flash Eprom card is inserted in slot 1 or 2,
+this routine will report a programming failure.<br>
+
+<br>
+
+It is the responsibility of the application (before using this call) to
+evaluate the Flash Memory (using the OS_Fep, FEP_CDID routine) and warn
+the user that an INTEL Flash Memory Card requires the Z88 slot 3
+hardware, so this type of unnecessary error can be avoided.<br>
+
+<br>
+
+Due to a strange side effect with Intel Flash Chips, a special "NULL"
+file is saved as the first file to the Card. These bytes occupies the
+first bytes that otherwise could be interpreted as a random boot
+command for the Intel chip - the behaviour is an Intel chip suddenly
+gone into command mode for no particular reason.<br>
+
+<br>
+
+The NULL file prevents this behaviour by saving a file that avoids any
+kind of boot commands which sends the chip into command mode when the
+card<br>
+
+has been inserted into a Z88 slot.<br>
+
+<br>
+
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+C = slot number (0, 1, 2 or 3) of Flash Memory Card</span><br style="font-family: monospace;">
+
+<br style="font-family: monospace;">
+
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Success:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0,</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to File Header for slot C (B = absolute bank of slot).</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(or pointer to free space in potential new File Area).</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = size of File Eprom Area in 16K banks</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 1, File Header available</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = "oz" File Eprom sub type</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+D = size of card in 16K banks (0 - 64)</span><br style="font-family: monospace;">
+
+<br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+All sectors erased and a new header blown.</span><br style="font-family: monospace;">
+
+<br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Failure:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_ONF (File Eprom Card / Area not available; possibly no card in
+slot)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_ROOM (No room for File Area; all banks used for applications)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_NFE (not a recognized Flash Memory Chip)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_BER (error occurred when erasing block/sector)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_BWR (couldn't write header to Flash Memory)</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_VPL (Vpp Low Error)</span><br style="font-family: monospace;">
+
+<br style="font-family: monospace;">
+
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+......../IXIY same</span><br style="font-family: monospace;">
+
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFBCDEHL/.... different</span><br style="font-family: monospace;">
+
+<br>
+
+<hr style="width: 100%; height: 2px;">
+<span style="font-family: monospace;"><br>
+
+</span><span style="font-weight: bold;"><a name="FEP_WRBT"></a>FEP_WRBT
+($0F) - Write byte to the Flash Memory</span><br>
+
+<br>
+
+Write a byte (in C) to the Flash Memory Card in slot x, at address BHL.
+BHL points to a bank, offset (which is part of the slot that the Flash
+Memory Card have been inserted into).<br>
+
+<br>
+
+The routine can be told which programming algorithm to use (by
+specifying the FE_28F or FE_29F mnemonic in E); these parameters can be
+fetched when<br>
+
+investigated which Flash Memory chip is available in the slot, using
+the OS_Fep, FEP_CDID routine that reports these constants back to the
+caller.<br>
+
+<br>
+
+However, if neither of the constants are provided in E, the routine can
+be specified with E = 0 which internally polls the Flash Memory for
+identification and intelligently use the correct programming algorithm.<br>
+
+<span style="font-style: italic;"><br>
+
+Important</span>:<br>
+
+Third generation
+AMD Flash Memory chips may be erased/programmed in all available slots
+(0-3). Only INTEL I28Fxxxx series Flash chips require the 12V VPP
+pin in slot 3 to successfully erase or blow data on the memory chip. If
+the Intel Flash Eprom card is inserted in slot 1 or 2, this routine
+will report a programming failure.<br>
+
+<br>
+
+It is the responsibility of the application (before using this call) to
+evaluate the Flash Memory
+(using the OS_Fep, FEP_CDID routine) and warn the user that an INTEL
+Flash Memory Card requires the Z88 slot 3 hardware, so this type of
+unnecessary error can be avoided.<br>
+
+<br>
+
+<span style="font-family: monospace;">
+In:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = byte to blow at address<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+E = FE_28F, FE_29F or 0 (poll card for blowing algorithm)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to Flash Memory address (B=00h-FFh, HL=0000h-3FFFh)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(bits 7,6 of B is the slot mask)<br>
+
+Out:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Success:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Failure:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_BWR (programming of byte failed)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_NFE (not a recognized Flash Memory Chip)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_UNK (chip type is unknown: use only FE_28F, FE_29F or 0)<br>
+
+<br>
+
+Registers changed on return:<br>
+
+&nbsp;&nbsp; ..BCDEHL/IXIY ........ same<br>
+
+&nbsp;&nbsp; AF....../.... afbcdehl different<br>
+
+</span><br>
+
+<hr style="width: 100%; height: 2px;">
+<span style="font-family: monospace; font-weight: bold;"><br>
+
+<a name="FEP_WRBL"></a></span><span style="font-weight: bold;">FEP_WRBL
+($12) - Write a block of bytes to Flash Memory</span><br>
+
+<br>
+
+Write a block of bytes to the Flash Eprom Card, from address DE to BHL
+of block size IX. If a block will cross a bank boundary, it is
+automatically continued on the next adjacent bank of the card. On
+return, BHL points at the byte after the last written byte.<br>
+
+<br>
+
+The routine is used by the File Eprom Management libraries, but is well
+suited for other application purposes.<br>
+
+<br>
+
+The routine can be told which programming algorithm to use (by
+specifying the FE_28F or FE_29F mnemonic in C); these parameters can be
+fetched when<br>
+
+investigating which Flash Memory chip is available in the slot, using
+the FlashEprCardId routine that reports these constants.<br>
+
+<br>
+
+However, if neither of the constants are provided in A, the routine can
+be specified with C = 0 which internally polls the Flash Memory for
+identification and intelligently use the correct programming algorithm.
+The identified FE_28F or FE_29F constant is returned to the caller in C
+for future reference (when the block was successfully programmed to the
+card).<br>
+
+<br>
+
+Uses the segment mask of HL (where BHL memory will be bound into the
+Z80 address space to blow the block of bytes (MM_S0 - MM_S3), which has
+to be in a different segment than DE is referring.<br>
+
+<br>
+
+BHL points to an absolute bank (which is part of the slot that the
+Flash Memory Card have been inserted into). Further, the local buffer
+must be available in local address space and not part of the segment
+used for blowing bytes.<br>
+
+<br>
+
+<span style="font-style: italic;">Important</span>:<br>
+
+Third generation
+AMD Flash Memory chips may be&nbsp;programmed in all available
+slots
+(0-3). Only INTEL I28Fxxxx series Flash chips require the 12V VPP
+pin in slot 3 to successfully&nbsp;blow data on the memory chip. If
+the Intel Flash Eprom card is inserted in slot 1 or 2, this routine
+will report a programming failure.<br>
+
+<br>
+
+It is the responsibility of the application (before using this call) to
+evaluate the Flash Memory
+(using the OS_Fep, FEP_CDID routine) and warn the user that an INTEL
+Flash Memory Card requires the Z88 slot 3 hardware, so this type of
+unnecessary error can be avoided.<br>
+
+<span style="font-family: monospace;"><br>
+
+In :<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = FE_28F, FE_29F or 0 (poll card for blowing algorithm)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DE = local pointer to start of block (located in current address space)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = extended address to start of destination (pointer into card)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(bits 7,6 of B is the slot mask)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(bits 7,6 of H = MM_Sx segment mask for BHL)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IX = size of block (at DE) to blow<br>
+
+Out:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Success:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = FE_28F or FE_29F (depending on found card)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL updated<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Failure:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_BWR (block not blown properly)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_NFE (not a recognized Flash Memory Chip)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_UNK (chip type is unknown: use only FE_28F, FE_29F or 0)<br>
+
+<br>
+
+Registers changed on return:<br>
+
+&nbsp;&nbsp; ....DE../IXIY ........ same<br>
+
+&nbsp;&nbsp; AFBC..HL/.... afbcdehl different<br>
+
+</span><br>
+
+<hr style="width: 100%; height: 2px;">
+<span style="font-family: monospace; font-weight: bold;"><br>
+
+<a name="FEP_CPFL"></a></span><span style="font-weight: bold;">FEP_CPFL
+($15) - Copy file entry between two File Areas</span><br>
+
+<br>
+
+Copy file entry from one file area to another file area in slot C (or
+to file area in same slot).<br>
+
+<br>
+
+The routine does NOT handle automatical "deletion" of existing files
+that matches the filename (excl. device). This must be used by a call
+to OS_Epr, EP_Delete. Should the actual process of blowing the file
+image fail, the new File Entry will be marked as deleted, if possible.<br>
+
+<br>
+
+The screen is turned off while the file entry is being copied to the
+file area of the same slot as the OZ ROM. During copying no
+interference should
+happen
+from Blink, because the Blink reads the font bitmaps each 1/100 second:<br>
+
+<br>
+
+<div style="margin-left: 40px;">If the screen were enabled
+while copying a file entry to a file area being part of the&nbsp;OZ
+ROM
+address space,
+the font bitmaps would suddenly be unavailable which would create
+violent screen flickering during chip command mode. Further, and most
+importantly, to avoid the Blink doing read-cycles while chip is in
+command mode.<br>
+
+</div>
+
+<br>
+
+By switching off the screen, the Blink doesn't read the font bit maps
+in OZ ROM, and the Flash chip can be in command mode without being
+disturbed by the Blink.<br>
+
+<br>
+
+<span style="font-style: italic;">Important</span>:<br>
+
+Third generation
+AMD Flash Memory chips may be&nbsp;programmed in all available
+slots
+(0-3). Only INTEL I28Fxxxx series Flash chips require the 12V VPP
+pin in slot 3 to successfully&nbsp;blow data on the memory chip. If
+the Intel Flash Eprom card is inserted in slot 1 or 2, this routine
+will report a programming failure.<br>
+
+<br>
+
+It is the responsibility of the application (before using this call) to
+evaluate the Flash Memory
+(using the OS_Fep, FEP_CDID routine) and warn the user that an INTEL
+Flash Memory Card requires the Z88 slot 3 hardware, so this type of
+unnecessary error can be avoided.<br>
+
+<span style="font-family: monospace;"><br>
+
+IN:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = slot number (0, 1, 2 or 3)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to file entry to be copied<br>
+
+OUT:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0,<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File successfully copied to File Area in slot C.<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1,<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File (Flash) Eprom not available in slot C:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Nfe (not a recognized Flash Memory Chip)<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Entry at BHL was not found, or no file area in slot C:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+No sufficient space to store file (and File Entry Header) in slot C:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Room<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Flash Write Errors:<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+If possible, the new File Entry is marked as deleted.<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Vpl, RC_Bwr (see "flashepr.def" for details)<br>
+
+<br>
+
+Registers changed on return:<br>
+
+&nbsp;&nbsp; ..BCDEHL/IXIY ........ same<br>
+
+&nbsp;&nbsp; AF....../.... afbcdehl different<br></span><br>
+
+<hr style="width: 100%; height: 2px;">
+<span style="font-family: monospace; font-weight: bold;"><br>
+
+<a name="FEP_RDFA"></a></span><span style="font-weight: bold;">FEP_RDFA
+($18) - Reduce an existing "oz" File Area <br><br></span>Reduce
+an existing "oz" File Area below application/OZ Rom Area, or on sole
+Flash Card by one or several 64K sectors. Reduction is done on Flash
+sector size, ie. 64K.<br>
+
+<br><span style="font-weight: bold;">This routine will signal failure
+("file area not found") if an application wants to reduce a file area
+that is part of the OZ ROM in slot 0. A file area in slot is located
+above the OZ area and as a different layout structure which cannot be
+shrinked.</span><br><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;IN:</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; B = total sectors to reduce file area</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; C = slot number (0, 1, 2 or 3) of Flash Memory Card</span><br style="font-family: monospace;"><span style="font-family: monospace;"></span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;OUT:</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; Success:</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0,</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BHL = absolute pointer to new "oz" header in card</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C = Number of 16K banks of File Eprom Area</span><br style="font-family: monospace;"><span style="font-family: monospace;"></span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Current files in file area are intact.</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; New header blown (for reduced file area) and old header sector erased.</span><br style="font-family: monospace;"><span style="font-family: monospace;"></span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; Failure:</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_ONF (File Eprom Card / Area not available; possibly no card in
+slot)</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_ROOM (File area cannot be reduced - files are located inside
+reducing sector)</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_NFE (not a recognized Flash Memory Chip)</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_BER (error occurred when erasing block/sector)</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_BWR (couldn't write header to Flash Memory)</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_VPL (Vpp Low Error)</span><br style="font-family: monospace;"><span style="font-family: monospace;"></span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;Registers changed after return:</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; ....DE../IXIY same</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; AFBC..HL/.... different<br></span>
+</body></html>

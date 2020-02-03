@@ -1,0 +1,231 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Dor, the DOR interface</font></b>
+<p><tt>RST 20H, DEFB $87</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = reason code
+&nbsp;&nbsp;&nbsp;&nbsp; HL, IX arguments
+
+&nbsp;&nbsp;&nbsp;&nbsp; Reason codes are as follows:
+
+&nbsp;&nbsp;&nbsp;&nbsp; DR_GET ($01)&nbsp;&nbsp; get handle for a DOR name (internal use)
+&nbsp;&nbsp;&nbsp;&nbsp; DR_DUP ($02)&nbsp;&nbsp; duplicate DOR
+&nbsp;&nbsp;&nbsp;&nbsp; DR_SIB ($03)&nbsp;&nbsp; return brother DOR
+&nbsp;&nbsp;&nbsp;&nbsp; DR_SON ($04)&nbsp;&nbsp; return child DOR
+&nbsp;&nbsp;&nbsp;&nbsp; DR_FRE ($05)&nbsp;&nbsp; free DOR handle
+&nbsp;&nbsp;&nbsp;&nbsp; DR_CRE ($06)&nbsp;&nbsp; create blank DOR
+&nbsp;&nbsp;&nbsp;&nbsp; DR_DEL ($07)&nbsp;&nbsp; delete DOR
+&nbsp;&nbsp;&nbsp;&nbsp; DR_INS ($08)&nbsp;&nbsp; insert DOR
+&nbsp;&nbsp;&nbsp;&nbsp; DR_RD ($09)&nbsp;&nbsp;&nbsp; read DOR record
+&nbsp;&nbsp;&nbsp;&nbsp; DR_WR ($0A)&nbsp;&nbsp;&nbsp; write DOR record</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; returned values depend on A(in)</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad argument
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ROOM ($07), no room
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_EOF ($09), end of file</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; not documented.</pre>
+Notes:
+<blockquote>When the last DOR record in a list has been read, an RC_EOF
+is reported and the handle is immediatly released, ie. it will not be necessary
+to release the handle with a DR_FRE call.</blockquote>
+Bugs:
+<blockquote>Corrupts the stack pointer SP when called with an old handle,
+e.g. when a previous DR_ call resulted in a "End of list" error (RC_EOF).</blockquote>
+Reason code specifications:
+<p><b>DR_GET ($01), get a handle for a DOR name (internal usage)</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; HL = pointer to a string (full path with device name)</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = DOR handle
+&nbsp;&nbsp;&nbsp;&nbsp; A = minor type</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../IX.. different</pre>
+Notes:
+<blockquote>Do not use this call. Instead use <a href='gnopf.html'>GN_Opf</a> with A = OP_DOR to
+obtain a DOR handle.</blockquote>
+<b>DR_DUP ($02), duplicate DOR</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = DOR handle</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; BC = duplicate DOR handle (IX is still valid)</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; BC = 0 (IX is still valid)
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad DOR handle</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ....DEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBC..../.... different
+
+</pre>
+<b>DR_SIB ($03), return brother DOR</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = DOR handle</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = next DOR handle (original IX invalid)
+&nbsp;&nbsp;&nbsp;&nbsp; A = minor type</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad DOR handle</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../IX.. different
+
+</pre>
+<b>DR_SON ($04), return child DOR</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = DOR handle</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = child DOR handle (original IX invalid)
+&nbsp;&nbsp;&nbsp;&nbsp; A = minor type</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad DOR handle</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../IX.. different
+
+</pre>
+<b>DR_FRE ($05), free DOR handle</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = DOR handle</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = 0</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad DOR handle</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../IX.. different
+
+</pre>
+<b>DR_CRE ($06), create blank DOR</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = parent DOR handle
+&nbsp;&nbsp;&nbsp;&nbsp; B = minor type</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = new DOR handle (original IX invalid)</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad DOR handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad argument
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ROOM ($07), no room</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../IX.. different
+
+</pre>
+<b>DR_DEL ($07), delete DOR</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = DOR handle</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0, DOR deleted
+&nbsp;&nbsp;&nbsp;&nbsp; IX = 0</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad DOR handle</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../IX.. different
+
+</pre>
+<b>DR_INS ($08), insert DOR</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BC = parent DOR handle
+&nbsp;&nbsp;&nbsp;&nbsp; IX = DOR handle</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; original BC and IX DOR handles are still valid</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; BC and IX is still valid
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad DOR handle</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different
+
+</pre>
+<b>DR_RD ($09), read DOR record</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; B = record type
+&nbsp;&nbsp;&nbsp;&nbsp; C = buffer length
+&nbsp;&nbsp;&nbsp;&nbsp; DE = user buffer address (to store information of read)
+&nbsp;&nbsp;&nbsp;&nbsp; IX = DOR handle</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; original IX DOR handle is still valid
+&nbsp;&nbsp;&nbsp;&nbsp; C = actual length of information</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; original IX is still valid
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad DOR handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad argument
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_FAIL ($16), information is not present</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..B.DEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF.C..../.... different
+
+</pre>
+<b>DR_WR ($0A), write DOR record</b>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; B = record type
+&nbsp;&nbsp;&nbsp;&nbsp; C = buffer length
+&nbsp;&nbsp;&nbsp;&nbsp; DE = user buffer address (to copy information of store)
+&nbsp;&nbsp;&nbsp;&nbsp; IX = DOR handle</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; original IX DOR handle is still valid</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; original IX is still valid
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad DOR handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad argument</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different
+</pre>
+
+</body>
+</html>

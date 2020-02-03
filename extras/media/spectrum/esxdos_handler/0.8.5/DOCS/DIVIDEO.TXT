@@ -1,0 +1,13 @@
+divideo - ESXDOS command for playing .dvo video files
+
+1. Copy the file 'divideo' to the /bin directory of your ESXDOS drive.
+2. Copy some .dvo files there too (see http://divideo.zxdemo.org/).
+3. Boot up ESXDOS, and run:
+	.divideo my_video.dvo
+
+NB: The .dvo files must be fully unfragmented on disk to work correctly...
+
+
+Matt Westcott
+gasman@raww.org
+2012-05-02

@@ -1,0 +1,55 @@
+
+                ÖÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ·
+                º TR-Dos system functions. º
+                ÓÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ½
+
+The  system  functions  work  with file and logical level of
+disk structure. The entry point for system functions call is
+15635.  If  TR-Dos  is  not  initialized,  init.  subroutine
+(15649)  must be called before system calls. Function number
+is placed in C register.
+
+ÖÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ·
+º C   ³Function                                              º
+ÇÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶
+º Start of work with disk                                    º
+º #00 ³Microcontroller reset                                 º
+º #01 ³Read drive parameters. A=drive No. (0-3)              º
+º #18 ³Read  disk parameters. 9th sector is read into buffer º
+º     ³placed after TR-Dos variables                         º
+º Logical level                                              º
+º #05 ³Read sectors. HL=memory address, DE=start sector/trackº
+º     ³B=number of sectors                                   º
+º #06 ³Write sectors. Parameters are the same                º
+º File level                                                 º
+º #07 ³Write current disk catalog into stream (number in A)  º
+º #08 ³Read catalogue entry (A=No.) into descriptor          º
+º #09 ³Write catalogue entry from descriptor                 º
+º #0A ³Find entry, placed in descriptor, in disk catalog.    º
+º     ³#23814-number  of  bytes  to  match.  Returns:C=entry º
+º     ³found, #FF, if no                                     º
+º #0B ³Create  file.  HL=start  address, DE=length, name and º
+º     ³type are in descriptor.                               º
+º #0C ³Create BASIC-program (detailed previous function)     º
+º #0E ³Read/verify  file.  #23801:#00-read, #FF-verify. Also º
+º     ³can  be given: HL-start, DE-length. If A=0, start and º
+º     ³length  are  taken from catalog, A=3 - only length is º
+º     ³taken  from catalog, other cases - both HL and DE are º
+º     ³significant.                                          º
+º #12 ³Erase file. Name, type etc. are in descriptor.        º
+º Service functions                                          º
+º #13 ³Copy 16b from HL to descriptor                        º
+º #14 ³Copy 16b from descriptor to HL                        º
+º #17 ³Choose bottom disk side                               º
+º #15 ³Test  physical track while formatting. Track is given º
+º     ³in  D, side - with previous operation. 23766 - number º
+º     ³of bad sectors on track                               º
+ÓÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ½
+Other  functions  are  used  by  TR-Dos  and are useless for
+programmer.
+
+Other    themes:    TR-Dos    system   variables,   BetaDisk
+microcontroller programming.
+                 Igor Yudincev (igor@karlson.kai.ksu.ras.ru)
+                 Text is written in IS-Editor v.1.1, 1.06.97
+

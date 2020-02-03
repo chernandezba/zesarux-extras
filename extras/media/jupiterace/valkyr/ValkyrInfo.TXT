@@ -1,0 +1,13 @@
+Valkyr
+------
+
+The game will not run correctly on an emulator becaues of the interrupt mode 2 vector table.
+This can be fixed by loading the game and entering the following;-
+
+126 DUP
+15452 C! 
+
+17970 C! 15504 32511 !
+
+then call the game with GO
+

@@ -1,0 +1,67 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Pdn, write binary integer number
+as decimal ASCII string</font></b>
+<p><tt>RST 20H, DEFW $1209</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; HL = 0, not allowed
+&nbsp;&nbsp;&nbsp;&nbsp; HL = 1, not allowed
+&nbsp;&nbsp;&nbsp;&nbsp; HL = 2, convert 16bit integer in BC
+&nbsp;&nbsp;&nbsp;&nbsp; HL > 255, HL points at 32bit integer to convert
+
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 0, write result to stream IX
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 1, write result to filter IX
+&nbsp;&nbsp;&nbsp;&nbsp; DE > 255, result is written at (DE)
+
+&nbsp;&nbsp;&nbsp;&nbsp; A = formatting specifier
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A0 = 1, disable leading zero blanking (ie. no leading spaces)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A1 = 1, output leading space
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A2 = 1, output trailing space
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A4->A7, numeric field width (0 = as large as is required)
+
+&nbsp;&nbsp;&nbsp;&nbsp; IX = optional result handle (if DE = 0,1)
+</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; DE points to character after result (if DE(in) > 255)</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BC..HL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF..DE../.... different
+</pre>
+Notes:
+<blockquote>Leading/trailing spaces only effective if numeric field width
+is given.</blockquote>
+Bugs:
+<p>Related calls:
+<blockquote><a href='gnd16.html'>GN_D16</a>, 16bit unsigned division
+<br><a href='gngdn.html'>GN_Gdn</a>, convert an ASCII string to a binary number
+<br><a href='gnm16.html'>GN_M16</a>, 16bit unsigned multiplication
+<br><a href='gnd24.html'>GN_D24</a>, 24bit unsigned division
+<br><a href='gnm24.html'>GN_M24</a>, 24bit unsigned multiplication</blockquote>
+
+</body>
+</html>

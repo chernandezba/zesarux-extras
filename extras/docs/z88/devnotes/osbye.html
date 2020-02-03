@@ -1,0 +1,49 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p><b><font size=+1>OS_Bye, exit application</font></b>
+<p><tt>RST 20H, DEFB $21</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = system error code to display standard error box message
+&nbsp;&nbsp;&nbsp;&nbsp; A = 0, no error message after exit</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+Notes:
+<blockquote>This is the call which the application must make to terminate
+itself; in particular in the error handler when responding to a &lt;>KILL
+request. Note that this call does NOT automatically close files and deallocate
+memory - the application must do this before making the call. Register
+changes are not fixed, as the code previously executing is not re-entered.</blockquote>
+Bugs:
+<p>Related system calls:
+<blockquote><a href="ospoll.html">OS_Poll</a>, poll for an application
+<br><a href="dcpol.html">DC_Pol</a>, poll for card usage
+<br><a href="osent.html">OS_Ent</a>, enter an application
+<br><a href="dcent.html">DC_Ent</a>, enter new application
+<br><a href="dcnam.html">DC_Nam</a>, name current application
+<br><a href="osexit.html">OS_Exit</a>, exit an application
+<br><a href="dcbye.html">DC_Bye</a>, exiting current application
+<br><a href="osstk.html">OS_Stk</a>, stack current process (application)
+<br><a href="osuse.html">OS_Use</a>, process card usage</blockquote>
+
+</body>
+</html>

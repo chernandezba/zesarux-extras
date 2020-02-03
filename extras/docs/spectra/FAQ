@@ -1,0 +1,73 @@
+Q: I've read the manual two times and there are some stuff about video modes I don't understand yet
+ 
+A: The basic concept is:
+- When the Z80 writes to the Spectrum’s video RAM (lower 16K), SPECTRA listens to these and writes an identical copy to its video RAM. Its RAM becomes a mirror of the Spectrum’s lower 16K RAM.
+- When the Spectrum generates a TV picture from its video RAM, SPECTRA generates a SCART picture from its video RAM. Both video RAM contents are identical but SPECTRA does not have to interpret the RAM in the same way that the Spectrum does.
+- SPECTRA does not have to read the same memory location as the Spectrum does. This means SPECTRA can read a different attribute byte for each scan line where as the Spectrum reads the same byte for 8 consecutive scan lines.
+- For each attribute byte the Spectrum reads, SPECTRA reads two bytes. Depending on the active display mode, it will use both or just one of the attribute bytes.
+ 
+Page 28 summarises how SPECTRA determines the address to reads attribute bytes from.
+Page 31 summarises how SPECTRA interprets the 2 attribute bytes it reads for each display mode.
+
+
+Q: Considering your comments on the last email and having read the video modes description again, one question about this mode:
+"
+
+Single line mode using double byte colour produces a composite screen consisting of two areas of different line resolutions – 128 single pixel height lines followed by 32 double pixel height lines. Both areas support the same colour palette, as specified by the basic / extra colours bit of the display mode register.
+
+ 
+"
+
+Why this mixed display mode? Because a 192 line mode will use more than 16kb?
+
+
+A: Correct.
+ 
+The reason is because SPECTRA can only safely read its video RAM to generate the SCART picture when the Spectrum is reading its video RAM to generate its TV picture. If SPECTRA tried to generate a SCART picture out of sync with the Spectrum then it would have to handle potential Z80 writes to the video RAM while it is generating the SCART picture. By keeping in sync with the Spectrum, memory contention is performed by the ULA.
+ 
+But only the lower 16K is contended RAM and so this limits the SPECTRA display modes to use only 16K. More than 16K would be required for 192 lines and so I had to adopt the mixed resolution mode.
+
+
+
+
+Q: In double byte colour mode, one byte stores ink and another stores paper. But how are they ordered? 
+1) ink byte, paper byte, ink byte, paper byte....
+Or
+2) ink byte, ink byte, ink byte... First, and then all the paper byte, paper byte, etc...
+
+You say:
+"
+
+In double byte colour mode, the attributes file consists of two distinct areas. The first generally holds the ink bytes for each cell and the second holds the paper bytes for each cell  
+"
+ So it seems option 2) but later in the manual seems to be 1)...
+
+
+
+A: Yes, option 2. All ink together, then all paper together.
+ 
+If you look at page 28 of the manual, this shows the addressing for each mode. It is the bit labelled ‘D’ that selects ink or paper. So for example, dual line mode has the ink attributes starting at $6000 and the paper attributes starting at $7000. The ink byte at $6000 corresponds to the paper byte at $7000, the ink byte at $6001 corresponds to the paper byte at $7001, etc.
+
+
+Let’s assume dual line mode (i.e. 2 pixel lines per attribute), configured for Double byte colour and Extra colours (or in shorthand notation: 8x2 DE mode).
+ 
+In this mode two attribute bytes are read for every display file byte.
+ 
+Page 28 shows that the addressing used for the attributes file is 011D AALL RRRC CCCC. Therefore:
+ 
+- The ink attributes (D = 0) are at 0110 0000 0000 0000 to 0110 1011 1111 1111 = $6000 to $6BFF
+- The paper attributes (D = 1) are at 0111 0000 0000 0000 to 0111 1011 1111 1111 = $7000 to 7BFF.
+ 
+For the first display file byte at $4000, attribute bytes at $6000 (‘byte 1’) and $7000 (‘byte 2’) are read.
+ 
+Page 31 shows how these two attribute bytes are interpreted for 8x2 DE mode. It is here that I refer to the two attribute bytes as ‘byte 1’ and ‘byte 2’. Byte 1 is when D in the addressing is 0, and byte 2 when D is 1. Hence Byte 1 for this mode refers to the ink attribute and byte 2 refers to the paper attribute.
+ 
+Page 31 shows that byte 1 is used to hold the ink and is formatted as F-GGRRBB, and byte 2 is used to hold the paper and is also formatted as F-GGRRBB.
+ 
+The bottom of page 33 shows a diagram that simply explains this formatting in more detail, but it is the same thing.
+ 
+ 
+I hope that makes things a bit clearer? Trying to explain all the modes in the manual was not easy.
+
+
+

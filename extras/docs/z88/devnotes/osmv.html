@@ -1,0 +1,77 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Mv, move bytes between stream
+and memory</font></b>
+<p><tt>RST 20H, DEFB $45</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BC = number of bytes to move (0 = indicates no data)
+&nbsp;&nbsp;&nbsp;&nbsp; IX = handle of file (or device)
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 0, move data from memory, starting at (HL), to the file
+&nbsp;&nbsp;&nbsp;&nbsp; HL = 0, move data from the file to memory, starting at (DE)</pre>
+OUT, if call (perhaps partially) successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; BC = number of bytes not 'moved'
+&nbsp;&nbsp;&nbsp;&nbsp; DE(in) = 0, HL points to next byte to read
+&nbsp;&nbsp;&nbsp;&nbsp; HL(in) = 0, DE points to next byte to write</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_EOF ($09), end of file reached at some stage
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad handle supplied in IX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_RP ($13), device is read-protected, eg. :OUT.0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ESC ($01), escape, if device :COM.0, :PRT.0, or :INP.0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_SUSP ($69), suspension if device is :COM.0, :PRT.0 or :INP.0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_DRAW ($66), redraw screen, if device is :INP.0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_QUIT ($67), kill request, if device is :INP.0</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......../IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/.... different
+</pre>
+Notes:
+<blockquote>If both HL and DE are zero or they are both non-zero then the
+operation of this call is undefined.</blockquote>
+Bugs:
+<blockquote>OS_Mv on files previously opened with <a href='gnopf.html'>GN_Opf</a>, OP_UP that are
+less or equal to 63 bytes length: Issuing a <a href='gncl.html'>GN_Cl</a> (close file) just after
+a OS_Mv, the file contents will be truncated into rubbish from the current
+file pointer and onwards (to the end of the file).<br>
+<BR></blockquote>
+Related calls:
+<blockquote><a href='gncl.html'>GN_Cl</a>, close file
+<br><a href='gndel.html'>GN_Del</a>, delete a file from memory
+<br><a href='gnopf.html'>GN_Opf</a>, open file/resource (wildcard search)
+<br><a href='gnren.html'>GN_Ren</a>, rename file
+<br><a href='oscl.html'>OS_Cl</a>, internal close (OZ usage)
+<br><a href='osdel.html'>OS_Del</a>, file delete (internal OZ usage)
+<br><a href='osfrm.html'>OS_Frm</a>, file read miscellaneous
+<br><a href='osfwm.html'>OS_Fwm</a>, file write miscellaneous
+<br><a href='osgb.html'>OS_Gb</a>, get byte from file (or device)
+<br><a href='osgbt.html'>OS_Gbt</a>, get byte from file (or device) with timeout
+<br><a href='osop.html'>OS_Op</a>, internal open (OZ usage)
+<br><a href='ospb.html'>OS_Pb</a>, write byte to file, device
+<br><a href='ospbt.html'>OS_Pbt</a>, write byte to file, device with timeout
+<br><a href='osren.html'>OS_Ren</a>, file rename (internal OZ usage)</blockquote>
+
+</body>
+</html>

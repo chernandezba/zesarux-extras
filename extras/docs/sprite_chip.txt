@@ -1,0 +1,127 @@
+Sprite chip
+
+Name: ZGX
+
+Ideas:
+http://emu-docs.org/Super%20NES/Graphics/consolegfx.txt
+
+http://emu-docs.org/NeoGeo%20Pocket/General/tech-11.txt
+
+https://wiki.neogeodev.org/index.php?title=Sprites&t=20150131182412
+
+http://problemkaputt.de/pandocs.txt
+
+http://emu-docs.org/Genesis/Graphics/genvdp.txt
+
+Msx video chips: V9958, V9938
+
+
+
+Sprite Table:
+The two first bytes (a word) indicates how many sprites are in the table
+
+Then, for every sprite:
+Every sprite has a 8 byte length header:
+Offset 0: Word. Sprite number. Unused yet
+Offset 2: Word. X Coordinate. 16 bit value
+Offset 4: Word. Y Coordinate. 16 bit value
+Offset 6: Byte. Atribute1:
+Bit 0 Visible/Hidden
+Bit 1 X Mirror
+Bit 2 Y Mirror
+Bit 3 Zoom X * 2
+Bit 4 Zoom Y * 2
+Bit 5 Flash 
+Bit 6,7 Unused yet
+
+Offset 7: Byte. Atribute2:
+Bit 0,1: Colour type: standard(0), spectra(1), ulaplus(2), valor 3 unused
+Bit 2,3: Indicates, for the whole sprite, with palette colour subgroup is using the sprite (used in ulaplus and spectra):
+00: from 0 to 15
+01: from 16 to 31
+10: from 32 to 47
+11: from 48 to 63
+
+Bit 4,5,6,7 Unused
+
+
+Offset 8: Here starts the sprite data. 16 colours per pixel. Colour 0 means transparent. Color 8 can be used as black in the standard colour type
+First byte:
+Bits 7654: Left pixel colour (Relative offset: 0,0)
+Bits 3210: Right pixel colour (Relative offset: 1,0)
+Second byte:
+Bits 7654: Left pixel colour (Relative offset: 2,0)
+Bits 3210: Right pixel colour (Relative offset: 3,0)
+Etc...
+
+Every sprite is 8x8, so, every sprite line is 4 bytes. A whole 8x8 sprite is 32 bytes size; adding the 8 byte header, the total sprite is 40 bytes length 
+
+-------
+
+Access protocol
+
+Sprite chip has 256 8-bit internal registers. These registers are called command registers. You can access them using the following ports:
+
+-Command port: 03F1H
+-Data port: 04F1H
+
+You must first send command number to command port, and then, write value to data port or read from it. 
+Command number on command port remains until you write it with another value.
+Some command registers only set an internal value for this registers, and some other, also start an action, like start scrolling.
+
+For example, to set Sprite table to address 8020H you must:
+OUT 03F1H,1H
+OUT 04F1H,20H
+OUT 03F1H,2H
+OUT 04F1H,80H
+
+To know, for example, if last scroll has finished:
+
+OUT 03F1H,9
+Read from port 04F1H
+You can read data port in a loop without having to resend commnad number 9 to command port, because this command number remains in port.
+The assembler piece of code would be:
+
+scroll_wait_finish:
+                ld d,9
+                ld bc,03F1H
+                out (c),d
+                inc b
+
+scroll_wait_finish_loop:
+                in a,(c)
+                jr nz,scroll_wait_finish_loop
+                ret
+
+
+
+Command list:
+
+CMD0: Enable/Disable chip. Value meaning:
+Bit 0: Sprite chip enabled (1) or disabled (0)
+Bit 7-1: undefined
+
+CMD1: Address (L) of sprite table
+CMD2: Address (H) of sprite table
+CMD3: x position base of scroll in row coordinates  (0..31)
+CMD4: y position base of scroll in pixel coordinates  (0..191)
+CMD5: scroll width. In row units (1..32)
+CMD6: scroll height. In pixel units (0..191)
+CMD7: pixel lines to move every scroll. Value between 1 and 8 
+CMD8: Filling bit on scroll. 0=fill with zero. 1=fill with one. 2=fill rotating circular  
+CMD9: Start scroll. Scroll direction: 1 up.  2 down. 3 left. 4 right
+
+Reading from data port returns:
+
+REG[0]: Chip state; it's the last value sent to register 0
+REG[1]: Address (L) of sprite table
+REG[2]: Address (H) of sprite table
+REG[3]: x position base of scroll in row coordinates  (0..31)
+REG[4]: y position base of scroll in pixel coordinates  (0..191). This value is increased every line of horizontal scroll
+REG[5]: scroll width. In row units (1..32)
+REG[6]: scroll height. In pixel units (0..191). This value is decreased every line of horizontal and vertical scroll
+REG[7]: pixel lines to move every scroll. Value between 1 and 8
+REG[8]: Filling bit on scroll. 0=fill with zero. 1=fill with one. 2=fill rotating circular
+REG[9]: Last value sent to register 9. Returns 0 when scroll has finished
+REG[10]: Last value sent to cmd4. This value is not changed during scroll
+

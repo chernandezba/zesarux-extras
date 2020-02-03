@@ -1,0 +1,161 @@
+          GLOSSARY OF ZX81 TODDY FORTH
+
+NAME   stack in -- stack out          description
+
+  Guide to stack diagrams:  R: = return stack,
+  c = 8-bit character, flag = boolean (0 or 1), 
+  n = signed 16-bit, u = unsigned 16-bit,
+  d = signed 32-bit, ud = unsigned 32-bit,
+  +n = unsigned 15-bit, x = any cell value, 
+  i*x j*x = any number of cell values,
+  a-addr = aligned adrs, c-addr = character adrs
+  p-addr = I/O port adrs, sys = system-specific.
+
+
+BRANCH --                           branch always
+0BRANCH  x --                  branch if TOS zero
+(DO)   n1|u1 n2|u2 --  R: -- sys1 sys2
+                             run-time code for DO
+(LOOP) R: sys1 sys2 --  | sys1 sys2
+                           run-time code for LOOP
+(+LOOP)  n --   R: sys1 sys2 --  | sys1 sys2
+                          run-time code for +LOOP
+I      -- n   R: sys1 sys2 -- sys1 sys2
+                     get the innermost loop index
+J      -- n   R: 4*sys -- 4*sys
+                        get the second loop index
+LEAVE  --                           exit DO..LOOP
+EXIT   --                 exit a colon definition
+LIT    -- x         fetch inline literal to stack
+EXECUTE   i*x xt -- j*x   execute Forth word 'xt'
+VARIABLE   x --           define a Forth variable
+CONSTANT   n --           define a Forth constant
+EMIT   c --           output character to console
+CLS    --                        clear the screen
+KEY    -- c           get character from keyboard
+DUP    x -- x x            duplicate top of stack
+?DUP   x -- 0 | x x                DUP if nonzero
+DROP   x --                     drop top of stack
+SWAP   x1 x2 -- x2 x1          swap top two items
+OVER   x1 x2 -- x1 x2 x1        per stack diagram
+ROT    x1 x2 x3 -- x2 x3 x1     per stack diagram
+>R     x --   R: -- x        push to return stack
+R>     -- x    R: x --      pop from return stack
+R@     -- x    R: x -- x       fetch from rtn stk
+SP@    -- a-addr           get data stack pointer
+SP!    --          set data stack pointer from S0
+RP!    --        set return stack pointer from R0
+!      x a-addr --           store cell in memory
+C!     c c-addr --           store char in memory
+@      a-addr -- x         fetch cell from memory
+C@     c-addr -- c         fetch char from memory
++      n1/u1 n2/u2 -- n3/u3             add n1+n2
+-      n1/u1 n2/u2 -- n3/u3        subtract n1-n2
+AND    x1 x2 -- x3                    logical AND
+OR     x1 x2 -- x3                     logical OR
+XOR    x1 x2 -- x3                    logical XOR
+NEGATE x1 -- x2                  two's complement
+?NEGATE  n1 n2 -- n3     negate n1 if n2 negative
+1+     n1/u1 -- n2/u2                add 1 to TOS
+2+     n1/u1 -- n2/u2                add 2 to TOS
+1-     n1/u1 -- n2/u2         subtract 1 from TOS
+2-     n1/u1 -- n2/u2         subtract 2 from TOS
+2*     x1 -- x2             arithmetic left shift
+2/     x1 -- x2            arithmetic right shift
++!     n/u a-addr --           add cell to memory
+0=     n/u -- flag           return true if TOS=0
+0<     n -- flag             true if TOS negative
+=      x1 x2 -- flag                   test x1=x2
+<      n1 n2 -- flag           test n1<n2, signed
+>      n1 n2 -- flag           test n1>n2, signed
+(.")   --                    run-time code for ."
+."     --                 compile string to print
+BL     -- char                     an ASCII space
+TIB    -- a-addr            Terminal Input Buffer
+LBP    -- c-addr              Line Buffer Pointer
+BASE   -- a-addr           holds conversion radix
+STATE  -- a-addr             holds compiler state
+DP     -- a-addr             holds dictionary ptr
+LATEST -- a-addr          last word in dictionary
+CONTEXT   -- addr      a system variable pointing
+                       to context vocabulary
+CURRENT   -- addr      a system variable pointing
+                       to current vocabulary
+HLD    -- a-addr                     HOLD pointer
+PAD    -- a-addr                       PAD buffer
+ABS    n1 -- +n2                   absolute value
+UM*    u1 u2 -- ud       unsigned 16x16->32 mult.
+*      n1 n2 -- n3                signed multiply
+UM/MOD ud u1 -- u2 u3     unsigned 32/16->16 div.
+/MOD   n1 n2 -- n3 n4        signed divide/rem'dr
+/      n1 n2 -- n3                  signed divide
+2DUP   x1 x2 -- x1 x2 x1 x2       dup top 2 cells
+2DROP  x1 x2 --                      drop 2 cells
+COUNT  c-addr1 -- c-addr2 u      counted->adr/len
+CR     --                          output newline
+SPACE  --                          output a space
+INPUT  c-addr --           get line from terminal
+TYPE   c-addr +n --         type line to terminal
+UD/MOD ud1 u2 -- u3 ud4          32/16->32 divide
+HOLD   char --          add char to output string
+<#     --                begin numeric conversion
+#      ud1 -- ud2       convert 1 digit of output
+#S     ud1 -- ud2        convert remaining digits
+#>     ud1 -- c-addr u      end conv., get string
+SIGN   n --                 add minus sign if n<0
+U.     u --                    display u unsigned
+.      n --                      display n signed
+DECIMAL --             set number base to decimal
+HEX    --                  set number base to hex
+HERE   -- addr         returns dictionary pointer
+ALLOT  n --              allocate n bytes in dict
+,      x --                   append cell to dict
+C,     char --                append char to dict
+WORD   char -- c-addr    parse word delim by char
+FIND   c-addr -- c-addr 0     ..if name not found
+                    xt  1     ..if immediate
+                    xt -1     ..if "normal"
+NUMBER c-addr u -- d  1  conv strg>number, double
+                -- d -1  conv strg>number, single
+                -- 0             if convert error
+INTERPRET  --              interpret given buffer
+QUIT   --    R: i*x --    interpret from keyboard
+ABORT  i*x --   R: j*x --      clear stack & QUIT
+COLD   --                 cold start Forth system
+'      -- xt              find word in dictionary
+ASCII  -- char              parse ASCII character
+CREATE --              create an empty definition
+(DOES>)  --              run-time action of DOES>
+DOES>  --           change action of latest def'n
+[      --                enter interpretive state
+]      --                   enter compiling state
+IMMEDIATE   --          make last def'n immediate
+:      --                begin a colon definition
+;                          end a colon definition
+IF     -- adrs         conditional forward branch
+THEN   adrs --             resolve forward branch
+ELSE   adrs1 -- adrs2         branch for IF..ELSE
+BEGIN  -- adrs         target for backward branch
+UNTIL  adrs --        conditional backward branch
+AGAIN  adrs --           uncond'l backward branch
+WHILE  -- adrs              branch for WHILE loop
+REPEAT adrs1 adrs2 --          resolve WHILE loop
+DO     -- adrs   L: -- 0        start of DO..LOOP
+LOOP   adrs --   L: 0 a1 a2 .. aN --
++LOOP  adrs --   L: 0 a1 a2 .. aN --
+COMPILE --          append inline execution token
+LITERAL  x --              append numeric literal
+LOAD  adrs --              interpret given buffer
+QUESTION   --        emit error mensage and abort
+LFA    nfa -- lfa          name adr -> link field
+CFA    nfa -- cfa          name adr -> code field
+FORGET name   --   erases the word 'name' and all
+        subsequently defined words from the dict.
+VLIST  --                 list all words in dict.
+MEM    --         print the amount of memory left
+CSAVE  --         Save the entire program to tape
+CODE   --                  Create code definition
+NEXT   --   Append "jp NEXT" in a code definition
+\      --        skip input until the end of line
+(      --                 skip input until next )
+.(     --              print coments until next )

@@ -1,0 +1,51 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Dly, delay a given period</font></b>
+<p><tt>RST 20H, DEFW $D606</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BC = delay in centiseconds</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; BC = remaining timeout
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ESC ($01), escape was pressed
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_SUSP ($69), process suspended
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_TIME ($02), timeout</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ....DEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBC..../.... different
+</pre>
+Notes:
+<p>Bugs:
+<br>&nbsp;
+<p>Related calls:
+<blockquote><a href='gngmt.html'>GN_Gmt</a>, get (read) machine time in internal format
+<br><a href='gngtm.html'>GN_Gtm</a>, convert an ASCII string to a time in internal format
+<br><a href='gnmsc.html'>GN_Msc</a>, miscellaneous time operations
+<br><a href='gnpmt.html'>GN_Pmt</a>, put (set) machine time
+<br><a href='gnptm.html'>GN_Ptm</a>, write internal time as ASCII string
+<br><a href='gnsdo.html'>GN_Sdo</a>, send date and time to standard output</blockquote>
+
+</body>
+</html>

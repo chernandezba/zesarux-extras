@@ -1,0 +1,34 @@
+Esxdos command "SNAPLOAD" v0.3.13
+=================================
+
+Code(from system FATWARE) by Baze, port(to ESXDOS) by Phoenix
+Patched by Velesoft
+
+Info:
+=====
+SNAPLOAD is command for load SNA and Z80 snapshots.
+
+Usage: snapload [-l] <file>
+-l: load in 48kB mode(LOCK 7FFD)
+-u: ignore 48kB LOCK in snapshot
+Hold SHIFT during loading snap jump to user menu where you can use new features.
+Controll in menu:
+-----------------
+L=start snap with set lock bit (in true 48kB mode)
+U=start snap and ignore lock bit(enable load 48kB snapshots in 128kB mode)
+V=start snap with videoram 1
+W=start snap with videoram 2
+0-7=start snap with ram page 0-7
+R=start snap with rom0(128basic)
+B=start snap with rom1(48 basic)
+SPACE=cancel changes+start snap
+ENTER=apply changes +start snap
+
+Border area show 4 color lines:
+-line 1 = ram 0-7 as color 0-7
+-line 2 = rom 0(black)/1(blue)
+-line 3 = vram 0(black)/1(blue)
+-line 4 = lock 0(black)/1(red)
+Blue flashing border sign 48ram and 128kB features are disable.
+
+You can during loading snapshot hold SHIFT and in menu change state of port 7FFD, hold NMI + press ENTER = start snapshot with jump to FILE BROWSER. Here is possible save snapshot with modified port 7FFD, if you need (after spress key "s")

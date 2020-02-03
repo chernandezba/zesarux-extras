@@ -1,0 +1,46 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Rbe, read byte at extended address</font></b>
+<p><tt>RST 20H, DEFW $3E09</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BHL = pointer to the byte to read (B = 0, local byte)
+</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = byte at address
+</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; .FBCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; A......./.... different
+</pre>
+Notes:
+<p>Bugs:
+<br>&nbsp;
+<p>Related calls:
+<blockquote><a href='gncme.html'>GN_Cme</a>, compare null-terminated strings, one local, one extended
+<br><a href='gnwbe.html'>GN_Wbe</a>, write byte at extended address
+<br><a href='osbde.html'>OS_Bde</a>, copy bytes to extended address
+<br><a href='osbhl.html'>OS_Bhl</a>, copy bytes from extended address</blockquote>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <TITLE>Blink Quick Reference</TITLE>
+   <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</HEAD>
+<BODY>
+&nbsp;
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<TR>
+<TH ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</TH>
+</TR>
+
+<TR>
+<TD ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%"><A HREF="index.html">Contents</A></TD>
+</TR>
+</TABLE>
+
+<HR WIDTH="100%">
+<table style="font-size: 12px" width="100%" >
+<TR>
+<TD></TD>
+
+<TD>
+<CENTER><B>Quick Reference to Blink Gate-Array Registers</B></CENTER>
+</TD>
+
+<TD></TD>
+</TR>
+
+<TR>
+<TD></TD>
+
+<TD ALIGN=LEFT WIDTH="80%">
+<PRE><TT><I>I/O port</I>&nbsp;&nbsp;&nbsp; <I>WRITE</I>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <I>READ
+</I>$70&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#Screen">PB0</A>, pixel base reg.0&nbsp;&nbsp; -
+$71&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#Screen">PB1</A>, pixel base reg.1&nbsp;&nbsp; -
+$72&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#Screen">PB2</A>, pixel base reg.2&nbsp;&nbsp; -
+$73&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#Screen">PB3</A>, pixel base reg.3&nbsp;&nbsp; -
+$74&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#Screen">SBR</A>, screen base reg.&nbsp;&nbsp; -
+
+$B0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#COM">COM</A>, command register&nbsp;&nbsp; -
+$B1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#INT">INT</A>, mask &amp; control&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#STA">STA</A>, interrupt status
+$B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#KBD">KBD</A>, keyboard
+$B3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#EPR">EPR</A>, EPROM programming&nbsp; -
+$B4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#TACK">TACK</A>, RTC ack.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -
+$B5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#TMK">TMK</A>, RTC int. mask&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#TSTA">TSTA</A>, RTC int. status
+$B6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#ACK">ACK</A>, main int. mask&nbsp;&nbsp;&nbsp;&nbsp; -
+
+$D0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#SR0">SR0</A>, segment reg. 0&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#TIM">TIM0</A>, RTC 5ms counter
+$D1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#SR0">SR1</A>, segment reg. 1&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#TIM">TIM1</A>, RTC seconds counter (6 bits)
+$D2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#SR0">SR2</A>, segment reg. 2&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#TIM">TIM2</A>, RTC minutes counter
+$D3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#SR0">SR3</A>, segment reg. 3&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#TIM">TIM3</A>, RTC minutes/256 counter
+$D4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#TIM">TIM4</A>, RTC minutes/64K counter (5 bits)
+
+$E0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#RXD">RXD</A>, UART receive data register
+$E1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#RXE">RXE</A>, extended receiver data
+$E2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#RXC">RXC</A>, receiver control&nbsp;&nbsp; -
+$E3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#TXD">TXD</A>, transmit data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -
+$E4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#TXC">TXC</A>, transmit control&nbsp;&nbsp; -
+$E5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#UMK">UMK</A>, UART int. mask&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#UIT">UIT</A>, UART int. status
+$E6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <A HREF="hardware.html#UAK">UAK</A>, UART int. mask&nbsp;&nbsp;&nbsp;&nbsp; -</TT></PRE>
+</TD>
+
+<TD></TD>
+</TR>
+
+<TR>
+<TD></TD>
+
+<TD></TD>
+
+<TD></TD>
+</TR>
+</TABLE>
+
+<P>
+<HR WIDTH="100%">
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<TR>
+<TD ALIGN=CENTER VALIGN=TOP WIDTH="34%"><A HREF="index.html">Contents</A></TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>

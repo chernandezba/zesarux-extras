@@ -1,0 +1,41 @@
+All commands must be sent ending with \r\n  (10,13)
+
+You can read the device on linux console with a simple:
+
+cat /dev/ttyUSB0
+
+and have another console making the writes to the device, for example:
+
+printf "AT+GMR\r\n" >/dev/ttyUSB0
+
+which will print you the copyright and versions
+
+
+Important: 
+seems some uart come by default as AP mode, not client mode.
+
+
+Number	Network Mode
+1	Network Device (client)
+2	Access Point (AP)
+3	Both
+
+
+To get the mode:
+
+printf "AT+CWMODE?\r\n" >/dev/ttyUSB0
+
+
+If it returns 2, you should set to 1 with:
+
+printf "AT+CWMODE=1\r\n" >/dev/ttyUSB0
+
+
+Note: if only garbae is read, try setting speed with command:
+
+screen /dev/ttyUSB0 115200
+
+and then kill this screen process (should be two in memory)
+
+Note for Mac OS X users:
+device can be found in path /dev/cu.usbserial or something similar

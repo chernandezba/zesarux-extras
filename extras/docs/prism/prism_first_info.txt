@@ -1,0 +1,229 @@
+I'll answer what I can now - may take a while to get you all the info.
+
+
+>>About ram paging on prism... You use bits 0,1,2,6,7 from port 32765. This gives 32 pages of 8k size... But how are paged in segments c000 and e000? If 
+>>I select page 0, which page will go to segment c000 and which one to segment e000?
+
+Prism's RAM pages are 8K each. There's 64 pages of SRAM (512K) and 4 pages of VRAM (32K). 
+VRAM is dual-ported SRAM on the FPGA. As it's dual ported, both CPU and ULA2 can access it at once with no need for memory contention.
+
+Memory paging using port 0x7FFD uses pairs of consecutive 8K pages. Prism's pages 0 and 1 are equivalent to the 128K Spectrum's page 0, Prism's pages 2 and 3 are equivalent to the 128K Spectrum's page 1 etc.
+
+If port 0x7FFD is 00xxx000 (Page 0 on 128K machines) then (8K) page 0 is paged at 0xC000 and (8K) page 1 is paged at 0xE000
+if port 0x7FFD is 00xxx001 (Page 1 on 128K machines) then (8K) page 2 is paged at 0xC000 and (8K) page 3 is paged at 0xE000
+if port 0x7FFD is 00xxx010 (Page 2 on 128K machines) then (8K) page 4 is paged at 0xC000 and (8K) page 5 is paged at 0xE000
+.. etc
+
+Like on the 128K spectrum, video RAM can be paged into this area of memory:
+
+if port 0x7FFD is 00xxx101 (Page 5 on 128K machines) then VRAM 0 is paged at 0xC000 and VRAM 1 is paged at E000
+if port 0x7FFD is 00xxx111 (Page 7 on 128K machines) then VRAM 2 is paged at 0xC000 and VRAM 3 is paged at E000
+
+
+More about the SRAM on Prism:
+
+The prototype only has 512K of SRAM on board, so whilst you can page in 512K worth of memory into 0xC000 - 0xFFFF just fine, some pages are shared with the Timex/Chloe sideways RAM and the divMMC memory:
+
+(8K) SRAM pages 0 to 15 - first 128K. Same as on a 128K spectrum. Not shared with anything. Pages 4 and 5 (equivalent to page 2 on a 128K) are at 0x8000 and 0xA000 respectively.
+(8K) SRAM pages 16 to 31 - second 128K - not shared with anything.
+(8K) SRAM pages 32 to 39 - same as DOCK pages 0 to 7.
+(8K) SRAM pages 40 to 47 - same as EX pages 0 to 7.
+(8K) SRAM pages 48 to 63 - last 128K - shared with divMMC
+
+
+It's up to you if you emulate the prototype and share memory pages, or if you use separate memory for DOCK, EX and divMMC (which I hope to do in future versions of Prism). 
+
+
+
+>>about Chloe/timex compatibility.
+
+Prism has multiple memory paging methods, like the Chloe. Port 7FFD works as described above. Port 0xF4/0xFF memory paging works as on Chloe/Timex. 
+
+Notes:
+If DOCK/EX RAM is paged at 0x0000 or 0x2000 and divMMC ROM+RAM gets enabled, divMMC overlays the DOCK/EX RAM (divMMC "wins")
+If DOCK/EX RAM is paged at 0x0000 or 0x2000 and Multiface128 ROM+RAM gets enabled, MF128 overlays the DOCK/EX RAM (MF128 "wins")
+
+DOCK/EX RAM overlays whatever pages are paged in at 0xC000 and 0xE000 using port 7FFD
+
+OUT to IO 0xF4 is the only even IO port that the "ULA" (port FE) doesn't respond to.
+timex port FF only responds to OUT; you cannot read from the port (IN FF returns the floating bus)
+
+
+>> what is this 'compatibility' feature? It's Only about vram aperture? Can you explain a bit more?
+
+Sure.
+
+The quick version is that when this option is turned on, VRAM0 is visible to the CPU between memory addresses 0x4000 and 0x5FFF, and VRAM1 is visible to the CPU between memory addresses 0x6000 and 0x7FFF. When the option is off (default) VRAM0 is only visible to the CPU between 0x4000 and 0x5AFF and the rest of the address space up to 0x7FFF is SRAM.
+
+
+A more detailed answer:
+
+Prism has 4x8K pages of VRAM (VRAM0, VRAM1, VRAM2 and VRAM3). Some video modes take up more than 1B00 bytes of VRAM - for example Prism's 512x192 res mode uses the first 1B00 bytes of VRAM0 for the left-hand 256 pixels and attributes, and the first 1B00 bytes of VRAM1 for the right-hand 256 pixels and attributes. Essentially it's 2 spectrum screens side-by side. The 16 colour "clashless" (4 bitplane) planar mode uses all 4 VRAM pages.
+
+If the whole 16K between 0x4000 and 0x7FFF was VRAM (as on the Spectrum and Timex) then system variables, printer buffer and the beginning of BASIC would corrupt part of the screen as they sits after 0x5B00. To prevent this, Prism defaults to only presenting VRAM0 to the CPU between addresses 0x4000 and 0x5AFF. Between 5B00 and 7FFF, Prism presents SRAM (this particular memory only resides at this address space, it's not one of the pages that can be paged in anywhere else)
+
+This is all well and good - Prism works fine with most software in this arrangement as the video memory is exactly where all standard spectrum software expects it to be. However a few pieces of software expect the whole 16K from 0x4000 to 0x7FFF to be video memory - some Timex/Chloe software expects the Timex shadow screen to be at 0x6000, and the Radastian mode 5,7 and 9 test software needs VRAM between 0x4000 and 0x7FFF. This is why I added the compatibility flag.
+
+
+There is a second compatibility option that can be selected which limits memory paging at 0xC000 to just the first 128K (this is needed for a small number of games to work like OutRun and Turbo OutRun). When this option is set, bits 7 and 6 of register 0x7FFD are ignored, and so paging is exactly the same as on a Spectrum 128.
+
+Both options can be turned on at once if required. 
+
+
+>>rom paging. You use 16k segments using 2 bits from 32765 and 8189 ports, like +2A. Then, how do you map for example rom page 4? Or 5?
+
+IO port 60987 is an 8 bit register which holds the current flash page 0-255.
+
+Writing a 0 or 1 to the ROM paging bit in 32765 changes bit 0 of the register at port 60987
+Writing a 0 or 1 to the ROM paging bit in 8189 changes bit 1 of the register at port 60987
+
+There's more on this in the docs in the Prism group.
+
+An example though: I've got the +3e ROMS split into 4 16K flash rom stored in flash pages 16,17,18 and 19.
+
+OUT 60987,16  switches to "ROM 0" of the +3e ROMS (the menu)   (register 60987 contains bin "00010000")
+
+If I select 48K mode from the menu, it sets both of the ROM select bits in 32765 and 8189 ports to '1' to select +3e "ROM 3". 
+
+These two bits are mirrored by bits 0 and 1 of the register at IO port 60987:
+* Internally, Prism converts the setting of the bit in 32765 to setting bit 0 of 60987  (so it now contains bin "00010001")
+* And it converts the setting of the bit in 8189 to setting bit 1 of 60987. Therefore IO port 60987 now contains 19 (bin "00010011")
+
+Alternatively, I could have just switched straight to +3e ROM 3 without using the menu by OUT 60987,19.
+
+
+
+>>safe mode: is there any safe rom? Or you use 48k spectrum rom?
+
+Currently I use the 48K Spectrum ROM for safe mode and FLASH programming mode. This is held in a "ROM" modelled within the FPGA rather than being on the FLASH chip, allowing recovery from a corrupted flash chip
+
+Safe mode: tap f9 while holding reset to boot into safe mode, or tap f9 while running and the safe ROM will be mapped into 0x0000 to 0x3FFF immediately (which could cause a crash if the Spectrum was expecting a different ROM or RAM to be mapped there).
+
+Programming mode: OUT 36411,250 enables programming mode:  the safe ROM is paged in at 0x0000 - 0x3FFF and the currently selected FLASH page is paged in at 0x8000 - 0xBFFF. When this mode is enabled, the write signal is connected to the flash chip.
+
+
+>>prism boot rom 0,1: where can they be downloaded?
+
+Not done yet. Once done, I'll let you know :)
+
+Currently flash pages 0,1,2 and 3 contain the 48K ROM.
+Page 4 and 6 contain SE BASIC ROM 0
+Page 5 and 7 contain SE BASIC ROM 1
+Page 8 and 10 contain 128K (toastrack) ROM 0
+Page 9 and 11 contain 128K (toastrack) ROM 1
+
+Page 16 contains +3eMMC ROM 0
+Page 17 contains +3eMMC ROM 1
+Page 18 contains +3eMMC ROM 2
+Page 19 contains +3eMMC ROM 3
+
+
+>>examples: do you have programs to test ram, rom, etc?
+
+Not really at the moment.
+
+To test the first 128K I've just tried a load of 128K only games like Where Time Stood Still, Terminator 2 etc... plus things like Rainbow Islands and Midnight Resistance which load all their levels in one go on a 128.
+
+Some Russian demos/games apparently use additional RAM (paged in the same way as Prism using bits 6 and 7 of IO register 7FFD) but I don't know which, so I've not tested to make sure they work.
+
+To test paging past 128K, I just did it manually (CLEAR 32768, then a loop which changed the page and poked the page number into each page except page 2, followed by a loop which changed the page and peeked the number back to make sure it was correct)
+
+To test the Timex/Chloe sideways RAM paging, I used Andrew Owen's MMCtest software (the rotating dancer). Before running this, you have to set the VRAM aperture to 16K as it expects VRAM1 to be at 0x6000.
+
+To test ULAplus, I've tried a number of ULAplus enabled games plus Andrew's palette editor
+Obviously you have test software for radastian modes which is what I'm using (spongebob, sonic etc)
+
+I have got a flash programmer written in BASIC (yep, really!)
+
+I need to write some tests for the new screen modes etc
+
+
+>>-ulaplus2 and other video modes: I only see an image on the Facebook group about rgb colours... 
+
+It's "ULA2"  :)
+In the early days when Andrew etc were discussing ULA+ (and before that even), I was designing something myself - which I called ULA2. 
+ULA2 isn't an extension of ULAplus, but (as on Prism) both ULA2 and ULA+ can be used together.
+
+Andrew and I are friends, so over the years I've suggested things for ULAplus and Andrew's suggested things for ULA2. Our friendship is also a big part of the reason why Prism has the Timex/Chloe screen modes and the Timex/Chloe sideways RAM paging. 
+
+As you noticed - I liked the idea of the Radastan (Radastian?) screen modes, so I implemented those too :)    (still finishing off modes 5, 7 and 9)
+
+
+>>Does prism have ulaplus 2? 
+
+Prism has both ULA2 and ULA+. It also supports the Timex screen modes.
+
+If ULA+ is enabled, then Prism uses the currently selected Timex or Radastian screen mode. If ULA+ is not enabled, then the currently selected ULA2 screen options are used.
+
+
+>>Where the documentation about ulaplus2 is? Is stable or beta?
+
+ULA2 is being developed as Prism is being developed, so it's still beta. I'd say I'm about 90% finished.
+
+* 512K memory pagable by port 7FFD is done
+* 32K VRAM is done
+* Most of the screen modes, attribute decode methods etc are implemented; a couple need some tweaking to get them centred on screen but they're working.
+* Tape IO works
+* SD card interface works (when using +3eMMC ROMs) but the DivMMC NMI menu and "automapper" (tape emulation etc) doesn't yet!
+* Multiface 128 isn't implemented yet
+* AY sound chip isn't implemented yet
+
+
+The documentation's being developed alongside - there's a lot of design notes etc but they've not been written up properly yet. The Prism group in FB that you're part of has a couple of documents so far dealing with RAM and ROM.
+
+There's some documentation on the Prism blog, but some of it is out of date so I won't advise you to look at that. I need to clean that page up!
+
+
+>>And about other video modes... I saw on your blog some new video modes on prism...
+>>any other extra feature to talk about?
+
+Yes there's 16 x  4-bit ULA2 and Prism hardware control registers, which control the screen resolution, the way the attribute byte is decoded etc. Not all 16 are currently in use. These are all accessed by OUT 36411, BIN "RRRRVVVV" where RRRR is the 4-bit number of the register, and VVVV is the 4 bit value you wish to set the register.
+
+One of these registers selects the CPU speed
+One of them selects particular screen modes/resolutions
+One of them defines how the 'attribute' byte is decoded
+One of them defines which palette is used
+
+There's a user definable palette (separate from the ULAplus palette) which lets you define up to 256 colours (depending on the screen mode). The ULA2 specification allows for up to 24 bit (8 bit per R, G and B value) colour, though due to hardware limitations, MY prototype prism only does 12 bit (4 bit per R, G and B value) colour at the moment. Up to you if you want to emulate the prototype or if you want to go full-specification and do 24 bit colour! 
+
+ULA2 also has its own (256 colour) border which is active when the normal BORDER colour is 0.
+
+I'll explain more in another email - my work lunch break's nearly over now so I'll have to finish this email! :)
+
+There's lots in this email, if there's anything that still isn't clear just ask :)
+
+You have no idea how excited I am that you might emulate Prism!
+
+
+On 11 December 2015 at 03:41, Cesar Hernandez <chernandezba@hotmail.com> wrote:
+Hi Jeff
+
+I have recently added timex, Chloe and cpc emulation to ZEsarUX... So this is time to add your machine ;)
+Some questions:
+
+-About ram paging on prism... You use bits 0,1,2,6,7 from port 32765. This gives 32 pages of 8k size... But how are paged in segments c000 and e000? If I select page 0, which page will go to segment c000 and which one to segment e000?
+
+-about Chloe/timex compatibility. I see your paging system is not like timex... So, what is this 'compatibility' feature? It's Only about vram aperture? Can you explain me a bit more?
+
+-rom paging. You use 16k segments using 2 bits from 32765 and 8189 ports, like +2A. Then, how do you map for example rom page 4? Or 5?
+
+-safe mode: is there any safe rom? Or you use 48k spectrum rom?
+
+-prism boot rom 0,1: where can they be downloaded?
+
+-examples: do you have programs to test ram, rom, etc?
+
+-ulaplus2 and other video modes: I only see an image on the Facebook group about rgb colours... Does prism have ulaplus 2? Where the documentation about ulaplus2 is? Is stable or beta?
+And about other video modes... I saw on your blog some new video modes on prism...
+
+-any other extra feature to talk about?
+
+
+Regards, 
+Cesar 
+
+
+---
+
+
+

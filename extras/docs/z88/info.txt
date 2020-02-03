@@ -1,0 +1,47 @@
+ver tambien
+https://cambridgez88.jira.com/wiki/display/DN/Introduction
+https://cambridgez88.jira.com/wiki/display/welcome/Cambridge+Z88
+
+
+Restart routines (lo que va realmente en la direccion 0, mapeado como RAM) se encuentra en la rom, en el offset
+125622 . leyendo una rom uk 400:
+
+
+;       ----
+;       RESTARTS
+.rst00                                          ; RESET
+        di
+        xor     a
+        out     (BL_COM), a                     ; bind b00 into low 8K of segment 0
+        ; code continues to execute in bank 0 in ROM (see [kernel0]/boot.asm)...
+
+...
+
+
+.OZ_INT
+        jp      LOWRAM_INT                      ; patch vector for interrupts during coma
+.LOWRAM_INT
+        push    af
+        ld      a, (BLSC_SR3)                   ; remember S3
+        push    af
+        call    MS3Kernel0                      ; and bind in KERNEL0
+        jp      INTEntry
+
+...
+
+
+
+;       ----
+;       Non Maskable interrupt entry
+.OZ_NMI
+        jp      LOWRAM_NMI                      ; patch vector for interrupts during coma
+.LOWRAM_NMI
+        push    af
+        ld      a, BM_COMRAMS                   ; bind bank $20 into lowest 8KB of segment 0
+        out     (BL_COM), a
+
+        push    hl                              ; if SP in lowest page we must
+        ld      hl, 0                           ; be in init code - reset
+        add     hl, sp
+
+...

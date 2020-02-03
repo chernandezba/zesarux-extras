@@ -1,0 +1,47 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Sdo, send date and time to standard
+output</font></b>
+<p><tt>RST 20H, DEFW $0E09</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; HL = pointer to 6 byte date and time. First 3 bytes are time in
+&nbsp;&nbsp;&nbsp;&nbsp; internal format, second 3 bytes are date in internal format.</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; ......../.... different</pre>
+Notes:
+<p>Bugs:
+<blockquote>Will fail if address pointer is in segment 2.</blockquote>
+Related calls:
+<blockquote><a href='gngmt.html'>GN_Gmt</a>, get (read) machine time in internal format
+<br><a href='gngtm.html'>GN_Gtm</a>, convert an ASCII string to a time in internal format
+<br><a href='gnmsc.html'>GN_Msc</a>, miscellaneous time operations
+<br><a href='gnpmt.html'>GN_Pmt</a>, put (set) machine time
+<br><a href='gnptm.html'>GN_Ptm</a>, write internal time as ASCII string
+<br><a href='osdly.html'>OS_Dly</a>, delay a given period</blockquote>
+
+</body>
+</html>

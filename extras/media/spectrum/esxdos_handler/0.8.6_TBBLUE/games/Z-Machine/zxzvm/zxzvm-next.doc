@@ -1,0 +1,95 @@
+ZXZVM v1.15 for the ZX Spectrum Next
+====================================
+
+ZXZVM is a Z-Machine emulator written by John Elliott (for the Spectrum +3
+and PCW machines) and ported to the ZX Spectrum Next by Garry Lancaster.
+
+It allows you to play text adventure games written for the Z-Machine.
+
+This includes classic games from Infocom, such as Zork and Planetfall, as
+well as hundreds of newer games written between 1993 and the present day
+(mostly using Graham Nelson's Inform compiler).
+
+Some games can be found in C:/games/Z-Machine on your Next's SD card. The
+definitive source for Z-Machine games on the internet is:
+
+        https://www.ifarchive.org/
+
+ZXZVM can play version 3, 4, 5, 7 and 8 games (these should be given filenames
+ending with .z3 .z4 .z5 .z7 or .z8 in order to be recognised by the Browser).
+
+You can play games simply by selecting them in the Browser, and ZXZVM will
+automatically be launched. Alternatively, you can run ZXZVM directly by
+selecting NXZXZVM.BAS in the C:/games/Z-Machine/zxzvm directory.
+
+The full source code for ZXZVM can be found on your Next's SD card in the
+C:/src/asm/zxzvm directory, and also at:
+        https://gitlab.com/garrylancaster/zxzvm
+
+
+Customising ZXZVM
+=================
+You can customise ZXZVM in a few ways to suit your tastes. To do this, first
+BREAK into the program just after loading NXZXZVM.BAS from the Browser.
+
+In the NextBASIC editor, examine the setup() procedure to see what can be
+modified (this begins with the line DEFPROC setup() near the start of the
+program). Currently you can change:
+
+  * the default colours
+
+  * the offset and size of the display, relative to the edge of the screen
+    (this may be useful if your monitor is unable to display the full width
+    or height)
+    The maximum size is 80 chars x 32 lines, and the program is supplied with
+    a default of 80 x 28, which should be usable with most monitors
+
+  * the printer (or other device) to which transcript output will be sent
+    (in most Infocom games, the transcript is turned on with the SCRIPT
+    command)
+
+When you are satisfied, save the program with:
+    SAVE "nxzxzvm.bas" LINE 730
+
+Please check the last few lines of the program in case this has changed due
+to renumbering. The line number to use in your SAVE command is the one
+that reads:
+        730 CLEAR %$67ff
+
+
+Fonts
+=====
+Additionally, you can replace the default fonts used by ZXZVM. The fonts/
+subdirectory contains the following files which ZXZVM loads in:
+
+  * normal.fnt          Main font (96 chars, standard 768-byte Spectrum format)
+  * accent.fnt          Accented characters (69 chars)
+  * emphasis.fnt        Emphasis font (should be underlined or italicised)
+  * accentem.fnt        Emphasis font for accented characters
+  * font3.fnt           Character graphics font (should not be changed)
+  * font3em.fnt         Emphasized char. graphics font (should not be changed)
+
+The normal.fnt, accent.fnt, emphasis.fnt, and accentem.fnt files may be
+replaced to suit your tastes. To aid in this a couple of alternatives are
+provided - just rename these to the appropriate font name:
+
+  * underline.fnt         A replacement for emphasis.fnt, using underlining
+  * italic.fnt            The default file for emphasis.fnt, using italics
+  * accent_underline.fnt  A replacement for accentem.fnt, using underlining
+  * accent_italic.fnt     The default file for accentem.fnt, using italics
+
+Also supplied is the following BASIC program:
+
+  * fontgen.bas
+
+This program allows you to provide a standard 768-byte Spectrum character set
+font (named input.fnt) and, optionally, a 69-character accents font (named
+inputacc.fnt). It can generate an accented character set (if you don't wish to
+provide your own) and it can generate emphasis fonts using underlining or
+italicising. Full instructions are provided when you run the program.
+
+
+--
+Happy adventuring!
+Garry Lancaster, 17 May 2019
+

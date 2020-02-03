@@ -1,0 +1,310 @@
+<HTML>
+<HEAD><TITLE>Screen Management</TITLE></HEAD>
+<BODY>
+
+<I>Developper's Notes Addendum</I>
+
+<CENTER><H1>SCREEN MANAGEMENT</H1></CENTER>
+
+<H2>Introduction</H2>
+On the Z88 the screen is hardware managed. The screen base file (SBF) is built by OZ on each OS_OUT or OS_MAP call. 
+This screen base file is independantly read by the blink directly in memory. 
+Then, it reconstructs 64 frames of 640 bits and send them to the LCD drivers. 
+There is no interrupt nor hardware routines specific to LCD.<P>
+
+
+<H2>1 - General organisation</H2>
+
+The LCD is a 640*64 Dot matrix panel.<BR>
+
+Two types of character can be used :<BR>
+The LORES : 6x8 character set<BR>
+The HIRES : 8x8 character set<BR>
+<BR>
+On the right of the screen, there is always the OZ window : 2 HIRES chars wide (16 pixels).<BR>
+The left part is a combination of windows and map.<BR>
+<BR>
+Windows use LORES chars, maximum 104 (*6=624 pixels).<BR>
+Map uses HIRES chars, maximum 32 (*8=256 pixels).<BR>
+<BR>
+
+<H2>2 - Pixel Base files : LORES and HIRES organisation</H2>
+
+The blink can address 512 different chars of each res.<BR>
+<BR>
+512 LORES :<BR>
+	448 defined in ROM : LORES1 ($000-$1BF)<BR>
+	64 user defined in RAM : LORES0 ($1C0-$1FF)<BR>
+	<BR>
+512 HIRES :<BR>
+	256 defined in ROM : HIRES1 ($000-$0FF)<BR>
+	256 defined by the map in RAM : HIRES0 ($100-$1FF)<BR>
+<BR>
+LORES1 contains the Normal, Tiny, Bold, Foreign and Special characters.<BR>
+<BR>
+The Underline, Grey, Reverse and Flash attributes are hardware managed.<BR>
+<BR>
+HIRES1 contains the characters for the OZ window :<BR>
+an upper case character set for COMMANDS and SQUARE+application letter keys.<BR>
+special chars (OZ, SQUARE, DIAMOND, FAIL, INDEX, CLI, CAPS, caps, BAT LOW...)<BR>
+<BR>
+For sparing space in the tidy 128K ROM, the LORES1 and HIRES1 are mixed together.<BR>
+They could be set independantly...(next OZ). <BR>
+There is some space left but it seems to be impossible to respect the full ISO LATIN1 character set
+if we want to keep the three polices.
+Each foreign OZ has his own LORES1. 
+Keyboard driver and screen driver are specific too.<P>
+
+You can find the description of these in 'HiLoRes.txt', 
+it describes the character set of OZ V4.005 (UK), exactly the same as OZ V3.26 (FR)!
+<P>
+
+
+<H2>3 - The Screen Base File (SBF)</H2>
+<H3>3.1 - Attributes</H3>
+The Screen Base File is 2K long file containing the screen character numbers referring to the Lores or Hires set.
+A visible character is stored in two bytes. Attributes are described below.
+These bits define a precise hardware command.<P>
+<BR>
+Byte 1 (odd)<BR>
+ch7 ch6 ch5 ch4 ch3 ch2 ch1 ch0<BR>
+<BR>
+Byte 2 (even)<BR>
+sw1 sw2 hrs rev fls gry und ch8<BR>
+<BR>
+
+
+<TABLE BORDER=5>
+<TR><TH>Bit</TH><TH>Value</TH><TH>Description</TH></TR>
+<TR><TD>SW1</TD><TD>	x</TD><TD>	No hardware command (only used by OZ)</TD></TR>
+<TR><TD>SW2</TD><TD>	x</TD><TD>	No hardware command (only used by OZ)</TD></TR>
+<TR><TD>HRS</TD><TD>	0</TD><TD>	Refer to LORES offset, display a 6 bits wide matrix</TD></TR>
+<TR><TD>   </TD><TD>	1</TD><TD>	Refer to HIRES offset, display a 8 bits wide matrix</TD></TR>
+<TR><TD>REV</TD><TD>	1</TD><TD>	Reverse attribute for LORES, Special use for HIRES</TD></TR>
+<TR><TD>FLS</TD><TD>	1</TD><TD>	Flash attribute</TD></TR>
+<TR><TD>GRY</TD><TD>	1</TD><TD>	Grey attribute</TD></TR>
+<TR><TD>UND</TD><TD>	1</TD><TD>	Underline attribute</TD></TR>
+</TABLE>
+<P>
+ch0-ch8	character number (refering to the RES tables, not ascii)
+<P>
+LORES<BR>
+<TABLE BORDER=5>
+<TR><TH>ch8</TH><TH>ch7</TH><TH>ch6-ch0</TH></TR>
+<TR><TD>	0</TD><TD>	0</TD><TD>	Normal charset (ascii order)</TD></TR>
+<TR><TD>	0</TD><TD>	1</TD><TD>	Bold charset (ascii order)</TD></TR>
+<TR><TD>	1</TD><TD>	0</TD><TD>	Tiny charset (ascii order)</TD></TR>
+<TR><TD>	1</TD><TD>	1</TD><TD>	Special (see RES tables) and user defined (LORES0)</TD></TR>
+</TABLE>
+<P>
+
+HIRES<BR>
+<TABLE BORDER=5>
+<TR><TH>ch8</TH><TH>ch7</TH><TH>ch6-ch0</TH></TR>
+<TR><TD>	0</TD><TD>	0</TD><TD>	Map (HIRES0)</TD></TR>
+<TR><TD>	0</TD><TD>	1</TD><TD>	Map (HIRES0)</TD></TR>
+<TR><TD>	1</TD><TD>	0</TD><TD>	Unused</TD></TR>
+<TR><TD>	1</TD><TD>	1</TD><TD>	Char set (upper case only) and specials</TD></TR>
+</TABLE>
+<P>
+
+When HRS and REV are set, it is a special command, FLS selects the type :<BR>
+<BR>
+FLS set : LORES cursor (other attributes are valid),<BR>
+It is clear that the cursor is only a Reversed char when flashing (once per second).<BR>
+The cursor will always look like : $xx $38 or $xx $39.<BR>
+<BR>
+FLS res : null character (always $00 $34)<BR>
+The null character fulls the empty areas of the screen (it is not spaces).<BR>
+<BR>
+
+<TABLE BORDER=5>
+<TR><TH>Set   </TH><TH>	HRS</TH><TH>	REV</TH><TH>	FLS</TH><TH>	GRY</TH><TH>	UND</TH><TH>	CHAR (bit 0 - bit 8)</TH></TR>
+<TR><TD>LORES1</TD><TD>	0</TD><TD>	v</TD><TD>	v</TD><TD>	v</TD><TD>	v</TD><TD>	000-1BF (448 chars)</TD></TR>
+<TR><TD>LORES0</TD><TD>	0</TD><TD>	v</TD><TD>	v</TD><TD>	v</TD><TD>	v</TD><TD>	1C0-1FF (64 chars)</TD></TR>
+<TR><TD>HIRES0</TD><TD>	1</TD><TD>	0</TD><TD>	v</TD><TD>	v</TD><TD>	v</TD><TD>	000-0FF (256 chars)</TD></TR>
+<TR><TD>HIRES1</TD><TD>	1</TD><TD>	0</TD><TD>	v</TD><TD>	v</TD><TD>	v</TD><TD>	100-200 (256 chars)</TD></TR>
+<TR><TD>CURSOR</TD><TD>	1</TD><TD>	1</TD><TD>	1</TD><TD>	v</TD><TD>	v</TD><TD>	000-1FF (lores char number)</TD></TR>
+<TR><TD>NULL  	</TD><TD> 1</TD><TD> 	1</TD><TD>	0</TD><TD>	1</TD><TD>	0</TD><TD>	000</TD></TR>
+</TABLE>
+<BR>
+v = valid (1 is set)
+<P>
+
+
+The OZ window is the right part of the map. 
+There are 2 visible hires char (16 pixels). In fact, it is 3 chars wide window, the third char is always a space.<P>
+
+<TABLE BORDER=5>
+<TR><TH>Line</TH><TH>Char</TH><TH>Description</TH></TR>
+<TR><TD>1</TD><TD>	$80 $81</TD><TD>	'OZ'</TD></TR>
+<TR><TD>1</TD><TD>	$82 $83</TD><TD>	'LOCK OUT'</TD></TR>
+<TR><TD>1</TD><TD>	$94 $95</TD><TD>	'CARD'</TD></TR>
+<TR><TD>1</TD><TD>	$96 $97</TD><TD>	'INDEX'</TD></TR>
+<TR><TD>1</TD><TD>	$8A $8B</TD><TD>	'FAIL'</TD></TR>
+<TR><TD>2</TD><TD>	$92 $93</TD><TD>	Bell symbol	</TD></TR>
+<TR><TD>3</TD><TD>	$88 $89</TD><TD>	'CLI'</TD></TR>
+<TR><TD>4</TD><TD>	-	</TD><TD>-</TD></TR>
+<TR><TD>5</TD><TD>	$90</TD><TD>	Diamond symbol</TD></TR>
+<TR><TD>5</TD><TD>	$91</TD><TD>	Square symbol</TD></TR>
+<TR><TD>6</TD><TD>	$8C $8D</TD><TD>	'BAT'</TD></TR>
+<TR><TD>7</TD><TD>	$8E $8F</TD><TD>	'LOW'</TD></TR>
+<TR><TD>8</TD><TD>	$84 $85</TD><TD>	'CAPS'</TD></TR>
+<TR><TD>8</TD><TD>	$86 $87</TD><TD>	'caps'</TD></TR>
+</TABLE>
+<P>
+
+<H3>3.2 - Hidden data of the SBF</H3>
+
+The SBF is 2K long. Each line uses 256 bytes (*8=2K).
+As there was space left in the screen base file, each line uses only (104+3)*2=214 bytes.
+The conceptors placed some important data of screen configuration after these bytes.
+It the data for each window and main datas like the active window and the VDU buffer.
+If you try to move the SBF directly, the screen turns to black and flickers because 
+OZ uses absolute addresses (always $21 $7800) but in theory it could be possible 
+(by rewriting all the routines) to move the SBF, the blink register exists.
+Each line contains a window frame. In the the last line are stored the main datas.
+The following parts are not exhaustive, some bytes havent been discovered.
+<P>
+
+<H4>3.2.1 - Main datas</H4>
+<P>
+<TABLE BORDER=5>
+<TR><TD>$7FE7</TD><TD> 	2</TD><TD>	Active window frame (=IX)</TD></TR>
+<TR><TD>$7FE9</TD><TD>	1</TD><TD>	VDU length, zero if no VDU</TD></TR>
+<TR><TD>$7FEA</TD><TD>	1</TD><TD>	?</TD></TR>
+<TR><TD>$7FEB</TD><TD>	1</TD><TD>	?</TD></TR>
+<TR><TD>$7FEC</TD><TD>	n</TD><TD>	buffer for VDU.</TD></TR>
+</TABLE>
+<P>
+Example with a VDU for defining a user lores character : 1,138,'=',..,...<BR>
+$7FE9	10 the VDU length<BR>
+$7FEC	'=' the VDU command<BR>
+$7FED	user defined char number<BR>
+$7FEE	user defined char data (8 raws)<BR>
+<P>
+
+<H4>3.2.2 - Window frame structure</H4>
+
+The window frame contains informations about the window appearance and the cursor (if selected).
+The different Window frames are :<BR>
+$78E6	win #1<BR>
+$79E6	win #2<BR>
+$7AE6	win #3<BR>
+$7BE6	win #4<BR>
+$7CE6	win #5<BR>
+$7DE6	win #6<BR>
+$7EE6	win #7<BR>
+$7FE6	win #8<BR>
+<BR>
+
+When addressing a frame, its number is in IX.
+The data i/o are done with LD (IX-nn) instructions.
+nn defines the data described in the window frame structure.
+<P>
+In that frame, the data of each window are stored.
+All the coordinates are absolutes. These coordinates are the address of the character attributes. 
+One X is two bytes (attribute 1 and 2).
+The screen base file address is $21 7800 on expaned and unexpanded machines.
+These (X,Y) coordinates are L H addresses.
+<P>
+For example:
+(0,0) will be $00 $78 (HL=$7800).
+(105,7) will be $E2 $7F (HL=$7FE2).
+<P>
+
+<TABLE BORDER=5>
+<TR><TH>Byte</TH><TH>Bit</TH><TH>Description</TH></TR>
+<TR><TD>IX-01</TD><TD></TD><TD>	Y up left coordinate</TD></TR>
+<TR><TD>IX-02</TD><TD></TD><TD>	X up left coordinate</TD></TR>
+<TR><TD>IX-03</TD><TD></TD><TD>	Y down right coordinate</TD></TR>
+<TR><TD>IX-04</TD><TD></TD><TD>	X down right coordinate</TD></TR>
+<TR><TD>IX-05</TD><TD></TD><TD>	Left margin</TD></TR>
+<TR><TD>IX-06</TD><TD></TD><TD>	Right margin</TD></TR>
+<TR><TD>IX-07</TD><TD></TD><TD>	Y cursor address</TD></TR>
+<TR><TD>IX-08</TD><TD></TD><TD>	X cursor address</TD></TR>
+<TR><TD>IX-09</TD><TD></TD><TD>	cursor attrib</TD></TR>
+<TR><TD></TD><TD>	bit 5</TD><TD>	? set=08 res=38</TD></TR>
+<TR><TD>IX-0A</TD><TD></TD><TD>?</TD></TR>
+<TR><TD>IX-0B</TD><TD></TD><TD>?</TD></TR>
+<TR><TD>IX-0C</TD><TD></TD><TD>?</TD></TR>
+<TR><TD>IX-0D</TD><TD>bit 0</TD><TD>justification bit 1</TD></TR>
+<TR><TD></TD><TD>bit 1</TD><TD>justification bit 2</TD></TR>
+<TR><TD></TD><TD>Value</TD><TD>Justification</TD></TR>
+<TR><TD></TD><TD>	0</TD><TD>	normal</TD></TR>
+<TR><TD></TD><TD>	1</TD><TD>	right</TD></TR>
+<TR><TD></TD><TD>	2</TD><TD>	left</TD></TR>
+<TR><TD></TD><TD>	3</TD><TD>	centered</TD></TR>
+<TR><TD></TD><TD></TD><TD></TD></TR>
+<TR><TD></TD><TD>	bit 6</TD><TD>	update cursor</TD></TR>
+<TR><TD></TD><TD>	bit 7</TD><TD>	cursor mode (res=OFF, set=ON)</TD></TR>
+<TR><TD>IX-0E</TD><TD>	bit 7</TD><TD>	? set=in use, res=first time</TD></TR>
+</TABLE>
+
+
+<H2>4 - The BLINK screen registers</H2>
+The blink screens registers stores the screen files addresses in order to read them directly 
+for the screen refresh 50 times per second.
+There are 4 pixel base registers (PBx) for each pixel base address and the screen base register (SBR).
+These registers have a special bit length, it will define the screen granularity : the screen mask in HL.
+For a 4K granularity screen address will be 0,4,8,12K.
+<P>
+Their softcopies are stored in $047n and $046n where n is screen reason minus one.
+Be careful when you set the register, you have to use both B, C and A registers in OUT (C),A.
+B contains the left bits of data (more than 8), A the data, C the port.
+So, A will be ($047x) and B will be ($046x).
+<P>
+
+<TABLE BORDER=5>
+<TR><TH>Port</TH><TH>Number</TH><TH>With (bits)</TH><TH>Granularity</TH><TH>Screen file</TH><TH>Reason</TH><TH>Size</TH></TR>
+<TR><TD>PB0</TD><TD>$70</TD><TD>13</TD><TD>512 bytes	</TD><TD>Lores0</TD><TD>1</TD><TD>512</TD></TR>
+<TR><TD>PB1</TD><TD>$71</TD><TD>10</TD><TD>4K		</TD><TD>Lores1</TD><TD>2</TD><TD>3.5K</TD></TR>
+<TR><TD>PB2</TD><TD>$72</TD><TD>9 </TD><TD>8K		</TD><TD>Hires0</TD><TD>3</TD><TD>2K</TD></TR>
+<TR><TD>PB3</TD><TD>$73</TD><TD>11</TD><TD>2K		</TD><TD>Hires1</TD><TD>4</TD><TD>2K</TD></TR>
+<TR><TD>SBR</TD><TD>$74</TD><TD>11</TD><TD>	2K		</TD><TD>Base	</TD><TD>5</TD><TD>2K</TD></TR>
+</TABLE>
+<P>
+The coding method to set the address in the blink register is below, the non significant bits are set to zero.<BR>
+Example with Lores0.<P>
+
+PB0 : Lores0<P>
+
+<PRE>
+B                       / H                    / L
+b7 b6 b5 b4 b3 b2 b1 b0 / 0 0 h5 h4 h3 h2 h1 0 / 0 0 0 0 0 0 0 0
+
+will become
+
+$0460                  $0470
+0 0 0 b7 b6 b5 b4 b3 / b2 b1 b0 h5 h4 h3 h2 h1
+</PRE>
+
+<P>
+
+Now the table of the screens address defined by OZ on reset :
+<P>
+
+<TABLE BORDER=5>
+<TR><TH>Screen</TH><TH>Unexpanded machine</TH><TH></TH><TH>Expanded machine</TH><TH></TH><TH></TH><TH></TH></TR>
+<TR><TH></TH><TH>Address</TH><TH>Size</TH><TH>Address</TH><TH>Size</TH><TH>($0460)</TH><TH>($0470)</TH></TR>
+<TR><TD>Lores0</TD><TD>$212200</TD><TD>256B</TD><TD>$430800</TD><TD>512B</TD><TD>$08</TD><TD>$64</TD></TR>
+<TR><TD>Lores1</TD><TD>$070000</TD><TD>	2K</TD><TD>	-</TD><TD>-</TD><TD>$00</TD><TD>$1C</TD></TR>
+<TR><TD>Hires0</TD><TD>$212000</TD><TD>	512B</TD><TD>$430000</TD><TD>2K</TD><TD>$00</TD><TD>$86</TD></TR>
+<TR><TD>Hires1</TD><TD>$070800</TD><TD>	1.8K</TD><TD>	-</TD><TD>-</TD><TD>$00</TD><TD>$39</TD></TR>
+<TR><TD>Base</TD><TD>$217800	</TD><TD>	2K	</TD><TD>	-</TD><TD>-</TD><TD>$01</TD><TD>$0F</TD></TR>
+</TABLE>
+
+<P>
+For getting the screen addresses, you can use an undescribed feature of OS_SCI. 
+Call it with the screen file reason in A and B=0. 
+The screen file address is outed in BHL without changing the register value.
+<P>
+
+
+
+<H2>Conclusion</H2>
+The screen driver is one the main advanced part of OZ. It interfaces with this hardware description via VDUs. 
+The latest Z88 have more ROM (Flash Eproms) and RAM, this new place could be used to improve and speed up the display.
+<P>
+
+<I>Thierry Peycru (Zlab), April 1998.</I></BODY></HTML>

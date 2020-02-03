@@ -1,0 +1,68 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Ptm, convert (and display) internal time to an ASCII string</font></b>
+<p><tt>RST 20H, DEFW $0C09</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; HL = 0, 1, 2, not allowed
+&nbsp;&nbsp;&nbsp;&nbsp; HL > 255, source pointer
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 0, output result to stream IX
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 1, output result to filter IX
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 2, not allowed
+&nbsp;&nbsp;&nbsp;&nbsp; DE > 255, output result at (DE)
+
+&nbsp;&nbsp;&nbsp;&nbsp; A0 = 1, display leading zeroes
+&nbsp;&nbsp;&nbsp;&nbsp; A1 = 1, output leading spaces
+&nbsp;&nbsp;&nbsp;&nbsp; A2 = 1, output trailing spaces
+&nbsp;&nbsp;&nbsp;&nbsp; A3 = 0, always 0
+&nbsp;&nbsp;&nbsp;&nbsp; A4 = 1, display centiseconds (only if A5 = 1)
+&nbsp;&nbsp;&nbsp;&nbsp; A5 = 1, display seconds
+&nbsp;&nbsp;&nbsp;&nbsp; A6 = 1, military format (ie. no delimiters)
+&nbsp;&nbsp;&nbsp;&nbsp; A7 = 1, force AM/PM (as opposed to 24 hour format)</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; DE = points to character after result (if DE(in) > 255)
+</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ROOM ($07), there is not enough room to convert time</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BC..HL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF..DE../.... different
+</pre>
+Notes:
+<p>Bugs:
+<blockquote>Will fail if source or destination pointers are in segment
+2.<br>
+<BR></blockquote>
+Related calls:
+<blockquote><a href='gngmt.html'>GN_Gmt</a>, get (read) machine time in internal format
+<br><a href='gngtm.html'>GN_Gtm</a>, convert an ASCII string to a time in internal format
+<br><a href='gnmsc.html'>GN_Msc</a>, miscellaneous time operations
+<br><a href='gnpmt.html'>GN_Pmt</a>, put (set) machine time
+<br><a href='gnsdo.html'>GN_Sdo</a>, send date and time to standard output
+<br><a href='osdly.html'>OS_Dly</a>, delay a given period</blockquote>
+
+</body>
+</html>

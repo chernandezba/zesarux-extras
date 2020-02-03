@@ -1,0 +1,85 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Alm, alarm manipulation</font></b>
+<p><tt>RST 20H, DEFB $81</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A =
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_SUSP ($01), suspend alarm
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_REV ($02), revive alarms
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_RES ($03), reset alarm enable state
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_SINC ($04), display symbol
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_SDEC ($05), remove symbol (subject to use count)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_SRES ($06), reset symbol
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_SET ($07), Set a new alarm:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BDE = routine address to be called on expiry:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B=0, DE&nbsp;&nbsp; call OS_Alm with (A = AH_CNC ???) IX=handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B&lt;>0, DE&nbsp; call BDE
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HL = 6 byte date, time.
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_CNC ($08), Cancel an alarm:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IX = alarm handle
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_DG1 ($09), Ding-dong type 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_DG2 ($0A), Ding-dong type 2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_AINC ($0B), action count increment
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_ADEC ($0C), action count decrement
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AH_ARES ($0D), action count reset</pre>
+OUT, always; <tt>AH_SUSP, AH_REV, AH_RES, AH_SINC, AH_SDEC, AH_SRES, AH_DG1,
+AH_DG2, AH_AINC, AH_ADEC, AH_ARES</tt>:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+
+&nbsp;&nbsp;&nbsp;&nbsp; Registers changed after return:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different</pre>
+OUT, <tt>AH_SET</tt>, if call succeeded:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = alarm handle</pre>
+OUT, <tt>AH_SET</tt>, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code.</pre>
+OUT, <tt>AH_CNC</tt>, if call succeeded:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = 0</pre>
+OUT, <tt>AH_CNC</tt>, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code.
+
+&nbsp;&nbsp;&nbsp;&nbsp; Registers changed after return, AH_SET, AH_CNC:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different
+</pre>
+Notes:
+<blockquote>Internal operating system usage.</blockquote>
+Bugs:
+<br>&nbsp;
+<p>Related calls:
+<blockquote><a href='gnaab.html'>GN_Aab</a>, allocate alarm block
+<br><a href='gnalp.html'>GN_Alp</a>, process an expired alarm (internal OZ usage)
+<br><a href='gnfab.html'>GN_Fab</a>, free alarm block
+<br><a href='gnlab.html'>GN_Lab</a>, link an alarm block into the alarm chain
+<br><a href='gnuab.html'>GN_Uab</a>, unlink an alarm block from the alarm chain</blockquote>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Ht, hardware time manipulation</font></b>
+<p><tt>RST 20H, DEFW $F206</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = HT_RES ($01), reset hardware timer
+&nbsp;&nbsp;&nbsp;&nbsp; A = HT_RD ($02), read hardware timer
+&nbsp;&nbsp;&nbsp;&nbsp; HL = pointer to a 5 byte buffer</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different
+</pre>
+<br>
+IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = HT_MDT ($03), read monthy/date/time address</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; BHL = month, date, time address</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ...CDE../IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFB...HL/.... different</pre>
+Notes:
+<blockquote>Internal operating system usage.</blockquote>
+Bugs:
+</body>
+</html>

@@ -1,0 +1,227 @@
+-Juegos funcionando
+
+Gunstick MHT:
+
+Solo - opera soft. va. Requiere dejar pulsado el boton un tiempo largo
+Target Plus.  va. Requiere dejar pulsado el boton un tiempo largo
+Trigger. va. Requiere dejar pulsado el boton un tiempo largo
+Space Smugglers. va. Requiere dejar pulsado el boton un tiempo largo
+Bestial Warrior. va. Pero con kempston. Puerto DF parece leer solo el disparo, pero no electron
+Guillermo Tell - va, pero cuesta mucho, hay que dejar pulsado y como se mueven los objetivos, cuesta
+
+Mike Gunner. practicamente no va. zonas blancas salen muy poco tiempo y cuesta darles
+Cosmic Sheriff. no parece ser version de gunstick
+El equipo A. no parece ser version de gunstick
+Sootland: no parece ser version de gunstick ademas que no carga del todo
+shooting range: no parece ser version de gunstick
+saygmix2: no es juego
+vgmix2: no es juego
+
+Phaser Light Gun: Leido por puerto de chip AY
+Rookie: en el juego funciona bastante bien, teniendo rango X 64 y rango Y 8
+JUNGLE WARFARE. en el juego funciona bastante bien, teniendo rango X 64 y rango Y 8. Debe detectar solo brillo 1
+QS Armoury. mas o menos, teniendo rango X 32y rango Y 8, offset y 24, y hay que disparar mas hacia la derecha
+Billy the kid. No parece detectar bien la y, solo va con brillo 0
+Parece que todos estos detecta la Y casi, pero luego la X no bien:
+Operation wolf
+Missile Ground Zero
+Solar Invasion
+Robot Attack
+Bullseye
+
+
+Bronx Street: no encuentro version de gun
+American Turbo King. No parece reconocer ningun tipo de gunstick
+
+
+
+
+
+A PEN LIGHT GUN FOR ZX SPECTRUM
+
+ 
+The ZX were the most widespread weapon lightgun and-STICK GUN. 
+
+
+SINCLAIR lightgun (ZX 128)
+
+Is readable registry port number 14 AY (#FFFD), which are used only 2 bits: D0: no significance D1: no significance D2: no significance D3: no significance D4: Photodiode (log.1 detecting the passage of the light beam) D5 : KEY FIRE (log.0 = PRESSED THE FIRE / FIRE log.1 out) D6: no meaning D7: no meaning
+
+
+
+
+
+
+
+
+Port #FFFD (65533) is actually AY port to which it is connected by ZX 128 and take KEYPAD RS232. An original lightgun for the ZX joined the law into connector KEYPAD and involved is as follows: PIN3 = photodiode PIN5 = KEY FIRE PIN1 = GND Pin6 = + 12V
+
+
+
+
+
+
+Scan of the JOURNAL
+
+Lightgun
+
+ 
+
+GAMES FOR lightgun (PORT #FFFD - ZX 128)
+
+Amarican TURBO KING 
+BILLY THE KID 
+BRONX STREET COP 
+F16 - FIGHTING FALCON 
+JUNGLE WARFARE 
+SOLAR INVASION 
+ACTION PACK (MISSILE GROUND ZERO, SOLAR INVASION, OPERATION WOLF, ROOKIE, ROBOT ATTACK, BULLSEYE)
+
+ 
+
+EMULATORS ZX Spectrum + lightgun (128)
+
+REALSPECTRUM 
+EMUZWIN
+
+SINCLAIR lightgun (PRO ZX 48)
+
+Lightgun was done in a version for ZX Spectrum 48 is joined to the EAR jack of the tape player instead. When reading #FE port (254) is the bit D6 state TV beam (probably combined with buttons FIRE)
+
+ 
+
+GAMES FOR lightgun (PORT #FE - ZX 48)
+
+1 lightgun GAMES 48K (MISSILE GROUND ZERO, SOLAR INVASION, OPERATION WOLF) lightgun 2 GAMES 48K (ROOKIE, ROBOT ATTACK, BULLSEYE)
+
+GUN-STICK
+
+Compared lightgun ma-STICK GUN advantage that is mounted over the ZX classic JOYSTICK Kempston interface (like UR-4) or the place SINCLAIR joystick. Thus connected, the gun can therefore be used for all ZX and nothing we do not interfere with port AY as a lightgun. I mapped the test routine for her-STICK GUN and here is a description of the port. GUN-STICK can be connected to port 31 (Kempston), or as SINCLAIR 1 and 2.
+
+Connection via port # 1F (31 or Kempston) :
+
+D0: no significance 
+D1: no significance 
+D2: Photodiode (log.1 detecting the passage of the light beam) 
+D3: no significance 
+D4: KEY FIRE (log.0 = PRESSED THE FIRE / FIRE log.1 out) 
+D5: no meaning 
+D6: no significance 
+D7: no meaning
+
+Connection via port #EFFE (or 61438 SINCLAIR 1 = klavesy6-0)
+
+D0: KEY FIRE (log.0 = PRESSED THE FIRE / FIRE log.1 out) 
+D1: no significance 
+D2: Photodiode (= log.0 detecting the passage of the light beam) 
+D3: no significance 
+D4: no meaning 
+D5: no meaning 
+D6: no significance 
+D7: no meaning
+
+Connection via port # F7FE (or 63486 SINCLAIR 2 = klavesy1-5)
+
+D0: no significance 
+D1: no significance 
+D2: Photodiode (= log.0 detecting the passage of the light beam) 
+D3: no significance 
+D4: KEY FIRE (log.0 = PRESSED THE FIRE / FIRE log.1 out) 
+D5: no meaning 
+D6: no significance
+
+Some games for STICK GUN-game support two players at once, and in that case counts connectivity through two gun SINCLAIR 1 and 2 When selecting one player to reckon with attached gun as SINCLAIR 1 (keys 6-0), or the port 31 seats Kempston joystick. Her on-STICK GUN there is only about 7 and lightgun so well. Handler for both types of gun works on exactly the same principle, and the renumbering of the test port and the Swap bit of a lightgun game can be used with the GUN-stick, or even reversed. strongly suggest as the best way to use light gun connections on port 31 (Kempston). While this means that the software will not work for lightgun or for-STICK GUN ala SINCLAIR. Games GUNSTICK who read from port 31 are probably only two, one of which has an option SINCLAIR / Kempston. But it is not nothing easier than to rewrite port numbers and all software and modify port on the 31st Tech 12-13 games can handle overwrite per day. Linking ala SINCLAIR is useless, because the vast majority of light gun is powered directly from the connector CANON, where of course u SINCLAIR missing joystick + 5V. U of some missing Kempston INTERFACE + 5V take, but for us to use fortunately UR-4, which has brought out watering. (Brand new, still unwrapped interface UR-4 can still buy for example in Prague in the bazaar for INTEGRA 99 Kc) well integrated connector for Kempston joystick has also K-MOUSE INTERFACE, at the moment I have a flare gun linked. There are also reductions for connection two gun on one connector for CANON Kempston INTERFACE. Nowhere Unfortunately I could not find a description of the connection to the other player, or software that uses this.
+
+ 
+
+GAME PRO-STICK GUN (PORT # 1F / SINCLAIR)
+
+BESTIAL WARRIOR 
+COSMIC SHERIFF 
+EL PREMIO 
+GUILLERMO TELL 
+MIKE GUNNER 
+SOLO 
+SHOOT LAND 
+SPACE SMUGGLERS 
+TARGET 
+TRIGGER
+
+ 
+
+EMULATORS ZX Spectrum + GUNSTICK (SINCLAIR 1)
+
+EMUZWIN
+
+Flare gun from the console
+
+Most of the old game console has the same connector wiring canon 9 for connected light gun.
+
+______________________ 
+\ 1o 2o 3o 4o 5o / 
+ \ 6o 7o 8o 9o / 
+  \ ________________ /
+
+PIN | SIGNAL 
+------------ 
+1 | Photodiode 
+2 | unconnected 
+3 | unconnected 
+4 | unconnected 
+5 | KEY FIRE 
+6 | Power Supply (probably 5V) 
+7 | unconnected 
+8 | GND 
+9 | unconnected
+
+DK'TRONICS LIGHT PEN
+
+External interface connector with 3.5 mm mono jack for connecting the light pen. Port is legibly on! IORQ &! RD &! A6 (addressing port x0xxxxxx)
+
+Connection via port # 3F (63)
+
+D0: Photodiode 
+D1: no significance 
+D2: no significance 
+D3: no significance 
+D4: no meaning 
+D5: no meaning 
+D6: no meaning 
+D7: no meaning
+
+ 
+
+PROGRAMS FOR LIGHT PEN DK'TRONICS (PORT # 3F)
+
+ORIGINAL TAPE
+
+TROJAN LIGHT PEN (PRO ZX 128 + 2A / 3 +)
+
+Light pen TROJAN plugs into the connector on one SINCLAIR ZX Spectrum 128 2A + / + third When passing through the light beam pen loosen the key "7", while the TV when you're pen beam does not pass, holding down the "7" is still depressed. The pen connects from the ZX and after loading and executing the utility, otherwise the BASIC block the keyboard.
+
+
+
+ 
+
+SINCLAIR connected via joystick 1 (port #EFFE / 61438)
+
+D0: no significance 
+D1: no significance 
+D2: no significance 
+D3: Photodiode (log.1 at detecting light) 
+D4: no meaning 
+D5: no meaning 
+D6: no meaning 
+D7: no meaning
+
+ADDITIONAL DOCUMENTATION
+
+Article about light PERU (CZ)
+
+SCHEMA light pen (TXT)
+
+SCHEMA LIGHT GUN
+
+
+
+ 

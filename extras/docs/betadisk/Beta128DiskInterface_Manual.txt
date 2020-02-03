@@ -1,0 +1,2839 @@
+
+ TECHNOLOGY RESEARCH BETA 128 DISK INTERFACE -- USER MANUAL
+
+
+
+
+
+
+COPYRIGHT
+
+(C) 1986 Technology Research Ltd, Staines, Middlesex, England.
+
+All  rights reserved. This manual contains proprietary information
+which  is protected under copyright. No part of this manual may be
+reproduced,  transcribed, stored in a retrieval system, translated
+into any language or conputer language, or transmitted in any form
+whatsoever  without  the  prior  consent  of  the  publisher.  For
+information write to:
+
+    TECHNOLOGY RESEARCH LTD,
+      UNIT 18, CENTRAL TRADING ESTATE,
+        STAINES, MIDDLESEX TE18 4XE
+          ENGLAND.
+
+
+NOTICE
+
+
+TECHNOLOGY RESEARCH LTD  makes no  representations or  warranty of
+any kind whatsoever  with  respect  to  the  contents  hereof  and
+specifically  disclaims any inplied warranty of merchantability or
+fitness  for any particular purpose. TECHNOLOGY RESEARCH LTD shall
+not be liable  for errors  contained herein  or for  incidental or
+consequential  damages in connection with furnishing, performance,
+or use of this material.
+
+TECHNOLOGY   RESEARCH  LTD  reserves  the  right  to  revise  this
+publication from  time to time and to  make changes in the content
+hereof without obligation to notify any person of such revision or
+changes.
+
+
+
+
+
+
+
+
+
+
+
+PART NUMBER :  SSBOTE1                                    May 1986
+
+
+
+
+
+
+                              page 1                              
+ 
+Dear customer
+
+Congratulations  in making a wise  choice. Technology Research Ltd
+are  confident that you will have  many years of satisfied service
+from  your interface. The wisdom of your choice is demonstrated by
+the  fact that there is no  other Spectrum disk interface offering
+all  these features:
+
+* Easy and fast     Retrieves your data/program a lot faster than 
+  access:           using cassette tape.
+
+* Wide choice of    5.25", 3.5" or 3",  40 or 80 track, single  or 
+  disk drives:      double  sided  disk  drives.  In short you can 
+                    use most makes of disk drives on the market.
+
+* Capacity:         Up  to 4 disk  drives on line.  Data is stored 
+                    at   double  density.  These  give  a  maximum
+                    capacity of over 2.5 million characters.
+
+* Flexibility:      The  Interface is independent, so you can  use
+                    your disk drives with other computers.
+
+* Compatibility:    The  Interface  may  be  used  with  Spectrum,
+                    Spectrum Plus and Spectrum 128 computers.
+
+* Auto-boot:        Runs a BASIC program automatically on power-up
+                    or after  a reset (Spectrum  and Spectrum Plus
+                    only).
+
+* Auto check:       Checks  and   adjusts   the  system  to  drive
+                    specification automatically.
+
+* Magic button:     This  special feature enables you to save tape
+                    based programs at a touch of the button.
+
+* System switch:    Use  this  3  position  switch  to  reset  the
+                    computer or switch off the Interface.
+
+* EPROM based       The disk operating system (TRDOS) is contained 
+  TRDOS:            in EPROM, and it uses only 112 bytes of RAM.
+
+* Syntax:           Simple  syntax using  Spectrum keywords allows
+                    access to disk  files in  TRDOS from  BASIC or 
+                    machine code.
+
+* File handling:    TRDOS  handles   number   and  string  arrays,
+                    serial  (sequential)  and  true random  access 
+                    files.
+
+This  booklet contains information that you will need to make full
+use  of the Teclnology Research Beta 128 Disk Interface (hereafter
+referred to as the Disk Interface).
+
+
+
+
+
+                              page 2
+ 
+Throughout this  manual,  references  are  made  to  the  Spectrum
+computer, however, unless  otherwise  stated,   they  are  equally
+applicable to the Spectrum Plus and Spectrum 128.
+
+Using the Beta 128  Disk  Interface  with  the  Spectrum  and  the
+Spectrum Plus (will be  referred to  as SPECTRUM  & PLUS)  are the
+same.  For Spectrum 128, there are  a number of differences. These
+will be highlighted where applicable.
+
+The Disk Interface is supplied with a Utility Disk, which contains
+a number of  Utility programs (see Appendix for details). The disk
+may be 5.25" or 3.5" depending on your requirement.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 3
+ 
+ CONTENTS
+
+
+      1    INTRODUCTION TO DISK SYSTEM
+           1.1    Disks and drives
+           1.2    Tracks, sectors and density
+
+
+      2    GETTING STARTED
+           2.1    Making the right connection
+           2.2    Auto-boot
+           2.3    Auto-check of drive specification
+           2.4    "40" and "80" commands
+           2.5    Using other interfaces
+
+
+      3    THE SYSTEM SWITCH
+           3.1    Reset
+           3.2    The off position
+
+
+      4    QUICK REFERENCE GUIDE
+
+
+      5    COMMAND SYNTAX
+           5.1    Changing from TRDOS to SOS
+           5.2    Changing from SOS to TRDOS
+           5.3    Calling TRDOS from SOS and BASIC programs
+           5.4    Default drive selection
+           5.5    Temporary drive selection
+
+
+      6    FORMATTING A DISK
+           6.1    Format as single sided
+
+
+      7    DISK CATALOGUE
+           7.1    Displaying a catalogue
+           7.2    Printing a catalogue
+
+ 
+      8    COPYING FILES
+           8.1    Copying to the same disk
+           8.2    Single drive copy and backup
+           8.3    Twin drive copy and backup
+
+
+      9    RENAMING, ERASING FILES AND DISK HOUSEKEEPING
+           9.1    Renaming a file - the NEW command
+           9.2    Erasing a file - the ERASE command
+           9.3    Packing disk space - the MOVE command
+
+
+
+
+
+
+                              page 4
+ 
+      10   SAVING, VERIFYING, LOADING, RUNNING AND MERGING PROGRAMS
+           10.1   The SAVE and VERIFY commands
+           10.2   The LOAD and RUN commands
+           10.3   The MERGE command
+
+ 
+      11   TRANSFERRING CASSETTE BASED PROGRAMS
+           11.1   Program conversion
+           11.2   The Magic button
+
+
+      12   DATA ARRAY FILES
+
+
+      13   SEQUENTIAL AND RANDOM ACCESS FILES
+           13.1   General Description
+           13.2   Sequential files
+           13.3   Random access files
+
+
+      14   DIRECT SECTOR READ/WRITE
+           14.1   The PEEK command
+           14.2   The POKE command
+
+
+      15   MACHINE CODE PROGRAMMING
+
+
+      16   ERROR MESSAGES
+           16.1   On-line messages
+           16.2   Error codes
+
+
+      17   FACTS ABOUT TRDOS
+
+
+      18   PIN CONNECTIONS OF THE DISK DRIVE CONNECTOR
+
+
+      APPENDIX : UTILITY PROGRAMS
+           A      TAPECOPY
+           B      MAGIC 
+           C      DOCTOR
+
+
+      GUARANTEE
+
+
+
+
+
+
+
+
+
+
+
+                              page 5                                   
+ 
+1    INTRODUCTION TO DISK SYSTEM
+
+The disk  system is the  professional way of  storing programs and
+data  files in home and personal  computer systems. There are many
+advantages  of using the disk system other than tape based systems
+such as cassette  tape and  Microdrives. The  disk system  is more
+reliable, easy to use and much faster.
+
+Terminology  associated  with   floppy   disks   often   lead   to
+confusion.  A short explanation will enable you to appreciate some
+of  the concepts involved and thereby get the best use out of your
+Technology Research Disk Interface.
+
+
+1.1  Disks and Drives
+
+The  Technology Research Beta  Plus Disk Interface  can use 5.25",
+3.5"  and 3" disk drives.  You may have heard  them referred to as
+floppy disk,  diskette, mini-disk or micro-disk.  We will refer to
+them simply as disk. At present, 5.25" disks are  the most popular
+type. However, the trend is towards the smaller disk of 3.5".
+
+Diagram 2  and  3  show  the  sketches  of  5.25"  and  3.5"  disk
+respectively.  The 5.25" diameter flexible  plastic coated disk is
+kept in its own  little  cardboard  or  plastic  jacket.  Although
+"flexible" the  disks should not  be bent. The  smaller 3.5" disks
+are  housed in stronger  plastic protective cases  which, for some
+time at least, means that their cost will be higher than the 5.25"
+disks.
+
+When  inserted in  the drive  the disks  are rotated  inside their
+protective covers at 300 RPM.  To  protect  the  disk  the  better
+quality ones have a plastic ring (the hub ring) around the edge of
+the central  hole. It  is this  ring rather  than the  weaker disk
+which is clamped by the drive mechanism.
+
+In a cassette recorder  the tape  unwinds past  the head  which is
+stationary. In  the disk drive not only  is the disk rotating past
+the  head but the head also moves across the disk from the edge to
+the centre.
+
+The index hole and a similar hole in  the disk enable the drive to
+keep  track of the  disk. The actual  data is written  to and read
+from, the disk in the long slot or Data Window.
+
+As  a safeguard for  valuable data the  "write-protected notch" in
+the  jacket can be covered by a small sticky label. Like the small
+tag on the  back of  a cassette  tape it  prevents the  disk being
+written on or  erased accidentally.  The 3.5"  disk covers  have a
+device similar to the cassette.
+
+
+
+
+
+
+
+                              page 6
+ 
+There  are 40 and 80 track disk  drives on the market. Many drives
+are switchable to  allow  the use of  disks recorded  as 40  or 80
+track. Some  drives have only one  read/write head (single sided).
+These drives can  only read  and write  on one  side of  the disk.
+Other drives have  two read/write  heads (double  sided), allowing
+both sides of the disk to be used.
+
+A  golden  rule  is  to  ensure  that  backups  are   made  before
+overwriting disks originally produced and intended to be read on a
+different  specification drive. Ideally if one user of the disk is
+using 40 or 80 track drive then so should the other.
+
+However, disks which are formatted and written by one type of disk
+drive may be read  by a  different type  of drive.  Obviously, the
+disk must  be physically the same size.  The chart below shows the
+compatibility between various type of disk drives.
+
+      Disk format    40T SS    40T D6    80T SS    80T DS
+
+      Drive 40T SS    C         ?         X         X
+            40T DS    C         C         X         X
+            80T SS    R         ?         C         ? 
+            80T DS    R         R         C         C
+
+      where T = track
+            SS = single sided
+            DS = double sided
+            C = compatible
+            R = compatible (read only)
+            X = incompatible 
+            ? = incompatible but may not be detected correctly on
+                some types of drive.
+
+For example, a 40 track double sided drive is compatible (can read
+from and write to) with disks formatted on a 40 track single sided
+drive. But an 80 track double sided drive can only read from disks
+formatted on a 40 track drive.
+
+
+1.2 Tracks, sectors and density
+
+The  formatting process (Section 6) enables TRDOS and the drive to
+electronically  divide up the disk into 40 or 80 tracks (according
+to the  disk drive)  and each  track into  sectors. The  number of
+sectors  per track and the number of bytes per sector is dependent
+entirely upon the Disk Operating System (D.O.S.).
+
+TRDOS gives you  16 sectors per  track and 256  bytes per  sector.
+This high number of small size sectors has several advantages.
+
+Firstly  if only small amounts  of data are to  be stored then not
+too  much of the disk will be used¯ This leads to a greater number
+of files being saved.
+
+
+
+
+                              page 7
+ 
+Secondly when using  the  Random  Access  files  (Section  13)  it
+provides   greater  program  flexibility  and  improves  speed  of
+operation.
+
+In  order to know what is where TRDOS uses Track 0, the outermost,
+for its own directory purposes.
+
+Given the above information it is possible to calculate the number
+of sectors and  storage  capacity  of  the  formatted  disk.  This
+formatted  capacity is the  only meaningful figure  for any system
+but must  still be considered  in conjunction with  the number and
+size  of the sectors. The following table shows the TRDOS capacity
+in Kilobytes with different drives:
+
+     40 track single sided =  39 * 16 =  624 sector * 256 = 156Kb
+     40 track double sided =  79 * 16 = 1264 sector * 256 = 316Kb
+     80 track single sided =  79 * 16                     = 316Kb
+     80 track double sided = 159 * 16 = 2544 sector * 256 = 636Kb
+
+For the  mathematically minded this equates to  4Kb per track or 4
+sectors  to 1Kb. This last evaluation is probably the most useful.
+When  examining the contents of a disk by CAT (Section 7) you will
+always be told the number of free sectors. Divide this number by 4
+and you know how many Kb of spare space remains.
+
+You will notice that we have not mentioned density. Single density
+and Double  density refer to  the recording method  of packing the
+data  on the disk. TRDOS uses double  density which is why you get
+16 sectors of 256 bytes per track.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 8
+ 
+2   GETTING STARTED
+
+2.1 Making the right connection
+
+Now  that you have the Disk Interface and one or more disk drives,
+please  first   read  and  understand   the  following  procedures
+thoroughly before proceeding  with  the installation. If  you have
+other interfaces, please also read Section 2.5 below.
+
+2.1.1  The  first  step  is  to look at Diagram 1 and identify the
+       four connections. The  connection   labelled  A  should  be
+       plugged into the back of the Spectrum unless an Interface 1
+       is fitted.  In that case  the Interface 1  goes between the
+       Spectrum  and the Disk Interface. The connection opposite A
+       is for adding your other interfaces, e.g. joystick.
+
+2.1.2  Before  connecting the Disk Interface  to the Spectrum, you
+       must clean  the connector on the  Spectrum, by rubbing both
+       sides gently with a cotton bud dipped in methylated spirit.
+
+2.1.3  Your   disk  drive  should  already   be  fitted  with  the
+       appropriate  plug on its connecting lead and this should be
+       inserted in the "Disk  Drive  Port" (labelled  B in Diagram
+       1). Make sure the coloured side of the flat ribbon cable is
+       towards the Spectrum.
+
+2.1.4  Plug in the Disk Drive mains lead and switch on.
+
+2.1.5  Switch on the TV.
+
+2.1.6  SPECTRUM & PLUS : Ensure  the  System switch  is  in   the
+                         centre, normal position.
+
+       Spectrum 128    : Ensure the System switch is in the off
+                         position.
+
+2.1.7  Plug the power socket from your Spectrum power supply  into
+       the power supply connection (labelled C in Diagram 1).
+
+2.1.8  SPECTRUM & PLUS : If more than 1 drive is fitted only drive
+                         A  will now engage and after a second you
+                         should see the following sign-on display:
+
+                                     * TR-DOS Ver 5.xx *
+                              (C) 1986 Technology Research Ltd. 
+                                           (U.K.)
+
+                              A>
+
+                        where 5.xx is the  version number, and A>
+                        is the TRDOS prompt.
+
+
+
+
+
+                              page 9
+
+
+                         It is  possible  that  on  power  up, the
+                         Spectrum  fails  to  recognise  the  Disk
+                         Interface. That  is, the  sign-on display
+                         above does  not appear on  the screen. If
+                         this happens,  just  reset  the  Spectrum
+                         using  the System switch  as described in
+                         Section 3.1.
+
+SPECTRUM 128           : The  Spectrum 128 starts up as normal. To
+                         change to TRDOS, type the following:
+                      
+                                   RANDOMIZE USR 15616 <ENTER> 
+
+                         where <ENTER> is the key ENTER.
+                          
+                         The screen will  then  show  the  sign-on
+                         display as shown above.
+
+You are now in TRDOS. After having read the rest of the manual you
+will be able  to use the  wide variety of  commands and facilities
+available.  But first of all, you may  try out an example with the
+Utility disk supplied.  The Utility  disk is  write-protected (see
+Section 1.1), and should be kept as such.
+
+Insert Utility  disk into  Drive A  (and close  the drive door  if
+necessary).  The CAT command (see Section  7.1 for details) may be
+used to display  the  contents  of  the  Utility  disk.  Type  the
+following after the TRDOS prompt A> and see what happens:
+
+     CAT <ENTER>
+
+Note that  CAT  is a keyword and  <ENTER> represents the ENTER key
+on the keyboard. The screen will show something like this:
+
+     Title: $Utili
+     6 file(s)
+     0 Del. file(s)
+     A:secread <C>  1:tape5.0 <C>  4 
+     A:doctor  <B> 22:tapecopy<B>  1
+     A:boot    <B>  3:magic   <B> 12
+
+     1221 Free
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                             page 10
+ 
+         _________________________________________
+
+         WARNING
+
+         NEVER  disconnect the Disk Interface from
+         the  Spectrun whilst  the power  is still
+         switched on.
+
+         NEVER  leave a disk in the drive with the
+         door  closed while the  power is switched
+         on or off.
+         _________________________________________
+
+2.2 Auto-boot
+
+SPECTRUM 128 : The Spectrum 128 cannot use this facility.
+
+On power up or after a Reset (assuming the System switch is in the
+normal  position, see Section  3)  you are  automatically in TRDOS
+and  drive A is always  selected by the system.  TRDOS will try to
+load  a BASIC program called "boot". If  there is no disk in drive
+A, or the drive  door is  open or  the disk  does not  contain the
+BASIC  program "boot", then the normal prompt  as in Section 2.1.8
+is displayed.
+
+Having  a disk in the  drive with the drive  door closed  when the
+Spectrum power  is turned  on may  corrupt the  disk, particularly
+those  drives with permanently loaded heads. It is recommended the
+following procedures should be used for auto-boot:
+     (1) Power up the Spectrum.
+     (2) Load disk with BASIC program "boot" into drive A.
+     (3) Reset the computer as described in Section 3.1.
+
+
+2.3 Auto check of drive specification
+
+When TRDOS starts up, it automatically checks the specification of
+Drive  A. This  assumes that  you have  applied good  practice and
+switched on the drives before or at the same time as the computer.
+
+TRDOS adjusts to meet  the step  rate of  the drive.  This ensures
+that  the faster  step rate  of modern  drives  is fully utilised.
+TRDOS also checks to match the drive specification of either 40 or
+80 track, single or double sided.
+
+These  tests will be carried out even if no disk is present in the
+drive.  If more than one drive is connected then these too will be
+checked when each particular drive is first addressed.
+
+
+
+
+
+
+
+
+
+
+                              page 11
+ 
+2.4 "40" and "80" commands
+
+Some of the older 40 track drives do not have an end stop and as a
+consequence  the auto check may not work. That is, TRDOS thinks it
+is an 80 track drive. The "40" command informs the system that the
+currently selected drive is actually a 40 track drive, eg:
+
+     40 <ENTER>
+
+For  those 40/80 track switchable disk drives, it is possible that
+you  switch from one position to the other after TRDOS has checked
+the specification. You must tell TRDOS that you have switched over
+by entering the "40" or the "80" command as appropriate, eg:
+
+     80 <ENTER>
+
+
+2.5 Using other interfaces
+
+The  Disk Interface is designed to be compatible with all official
+Sinclair peripherials such as Interface 1 and Microdrives. It will
+also  work with most other add-ons available on the market, simply
+by plugging them into the  connector  on  the  rear  of  the  Disk
+Interface.
+
+There  are a few add-on  units which use a   ROM that competes for
+space in  the memory  with TRDOS.  If you  have such  an interface
+connected, and  unless that  interface is  switched off,  you must
+first  switch off the Disk Interface  by pulling the System switch
+to the off position (Section 3.2).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 12
+ 
+3    THE SYSTEM SWITCH
+
+The System  switch is on the left-hand  side of the Disk Interface
+(see Diagram 1).  It  is  a  three  position  switch.  For  normal
+operation the switch  should be at  position 2. Position  1 is the
+reset position, and 3 is the off position.
+
+SPECTRUM 128 : The  System switch  must  be at the off position.
+
+Normally when operating in TRDOS  the  switch  should  be  in  the
+centre position. You  will  recall  that  in  Section  2.1.6  (for
+SPECTRUM  & PLUS), the switch was in the centre, number 2 position
+on power up. This enable TRDOS to take control.
+
+To  change from TRDOS  to SOS and  back again (Section  5) is done
+without moving the switch.
+* SOS stands for Standard Operating System.
+
+3.1 Reset
+
+SPECTRUM 128 : Do not  use the System switch to reset the Spectrum
+               128. Use the reset button  on the computer instead.
+
+The reset facility is incorporated  in  the  Disk  Interface.  Its
+function is to perform a  complete  system  reset.  The  practical
+effect  is as if  the Spectrum had  been switched off  and then on
+again. All  you need to  do to effect  a reset is  push the switch
+away  from you  to position  1 and  then return  it to  the centre
+again.
+
+The screen will  go blank  for a  second, at  the same  time TRDOS
+again takes over and you will see the display as in Section 2.1.8.
+
+After a  Reset  the  normal  power  on  RAMTOP  is  restored,  all
+variables and memory are cleared. It is therefore a very quick and
+easy  method of ensuring that all effects and data from a previous
+operation are removed and the Spectrum wiped clean.
+
+The Reset also provides  a  quick  method  of  changing  from  one
+activity to another  provided that  none of  the existing  data is
+required.
+
+3.2 The off position
+
+SPECTRUM 128 : Always set the System switch at this position.
+
+As mentioned in  Section 2.5, there  are a few  add-on units which
+use  a  ROM that competes  for space in the  memory with TRDOS. If
+you have such an interface connected, and unless that interface is
+switched off,  the System switch must be  in the off position when
+power is applied.
+
+
+
+
+
+
+                              page 13
+ 
+4    QUICK REFERENCE GUIDE
+
+COMMAND        FUNCTION                                    SECTION
+
+*"a:"     set default to drive A                               5.4
+
+*"b:"     set default to drive B                               5.4
+
+*"c:"     set default to drive C                               5.4
+
+*"d:"     set default to drive D                               5.4
+
+40        inform TRDOS that default drive is 40 track          2.4
+
+80        inform TRDOS that default drive is 80 track          2.4
+
+CAT       display the disk directory                           7.1
+
+CAT#      print the disk directory                             7.3
+
+CLOSE#    closing a serial/random access file                 13
+
+COPY      copying files from one drive to another              8.1
+
+COPY s    copying files in a single drive system               8.2
+
+COPY b    backup disk in a single drive system                 8.2
+
+ERASE     delete a file from the disk                          9.2
+
+LIST      display details of disk contents                     7.2
+
+LIST#     print details of disk contents                       7.2
+
+LOAD      load a program from the disk                        10.2
+
+INPUT#    read from serial/random access file                 13
+
+MERGE     combine Basic program from disk with one in RAM     10.3
+
+MOVE      reorganise and pack together the files on a disk     9.3
+
+NEW       change the existing name of a file                   9.1
+
+OPEN#     opening a stream for a serial/random access file    13
+
+PEEK      read a sector of a file from disk to RAM            14.1
+
+POKE      store data in RAM to a sector of a file             14.2
+
+PRINT#    writing a serial/random access file                 13
+
+
+
+
+
+
+                              page 14
+ 
+COMMAND                  FUNCTION                          SECTION
+
+RANDOMIZE USR 15616      go to TRDOS from SOS                  5.2
+
+RANDOMIZE USR 15619      call TRDOS commands from SOS          5.3
+
+RETURN    return to SOS from TRDOS                             5.1
+
+RUN       load and run a program from the disk                10.2
+
+SAVE      save a program to the disk                          10.1
+
+VERIFY    verify a program saved on disk                      10.1
+
+
+
+The table above is a summary of TRDOS commands. Before using these
+commands  you are  advised to  read the  relevant sections  of the
+manual.
+
+Where applicable, the  commands shown  are Spectrum  keywords (for
+SPECTRUM &  PLUS) obtained in the normal  SOS fashion. Some of the
+commands require  additional details and these  will be dealt with
+in the specific sections.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 15
+ 
+5    COMMAND SYNTAX
+
+TRDOS is flexible and you can access the disk system:
+     (a) directly from TRDOS
+     (b) Direct Entry from Spectrum SOS and
+     (c) from within a BASIC
+     (d) from within a machine code program.
+
+Whenever you are in  TRDOS  you  will  see  the  prompt  of  drive
+designation plus the arrow. This will be referred as TRDOS prompt,
+eg:
+     A>
+     B>
+
+According to  the  operation  just  finished  the  prompt  may  be
+followed by a further part of a TRDOS command, eg:
+     A>RUN "boot"
+
+TRDOS  commands may be entered directly after the TRDOS prompt. If
+the  prompt is followed by a previous command, you must remove the
+old command using the DELETE [Caps shift 0] key.
+
+
+5.1 Changing from TRDOS to SOS
+
+To change  to SOS  the RETURN  command is  used. In  the following
+example the words in []  are  explanation  and  not  part  of  the
+syntax.
+
+     A>                          [TRDOS prompt on screen]
+     A>RETURN                    [Y pressed - now on screen]
+     (C) Sinclair Copyright ..   [ENTER pressed - now on screen]
+
+Please note  that the ENTER key is  pressed to complete the RETURN
+command.  Unless otherwise stated, this will apply throughout this
+manual, even ENTER is not shown.
+
+
+5.2 Changing from SOS to TRDOS
+
+To  change from SOS to  TRDOS when the K  cursor is shown requires
+the following entry:
+     RANDOMIZE USR 15616
+
+This  is obtained by using the keyword on the letter T (RANDOMIZE)
+to  be followed by the E mode letter L (USR) and then the numbers.
+As in the example in Section 5.1, the ENTER key must be pressed to
+complete the command.
+
+If  only one drive is fitted then this will return you to drive A.
+However, if more  than one drive  is fitted then  the command will
+return you to the drive which was last selected (see Section 5.4).
+
+
+
+
+
+                              page 16
+ 
+Although  no longer displayed the program  is still in memory and,
+after  executing certain TRDOS commands, such as a disk catalogue,
+you can return to SOS and LIST to display the program.
+
+
+5.3 Calling TRDOS from SOS and BASIC programs
+
+The syntax  of the command is the same  at all times, but a prefix
+must  be used if the command is called from SOS or from a program.
+When the command  is entered  directly from  SOS, it  executes the
+command, and returns to SOS. In this case the prefix nust be:
+     RANDOMIZE USR 15619: REM:
+
+For example:
+     RANDOMIZE USR 15619: REM: CAT "B:"
+
+The use  of 15619  instead of  15616 retains  control in  SOS. The
+CATaloge action is to be taken on Drive B (see Section 5.5).
+
+Unless the command  performs  an  over-riding  function,  such  as
+RUNning a program,  it will  terminate its  action with  the drive
+prompt  if made from  TRDOS or the  Sinclair OK if  made from SOS,
+e.g.
+     A>CAT <ENTER>          results in the prompt A> on completion
+     RANDOMIZE USR 15619: REM: CAT <ENTER>       results in OK.
+
+Although it is  possible to execute  commands from SOS,  it is not
+recommended. Firstly, it is far less likely to lead to disaster if
+all actions are taken from  within  TRDOS.  Secondly,  the  actual
+typing  required is  considerably  less,  and thirdly, the current
+default drive is displayed which  can  help  to  avoid  the  silly
+mistakes which lead to loss of valuable data.
+
+When TRDOS  commands are included in a  BASIC program they must be
+prefixed with:
+     RANDOMIZE USR 15619: REM:
+
+In  addition, the command  must be the  last item in  a line. When
+writing a  program or converting one to  run from disk  instead of
+cassette the rule you  must  obey  is  "The  TRDOS  command  which
+finishes the line". For example:
+
+Cassette program line
+     10 INK 7: PAPER 1: LOAD "" CODE: GOSUB 500:
+        CLS: PRINT "Press any key"
+
+Converted to disk
+     10 INK 7: PAPER 1: RANDOMIZE USR 15619: REM: LOAD
+        "TITLE" CODE
+     20 GOSUB 500: CLS: PRINT "Press any key"
+
+Note  how the empty "" cannot be used for the disk. In addition to
+the TRDOS command finishing line 10 we must insert the title under
+which the code has been saved.
+
+
+
+                              page 17
+ 
+5.4  Default drive selection
+
+The default drive is the one which will be accessed by any command
+which  does not specify the drive to be used. On power up or after
+a system reset the default drive is always A.
+
+TRDOS supports  up to 4  drives, designated as  A, B, C  and D. To
+change the default drive the command format is:
+     *"drive:"
+
+where drive is the designated drive A, B, C or D. For example:
+     *"B:"      to change default to drive B
+     *"a:"      to change default to drive A
+
+NOTE:  The command can use either upper or lower case to designate
+the drive although  the screen  display will  always be  a capital
+letter before the arrow.
+
+Having changed the  default from say  A to B,  all future commands
+will access drive B unless told otherwise.
+
+If  only one drive is fitted the screen designation remains A> and
+the flexible working of multi drives demonstrated in this manual
+does not apply.
+
+5.5 Temporary drive selection
+
+On  occasion it is desirable to remain in default to one drive but
+want  to access another drive. The syntax  for this is a suffix to
+the command showing  the required  drive. The  suffix is  like the
+default change but without the star, e.g.
+     "a:"    or    "B:"    or    "c:"    or    "D:"
+
+An example of the full statement from SOS would be:
+     RANDOMIZE USR 15619: REM: LOAD "b:program"
+
+This ensures that "program" is loaded from drive A irrespective of
+which is the current default drive, including B.
+
+From TRDOS with default drive A the command would be:
+     LOAD "b:program"
+
+This  would load "program" from drive A but leave default in drive
+A for further TRDOS operations.
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 18
+ 
+
+6    FORMATTING A DISK
+
+A  disk must be formatted  before it can be  used by the computer.
+This means that  the  sectors  on  each  track  must  be  checked,
+identified  and marked electronically by TRDOS. From then on TRDOS
+will keep track of what it has stored where on the disk.
+
+TRDOS contains the disk  formatting  routine,  and  no  additional
+software  needs to be loaded. Formatting can be carried cut at any
+time, even with a program in memory.
+
+To  format a disk,  insert it in  the default drive  and close the
+door.  Type the keyword FORMAT [E  shift, symbol shift 0] followed
+by the  disk title in quotes, the title  can be up to 8 characters
+long, in upper or lower case including spaces. e.g.
+     FORMAT "DISCONE"
+
+Press ENTER  to complete the command and  sit back. The time taken
+by  TRDOS to  mark the  sectors varies  between single  and double
+sided, 40 and 80 track drives. If the drives are double sided then
+both sides will be formatted automatically. When finished the
+screen will display:
+     DISCONE
+     624/624   or    1264/1264   or    2544/2544
+     A>
+
+This display shows the  disk  title  followed  by  the  number  of
+sectors formatted and secondly  the  maximum  possible  number  of
+sectors for the  particular disk  format. If  the first  number is
+less than the second you have a faulty disk.
+
+The maximum number  of  sectors  varies  according  to  the  drive
+specification. Track 0  is always  used by  the system  leaving 39
+tracks on a SS 40 track, 79 on a DS 40 or SS 80 track and 159 on a
+DS  80 track. At 16 sectors per track  we get 624, 1264 or 2544 as
+the maximum number possible (see also Section 1.2).
+
+
+6.1  Format as single sided
+
+There are occasions when you wish  to  format  a  disk  as  single
+sided. If the drive is  only  a  single  sided  drive  no  special
+formatting  is  required,  just  use  the  standard  TRDOS  FORMAT
+command.
+
+If the drive is double sided then the first character of the title
+of the disk must be "$", e.g.
+     FORMAT "$DUMPER"
+
+After  you have pressed ENTER and the formatting has finished, the
+display will be:
+     $DUMPER
+     624/624   or    1264/1264   dependant upon 40 or 80 track
+     A>
+
+
+
+                              page 19
+ 
+7    DISK CATALOGUE
+
+7.1  Displaying a catalogue
+
+There  are two commands for displaying the contents on a disk. The
+first  and most commonly used is the CAT command. The other is the
+LIST command.
+
+Both the CAT and the  LIST  commands  can  be  accessed  whilst  a
+program is held  in memory.  The CAT  command displays  the title,
+type and sector size  of  the  files  and  is  adequate  for  most
+purposes. The LIST  command displays  the catalogue  with extended
+information, and is ideal for program analysis.
+
+The syntax to obtain the catalogue of the disk is:
+     CAT      or
+     LIST
+
+You  may display the catalogue of a disk other then the one in the
+default drive, eg:
+     CAT "b:"       or
+     LIST "b:"
+
+The command may also be called from SOS, eg:
+     RANDOMIZE USR 15616: REM: CAT "a:" or 
+     RANDOMIZE USR 15616: REM: LIST "a:"
+
+For the CAT  command, the  information that  will be  displayed on
+screen is:
+  Disk title
+  No. of files
+  No. of deleted files
+  Drive: File title: type of file: size of file [in 2 columns]
+  No. of free sectors
+  TRDOS prompt
+
+For example:
+     Title: ACCOUNTS    Meaning
+     4 file(s)          The disk in drive A
+     1 Del. file(s)     4 files + 1 deleted 
+     A: HOME    <B> 12  B=BASIC program         12 sectors    (3K)
+     A: HOME1   <C> 6   C=machine code           6 sectors  (1.5K)
+     A: HOME2   <#> 13  #=serial/random access  13 sectors (3.25K)
+     A: HOME3   <D> 7   D=data array             7 sectors (1.75K)
+
+Free 2503                2544-38=2506, deleted file occupies 3
+                         sectors leaving 2503 free.
+A>                       default drive is A.
+
+If the number  of files  to  be displayed  is  more  than  30  the
+"scroll?" will  appear.  The  normal  Spectrum  key  presses  will
+continue the display. "N" or "BREAK" will terminate the listing.
+
+
+
+
+
+                              page 20
+ 
+An example of the resulting display of the LIST command is:
+
+     Title Poolperm       Disk Drive: B
+     4 file(s)            80 Track D. Sided
+     1 Del. File(s)       Free Sector 2480
+     File Name            Start Length Line
+     POOLCALC <B> 5       00298 01200  25
+     Pooll    <C> 32      32768 08000
+     Poolfact <#> 7       01780 01780
+     Poolbase <D> 8       30000 32000
+
+The  display is showing all the usual details of the disk, that it
+is  in drive B, that it is 80  track double sided with 4 files and
+2480 sectors (about 620K bytes)  free.  In  addition  to  the  CAT
+details  of title, type and size we now have the starting address,
+length and , if BASIC, the start line of the programs.
+
+7.2  Printing a catalogue
+
+It is often  desirable to know  the contents of  the disks without
+using the computer to display the catalogue every time.
+
+The paper and  pencil  is an  obvious  method,  although  somewhat
+inconvenient and  very often prone  to  error. TRDOS allows you to
+produce a hard copy  of the  disk catalogue,  assuming you  have a
+printer connected to your system.
+
+The  following example is based upon using Interface 1. The normal
+SOS procedure  of  opening  a  stream  must  be  initiated  before
+printing. This  requires returning to SOS  if currently working in
+TRDOS and the stream is not already open.
+
+Once in SOS the usual Interface 1 syntax can be entered, eg:
+FORMAT "T"; 9600 : OPEN #4; "T"
+
+Once the stream  is open  a return  to TRDOS  is preferable  as it
+provides better control and less typing (RANDOMIZE prefix). Having
+returned  to TRDOS the CAT  # and LIST #  commands are exactly the
+same as the CAT and LIST commands above, eg:
+     CAT #4         will  send  the  catalogue  to the printer via
+                    stream #4.
+
+     LIST #4, "b:"  will  send the  extended catalogue of  drive B
+                    to the printer.
+
+The Sinclair manual deals with the use of streams 0 to 15. Streams
+0 to  3 are  reserved for  the Spectrum.  The actual  stream used,
+between  4 and 15, does not matter. Whatever stream is opened must
+be the one used in CAT # or LIST # commands.
+
+
+
+
+
+
+
+
+                              page 21
+ 
+8    COPYING FILES
+
+There are three commands for file copying:
+     COPY    - for normal file copying
+     COPY s  - for single drive system file copying
+     COPY b  - for single drive system backup.
+
+The basic  element  of the syntax  is COPY.  This is  the Spectrum
+keyword on the Z key. The basic syntax is:
+     COPY "new_file", "old_file" type
+
+The  syntax required follows SOS practice  by putting both the new
+and old  file titles between  quotes and specifying  the file type
+using SOS  keywords. The four different  types of  files and their
+file type are:
+     BASIC programm
+     machine code programm      CODE
+     data array file            DATA
+     serial/random access file  #
+
+Note that the BASIC program has a blank file type.
+
+All  commands must  have the  precise form  of the  name including
+upper  and lower case and  spaces as well as  the file type. Hense
+the best thing to do is to have a CAT display.
+
+One  important point to remember is that whenever 2 titles have to
+be quoted, e.g. for the COPY or for the NEW commands it is the new
+title which is quoted first. In addition, the type does not follow
+the new title, because it is same as the old file.
+
+
+8.1  Copying to the same disk
+
+Having put the disk containing tge file(s) to be copied into drive
+A  (the actual drive used is unimportant) the first thing to do is
+a  CAT of the disk. We have to tell TRDOS the title of the file to
+be copied and the title under which the copy should be saved. Eg:
+COPY "Vat69","Whisky" CODE
+
+Note that  the new and the old file  titles are in quotes, and the
+separated  by a  comma. Because  this is  a mythical  machine code
+program  related to alcoholic beverages we  must add the file type
+CODE. Press  ENTER and the command will  disappear for a couple of
+seconds.  When the TRDOS prompt reappears there will be no obvious
+change.  By doing another CAT command we will now find the display
+includes the new file Vat69 <C>.
+
+
+
+
+
+
+
+
+
+
+                              page 22
+ 
+You  cannot save two files on the same disk with identical titles.
+Identical  means exactly the same. It is possible to have the same
+name but  with one in upper case and  the other in lower case. One
+can be a BASIC program and the other a machine code program, eg:
+
+  STOCKFILE <C>       Acceptable because the file types are
+  STOCKFILE <B>       different
+
+  PURCHASE  <B>       Acceptable because the last letter is
+  PURCHASe  <B>       caps on one.
+
+Using this principle it would  have  been  possible  to  COPY  our
+previous example without going from the general term "whisky" to a
+particular brand, eg:
+     COPY "WHISKY", "Whisky" CODE   or
+     COPY "WHYSKY2" ,"WHYSKY" CODE
+
+So far we have considered COPYing  only  to  the  same  disk.  The
+procedure  for COPYing to another disk depends upon whether or not
+you have a second disk drive.
+
+
+8.2  Single drive copying and backup
+
+If only one disk drive is available the normal COPY command cannot
+be  used. Both the  "COPY s"   and  the  "COPY b"  command are for
+single drive system.
+
+The first, "COPY s"  is used to  copy  one file  from one  disk to
+another disk using the same drive. Whereas the second, "COPY b" is
+used  to backup a disk  to another disk, that  is, copying all the
+files.
+
+Here are some examples of the "COPY s" command:
+     COPY s "Wines"           or
+     COPY s "BEER"CODE
+
+where both  "Wines" and "BEER"CODE are  existing files. Notice the
+difference.   Previously  we  entered  the   new  name  in  quotes
+immediatly after the  prompt.  Now  we  are  telling  TRDOS   what
+program  to copy and so the existing name goes in quotes after the
+"COPY s".
+
+To make  sure you haven't got the wrong  disk in the drive you are
+prompted  to insert the disk and press Y. Having read the disk the
+program prompts  you to replace it with  the second disk and enter
+the new name under which the program will be copied.
+
+The practice of making  a backup  copy of  all programs  cannot be
+over emphasised.  With cassette  based operations  this is  a time
+consuming activity. To be of value the program must be copied, the
+tape rewound and then verified. This can be quite a lenghtly
+procedure!
+
+
+
+
+                              page 23
+ 
+With TRDOS  and disk it  can take less  than a minute  to COPY and
+then if desired  reLOAD the program  to actually check  that it is
+OK. Essentually backup of a program consists of making a COPY onto
+another disk kept purely for backup purposes.
+
+The "COPY b" command operates as an extension of the "COPY s". The
+routine  is run by entering the command "COPY b". From then on the 
+screen  prompts as to changing the disk and what keys to press are
+straightforword.
+
+8.3  Twin drive copy and backup
+
+Copying to another drive automatically  means  that  you  will  be
+copying to another disk. Although the interchange could take place
+between  any combination of two drives we will use drives A and B.
+It  will be apparent from the  syntax how other combinations would
+be entered.
+
+Enter the keyword  COPY followed by  the two titles  in quotes but
+this time include  the  temporary  drive  indicator.  Being  on  a
+different disk, we can use the same title if we wish in the second
+disk, eg:
+      COPY "A:Whisky", "b:Whisky"
+
+Although default drive is A we are copying from the disk in B to A
+and using the  same title which is  not in use on  disk A. Had the
+disks been reversed in the two drives then we would have had:
+      COPY "B:Whisky", "A:Whisky"
+
+thus copying the file from drive A to drive B.
+
+The backup operation is much simplier using twin drive system. The
+disk  to be copied is  placed in one drive  and the receiving disk
+(blank and  formatted or  partially used)  is inserted  in another 
+drive. Any  drives can be used. We will  use drive A as the source
+and  drive B as the recipient. The  command syntax is similar to a
+single file  copy with a  "*" (the computer  jargon is "wildcard")
+replacing a specific file title, eg:
+     COPY "B:*", "A:*"
+
+Having  entered the command TRDOS will  do the rest. Provided that
+the file names are not  duplicated  and  the  receiving  disk  has
+sufficient space the  operation will  end with  the return  of the
+prompt A>.
+
+If a file  name is  duplicated then  the error  message "Overwrite
+existing file? Y/N" appears. Enter  "Y"  and  the o verwrite  will
+occur.  Enter "N" and the COPY will continue but ignore that file.
+This  allows you to later change and COPY one file if the name has
+been duplicated on two different files.
+
+The advantade of the "*" COPY is the speed compared with having to
+enter each file separately.
+
+
+
+
+                              page 24
+ 
+9    RENAMING, ERASING FILES AND DISK HOUSEKEEPING
+
+9.1  Renaming a file - the NEW command
+
+The ability to change the title of any file on the disks in one of
+the most  flexible commands  at your  disposal. Title  changing is
+invaluable  for program development. In  addition, you can correct
+typing errors (they do happen) in the titles of programs.
+
+Unlike  other TRDOS commands the disk must be in the default drive
+and this has  to be  drive A.  This is  also one  of the  few disk
+commands for which you need to be in TRDOS rather than issuing the 
+command from the SOS.
+
+We are therefore going to be  in  TRDOS  using  drive  A  and  the
+Spectrum keyword  NEW [the A key]. First do  a CAT pf the disk, so
+that the title of the file to be changed is displayed.
+
+Now  enter the keyword NEW followed by the new title (in quotes as
+always) and then the  existing title  and the  two separated  by a
+comma, eg:
+     NEW "boot", "prog"
+
+Press ENTER and the prompt will disappear for a couple of seconds.
+When  it reappears nothing will  seem  to have changed. Repeat the
+CAT and  the  listing  will  be  redisplayed  showing  "boot"  has
+replaced "prog".
+
+
+9.2  Erasing a file - the ERASE command
+
+If  a file on the disk becomes obsolete and no longer required, it
+may be erased. The  command keyword  is ERASE  and is  obtained by
+going into  E mode and holding down  the symbol shift and pressing 
+the 7 key, eg:
+     ESARE "oldprog"
+     ERASE "oblsole"DATA
+
+We  now ENTER the command. A CAT when the prompt reappears after a
+couple of  seconds will  confirm the  file has  gone and  the fact
+recorded in the heading of  the  CAT  as  the  number  of  file(s)
+deleted.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 25
+ 
+9.3  Packing disk space - the MOVE command
+
+When a  file is erased, the sectors it  used to occupy have yet to
+be released for other files. To retrieve the "lost" sectors by the
+erased files we  use the MOVE  command.  This Spectrum keyword  is
+obtained by  going into E mode and  pressing both Symbol Shift and
+key 6, eg:
+     MOVE or
+     MOVE "b:"
+
+Although the latter  example  is  possible  it  is  perferable  to
+execute this with default  set  to  the  drive  in  which  we  are
+working. This is a command which most inevitably must be used from
+within  TRDOS rather than from SOS. Having gone inro TRDOS we have
+performed  a CAT to examine the  disk, possibly done some erasing,
+and are now finishing with a MOVE to reclaim the space for use.
+
+The MOVE command  itself does  all the  work in  re-organizing the
+disk  and its directory. When completed TRDOS prompt reappears. If
+CAT is now  entered, the listing  will show 0  file(s) deleted and
+the increased number of free sectors.
+
+Like all  machine code instructions the MOVE  is fast but the time
+taken  varies according to the number and size of the files stored
+and deleted and their whereabouts  on  the  disk.  To  reduce  the
+waiting  time to a minimum it is good practice to MOVE immediately
+after making  any deletions. This has the  positive advantage that
+it  avoids multiple  readjustements and  the disk always indicates
+precisely what is spare. It  is  ready  to  load  to  its  maximum
+without having to stop and undertake housekeeping first.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 26
+ 
+10   SAVING, VERYFYING, LOADING, RUNNING AND MERGING PROGRAMS
+
+The syntax for all  of these commands are similar. As you will see
+these commands  have the same or similar  syntax as thise used for
+cassette baset system.
+
+All these  commands operate on files. A file  on the disk can be a
+BASIC program,  a machine  code program,  a data  array file  or a
+serial/random  access file. The  loading and saving  of data array
+file  is covered in Section 12, and serial/random access files are
+covered  in Section 13. This section covers both BASIC and machine
+code programs.
+
+During all five operations of SAVE/VERIFY/LOAD/RUN/MERGE the Break
+key  can be used to abort the command.  If there is no disk in the
+drive  the command will be aborted abd the Error Message "No disk"
+will be displayed on screen.  Similarly,  if  the  disk  does  not
+contain  the file,  then the  Error Message  "No file(s)"  will be
+displayed.
+
+
+10.1 The SAVE and VERIFY commands
+
+The SAVE  command will  save a  program in  the Spectrum  onto the
+disk.  A title of the program must be specified and is enclosed in
+quotes.
+
+For BASIC program, a  file type  is not  required. However  a line
+number can  be specified after  the keyword LINE  for auto-run. If
+the line number is not specified then the program will be run from
+the first line. Eg:
+    SAVE "homeacc"LINE 100
+    SAVE "graph"LINE
+    SAVE "A:design"
+
+For a  machine code program, you must  specify the file type CODE,
+followed by the starting  address and  the number  of bytes to be
+saved. Eg:
+    SAVE "Discount"CODE 47800, 955
+    SAVE "B:Collec"CODE 32768, 4000
+
+The VERIFY command tests  whether the  file saved  on the  disk is
+exactly the same as that in memory. The VERIFY command may be used
+to verify BASIC, machine-code programs and data array files. Eg:
+    VERIFY "A:Design"
+    VERIFY "Discount"CODE 47800, 955
+    VERIFY "Money"DATA M()
+
+if they are different, a Verify Error message will be displayed.
+
+
+
+
+
+
+
+
+                              page 27
+ 
+10.2 The LOAD or RUN commands
+
+If a BASIC program is saved to auto-run from a line number, eg:
+     SAVE "INTEREST"LINE25
+
+then it will auto-run whichever command (LOAD or RUN) is used.
+
+If  the BASIC program is not saved to auto-run then LOAD will load
+and LIST whereas RUN will  load and RUN a non-auto program.
+
+For exaple:
+     LOAD "INTEREST"
+     RUN "desing"
+
+As you might  expect  TRDOS  will  inform  you   of  "Insufficient
+memory" if you attempt  to LOAD  or RUN  a program  which requires
+more memory than  the Spectrum  has available.  This can  arise if
+RAMTOP has been set too low.
+
+If you  enter either LOAD or RUN without  the filename, TRDOS will
+load or run the BASIC program "boot".
+
+As can  be seen in  the examples above  the syntax is  the same as
+Spectrum BASIC. For the machine code programs, they  can be loaded
+to the same address from which they were saved, eg:
+     LOAD "A:SALECALC"CODE
+
+or  loaded to  a different  address by  specifying in  the loading
+instructions, eg:
+     LOAD "margin"CODE 51000
+
+When running a machine code program the auto-run address should be
+the same as the strating address of the program, eg:
+     RUN "Discound"CODE 47800
+
+provided the  code is meant to auto-run  from 47800 on loading all
+will be well.
+
+The alternative is to  use  a  two   line  loader,  eg,  SAVE  the
+following program on disk as say "DCTLOAD"LINE 10
+
+     10 RANDOMIZE USR 15619:REM:LOAD "Dsicount"CODE 47800
+     20 RANDOMIZE USR 47838
+
+To run the program you now enter RUN "DCTLOAD" which will load the
+machine code and the "run it" fom 47838.
+
+The two line loader is necessary because the TRDOS command must be
+the last entry in a line.
+
+
+
+
+
+
+
+
+                              page 28
+ 
+10.3 The MERGE command
+
+The TRDOS  merge is the  same as the  SOS merge. It  uses the same
+keywords [E mode symbol  shift T]  and serves  the same purpose to
+merge in the  Spectrum memory a  BASIC program from  the disk with
+one already in memory.
+
+For example:
+     MERGE "subroul"
+     MERGE "B:funct2"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 29
+ 
+11   TRANSFERRING CASSETTE BASED PROGRAMS
+
+If  the cassette program was written by you then the copying of it
+to disk presents few problems. You load your program from cassette
+in  SOS as usual. Once  in Spectrum the program may be saved to  a
+disk by the direct keyboard entry. eg:
+
+     RANDOMIZE USR 15619: REM: SAVE "xxx"           or
+     RANDOMIZE USR 15619: REM: SAVE "xyz"CODE NNNN, BBB
+
+Many  other programs can be copied using the Utility Disk TAPECOPY
+program (see Appendix).
+
+The syntax  for these  programs may  require conversion  to ensure
+that it will  run  under  TRDOS.  For  other  programs  which  are
+difficult  or impossible  to convert  and run  on disk,  the Magic
+button may be used.
+
+
+11.1 Program conversion
+
+Very ofter programs are  a mixture  of BASIC  and Machine  code to
+improve the  speed. The BASIC element can  vary from a simple code
+loader to a more complex interface between the code and the user.
+
+For those programs  which  use  the  BASIC  as  an  interface  the
+conversion to  use  TRDOS  is  relatively  straightforward.  Other
+programs  may require extensive "hacking" to be able to alter them
+to run under TRDOS. Some difficult ones may require the use of the
+Magic button  (Section 11.3) as  the only means  of overcoming the
+problem.
+
+You must be able to get access to all the LOAD or SAVE commands in
+the  original BASIC program require changing, so the first step is
+to LIST the BASIC program.
+
+The  technique used will vary according to the individual program.
+In some cases the LOAD or  SAVE  attributes  of  the  program  are
+minimal and a quick scan of the LISTing is all that is required to
+locate  the commands. Other programs can have several LOAD or SAVE
+options. With these the  simplest  way  is  to  step  through  the
+program a line  at a time  looking for LOAD  or SAVE instructions.
+Each  time one is found the syntax modification is the addition of
+the usual prefix, i.e. RANDIMIZE USR 15619: REM:
+
+This  is inserted in  front of the  existing LOAD or  SAVE in  the
+program.
+
+We must  also bear  in mind  two other  points. Firstly  the TRDOS
+command  must be the last item in a program line, and secondly the
+drive location must be considered.  The  first  point  will  often
+require  some  slight  modification  to  the  line  numbering  and
+contents  of the lines. The following example will illustrate both
+these points:
+
+
+
+                              page 30
+ 
+EXISTING PROGRAM:
+
+    500 IF X=5 THEN PRINT "Name"; N$: SAVE N$ DATA C$ ():
+        VERIFY N$ DATA C$ (): GOSUB 700
+    505 IF X=V THEN GOSUB 800: INPUT "Title"; T$: SAVE T$: SAVE
+        T$ CODE 50000,575
+    506 ....... More of the program
+
+Assuming the files are saved to the default drive.
+
+NEW PROGRAM:                          COMMENTS
+
+    500 IF X=5 THEN INPUT "Name"; N$: RANDOMIZE USR 15619:
+        REM: SAVE N$ DATA C$ ()
+    502 GOSUB 700
+    504 IF X=V THEN GOSUB 800: INPUT "Title";T$: RANDOMIZE USR
+        15619: REM: SAVE T$
+    505 RANDOMIZE USR 15619: REM: SAVE T$ CODE 50000,575
+    506 ....... program continued
+
+The line  adjustment will vary  from prigram to program . Here the
+unused  lines 502 and 504 were sufficient to allow the essential 1
+line  per TRDOS command. On occasion it may be necessary to adjust
+other lines not involved  directly  with  the  TRDOS  commands  to
+create sufficient space.  At all  times the  program flow  must be
+watched.  It is not uncommon  to find that as  a result of program
+development another part of the  program  is  jumping  to  a  line
+number which you are now using.
+
+As a summary, the rules for conversion are:
+
+(1) TRDOS command must be the last statement in a line.
+(2) Only the prefix RANDOMIZE USR 15619: REM: needs to be added to
+    all existing LOAD and SAVE commands.
+(3) If more  that one drive is used then make sure the right drive
+    is used.
+(4) All files must have filename.
+(5) Check the program flow when adding intermediate line number.
+
+
+11.2 The Magic button
+
+The Magic button is  situated at  the rear  of the  Disk Interface
+(see Diagram 1). The purpose  of  the  Magic  button  is  to  save
+cassette based programs and run on disk without any conversion.
+
+There are  many programs which have been  written in such a manner
+that it is  either difficult or  impossible to convert  and run on 
+disk. These may be those programs with sophisticated protection or
+those  which SAVE and LOAD data files for the main program to use.
+Because the sunstitution of  TRDOS  commands  in  not  possible  a
+different approach is required.
+
+
+
+
+
+                              page 31
+ 
+For the latter  the program  is loaded  and data  file(s) created.
+Instead of using the programs  own  SAVE  instructions  the  Magic
+button is used to dump  the  whole  programs  and  files  to  disk.
+Subsequent reloading means loading the complete package instead of
+just a data file.
+
+The minor  inconvenience  of  having  an  individual  tailor  made
+version of  the complete  package for  each type  of data  file is
+offset by the speed abd flexibility of TRDOS disk working.
+
+A formatted blank disk should be set aside purely for this purpose
+and when used MUST be in drive A. Assuming these are in order, the
+following sequences show you the detailed operations (assuming you
+are in TRDOS):
+
+(1) Return to BASIC, by typing
+          RETURN <ENTER>
+(2) Pull the System switch to the off position.
+(3) Clear the Spectrum by typing
+          PRINT USR 0 <ENTER>
+(4) Load and run program from cassette tape as normal.
+(5) After the  program has been  loaded and is  running, press the
+Magic button and release it promptly.
+
+The computer  memory is  then dumped  to the  disk. The  memory is
+stored as file(s) on the disk.
+
+SPECTRUM & PLUS : only   one  file  will  be  created.  This  file
+                  contains  the image of  the whole 48K  of RAM. A
+                  CAT  of the disk  will reveal that  the title is
+                  "@" abd the file type is CODE.
+
+SPECTRUM 128  :   up  to  seven  files may  be saved  depending on
+                  whether the pages on the upper 64k RAM are being 
+                  used.  An example of the  disk catalogue after a
+                  Magic button dump is:
+
+     Title: test
+     7 File(s)
+     0 Del. File
+     A:@       <C>192:@7      <C> 64
+     A:@6      <C> 64:@4      <C> 64
+     A:@3      <C> 64:@1      <C> 64
+     A:@8      <C>  1
+
+The "family" name if these files is "@".
+
+To reload the file (for all Spectrum computers) the syntax changes
+from the normal LOAD or RUN.  Instead  the  SOS  keyword  of  GOTO
+[letter G] is used, eg:
+     GOTO "@"CODE
+
+
+
+
+
+
+                              page 32
+ 
+The program can be renamed ir copied to another disk under its own
+title and run by the GOTO command, eg:
+     NEW "game1", "@"CODE
+     COPY "B:game1", "A:@"CODE
+
+When running "game1" and assuming the  disk  is  in  drive  A  the
+syntax is:
+     GOTO "game1"CODE
+
+SPECTRUM 128 : it is possible to rename or copy all the files (one
+               by one)  using  the  NEW  and  the  COPY  commands.
+               Hovewer,  for your convenience,  a Utility program,
+               MAGIC is supplied on  the  Utility  disk.  See  the
+               Appendix for details. This Utility program may also
+               be  used to erase a 'family"  of files saved by the
+               Magic button.
+
+Before you use the Magic button to save a program, you must ensure
+that  the disk does not contain any file with the name "@" or "@1"
+etc.
+
+Some programs use a  non-standart  key  scan  routine.  For  these
+programs it  will be necessary to make  the first character of the
+disk title a "$", eg:
+     GOTO "$game1"CODE
+
+If the  program is  being checked  before copied  with a  title to
+another disk  then the file title would  require the prefix "$" if
+the key scan problem occours, eg:
+     NEW "$game2", "@"CODE
+     GOTO "$game2"CODE
+
+During  the loading ot these files the screen display will contain
+some random elements,  often a  number of  pixel lines  which look
+something like  a visual  Morse transmission.  When it  clears the
+program will run from where it was stopped.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 33
+ 
+12    DATA ARRAY FILES
+
+The  SOS syntax for LOADing or SAVEing a non string array entitled
+Money is:
+     LOAD "Money"DATA M() or
+     SAVE "Movey"DATA M()
+
+For a string array the addition of $ is required, eg:
+     LOAD "Money"DATA M$()
+
+Like most of  the TRDOS commands  the LOADing and  SAVEing of data
+arrays is achieved by  using SOS  Basic syntax  with a  prefix and
+possibly  a  drive  indicator. It  is seldom  that data arrays are
+likely to be handled from TRDOS.
+
+The  nature of the arrays is such that they will be saved from and
+loaded to a running program. The SOS syntax for use within a BASIC
+program would be:
+     RANDOMIZE USR 15619: REM: LOAD "Money"DATA M() or
+     RANDOMIZE USR 15619: REM: SAVE "Money"DATA M()
+
+Note:  This syntax assumes that the  default drive is either fixed
+as drive A. If you have a twin drive system, the alternative would
+be  to assume that  the data disk  is always loaded  into the same
+drive, say  B whilst the main program  and default drive remain in
+A. In this case a temporary drive indicator would be used, eg:
+     RANDOMIZE USR 15619: REM: LOAD "B:Money"DATA M()
+
+When COPYing, ERASEing,  or NEWing  a DATA  file the  command must
+always  terminate with the designation of the file type, i.e. DATA
+otherwise TRDOS  will assume that it is  looking for a BASIC file,
+eg:
+     COPY "a:Money"DATA, "B:Money"DATA
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 34
+ 
+
+
+13   SEQUENTIAL AND RANDOM ACCESS FILES
+
+13.1 General description
+
+Normal  data array files have been  discussed in the last section.
+TRDOS  supports two additional types of data files, Sequential and
+Random  Access. In order to use these two types of data files, you
+must first  open a stream.  The Spectrum contains  16 streams. The
+SOS  reserves the streams 0 to 3 for  its own use and streams 4 to
+15  are available to  TRDOS. When a  stream for a  sequential or a
+random access data file is opened, 336 bytes of RAM are used.
+
+Both numeric and string  variables may  be stored in  a data file.
+The  numeric variables are converted to strings by the computer. A
+string is terminated (by the system) with a carriage retuen (ASCII
+code 13).
+
+A  sequential file stores the data serially rather like a cassette
+tape.  In order to read a string towards the end of the file it is
+necessary to start from very beginning if the file.
+
+The random access file, on the other hand, stores data as a number
+of  records. Any record in  these files may be  read or written by
+specifying the record number. Therefore, to access the last record
+is as quick as the first record.
+
+The other TRDOS  commands for  drive selection,  copying, changing
+titles etc all equally apply to these Sequential and Random access
+files.  The only dufference is the type of file indicator which is
+"#" instead of "CODE" or "DATA". Eg:
+     COPY "B:phone", "A:phone"#
+     NEW "newfile", "oldfile"#
+     ERASE "namadd"#
+
+Similar to the data array files, the  sequential and random access
+files are seldomly handled directly from TRDOS. Hense the examples
+that follow are assumed to be in a BASIC program.
+
+13.2 Sequential files
+
+A  sequential file may be opened either  for Write or Read but not
+both at the same time. To open a file for Write the syntax is:
+     OPEN stream_number, "filename",W
+
+When a stream is open for Write the BASIC keyword PRINT is used to
+WRITE data to that stream, eg:
+     10 LET DOS = 15619
+     20 RANDOMIZE USR DOS: REM: OPEN #4, "TEST",W
+     30 PRINT #4; "This is a test line"
+     40 RANDOMIZE USR DOS: REM: CLOSE #4
+
+Notice the use of "DOS" instead  of  typing  in  "15619"  and  the
+closure of the file.
+
+
+
+
+                              page 35
+ 
+The string  in line 30 will  be saved in file  "TEST" on the disk.
+Had  the file not been  closed the data would  have been lost. Any
+closed  file may be re-opened for further Write action by Reading,
+changing and re-saving under a new name.
+
+To open a file for READ the syntax is:
+     OPEN stream_number, "filename",R
+
+With  the stream opened for READ the  SOS keyword INPUT is used to
+Read data from this stream, eg:
+     10 LET DOS = 15619
+     20 RANDOMIZE USR DOS :REM :OPEN #7, "TEST",R
+     30 INPUT #7; A$
+
+The data file "TEST" will be loaded into A$ from the disk.
+
+
+13.3 Random access files
+
+A  random access file  is a data  file which contains  a number of
+records numbered  from 0 onwards.  The length of  the records (max
+254 bytes each )  is chosem  and allocated  when first opening the
+file.
+
+The  record is stored as a single string. Any string less than the
+allocated  record length is stored,  left justified and terminated
+by a  carriage return (ASCII code 13).  The remaining bytes of the
+record  are not defined. Any string  longer than the record length
+will  be truncated to the allocated  length and stored without the
+carriage return terminator.
+
+When a  Random Access file is first  opened TRDOS will allocate 16
+sectors (approximately 4K) to the  file.  This  will  be  expanded
+automatically as the length of the file excees 4K.
+
+To open a file for random access, the command syntax is:
+     OPEN stream_number, "filename"RND, record_length
+
+To write a record to a  file  the  command  syntax  is  (RANDOMIZE
+prefix is not required for PRINT and INPUT):
+     PRINT stream_number; record_number, variabel_name
+
+For example:
+     100 RANDOMIZE USR 15619: REM: OPEN #8, "Address"RND, 100
+     150 PRINT #8; 72,D$
+
+Stream 8  has been  opened for  the file  "Address" in  which each
+record  has been allocated 100 bytes. The contents of D$ have been
+put in record number 72 of the file.
+
+Unlike  the sequential file, you may read and write while the file
+is opened, To read a record from a file the command syntax is:
+     INPUT stream_number; (record_number), variable name
+
+
+
+
+                              page 36
+ 
+For example:
+     100 RANDOMIZE USR 15619: REM: OPEN #12, "TEST1"RND, 20
+     110 PRINT #12; 20, A$
+     :
+     :
+     570 INPUT #12; (15), A$
+     :
+     :
+     990 RANDOMIZE USR 15619: REM: CLOSE #12
+     999 END
+
+In  line 570, the record in record number 15 (remember this is the
+16th record) is read  and loaded  into the  variable A$.  When all
+operations with a file are completed the stream must be closed, as
+shown  in line  990. The  contents will  be lost  if the  power is
+turned off before the stream is closed.
+
+It  is acceptable for a record to comprise more than one variable.
+It is the responsibility of  the  program  to  link  together  the
+strings of those variables for the write  operation. Similarly the
+program must  split up the string after  the read operation if the
+data is to be split into separated variables again.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 37
+ 
+
+14   DIRECT SECTOR READ/WRITE
+
+In addition to three types of data files described in the last two
+sections, TRDOS also offers direct sector (one sector contains 256
+bytes) read/write of a file on the disk.
+
+
+14.1 The PEEK command
+
+The PEEK command allows you to read any part of a file on the disk
+and transfer the data to RAM. You may only read a sector at a time
+and the data can be  transferred  to  any  location  in  RAM.  The
+command syntax is:
+     PEEK "filename"Buffer_address, Sector_numbers
+
+Eg:
+     PEEK "Record" 30023,5
+
+In  this example, the 5th sector of  the file "Record" is read and
+its content is written to RAM from address 30023.
+
+
+14.2 The POKE command
+
+The  POKE command allows you to write a sector of data from RAM to
+any location  in a file on the disk.  The syntax is similar to the
+PEEK command:
+     POKE "filename"Buffer_address, Sector_number
+
+Eg:
+     POKE "B:OLD"30024, 10
+
+In this example, a sector length of data starting from RAM address
+30024  is written to the 10th sector of the file "OLD" in drive B.
+As  this command changes the  content of the file  on the disk, it
+must be used with care.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 38
+ 
+
+15   MACHINE CODE PROGRAMMING
+
+The inclusion of TRDOS  routines  in  machine  code  programs  are
+relativey straightforward.
+
+There are 3 elements required for the program:
+
+(1) The machine code equivalent of the BASIC TRDOS command.
+(2) The machine code routine to implement 1 above.
+(3) The machine code routine to restore the system to its original
+    state before calling and executing the command.
+
+The actual memory locations used will depend upon the program as a
+whole. For the  purpose  of  this  example  the  location  of  the
+routines  will be at 49000 for the SAVE, at 49500 for the LOAD and
+at 50000 for the instructions calling them. Thus item 1 will be at
+either 49000 or 49500 and items 2 and 3 at 50000.
+
+EXAMPLE:
+
+Address     Code     Basic   Comment
+
+49000       234      REM     Codes as in Appx A of Spectrum
+49001        58       :      manual
+49002       248      SAVE
+49003        34       "
+49004        69       E
+49005       120       x
+49006        97       a
+49007       109       m      File name "Example"
+49008       112       p
+49009       108       l
+49010       101       e
+49011        34       "
+49012        13      ENTER   Always end with ENTER
+
+The  code for the LOAD commences at  49500 and is eaxctly the same
+as above except that address 49502 will contain 239 (LOAD) instead
+of 248 (SAVE).
+
+These two  routines, LOAD, and  SAVE can be  located anywhere, but
+the  initiator which we are locating at 50000 requires changing at
+addresses  50007-50008 (Save  routine address)  and 50025  - 50026
+(LOAD routine address) to point to the new addresses.
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 39
+ 
+To relocate, the  initiator itself  requires reassembly.  For that
+reason the Z80 mnemonics only are given below.
+
+CHADD  EQU   23645         Location of SOS variable CHADD
+       ORG   XXXXX         XXXX=address of this code
+       LD    HL,(CHADD)    Start to save true CHADD
+       LD    (TEMP), HL    Temporary store of true CHADD
+       LD    HL,49000      Address of SAVE routine
+       LD    (CHADD),HL    CHADD now points to our routine
+       CALL  15363         ENTER TRDOS SAVE via chadd
+       JP    BACK          Jump to program point from which
+                           the whole routine was called
+       LD    HL,(CHADD)    
+       LD    (TEMP),HL     The routine for LOAD now repeats
+       LD    HL,49500      the above with just the address
+       LD    (CHADD),HL    changed.
+       CALL  15363         
+BACK   LD    HL,(TEMP)     Start to restore CHADD
+       LD    (CHADD),HL    Reload original CHADD
+       RET                 Return from where you came
+TEMP                       Label allocating memory for
+                           temporary storage
+
+The whole routine  pointing to  both the  SAVE and  LOAD routines,
+together with the  "return  to  point  of  entry"  ending  routine
+occupies only 47 bytes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 40
+ 
+16  ERROR MESSAGES
+
+16.1 On-line messages
+
+When you enter a  command in  TRDOS, the command  will be executed
+provided it  is  valid.  If  the  command  is  not  one  of  those
+recognised  by TRDOS (eq LOAD, RUN,  FORMAT etc) TRDOS will ignore
+it. If there is a syntax error or an error occurs when the command
+is executed,  an  error  message  will  be  displayed.  The  error
+message and how they are caused are explained below.
+
+(1)      No disk
+
+There is no disk, or an unformatted disk in the drive or the drive
+door is open.  The command is  displayed after the  prompt A>, you
+may  insert a disk and/or close the  drive door and press ENTER to
+execute the same command.
+
+(2)      No file(s)
+
+TRDOS cannod find the file on  the  disk.  This  error  will  also
+appear if  any command  is used  which incorrectly  identifies the
+file, eg:
+      LOAD "TEST"CODE instead of LOAD "TEST"
+      ERASE "DUMMY1"DATA instead of ERASE "DUMMY2"DATA
+
+(3)      *ERROR*
+
+This  will appear if  there is a  syntax error in  the command you
+typed, such as:
+
+      SAVE "CJ""
+      ERASE
+
+The error  in the SAVE command in the  extra " and the filename is
+missing from the ERASE command.
+
+(4)      Out of memory
+
+This  message will  appear when  loading a  program from  disk and
+there is insufficient memory left to accomodate it, and when using
+the MOVE command if the  necessary  4K  byte  work  space  is  not
+available.  Usually resetting  of the  computer will  overcome the
+problems.
+
+(5)      File exists
+
+A file  with the same  name and type  that you have  tried to save
+already exists on the disk.
+
+
+
+
+
+
+
+
+                              page 41
+ 
+(6)      Overwrite existing file ? (Y/N)
+
+This  appears when copying all the files from one disk to another.
+There is already a file  with  the  same  name  and  type  on  the
+destination disk. You may enter "Y" to overwrite the existing file
+or "N" to ignore that file.
+
+(7)      Disk error
+         Trk xx sec yy
+         Retry,Abort,Ingnore?
+
+This disk has a fault at track xx,sector yy as indicated. You have
+three options,  you can type "R" to  re-try and often complete the
+operation succsessfully,  "A" to abort the operation and return to
+TRDOS  or "I" to ignore this sector  and continue with the rest of
+the disk operations.
+
+(8)      Write protect
+         Trk xx, sec yy
+         Retry,Abort,Ignore?
+
+The disk  is write protected.  Similar to Disk  error above, there
+are three options. However, there is no point to re-try unless you
+change the disk or make it non-protected.
+
+(9)      Verify Error
+
+This may  appear when the  VERIFY  command  is  used. The  message
+informs  that the file on the disk is  not the same as that in the
+memory.
+
+16.2 Error codes
+
+All the above error messages only  appear when entered from TRDOS.
+If  the command was  issued from SOS  or Machine Code  either as a
+direct  entry or from within a program the message will not appear
+on the screen. However,  they  are  stored  as  Code  in  the  Z80
+Register Pair BC. The key to the code is:
+    0 ----- No errors
+    1 ----- No files
+    2 ----- File exists
+    3 ----- No space
+    4 ----- Directory full
+    5 ----- Record number overflow
+    6 ----- No disk
+    7 ----- Disk errors
+    8 ----- Syntax errors
+   10 ----- Stream already opened
+   11 ----- Not disk file
+   12 ----- Stream not open
+
+To obtain the error  code  set  a  variable  equal  to  the  TRDOS
+command.  The variable will take on the value of the error code on
+completion of the TRDOS command.
+
+
+
+                              page 42
+ 
+Example 1:
+
+     LET A=USR 15619: REM: CAT
+
+Example 2:
+
+A simple program illustrating the use of error code 1:
+
+     10 CLEAR 65367
+     20 LET ERR = USR 15619: REM: LOAD "COPY"CODE
+     25 REM error code is returned in the variable ERR
+     30 IF ERR = 1 THE CLS: PRINT AT 10, 1;"""COPY""CODE NOT
+        ON DISK": STOP
+     40 RANDOMIZE USR 32768
+     50 RANDOMIZE UST 15616
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 43
+ 
+17   FACTS ABOUT TRDOS
+
+17.1 TRDOS occupies 112 bytes of RAM
+
+17.2 Without TRDOS connected user RAM commence at:-
+     (a) address 23755 without Interface 1 connected,
+     (b) address 23813 with Interface 1 connected.
+
+     With TRDOS connected user RAM commences at:-
+     (a) address 23867 without Interface 1 conencted,
+     (b) address 23925 with Interface 1 connected.
+
+     To   save/load/run   a   program   which   uses   the   bytes
+     between 23755  and say  23925 the  procedure in  Section 11.3
+     (Magic button) must be followed.
+
+17.3 TRDOS uses disk sectors for storage (see Section 1.2). If the
+     number of bytes exceeds 256  another  sector  is  used.  This
+     continues untill all the file is saved.
+
+     To save   522 bytes will  occupy 3 sectors.  The third sector
+     will contain only 10 bytes.  Only  those  10  bytes  will  be
+     loaded from disk. The  empty  remaining  246  bytes  are  not
+     loaded to overwrite other data which may be in SOS memory.
+
+17.4 In  addition  to the 112  bytes of RAM the  TRDOS also uses a
+     256 bytes buffer when accessing  the  disk.  This  buffer  is
+     allocated dynamically.
+
+     When  executing  many  commands  TRDOS first shifts the BASIC
+     program (if any) up to create the buffer. After completion of
+     the command the BASIC programs  is moved back to its original
+     position. The operation is unseen and unnoticed.
+
+17.5 The  MOVE command requires  4K (minumum)  of  Spectrum RAM as
+     work  space. If  the MOVE  is being  executed with  a program
+     still held in memory  it  will  be  necessary  to  clear  the
+     computer and then execute the MOVE. Clearing the computer can
+     be done  by returning to SOS and  entering RANDOMIZE USR 0 or
+     by using the reset position on the System swith.
+
+17.6 Up to a maximum of 128 files may be stored in one disk.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 44
+ 
+18  PIN CONNECTIONS OF THE DISK DRIVE CONNECTOR
+
+The disk drive connector (see Diagram 1) is designed to be Shugart
+compatible, and the pin connections are detailed as below:
+
+          0V -- 1              2 --
+          0V -- 3              4 --
+          0V -- 5              6 -- Select drive D
+          0V -- 7              8 -- Index
+          0V -- 9             10 -- Select drive A
+          0V -- 11            12 -- Select drive B
+          0V -- 13            14 -- Select drive C
+          0V -- 15            16 -- Load head ( motor on )
+          0V -- 17            18 -- Direction
+          0V -- 19            20 -- Step
+          0V -- 21            22 -- Write data
+          0V -- 23            24 -- Write enable
+          0V -- 25            26 -- Track zero
+          0V -- 27            28 -- Write protected
+          0V -- 29            30 -- Read data
+          0V -- 31            32 -- Side 1
+          0V -- 33            34 --
+
+
+The pin  allocation  of  the  connector,  looking  into  the  Disk
+Interface from the right (see Diagram 1) is a follow:
+
+          2  4                                               34
+
+          o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o
+
+          o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o  o
+
+          1  3                                               33
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 45
+ 
+APPENDIX : UTILITY PROGRAMS
+
+There are three Utility programs supplied with TRDOS:
+     TAPECOPY - transferring cassette based program
+     MAGIC    - renaming, copying and erasing a "family" of files
+                saved by the Magic button
+     DOCTOR   - disk doctor.
+
+To run one of these programs,  insert  the  Utility  disk  in  the
+default drive and enter:
+
+     RUN "boot"
+
+The BASIC program "boot"  will display  a menu  and invide  you to
+select  one of the  Utility programs. Alternatively,  you may call
+the Utility program directly by typing one of the followings:
+     RUN "tapecopy"
+     RUN "magic" or
+     RUN "doctor"
+
+Once a menus has appeared on the screen, REMOVE THE UTILITY DISK.
+
+
+A:   TAPECOPY
+
+The Utility  program  TAPECOPY  is  a  relatively  unsophisticated
+copier not intended  to  handle  commercial  programs  with  their
+sophisticated security precautions.  It is  ideal if  you transfer
+your programs and files on cassette.
+
+It will  copy BASIC, CODE, ARRAY and  DATA files provided that the
+length  of the file is not greater than 40,000 bytes (for SPECTRUM
+& PLUS).
+
+When the program has  been  loaded  you  will  see  the  following
+display:
+
+            TAPE TO DISK COPIER VER 5.0
+              TECHNOLOGY RESEARCH LTD
+
+          Data type:
+          Filename:
+          Code length:
+          Start line:
+          Basic length:
+
+                  PRESS [BREAK] TO STOP
+                     START TAPE
+
+Once the display has appeared REMOVE THE UTILITY DISK. The program
+will save the cassette based files onto the same drive!
+
+Having replaced the disk with the one to  receive the copied files
+all  that is required  is to start  the tape playing  with the EAR
+lead from the cassette connected as usual.
+
+
+                              page 46
+ 
+The procedure is  now automatic.  The display  will  iform  you to
+stop the  tape. At the same  time the file is  being copied to the
+disk, with the same name as that stored on the tape. When complete
+you  will again be told to start the  tape for the next file to be
+copied. If  a file with the same name  as that stored on the tape,
+then it will be overwritten.
+
+The messages you may are duting copying are:
+
+START TAPE:        Press  the PLAY  key  on  the cassette to start
+                   loading.
+
+STOP TAPE:         STOP  the  cassette recorder whilst the program
+                   is being copied to disk.
+
+TAPE LOAD ERROR:   The  SOS  message for loading  problems, revind
+                   and start again
+                   
+NOT ENOUGH MEMORY: The  program is longer  than  40,000  bytes. to
+                   copy this note down the header details from the
+                   display.  Now press BREAK to return to Spectrum
+                   SOS.  Clear  the machine with a RANDOMIZE USR 0
+                   and load  the program as normal. Use the header
+                   details to SAVE  to  disk  in  the  normal  way
+                   (Section 10.1).
+
+
+B : MAGIC
+
+When  the Magic button is  used to dump a  program of the Spectrum
+128  computer, a "family" if files (up to 7) are saved. It is very
+tedious to  deal with  these files  one by  one. This  menu driven
+Utility program enables you to rename, erase ir copy (single drive
+or twin drives system) these files easily.
+
+
+C : DOCTOR
+
+This  Utility program is also menu driven. The disk doctor enables
+you  to read, inspect and  modify any sector on  the disk. You may
+set  up the drive  (A, B, C  or D), the  sector (0 to  15) and the
+track  (0 to 159). After these have been set up, the sector may be
+read and stored in the buffer. The sector size is 256 bytes.
+
+The content in the buffer may be displayed and edited. The program
+asks for  the starting address  which has a  range of 0  to 255 in
+decimal. When  the content is being displayed,  you may stop it by
+pressing the  ENTER key. If desired, the  buffer can be saved back
+to the disk.
+
+The "change disk" command informs the system that you have changed
+the disk in the drive. You may also "verify"a disk.
+
+
+
+
+
+                              page 47
+ 
+GUERANTEE
+
+This Disk Interface is gueranteed by TECHNOLOGY RESEARCH LTD for a
+period of twelve months from the date of purchase against material
+defect and bad workmanship.
+
+The  faulty Disk  Interface will  be repaired  or replaced  with a
+similar model  during this period at  the discretion of TECHNOLOGY
+RESEARCH  LTD. The repaired  or replaced model  will be gueranteed
+for a period  of  one  month  or  the  balance  of  the  unexpired
+guerantee period whichever is longer:
+
+The  guerantee does  not cover  defect caused  through accidential
+damage, misuse, or wear  and tear.  The guerantee  is void  if any
+attempt has been made by  persons  not  authorised  by  TECHNOLOGY
+RESEARCH  LTD  to  dismantle  or  repair  any  part  of  the  Disk
+Interface.
+
+In  order to  claim the  guerantee you  must return  to TECHNOLOGY
+RESEARCH LTD  within 14 days of  purchase a completed registration
+form with the purchase date and dealer's stamp. The Disk Interface
+must  be returned at your own  expenses to TECHNOLOGY RESEARCH LTD
+properly protected and insured against damages in transit together
+with a brief description of the nature of the fault.
+
+The guerantee does not  affect  your  consumer  rights  under  the
+statutory law.
+
+The guerantee is only valid in the United Kingdom.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              page 48
+ 

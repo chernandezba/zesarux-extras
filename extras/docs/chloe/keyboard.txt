@@ -1,0 +1,17 @@
+On the SE esc = break, tab = tab, caps = caps, shift = shift (but shift+num should give a symbol)
+
+
+Keyboard:
+
+Tab is shift+1
+Control is shift +9?
+Alt is sym+shift?
+ESC is break (shift+space)
+Win key is sym
+
+But, exclamation mark (!) is got with shift+1. So in this case, shift on pc keyboard is acting as symbol on spectrum keyboard
+So, symbol @ shows pressing shift+2 (shift is converted to symbol in spectrum). But A (a uppercase) appears pressing shift +a (so shift in this case is shift in spectrum)
+
+
+
+About TRUE VIDEO,INV VIDEO: The keyboard is almost perfect now. Just two keys you can't get to on a laptop keyboard which are RUN and STOP shortcuts. These are mapped to TRUE VIDEO and INV VIDEO so my suggestion is to have § map to TRUE VIDEO and ± map to INV VIDEO if that's possible. (the symbols on the key to the left of the 1 key). Command as symbol shift can get to LOAD, CODE, DATA, and SAVE in combination with Q, W, E, and I.

@@ -1,0 +1,20 @@
+Trackerplayer
+-------------
+
+A suite of commands for ESXDOS for playing Spectrum tracker music files.
+
+Instructions:
+* Copy the files playpt3, playsqt and playstc to the C directory of a
+disk which has been set up for use with ESXDOS.
+* Copy some music to that disk, in .pt3, .sqt or .stc format ( as used
+by Sergey Bulba's AY Emulator: http://bulba.untergrund.net/emulator_e.htm )
+* Boot up into ESXDOS, then enter at the Basic prompt:
+
+	.playpt3 my_music.pt3
+or	.playsqt my_music.sqt
+or	.playstc my_music.stc
+
+
+
+
+Matt Westcott <gasman@raww.org> 2010-02-10

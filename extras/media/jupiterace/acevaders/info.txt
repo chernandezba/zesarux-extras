@@ -1,0 +1,24 @@
+ACEVADERS
+
+THE EVER-POPULAR INVADERS GAME! SHOOT THEM DOWN BEFORE THEY GET YOU!
+
+THIS GAME HAS TWO LEVELS OF SKILLS.
+
+LOADING INSTRUCTIONS
+
+This program is loaded in two parts.
+(1)
+To load the graphics type:
+'load gr' and press Enter key and start tape recorder (when Jupiter displays O.K. report on screen stop tape).
+Type:
+'gr' and press Enter key to define the graphics (Jupiter will report O.K. when this has been carried out) and then type:
+'forget gr' and press Enter key (Jupiter will again report O.K. when this has been achieved).
+
+(2)
+To load the game type:
+'load acevaders' press the Enter key and start your tape	recorder (Jupiter will report O.K. when the program has been loaded—do not forget to stop the tape recorder).
+
+To start play type:
+'r' press Enter key and use letter z key to move left, letter x key to move right and press letter m key to fire your laser gun.
+
+To replay repeat above instructions, and to speed the game up to the second level of play type 'fast r' and press Enter key; your score will be displayed in the bottom left-hand corner of the screen. 

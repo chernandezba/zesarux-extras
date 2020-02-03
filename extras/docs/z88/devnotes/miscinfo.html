@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Miscellaneous useful information</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="misc.html">Previous</a></td>
+
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="bottom" width="10%"><a href="basicasm.html">Next</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+
+<b><font size="+1">23. Miscellaneous useful information</font></b>
+<br>
+&nbsp;
+</p>
+<p><b>The expanded and non-expanded machine</b>
+</p>
+<p>When a Z88 has 128K or more of RAM in slot 1, it becomes expanded. The
+latest V4 of the operating system is expanded automatically if internal
+RAM has been upgraded to 128K or more. For previous versions of the Z88
+operating system only the first rule is obeyed. The differences between
+the expanded and non-expanded computers are as follows:
+</p>
+<pre><i>Property</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Expanded</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Non-expanded<br></i>Size of BBC BASIC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 40K&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8K<br>Maximum map width&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 256 pixels&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 96 pixels<br>User characters&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 64&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 16 (but see below)<br>Value of EOF#-1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0</pre>
+
+Some users will want to use extra memory, for filing for example, without
+the burden of a 40K BASIC. If all your BASIC programs fit comfortably within
+the ordinary 8K it is unhelpful to have to carry the extra 32K around,
+thus using slot 2 or slot 3 to expand the memory does not expand the machine
+(V3 or earlier operating systems), but just increases memory size (note
+that using slot 3 for RAM causes a very heavy power drain on the Z88, due
+to the lack of special power saving hardware in this slot). The unexpanded
+machine can use 64 user characters, but if an 80 pixel map is used, the
+last 48 of these will be overwritten by map information when PipeDream
+is used (or another application that write to the high resolution map).
+Reducing the map width to 64 pixels, or not using the map at all, allows
+for free use of all 64 user characters. The file attributes for BASIC's
+-1 channel ($FFFF) all hold interesting information:
+<pre>PTR#-1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; high word = no. of free handles in the system.
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; low word = ROM version code: $03 for V2.2 and 3.x versions, $04 for OZ V4.0 (UK), $42 for OZ V4.2 release.<br><br>EXT#-1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; free memory. This is an approximation and should be interpreted<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; with care. It is similar to the memory free indicators given by<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PipeDream and the Diary (Z80asm uses it too).<br><br>EOF#-1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -1 = machine is expanded. 0 = standard 32K machine</pre>
+
+This information can be accessed by applications by using the <a href="osfrm.html">OS_Frm</a> system
+call, to read file attributes, and specifying a handle of $FFFF in the
+IX register pair. Note that although the sequential pointer (PTR) and extent
+(EXT) are returned as 4 byte values in DE and BC registers, the end of
+file (EOF) result is returned in Fz, with Fz = 1 indicating the end of
+file (ie. TRUE or 1) and Fz = 0 otherwise (ie. FALSE or 0).
+<br>
+&nbsp;
+<p><b>Extra CLI features</b>
+</p>
+<pre>&lt;SQUARE&gt; + S&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; T-direct output to ":RAM.-/s.sgn".<br>&lt;SQUARE&gt; + K&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; T-direct input to ":RAM.-/k.sgn".<br>&lt;SQUARE&gt; + P&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; T-direct output to :PRT.0<br>&lt;DIAMOND&gt;&lt;LEFT-SHIFT&gt;&nbsp;&nbsp; Freeze screen output</pre>
+
+If there is an EPROM, which contains a file called "boot.cli", present
+in slot 3 at the time of a reset (soft or hard) then it will be loaded
+into :RAM.- and executed as a CLI file.
+<p>Note: :RAM.- files are dangerous under the version 2.2 or 3.0 of the
+operating system - see below for details.
+<br>
+&nbsp;
+<br>
+&nbsp;
+</p>
+<p><b>Memory for files and applications</b>
+</p>
+<p>Each RAM card is given an allocation of space by the system which is
+useable by the RAM filing device associated with that slot. This allocation
+is always less than total RAM available in that card. Applications (and
+the special device :RAM.-) can use the remaining memory as well as the
+memory allocated to files. Because of this approach, the values given for
+free memory are sometimes confusing. The free memory indicators return
+space available to applications, which will generally be rather less than
+that available to files.
+</p>
+<p>The device :RAM.- can use memory from anywhere in the system, and as
+such is it very useful for large files. Due to a bug in versions 2.2 (3.0)
+in the operating system, if any files are stored in the device when a soft
+reset occurs, the system becomes badly confused, and it is very likely
+that a crash will follow sometime later. If you need to use :RAM.- files,
+then it is vital that they are deleted immediately after use. The features
+described in the previous section all use :RAM.- and if these operations
+are used, then the files generated should be deleted at the first opportunity.
+</p>
+<p>NOTE: V4 has fixed the :RAM.- problem. Some foreign V3.xx versions contains
+the fix as well. You will probably be aware of this on your own Z88.
+<br>
+&nbsp;
+</p>
+<p><b>PipeDream format</b>
+</p>
+<p>The PipeDream file format is designed to facilitate manipulation by
+other programs. No control characters, or characters above ASCII value
+127 are used in the file, unless they have been explicitly typed in (ISO
+characters), apart from Carriage Return (CR) characters which are used
+as separators. The files are sequential, and can be edited by any text
+editor.
+</p>
+<p>PipeDream uses a special form of construct to add special information
+about the structure of the file. All constructs begin and end with an ASCII
+percent sign '%'. Immediately after the first percent sign come one or
+more alphabetic characters which identify the construct. Between these
+characters and the final percent sign, can come any information which is
+relevant to the construct.
+</p>
+<p>At the start of the file is a group of constructs that identify what
+the values of Options Page Parameters are for the file. This is followed
+by the main body of the file.
+</p>
+<p>Each column in the file is preceeded by a column construct which gives
+details about the column followed by all the slots in the column. Every
+slot that is defined in that column has an entry.
+</p>
+<p>Each entry is separated from the next one with a CR character. On each
+line there can be a collection of constructs giving details about the slot.
+</p>
+<p>For each column in the file there is a column construct, followed by
+all the entries for that column, until the end of file.
+</p>
+<p><b>Options Page construct</b>
+</p>
+<p><tt>%OP%parameter value CR</tt>
+</p>
+<pre>parameter&nbsp;&nbsp; two characters identifying the parameter<br>value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the value of the parameter<br>CR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Carriage Return ($0D)</pre>
+
+The various parameter values are:
+<pre>AM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Auto/manual<br>BM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bottom margin<br>BO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Borders<br>DE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Title<br>DP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Decimal places<br>FM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Footer margin<br>FO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Footer<br>HE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Header<br>HM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Header margin<br>IW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Insert on wrap<br>JU&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Justify<br>LM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Left margin<br>LP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Leading characters<br>LS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Line spacing<br>MB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Minus/Brackets<br>PA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Pages<br>PL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Page length<br>PS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Page start no.<br>RC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Rows/Columns<br>TM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Top margin<br>TN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Text/Numbers<br>TP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Trailing characters<br>WR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Wrap<br><br></pre>
+
+<b>Column construct</b>
+<p><tt>%CO: column, width, wrap-width%</tt>
+</p>
+<pre>column&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; letter identifying the column, eg. A<br>width&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; decimal number giving the column width<br>wrap-width&nbsp; decimal number giving the wrap-width</pre>
+
+These constructs can appear anywhere in the entry for each slot:
+<pre>%B%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bracket format<br>%C%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; centre format<br>%Dn%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; decimal places. n gives the number<br>%DF%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; floating format<br>%F%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; free align<br>%Hn%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; highlight character: n gives the number (1 to 8)<br>%JL%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; justify left<br>%JR%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; justify right<br>%L%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; left align<br>%LC%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; leading character format<br>%LCR%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LCR align<br>%Pn%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; page break: n gives the argument, 0 for unconditional<br>%PC%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; per cent character<br>%R%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; right align<br>%TC%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; trailing character format<br>%V%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; slot is a number slot<br></pre>
+
+<b>General format</b>
+<p><tt>construct text construct text ... CR</tt>
+</p>
+<pre>construct&nbsp;&nbsp; one of the constructs above<br>text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ASCII characters being the slot contents<br>CR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Carriage Return ($0D)<br><br></pre>
+
+<b>Diary format</b>
+<p>Each day the diary uses (an active day) is headed by a date. This date
+is in the form:
+</p>
+<blockquote><tt>%dd,mm,yyyy</tt></blockquote>
+
+The % character is represented as %%
+<p>The remainder of a diary file is simply straight text.
+<br>
+&nbsp;
+</p>
+<p></p>
+<p><b>File EPROM format</b>
+</p>
+<p>The following is the format used in file EPROMs. Unfortunately this
+is not the conventions used by the DOR system. However, it is sufficient
+for traversing through the file contents. With this information you can
+program an application that can retreave previously 'deleted' (overwritten)
+files. The format is as follows:
+</p>
+<pre>$0000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; File entry<br>...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; File entry</pre>
+
+<tt>...</tt>
+<pre>...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Latest file entry<br>...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $FF's until<br>$3FC0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $00's until<br>$3FF7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $01<br>$3FF8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4 byte random id<br>$3FFC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size of card in banks (2=32K, 8=128K, 16=256K)<br>$3FFD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sub-type, $7E for 32K cards, and $7C for 128K (or larger) cards<br>$3FFE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'o'<br>$3FFF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'z' (file eprom identifier, lower case 'oz')</pre>
+
+A file entry has the form:
+<pre>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; length of filename<br>1 byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '/' for latest version, $00 for old version (deleted)<br>n-1 bytes&nbsp;&nbsp; 'xxxx'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; filename<br>4 bytes&nbsp;&nbsp;&nbsp;&nbsp; m&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; length of file (least significant byte first)<br>m bytes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; body of file</pre>
+
+When a file is saved to EPROM which has the same name as an exising file,
+the byte following the filename length, is set to zero, thus marking the
+file deleted. However, the name length and contents of the old file are
+all intact and so by directly reading the EPROM, old files can be recovered.
+
+<p>
+</p>
+<hr width="100%">
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <td align="left" valign="top" width="33%"><a href="misc.html">Previous</a></td>
+
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="top" width="33%"><a href="basicasm.html">Next</a></td>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="top" width="33%">Miscellaneous useful routines</td>
+
+   <td align="center" valign="top" width="34%">Miscellaneous useful information</td>
+
+   <td align="right" valign="top" width="33%">BBC BASIC &amp; in-line assembler</td>
+
+ </tr>
+
+  </tbody>
+</table>
+</body>
+</html>

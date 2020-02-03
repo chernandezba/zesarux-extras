@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html><head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<title>System Calls Reference</title><link href="stylesheet.css" type="text/css" rel="stylesheet"></head>
+
+<body>
+<table style="font-size: 12px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr>
+<th colspan="3" align="center">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+<td align="center" valign="bottom" width="80%">&nbsp;</td>
+<td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</tbody></table>
+
+<hr width="100%">
+<p>
+
+<b><font size="+1">OS_Map, PipeDream map control</font></b>
+</p><p><tt>RST 20H, DEFW $F406</tt>
+</p><p>IN:
+</p><pre>&nbsp;&nbsp;&nbsp;&nbsp; BC = reason code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MP_WR ($01)&nbsp;&nbsp;&nbsp; write a line to the map<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MP_DEF ($02)&nbsp;&nbsp; define a map using the Panel default width<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MP_GRA ($03)&nbsp;&nbsp; define a map of specific width<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MP_DEL ($04)&nbsp;&nbsp; no functionality<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MP_MEM ($05)&nbsp;&nbsp; define a map of specific width and associate to application segment</pre>
+
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp; A = error code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad parameters (errors are generally ignored)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_UNK ($03), value of BC is not valid</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; defined by MP_ reason code.<br></pre>
+<b>MP_WR ($01), write a line to the map</b>
+<p>IN:
+</p><pre>&nbsp;&nbsp;&nbsp;&nbsp; A = window ID number (ASCII digit '1' to '6')<br>&nbsp;&nbsp;&nbsp;&nbsp; DE = row of the map to be written (0 to 63, 0 = top of screen)<br>&nbsp;&nbsp;&nbsp;&nbsp; HL = points to bytes to be written</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -<br></pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different<br></pre>
+Notes:
+<blockquote>HL points to a series of bytes, where each byte represents
+8 pixels on the map. Bit 7 is the left most pixel and the bytes are written
+onto the map from left to right. The number of bytes read from HL depends
+on the width of the map.<br>
+<br>
+<br></blockquote>
+<b>MP_DEF ($02), define a map using the Panel width</b>
+<p>IN:
+</p><pre>&nbsp;&nbsp;&nbsp;&nbsp; A = window ID number (ASCII digit '1' to '6')</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; B = width of map in pixels<br>&nbsp;&nbsp;&nbsp;&nbsp; C = width of map in 6 bit characters</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A...DEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .FBC..../.... different<br></pre>
+Notes:
+<blockquote>This call simply reads the value of the map size entry in the
+Panel and attempts to define a map of that width.<br>
+<br>
+<br></blockquote>
+<b>MP_GRA ($03), define a map of specific width</b>
+<p>IN:
+</p><pre>&nbsp;&nbsp;&nbsp;&nbsp; A = window ID number (ASCII digit '1' to '6')<br>&nbsp;&nbsp;&nbsp;&nbsp; HL = width of map to set up (0 to 255)</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; as for MP_DEF<br><br></pre>
+<b>MP_DEL ($04), delete a map</b>
+<p>IN:
+</p><pre>&nbsp;&nbsp;&nbsp;&nbsp; A = window ID number (ASCII digit '1' to '6')</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+
+Notes:
+This call executes no functionality. <br>
+<br>
+<br>
+<b>MP_MEM ($05), define a map of specific width and associate to application segment</b>
+<p>IN:
+</p><pre>&nbsp;&nbsp;&nbsp;&nbsp; A = window ID number (ASCII digit '1' to '6')<br>&nbsp;&nbsp;&nbsp;&nbsp; B = MS_Sx segment for returned map memory as extended address<br>&nbsp;&nbsp;&nbsp;&nbsp; HL = width of map to set up (0 to 255), modulus 8<br>OUT:<br>&nbsp;&nbsp;&nbsp;&nbsp; D = width of map in pixels<br>&nbsp;&nbsp;&nbsp;&nbsp; E = width of map in 6 bit characters<br>&nbsp;&nbsp;&nbsp;&nbsp; C = MS_Sx segment for returned map memory as extended address<br>&nbsp;&nbsp;&nbsp;&nbsp; BHL = extended address of base of map area (for MS_Sx segment), upper left (0,0) coordinate<br>&nbsp;&nbsp;&nbsp;&nbsp;      (size of map area is D * 64 pixels = size/8 bytes)<br><br>Registers changed after return:<br>&nbsp;&nbsp;&nbsp;&nbsp; A......./IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .FBCDEHL/.... different<br></pre>
+
+Notes:
+<blockquote>A map has always 64 pixels height (depth of screen). When
+the map is created, just use OS_Mpb (or RST OZ_MPB in OZ 4.2) )&nbsp;
+to bind returned BHL pointer into
+C = MS_Sx segment. &nbsp;An example:<br><br><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a,'4' &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; ; use window '4' for graphics</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B, MS_S2</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C, MP_MEM</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; hl,64</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+oz&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OS_Map &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp;; create a map of 64 pixels<br></span><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+rst &nbsp;&nbsp;&nbsp; OZ_Mpb &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;; and bind map memory to segment 2<br></span><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ld &nbsp; &nbsp; &nbsp;(hl),@10101010 &nbsp; &nbsp;; write first 8
+pixels to the map area, which is automatically displayed on screen</span><br style="font-family: monospace;">
+</blockquote>
+
+<hr>
+<br>
+At present there is only one map area and it is reclaimed for
+text by redefining the window in which it sits, or by defining a window
+which overlaps it. However, to allow for future expansion this call should
+be used if a map area is to be reclaimed for text use. Please refer to <a href="map.html">section 21, "The Map Area"</a>, to know more about. how the map pixel memory is organised.<br><br>
+
+</body></html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<title>The Map Area</title><link href="stylesheet.css" type="text/css" rel="stylesheet"></head>
+
+<body>
+<table style="font-size: 12px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="dors.html">Previous</a></td>
+
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="bottom" width="10%"><a href="misc.html">Next</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p><b><font size="+1">21. The Map Area</font></b>
+</p>
+<p>The map area was designed for graphics purposes. However, no graphics
+routines were implemented other than a simple horisontal line-write that
+PipeDream uses. The map is the small area on the right hand edge of the
+screen to display a picture of what a page looks like in PipeDream, when
+printed. This region consists of between 0 and 256 pixels across by 64
+pixels down. It is theoretically possible to have a 624 by 64 Hires screen,
+but with current information, graphics are limited to the map area only.
+It is possible, with extreme care, to write directly to the map memory,
+by accessing the HIRES0 character set, see the "Hardware layout of the map"
+section for further details.
+</p>
+<p>Once you have opened a window for the map, say window '1', the system
+automatically updates the contents of the map to the defined window 50
+times a second by the Blink array chip. The map memory is simply hard-wired,
+and everthing written to it will immediatly be reflected on the screen
+(if opened via the <a href="osmap.html">OS_Map</a> call).
+</p>
+<p>The calls provided here, only allows you to write to the map area, not
+to read back from it. If you need to know about the contents of the map
+area, then you should keep a copy of what you write have written to it.
+The width of the map is limited to 96 pixels in an unexpanded machine.
+The actual width will always be a multiple of 8, although the widths used
+by the <a href="osmap.html">OS_Map</a> call will be on less than this, ie.
+63 refers to an actual width of 64 pixels, numbered 0 to 63. The map call
+has the following specification:
+</p>
+<p>
+</p>
+<hr width="100%">
+<p><b><font size="+1">OS_Map, PipeDream map control</font></b>
+</p>
+<p><tt>RST 20H, DEFW $F406</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BC = reason code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MP_WR ($01)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; write a line to the map<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MP_DEF ($02)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; define a map using the Panel default width<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MP_GRA ($03)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; define a map of specific width<br>            MP_MEM ($05)&nbsp;&nbsp;          define a map of specific width and associate to application segment<br></pre>
+
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0</pre>
+
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = error code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad parameters (errors are generally ignored)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_UNK ($03), value of BC is not valid</pre>
+<hr width="100%">
+<p>The various calls to manipulate the map area on the simple line based
+interface is found at the <a href="osmap.html">OS_Map</a> call specification
+in the "System Calls Reference" section.
+</p>
+<p>If you are adventurous, have a look at the following examples. Since
+the map is hardwired, anything written to it will automatically be reflected
+in the map window. It is possible, and very easy to write graphical routines
+once the physical layout of the map memory is defined.
+<br>
+&nbsp;
+</p>
+<p><b>The hardware layout of the map</b>
+</p>
+<p>The map on the Z88 have been designed for a maximum of 256 pixels wide
+and 64 pixels high graphical area. Even though it is a graphical area,
+its basic organisation is a character based matrix, where each 'character'
+is defined by eight column bytes from top to bottom. Each 'line' is then
+defined by the 'characters'. This is why the width of the map area is defined
+in multiple of 8 (bits). The following illustrates the memory map organisation:
+</p>
+<p>&lt;graphics_base&gt;, (0,0)
+<br>
+&nbsp;
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; y columns:<br>x rows:&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte0&gt;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte8&gt;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte16&gt;&nbsp;&nbsp;&nbsp; ...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;mapwidth&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte1&gt;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte9&gt;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte2&gt;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte10&gt;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte3&gt;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte11&gt;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte4&gt;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte12&gt;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte5&gt;&nbsp;&nbsp;&nbsp;&nbsp; ...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte6&gt;&nbsp;&nbsp;&nbsp;&nbsp; ...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte7&gt;&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte15&gt;&nbsp;&nbsp;&nbsp; &lt;byte(x)*8+y&gt;<br><br>line y:&nbsp;&nbsp;&nbsp;&nbsp; &lt;byte &lt;mapwidth&gt;*8*(y div 8)&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;graphics_end&gt;</pre>
+
+The above illustration defines the organisation for 'lines' of 'characters'.
+The width of the map is defined in byte boundaries. The following formula
+defines the byte position from the base of the map area, defined by a simple
+(x,y) pixel position, where (0,0) is at the upper left corner of &lt;byte0&gt;.
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; linedist = (y div 8) * &lt;mapwidth&gt;&nbsp;&nbsp; ; each line is 8 * &lt;mapwidth&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rowdist&nbsp; = (x div 8) * 8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; step 8 bytes pr. 8 pixels<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; coldist&nbsp; = y mod 8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; somewhere in a 'character'<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bytepos&nbsp; = linedist + rowdist + coldist</pre>
+
+Given a pixel coordinate of (x,y) = (10,4), and a map of 80 pixels wide
+(10 bytes), the formula would look like this:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; linedist = (4 div 8) * &lt;10&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rowdist&nbsp; = (10 div 8) * 8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; coldist&nbsp; = (4 mod 8)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bytepos&nbsp; = 12</pre>
+
+which is at &lt;byte12&gt;. The pixel position within the byte (ie. bit position)
+is simply:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pixelpos = 7 - (x mod 8)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5</pre>
+
+which fits: the second bit (seen from left) in the second byte row.
+<br>
+&nbsp;
+<p><b>Example</b>
+</p>
+<p>The following two examples manipulates the map area directly, thereby
+avoiding the relatively large system overhead of the <a href="osmap.html">OS_Map</a>
+call. Here, you read/write directly to the map area. The two examples show
+how easy graphics can be implemented on the Z88, as long as you play by
+the rules and avoid writing beyond the boundaries of the map.
+</p>
+<p>First the base address of the map is fetched, then the memory is paged
+into segment 2 and the base address of the map is stored at <i>(BASE_GRAPHICS)</i>.
+The following example routine will return an address and a corresponding
+bit position of the address in the map from a virtual (x,y) coordinate.
+This is the basic algorithm for manipulating graphics in the map area.
+The Standard Library contains a complete set of library graphics
+routines to plot points, draw lines, sprites and scroll the map area contents.
+All source files are included for evaluation and improvement. These two
+routines are an extract:
+</p>
+<p>
+</p>
+<hr width="100%">
+<br>
+<tt>include "memory.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; memory call definitions</tt>
+<br>
+<tt>include "map.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; map call definitions</tt>
+<br>
+<tt>include "screen.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+; low level screen call definitions</tt>
+<p><tt>; Open graphics window '1', static size of 256x64 pixels, and bind
+graphics</tt>
+<br>
+<tt>; memory into segment 2. NOTE: Only expanded machines may open
+a 256 pixels</tt>
+<br>
+<tt>; wide map.</tt>
+<br>
+<tt>;</tt>
+<br>
+<tt>.openmap&nbsp;&nbsp;&nbsp;&nbsp;</tt></p><p><span style="font-family: monospace;">&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+a,'1' &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ; use window '1'
+for graphics</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B, MS_S2</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C, MP_MEM</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; hl,255</span><br style="font-family: monospace;"><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; oz&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+OS_Map &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;; create a map
+of 256 pixels<br></span><span style="font-family: monospace;">&nbsp;
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; rst
+&nbsp;&nbsp;&nbsp; OZ_Mpb &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;; and bind map memory to segment 2</span><br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ld &nbsp; &nbsp;&nbsp; (base_graphics),hl&nbsp; ; initialize base address of hires0</tt>
+<br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ret</tt></p><p><tt></tt></p>
+<p><tt>; This routine returns the address and bit position of a pixel coordinate
+(x,y)</tt>
+<br>
+<tt>;</tt>
+<br>
+<tt>; in: hl = (x,y) coordinate of pixel (h,l)</tt>
+<br>
+<tt>;</tt>
+<br>
+<tt>; out: de = address of pixel byte</tt>
+<br>
+<tt>; a = bit number of byte where pixel is to be placed</tt>
+<br>
+<tt>; fz = 1 if bit number is 0 of pixel position</tt>
+<br>
+<tt>;</tt>
+<br>
+<tt>; registers changed after return:</tt>
+<br>
+<tt>; ......hl/ixiy same</tt>
+<br>
+<tt>; afbcde../.... different</tt>
+<br>
+<tt>;</tt>
+</p>
+<pre>.pixeladdr&nbsp; ld&nbsp;&nbsp; b,l<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; srl&nbsp; b<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; srl&nbsp; b<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; srl&nbsp; b&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; linedist = y div 8 * 256<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a,h<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and&nbsp; @11111000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; rowdist = x div 8 * 8<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; c,a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; bc = linedist + rowdist<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a,l<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and&nbsp; @00000111&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; coldist = y mod 8<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; de,(base_graphics)&nbsp; ; pointer to base of graphics area<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; e,a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; coldist = graphicsarea + coldist<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a,h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ex&nbsp;&nbsp; de,hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add&nbsp; hl,bc&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; bytepos = linedist + rowdist + coldist<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ex&nbsp;&nbsp; de,hl<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and&nbsp; @00000111&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; a = x mod 8<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xor&nbsp; @00000111&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; a = 7 - a<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret<br></pre>
+<hr width="100%">
+<table style="font-size: 12px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <td align="left" valign="top" width="33%"><a href="dors.html">Previous</a></td>
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+   <td align="right" valign="top" width="33%"><a href="misc.html">Next</a></td>
+
+ </tr>
+ <tr>
+
+   <td align="left" valign="top" width="33%">Dors</td>
+   <td align="center" valign="top" width="34%">The Map Area</td>
+   <td align="right" valign="top" width="33%">Miscellaneous useful routines</td>
+
+ </tr>
+
+  </tbody>
+</table>
+</body></html>

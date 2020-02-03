@@ -1,0 +1,3230 @@
+--------
+Project 81 presents:
+Etext of the ZX-Aszmic manual (etext #2)
+converted to etext by Adam Bergstrom.
+
+Project 81 is the official sister page of Project 64. Its goal is to
+is to preserve ZX81/80 documents like manuals and some other. By translating
+manuals into etexts, the documents will exist for a long time. Each manual
+is also a bit of computer history and should be preserved.
+The 'Project 81' needs your partizipation! If you have manuals
+or ZX81/80 related documets just send an e-mail to me what you want
+to convert. You can also send me an e-mail if you desperately need some
+information. 
+
+The contributors of Project 81 do not take any responsibility for the accurrance
+in this etext. Please use the information given ihn this text at your own risk.
+
+The Project 81 homepage is located at:
+http://www.hh.schule.de/hhs/mjaap/project.htm
+----
+Comprocsys  limited
+
+ZX.ASZMIC
+manual
+C FRAZER JOHNSON
+
+
+
+Contents
+
+
+1 Insertion & Overview
+2 First Steps
+3 First Steps continued
+4 More Debug Operations
+5 Text Operations
+6 The Assembler
+7 Program Execution & Test
+8 Graphics
+
+Appendices
+
+1 General Information
+2 The Shift Keys
+3 Debug Commands
+4 System Addresses
+5 Z80 Instructions
+
+
+Application Note *1
+
+
+
+
+*****  All rights reserved. Manual & ROM contents copyright  ***
+
+	INSERTION & OVERVIEW		Chapter 1
+
+
+
+Congratulations on your decision to buy ZX.ASZMIC. If you have had previous 
+experience of assembly and debug systems you may wish to proceed immediately 
+to the first 3 appendices, which summarise the ASZMIC features for you. 
+Otherwise the next 3 chapters contain a series of worked examples to help 
+give you a feel for ASZMIC usage. Chapters 5,6 & 7 are a more general 
+discussion of the features; chapter 8 introduces you briefly to the graphics 
+possibilities; and appendices 4 thru 6 contain useful reference information.
+
+What exactly is ASZMIC? It was designed to be an ultra low cost program 
+development station for assembly language. As such it gives you all the 
+facilities you need to write and edit programs, assemble them and then run 
+and debug them in a controlled environment. Since the programs may also be 
+run on an '81 fitted with ASZMIC we tried to document some of the useful 
+routines in the monitor itself to help free you from that curse of assembly 
+language programming....Input/Output...., and we parametrised the display 
+routine to release the graphics possibilities which were latent in the 
+hardware. Unlike some of the other offerings on the market ASZMIC is almost 
+completely independent of Basic, and you should bear in mind that the 
+personality of the computer is completely transformed. ASZMIC tips its hat in
+the direction of Cambridge and then does its own thing. If you are experienced
+with microcomputer development systems then much of ASZMIC will be familiar
+to you; but if you are used only to Basic then ASZMIC will give you a power
+which you could never achieve when everything you did was filtered thru the 
+Basic interpreter. This is unfortunately a power for both good and evil; since
+ASZMIC does what you tell it to then a command which is, shall we say, less than
+wise can easily wipe out the system. Fortunately you will not do this very often.
+
+
+1.1	INSTALLATION
+
+ASZMIC is a direct replacement for the Basic Rom in the ZX81. To insert it
+in your computer you must first seperate the case by removing the 5 screws
+from the base of the ZX81; three of which are concealed under the peel-off
+rubber 'feet'. Then remove the three screws which hold the printed circuit
+board onto the lid and,taking care not to pull the 'tails' from the touch
+panel out of their holders, fold back the circuit board and rest it and the
+lid on a clean surface. If you do pull out the 'tails' they can be pushed
+back in without too much difficulty.
+
+If you now look at the component side of the board; calling the edge with
+the edge connector 'top', that closest to the keyboard 'bottom' and the edge
+with the power, cassette & t.v. connections 'left', then the Rom lies at the
+bottom of the board. You can look at the diagram on p. 162 of the ZX8l manual
+to see the Rom identified (and beware1 in the picture it is inserted upside
+down). Although modern technology has made MOS circuits much more tolerant
+than they used to be you may feel more secure working on a large sheet of
+aluminium kitchen foil which is connected to a radiator or earth of
+some sort, or a metal draining board is excellent. Avoid wearing nylon
+clothing and try to earth yourself before touching any circuit not in its
+socket on the board. The Basic Rom will probably be in a 28-pin socket, even
+though it has only 24 pins, so there will be four empty 'holes' in the socket
+above the Rom. ASZMIC also has 24 pins so when it is inserted it also should
+be positioned at the bottom of the socket with four empty 'holes' above it.
+ASZMIC should be inserted so that the 1 on the label lies towards the left.
+Remove the Basic Rom by gently levering it up from top and bottom with a fine
+screwdriver until it lies loose in the socket, and then lifting it away. If you
+are too hasty you may bend the pins. Put it on a little bit of foil. ASZMIC's
+pins may now need to be bent slightly inwards so that you can press it into the
+socket, but not too much since the socket generally makes contact on the
+outside of the pins and you run the risk of a bad contact on one or more pins
+if you bend it too much. Push ASZMIC carefully into place.
+Before putting everything back together again you might like to connect up
+the power and t.v. lines and check that you have a blinking cursor.
+If not then you have a bad connection and you should try to remove and replace
+ASZMIC a couple of times
+
+If you plan to use both ASZMIC and Basic alternately then you may wish to 
+invest in one of the boards available which will hold both Roms. Capital 
+Computers Ltd can give you details. When we were developing ASZMIC we cut a 
+hole in the lid of an '81 (from 4 to 6 back from the touch keyboard for
+about 5 cms and if you cut more than a mm into the keyboard you will kill it)
+and pic-a-backed a zero insertion force socket onto the ZX8l Rom socket.
+This worked surprisingly reliably, but a dual Rom board will give you the ability
+to preserve regions of memory when you transfer control.
+
+1.2	ZX80 INSTALLATION
+
+The circuit board on the ZX80 is more accessible than on ZX8l; you just have to
+remove plastic pins to release the lid and the Rom lies on the right. ASZMIC
+should be inserted with the 1 closest to the UHF modulator (metal box). You
+will not be able to use the G command with a ZX80, and a steady display will
+not be maintained under Edit operations.
+
+Some ZX80's suffer from excessive load on the Al2 address line which can lead 
+to difficulties in reading the key group 6 thru 0. This can be cured by soldering
+a 4.7K resistor between the left hand (keyboard) side of D7 to the earth plane
+below IC11 & IC17.
+
+	FIRST STEPS WITH ZX.ASZMIC	Chapter 2
+
+
+
+
+2.1	POWER UP
+
+After connecting the power to your ZX80/81 you will have a clear screen,
+except for a funny little character towards the bottom left (End-of-Data)
+and a blinking cursor on the line just above it. The speed of blink identifies
+which mode ASZMIC is in..... Fast blink means EDIT, slow blink means DEBUG.
+With 16k of memory on the system you will be in DEBUG mode but if you are 
+using a "bare" machine then you will be in EDIT mode. Shifting between
+EDIT & DEBUG modes is achieved by use of the Shift 9 & Shift E keys. Experiment
+by pressing Shift 9 (DEBUG) and Shift E (EDIT) alternately, and watch what
+happens to the cursor blink rate. There is only one difference between EDIT
+and DEBUG modes, but that is an important one. When you hit newline (we shall
+write newline as /NL/ in future) in DEBUG mode the line you have just finished
+will be passed to the Command Interpreter. In EDIT mode you just start a new
+line.
+
+2.2	EDITING
+
+Press Shift E to get yourself in EDIT mode. The cursor will be blinking quickly.
+Now type A. An "A" appears on the screen & the cursor is advanced to the right.
+Type A again, but this time leave your finger pressing on the key. After
+half a second ASZMIC will start writing A's at a rate of 8 per second. Take
+your finger off the key before the line is full. This illustrates the very
+useful key repeat feature built into ASZMIC. It works on all keys, including
+/NL/. Now type /NL/ & then press B for a second or two, type /NL/ and press C
+for a second or two, type /NL/ and repeat the process till you have 5 or 6
+lines on screen. Notice how the display is scrolled up with each /NL/. Now
+type a final line of, say, G's but do not press /NL/ at the end. Instead
+press Shift 5 (CURSOR LEFT) & keep your fingers on the keys. The cursor will
+move left along the line till it comes to line start. Press Shift 8 (CURSOR
+RIGHT) continuously & watch the cursor advance along the line to line end.
+Press Shift 5 (CURSOR LEFT) again until the cursor lies in the middle of
+the line.Type 12345. The figures are inserted in the middle of the line.
+What actually happens is that everything under and right of the cursor is
+shifted right, the character you have typed is placed under the cursor, and
+then the cursor is shifted one place to the right.
+
+2.2.1	RUBOUTS
+
+Press Shift 0 (RUBOUT). The 5 you have just typed will disappear. This is
+the first type of rubout in ASZMIC, and is the typing error rubout. The
+character to the left of the cursor is deleted and everything past it moved
+left one place. Press Shift 5 twice to position the cursor over the 3.
+Press Shift Q (EDIT RUBOUT) and watch the 3 disappear. This is the second
+type of rubout; the editing rubout. The difference is that Shift 0 is more
+convenient when you are typing in a fresh line, and Shift C is better when
+editing a file. Experiment a bit with them if you like. Edit Rubouts do not work
+when there is only one character remaining on a line. You can rubout /NL/'s
+with Shift 0. Shift Q can also delete the "padding" blank ASZMIC inserts before
+a /NL/; which can give problems with assembly & merging.
+
+2.2.2	VERTCAL CURSOR OPERATIONS
+
+Reset your ZX80/81 (turn off & on again). We ask you to do this quite often
+because if you have only 1K of memory these examples will soon fill up the
+text area. Enter DEBUG mode with Shift 9. Type D 0/NL/ .
+ASZMIC responds with  0000 F5
+Keep your finger on the /NL/ key until ASZMIC has printed 0030 3E and then
+type . (period) followed by /NL/ followed by E/NL/ to get back to
+EDIT mode. You have actually done a Dump & Modify of the first 49 monitor
+locations but we want it just to have some text to play with. Now press Shift
+7 (CURSOR UP) and hold it down. Watch the cursor move up the screen until it
+reaches the top, and then watch the text scroll down until the cursor has moved
+onto a blank line. Now press Shift 6 (CURSOR DOWN) and watch the cursor move
+down until it is on the final line just above the End-of-Data character. It
+will not move down any further. Now press Shift 4 (PAGE UP) a couple of times
+and see how you flip up through the text. Press Shift 3 (PAGE DOWN) to reverse
+the process.
+
+2.2.3	DELETING A LINE
+
+Move the cursor up to 0020 7E or thereabouts. Now press Shift 1 (DELETE LINE).
+The line will vanish. Repeat the process and sucessive lines will vanish
+until you are back down above the End-of-Data character. You cannot delete this
+final line with Shift 1; you have to rub it out character by character. This
+is to protect the vital End-of-Data character which is used as a "stop" for
+many ASZMIC operations. Now press Shift T (TOP). The cursor and display
+jump up to the very top. This is useful if you want to search down through
+large texts, but is most important because the top line has a special significance.
+It is the Shift Macro line, but more of that later. Now press Shift 9 (DEBUG)
+and notice how you have jumped down to the bottom line and entered DEBUG mode.
+Press Shift E (EDIT) and note that you have not only entered EDIT mode (fast
+blink) but also jumped back to the point where you were when you last pressed
+Shift 9. This enables you to toggle between EDIT and DEBUG modes without having
+to search for your place all the time.
+
+2.2.4	FILES & FILEMARKS
+
+Unlike the BASIC rom, ASZMIC does not construct a special display file for
+you, but instead uses most of memory as one big text area over which you
+move the T.V. screen as a sort of window. A lot of operations are controlled
+by a special character, the  (sterling) sign, which acts as a delimiter. 
+Since blocks of text seperated by  signs are treated as files, we call the o
+a filemark. It is used by itself to indicate the end of a file, and is
+needed for print, assembly, cassette save, merge, and file deletion operations
+to tell ASZMIC that it is time to stop. You indicate the start of a file by a
+name which is particular to it & does not also occur in the body of the file.
+It is good practice to have a filemark as the first character of the name. Thus:-
+
+oNURSERY.RHYME
+1
+2
+BUCKLE MY SHOE
+3
+4
+KNOCK ON THE DOOR
+o
+
+is an example of a file, and can be printed, saved, edited etc. by
+referencing the name oNURSERY.RHYME  . A filename can be any combination of
+alphanumeric characters (0-9 A-Z) and . (period) and is terminated by any
+other character.
+
+Home the cursor (Shift 9) & type /NL/  . Then press Shift E to get into EDIT
+mode & move the cursor till it blinks on the D of your original D 0 line at
+the top of the dump. Now press Shift 2 (delete file) . All the text from the
+cursor to the filemark will have been wiped away.
+
+2.2.5	RUNNING OUT OF SPACE
+
+Reset the ZX80/81 and hit Shift 9 (DEBUG, as you probably know by now).
+Type D 0 5000/NL/   . The screen will go blank for several seconds because
+ASZMIC is generating 625 lines of formatted dump for you. Unfortunately
+it would take more than a 16k memory pack to contain so much text, even if
+ASZMIC had not divided up your memory into 3 parts for text and 1 for programs.
+When the display comes back try typing in a character. Nothing happens. You
+can move the cursor around (try it) but you cannot insert any fresh text. To
+use ASZMIC further you must delete some text. Move the cursor up 4 or 5 lines
+(Shift 7) and then hold Shift 1 continuously depressed. You will delete the
+last few lines. You can now insert characters (100 or more) until you run out
+of text space again.
+
+2.2.6	MACROS
+
+We may as well use this mass of text for something. Press Shift T. This
+takes the cursor up to the top line. Now type E 40 but, since you are in
+DEBUG mode, do not press /NL/ to execute the command but instead press Shift 9
+(DEBUG) to home the cursor on the bottom line. Now press Shift R (Shift macro).
+The effect of this is to execute the top line as a DEBUG statement, irrespective
+of what mode you are in. E 40 is a DEBUG command to enter EDIT mode
+and position the cursor at the start of the first occurrence of the string "40"
+above its current position, so you will see the cursor blinking quickly on the
+"4" of a "40". Press Shift R several times and see how each "40" in the dump is
+successively searched out. You can have almost any DEBUG command or concatenation
+of commands on the top line and this is a way of doing a lot of work with a
+single keystroke. (there is another sort of macro, a Command Macro, built
+into ASZMIC and we will look at it when we discuss file merging)
+Now delete the dump by pressing Shift 9, typing /NL/ ( is not a valid DEBUG
+command and is ignored by the Command Interpreter), pressing Shift T, and
+then holding down Shift 6 to move the cursor down to the "D" of D 0 5000,and
+then pressing Shift 2 (delete file). You should have cleared out everything.
+
+2.2.7	MERGING
+
+Reset the ZX80/81. Type Shift E (EDIT). Type the following:
+
+>D 0 1/NL/
+D 0 2/NL/
+D 0 3/NL/
+D 0 4/NL/
+D 0 5/NL/
+o/NL/
+
+Now press Shift G (merge) once. Everything between the > and  characters
+has been. duplicated. Try it again. Every time you press Shift G a further 5
+lines are copied down at the cursor position. Move the cursor up to the D of
+a D 0 3 and press Shift G. The 5 lines have been inserted before the D 0 3,
+because that is where the cursor was. Now type Shift 9 (DEBUG).
+
+In EDIT mode the Shift G is a pure merge key. Now that you are in DEBUG mode
+the effect is rather different, because every time ASZMIC writes a /NL/ to
+the text area in DEBUG mode it passes control to the Command Interpreter.
+Press Shift G. Every "D" line has been copied, but since each line is a dump
+command, it is followed by the appropriate dump. Just by pressing 1 key we have
+executed 5 lines of DEBUG commands. This is called a Command Macro.
+
+Normally in EDIT mode merging you will want to copy one piece of text into
+another. You do this by identifying the text to be moved by the > and  
+characters, putting the cursor at the point you want the text merged into,
+pressing Shift G, and then, if you want the original text deleted, positioning 
+the cursor on the > character and pressing Shift 2 (delete file). Simple,
+flexible, and, for the poor sweated labourer who wrote ASZMIC, easy to 
+implement. Check Appendix 4 for the symbols SHFTD & SHFTF. If they
+appear then you have 3 merge keys. Shift D is like Shift G but uses * as 
+merge start identifier, and Shift f uses <  .
+
+2.3	WHAT NEXT?
+
+You have now covered all the Shift keys which control the EDIT functions. If
+you look at Appendix 2 you will see a formal summary of each Shift. Try
+setting up some text of your own and working with it. Then look at Appendix 3
+for a summary of the DEBUG commands. We are going to look a little more
+closely at them, although not in alphabetical order, since some of the
+commands are more complex in their implications than others.
+
+	FIRST STEPS CONTINUED	Chapter 3
+
+
+
+
+3 SIMPLER DEBUG COMMANDS
+
+Everything that you can do in EDIT mode you can also do in DEBUG mode .
+The difference is that the Command Interpreter is called in DEBUG mode when
+you press /NL/. However if you do any editing in DEBUG mode then you cannot
+rely on Shift E (EDIT) to take you back to the point where you exited from EDIT
+mode. It will take you back to the location in memory where the cursor WAS, but
+you may have edited in something different there (such as a /NL/, in which case
+the cursor will not appear).
+
+3.1	D for DUMP
+
+Reset your ZX8l. Hit Shift 9 to ensure you are in DEBUG mode. Type D :4300 12/NL/
+and you will get a display of the form:-
+
+4300 00 00 00 00 00 00 00 OC
+4308 00 00 00 00
+
+This is an example of a Dump Range command. It introduces an important new idea,
+that of a FIELD. The command itself is just a letter D, followed by a field which
+defines the starting address for the dump and then a field which defines the
+number of bytes which are to be dumped from successive locations. The : (colon)
+identifies the 4300 which follows as being a hexadecimal value. Lock at the
+definition of the field types in ASZMIC which you will find in Appendix 1.
+The use of fields defined there is common throughout ASZMIC with one exception
+which we shall discuss in a moment. Fields are seperated by one or more blanks
+or a comma, but not both. The first field can start immediately after the DEBUG
+command letter, but an intervening blank often looks better.
+
+There is another form of dump which we call Dump & Modify. Type D :4300/NL/
+ASZMIC responds with:-
+
+4300 00
+
+and the cursor is waiting on the line for input. Depress /NL/ 2 or 3 times.
+With each press the next location and its contents are printed out thus:-
+
+4301 00
+4302 00
+4303 00
+
+How do you get out of this? Press . (period) followed by /NL/ and you are back
+in ordinary DEBUG mode again. So where does the Modify come in? Type
+D :4300/NL/ again. Now type 1 4 7 C 12/NL/ followed by . (period) and /NL/.
+Then do a dump range of the form D :4300 6/NL/  . The response is:-
+
+4300 01 04 07 0c 12 00
+
+Compare this with the result of the first D :4300 12 that you did. Dump &
+Modify is the exception to the ASZMIC field rules that we mentioned earlier.
+Numbers are ASSUMED to be hexadecimal even without the : (colon) prefix. If
+you want to type in a decimal number use 0+decimalno. For a more dramatic (?)
+demonstration reset your ZX81,enter DEBUG mode, type 15 or 20 o signs, then look
+for the address of DSPBGN in appendix 4 and add 55 to it (e.g. :40B4+55). After
+terminating your oo's line with /NL/ type D :40B4+55/NL/  & then 1C/NL/ 1D/NL/
+etc. You can see the o signs being overwritten with the characters corresponding
+to the codes that you typed in.
+
+3.2	C for COPY
+
+Reset the ZX8l (if you have 16K of memory you need not do this all the time).
+Enter DEBUG Mode (Shift 9). Type the following commands:-
+
+D :4300 20/NL/
+D :4300/NL/
+1 2 3 4 5 6 7 8 ./NL/
+D :4300 20/NL/
+C :4300 :4308 8/NL/
+D :4300 20/NL
+
+Take a deep breath and look at what you did. First you dumped 20 locations which
+were all 0 (the machine zeroes memory on reset). Then you did a Dump and Modify
+of the first 8, and a Dump Range to verify that they had been modified. You
+then copied 8 bytes from the location :4300 to the location :4308 (the bytes
+are counted UP from the addresses you give) and finally you dumped the 20 locations
+again to verify that the copy had taken place.
+
+The format for Copy is C from to count. It has logic in it to ensure
+that if you specify overlapping memory regions then the data moved to the 
+destination region is not corrupted. The copy goes from top to bottom or
+vice versa as required to ensure that the source region is not overwritten
+by the destination region before the source bytes have been copied.
+
+3.3	F for FILL
+
+Reset the ZX81 & enter DEBUG mode. Type F :4300 :4310 :AA/NL/  .
+Then type D :4300 16/NL/ and note that you have filled the region with AA
+codes. The format is F from to fillerbyte . The command is most often used
+to initialise regions of memory (notably to zero them out; zero is the default
+fillerbyte if you do not specify a third field)
+
+3.4	E for EDIT
+
+E by itself just shifts back to EDIT mode. If followed by a symbol
+then ASZMIC searches up for the symbol and positions the cursor at
+its start. Great for getting to a file when you have a lot of text. You have
+already used this command in 2.2.6 MACROS so we will not give any examples.
+Look at the description of the subroutine CMPSTR (used by E & many other
+ASZMIC commands) to see what constitutes a valid comparison.
+
+3.5	H for HORRIBLE JUMP
+
+The format for this is H field  and the result is a jump to the address
+specified by the field whilst still in the context of the Command Interpreter
+You presumably have a program at the address which does something for you and
+then RET's to ASZMIC. Your routine can analyse further fields on the line using
+GETFLD, so this is a way of linking in your own personalised commands. If you
+want an example try looking up the address of INICON in Appendix 4
+and then doing an H to that address (remember the :). INICON is the start of
+the ASZMIC initialisation so the effect should be the same as resetting the
+ZX81.
+
+3.6	M for MACRO
+
+This is an extension of the Shift G key. Reset the ZX8l and enter DEBUG mode.
+type: -
+
+=D 0 8/NL/
+o/NL/
++D 16 8/NL/
+o/NL/
+
+Then type M=/NL/ a couple of times and M+/NL/ a couple of times. The dumps
+specified are generated. The character after the M specifies the start character
+for the command macro, unlike Shift G , which always uses > as a start
+character. You thus have a wide choice of macros.
+
+3.7	O for OLD REGISTERS
+
+In DEBUG mode type O/NL/. You will get a pair of intimidating lines
+each with six 4-digit hexadecimal numbers on it. These are the registers which
+are saved in the register context area (REGIM). See the definition of O in
+Appendix 3 to tell you which is which. They do not mean too much until you 
+start executing programs and generating Breaks in them, which causes the 
+registers to be saved in the Image area. It is a very good idea to put an
+O in the Shift Macro line when you start a session with ASZMIC, since the
+Shift Macro line is executed for every break condition, and you normally
+are interested in register contents when a break has occurred.
+
+If you are feeling dynamic try looking up the addres of REGIM in Appendix
+4 and then modifying some locations between (REGIM) and (REGIM)+24 and
+noting the effect on the Old Register dump lines.
+
+3.8	P for PRINT
+
+This command will do precisely nothing for you if you do not have a Sinclair
+printer attached. If you do then reset the ZX81 and enter EDIT mode. Type:-
+
+oPRINT. FILE
+ANY
+SORT
+OF
+RUBBISH
+WILL DO
+o
+
+and then hit Shift 9 to enter DEBUG mode.
+Type P oPRINT.FILE/NL/ and the file will be printed. If you want to terminate
+the printing prematurely (e.g. if you forgot the o sign which terminates the
+printing) you just have to hit the Break key.
+
+
+This concludes the simpler DEBUG commands. In the next chapter we shall be
+looking at some of the more complex, and interesting, ones.
+
+	MORE DEBUG OPERATIONS	Chapter 4
+
+
+
+
+
+4 SAVING & LOADING
+
+It is now time to look at the ASZMIC cassette interface. This uses the same
+recording format as the BASIC Rom, so that it is possible, using some tricks
+described in the chapter on text ops, to read in a program saved by BASIC,
+modify it with ASZMIC e.g. writing REM's full of machine code, and then write
+it back so that it can be loaded by BASIC again. The price you pay for this
+compatibility is the dreadful slowness of the interface, but of course you are
+used to that by now.
+
+When ASZMIC writes out a file to cassette it first writes out a title line
+which identifies the program or file which follows, waits 5 seconds, and then
+writes out the file or memory region you specified. When you are loading from
+cassette ASZMIC detects the title line and writes it to screen, using the 5
+second pause before data to display it to you. You thus get a catalogue of
+everything on the tape built up for you, which is informative and soothing
+because you know that your system has not disappeared into one of those black
+holes which lurk around cassette reading.
+
+4.1	K for KASSETTE (sic)
+
+Reset your ZX81, enter EDIT mode and type in a file, such as:-
+
+oLIMERICK
+THERE WAS A YOUNG LADY FROM EXETER
+SO LOVELY THAT MEN CRANED THEIR NECKS AT HER
+AND ONE WENT SO FAR
+AS TO WAVE FROM HIS CAR
+THE DISTINGUISHING MARK OF HIS SEX AT HER
+o
+
+Now enter DEBUG mode, connect your cassette recorder just as you do for
+BASIC, and type in :-
+
+KoS "POETRY" oLIMERICK/NL/
+
+The sequence K o S space   is very important. If you do not write it like
+that, with only 1 blank between S and ", then ASZMIC will not recognise it
+as a file title and you will never ever (unless you are very smart) be able
+to read the file back.
+
+After you hit /NL/ you have S seconds to turn on your cassette recorder. It
+does no harm to turn it on early. The screen then blanks out for half a second
+and the title line is written out. The display returns for a further 5
+seconds and then the file itself is written out. The display comes back again 
+when the save is complete. You can abort a save at any time with the BREAK key.
+Stop the recorder .
+
+Now type F :4300 :4320 :BB/NL/ to set a region of memory to "BB" codes.
+Do another save, but this time of a memory region:-
+
+KoS "MEMSAVE" :4300 :4320/NL/
+
+Cassette operating procedure is as above. Rewind the tape.
+
+4.2	L for LOAD
+
+Reset the ZX81 and enter DEBUG mode. Type:
+
+L "NOTHING"/NL/
+
+and start the recorder in playback mode with the same volume setting that
+you use for BASIC. After a while the screen will light up with:-
+
+KoS "POETRY" oLIMERICK
+
+
+for 5 seconds and then blank out again. A little later there comes another
+5 second burst but this time the line:-
+
+KoS "MEMSAVE" :4300 :432
+
+has been added to the display.Since there is no file called "NOTHING" on
+the tape you may as well hit BREAK to come back in EDIT mode. Now rewind the
+tape, enter DEBUG mode and, using the same procedure as above but with:-
+
+L "LIMERICK"/NL/
+
+load the file you first saved. Check that it is O.K.
+
+Reset the ZX8l, enter DEBUG mode and rewind the cassette. Check that :4300
+to :4320 contains zeroes (D :4300 32/NL/) and load the second file with:-
+
+L "MEMSAVE"/NL/
+
+Dump :4300 to :4320 to verify that it now contains "BB" bytes.
+
+EASY?
+
+4.5	A for ASSEMBLE
+
+The ASZMIC assembler was developed from a 1K assembler (yes, 1K) written for
+NASCOM 1 and normally called, with mixed emotion, the "Dirty Dog" assembler.
+It is a 2 pass assembler with full Zilog mnemonics. If you are not familiar
+with Zilog's assembly language then it might be a good idea, to put it mildly,
+if you bought a book on the subject. There are references in Chapter 26 of
+the ZX81 manual.
+
+Reset the ZX81, enter EDIT mode and type the following sequence (we are going
+to assume that you know enough to terminate each line with a/NL/):-
+
+oFILE
+ORG :4300
+START LD HL,0
+LD DE,0
+LD B,10
+LOOP INC DE
+ADD HL,DE
+LOOPEND DJNZ LOOP
+RST 0
+o
+
+This is a program. Please always start every program with an ORG directive to
+tell the assembler where it should be located. It will probably start at 
+(TXTLIM) if you do not, but that default may not necessarily be in your version
+of ASZMIC. Now we are ready to do an assembly. Enter DEBUG mode and type:-
+
+A oFILE 1
+
+The "1" is an option to say that you want an assembly listing. Almost
+instantaneously ASZMIC comes back to you in EDIT mode (It can assemble at up
+to 300 statements a second) with a listing showing the code generated for
+each statement, plus the location in memory it has been assembled at. 
+Enter DEBUG mode and dump the program (D :4300 14) to see that it really has
+been assembled for you. We call this generated machine executable code "object
+code" .
+Now delete all the text in the text area, but do not reset the ZX81
+because we do not wish to lose the program.
+
+4.6	J for JUMP
+
+We are now going to execute the program. It generates the sum of the numbers
+from 1 to 10 in the HL register. To help us see what is happening we are
+going to use a Shift Macro (which is automatically executed whenever a BREAK
+condition is encountered. BREAK means breakpoint,single step,RST 0 code or
+externally generated NMI interrupt). Hit Shift T, type O (not 0) without a
+newline and then Shift 9 to home back in DEBUG mode. Check Appendix
+3 for the O command if you have forgotten it. Type:-
+
+J :4300
+
+You now have a dump of the registers at the end of the program. Look at HL.
+It should contain :0037, which is the hex equivalent of decimal 55. DE should
+contain :000A which is 10 of course.
+
+	4.7	B for BREAKPOINT
+
+Let us now try to execute the program again, but this time with a breakpoint
+inserted to stop execution "in midstream". Type B LOOPEND/NL/ (the DJNZ
+instruction) and then J START /NL/. Now take a look at the registers. Both
+DE and HL should contain :0001, and B should still contain :0A, since the
+breakpoint takes effect before the instruction at whose location it was
+inserted is executed.
+
+Breakpoints work by saving the byte at the breakpoint location and substituting
+a RST 0 (:C7) code. When you hit a breakpoint in the course of normal execution
+the "normal" byte is put back there ( check with D LOOPEND 1).
+Now type B /NL/. Since you did not specify an address the breakpoint was reinserted
+at the previous breakpoint location ( check with D LOOPEND 1 again). Type B 0/NL/
+to clear the breakpoint.
+
+4.8	G for GO
+
+Now type G/NL/. You have advanced one instruction. Type it a couple more times.
+This is called single stepping. You can see the Program Counter (PC) changing
+ as well as the registers you are working with. Since we did not specify an
+address with the G command it used the saved Program Counter address in the
+register image area (PCl in REGIM).
+
+Now why not try executing 20 instructions before jumping back to the monitor?
+Type G START 20/NL/  .The "START" tells the G command where to go and the "20"
+tells it to execute 20 instructions before it comes back to you. You will
+see that the Program Counter,which points to the next instruction to be
+executed, is :4308, HL is :0015, DE is :0006 and B is :04. If you add it all
+up you will see that this is the sixth time through the loop and we have in fact
+executed 20 instructions. Then type J /NL/. This shows how J without an address
+will just continue the program to its end.
+
+We sneaked in a little subtlety without mentioning it to you beforehand.
+You have used the symbolic names FROM YOUR PROGRAM in DEBUG instructions, and
+they worked. That sort of thing makes debugging a program very much simpler.
+
+By the way, if you try single stepping through a breakpoint then you will single
+step into the breakpoint logic, which may not be exactly what you had in
+mind.
+
+4.9	I for Immediate
+
+WE conclude this chapter by looking at the Immediate instruction facility in
+ASZMIC, which to the best of our knowledge is unique. It is a way of giving
+you the sort of interactive capacity you have in BASIC by allowing you to
+specify assembler statements which are immediately executed in your program
+context, and function as an extension of the program itself without
+the need to recompile.
+
+Clean up the text area if you have a 1K system. Type I LD HL,1/NL/
+and look at the HL register in the "O" dump. It contains :0001. Type I EX DE,HL/NL/
+and note that the DE and HL registers have been exchanged. You can put any
+instruction in an Immediate command, and even define labels with the = (EQU)
+directive, but relative jumps and the other directives (ORG,DEFB,DEFW,DEFM)
+are meaningless and can crash the system when the I command tries to execute
+them.
+
+Finally try I LD HL,1+2+3+4+5-15/NL/ and look at HL in the register dump. It
+should be zero, thus demonstrating how you can do simple arithmetic with
+fields.
+
+We now recommend that you look at the formal definition of the DEBUG commands
+in Appendix 3 to see what you have been doing all the time. There is one
+more Debug command, the N command, which is used in conjunction with a
+special board which holds both Basic & ASZMIC roms to switch between roms
+whilst preserving memory. Its use is described in the board documentation.
+
+	TEXT OPERATIONS	Chapter 5
+
+
+
+
+This and the next 2 chapters contain di scussi on around features of ASZMIC 
+to help 'flesh out' the bare bones of definition in the Appendices and the 
+exemplars of the previous chapters. They should not be taken as comprehensive 
+descriptions of everything which is available.
+
+5.0	INTRODUCTION
+
+The second partition in ASZMIC memory, lying between DSPBGN & (TXTLIM), is 
+used for text preparation and editing. On a 16K system this means you have 
+around 12000 characters available; more if you move up the TXTLIM pointer 
+yourself. ASZMIC treats this as an allowed space in which you can insert 
+characters at will, and your T.V. screen becomes a window which is moved 
+over this enormous area under control of the Editor Shift keys. There is no 
+specific display file as with BASIC, but instead the whole text area is a 
+display file, and the BASIC notions of program, variable and display space 
+are no longer relevant. This is a- software utilisation of one of the 
+main strengths of ZX81 viz. that it allows most of memory to be mapped onto 
+a video display. We force a few conventions of our own onto this space to make 
+life a bit more meaningful for you.
+
+5.1	FILES
+
+The first convention is to introduce a protocol which divides up the 
+text in the text area into identifiable sections. We call these sections files. 
+A file is identified by a symbol whose first character is a f (sterling) sign 
+left justified on the first line of the file. This symbol, plus its preceding 
+o sign, becomes the NAME of the file. The end of a file is signalled by a o 
+sign as the first character of a line. We call the o signs FILEMARKS in 
+consequence. The ASZMIC character string comparison routine CMPSTR is coded 
+to recognise a comparison of strings beginning with o only if the 
+destination string is the first on a line. This all sounds a bit complicated 
+but it works out very well in practice, because if you start every 
+file with an unique filename, and terminate it with a filemark, the ASZMIC 
+commands will unerringly pluck out the file you are interested in from the 
+text area and process it for you. The convention is fully integrated into 
+the Debug commands
+
+This means that you can have as many files as you like, subject only to 
+space restrictions. We should point out that the Debug commands will often 
+work if you have specified an invalid filename for a file i.e. one not starting 
+with a filemark but there are no guarantees. Forgetting the terminating 
+filemark can be a nuisance for cassette ops and printing, and a total disaster 
+if you then try to assemble or merge the endless file.
+
+5.2	MERGING & DELETING
+
+We implemented these functions as Edit Shift operations, rather than Debug 
+commands, to give extra flexibility and to tie up with the 'Show it 
+rather than tell it' philosophy of a full-screen Editor. The cursor 
+is used to identify the starting point for merge & delete operations; and a 
+filemark is used to terminate the operation. When a merge key is pressed 
+ASZMIC searches from a little past the shift macro line down to a little 
+beyond the current end of data pointer to find the merge start character 
+( > for Shift G   < for Shift F  * for Shift D ) and then copies the source 
+text down (or up) to the cursor position until it finds a filemark in the 
+source text. Long merges can blank the screen for a moment.
+
+At one extreme this is a conventional file merging operation, at the other it 
+becomes a text macro. You can, for example, copy in a file of subroutines 
+from tape and merge them into a program. You can also, if you are writing a 
+program with a lot of data in it, code something like   > DEFB o high up in 
+the text area and then whenever you hit Shift G the string     DEFB  will 
+be incorporated into your program. This can save quite a lot of typing.
+
+When you want to delete the source file/string which you have merged you just 
+position the cursor onto the merge character and press Shift 2 
+and, Presto, it has been deleted. A filemark will always stop a delete or merge 
+operation. Failure to terminate a merge source string with a filemark will mean 
+that the poor computer will go trying to merge on forever. You can break 
+back to ASZMIC. Deletes just refuse to work if they cannot find 
+a terminating filemark.
+	
+5.3 EDITING
+
+You have covered the EDIT functions pretty comprehensively in Chapter 2, so 
+here we will just give a few hints & tips. Remember the use of the E string 
+command as a Shift Macro when you want to search out all occurrences of a name 
+in a file. Hitting /NL/ in the middle of a previously written line will convert 
+it to 2 lines, and Typing Rubout can be used to concatenate lines by deleteing 
+a /NL/. Please try not to edit in the top 20 lines of the text area unless you 
+are working with a shift macro. These lines are really padding to preserve a 
+clean display and deleting them could mean that you generate an illegal display. 
+In particular using type rubout to delete the /NL/ at the very beginning of 
+display can leave the vital (but invisible) start of data marker exposed with 
+later disastrous consequences. Editing out the blank which ASZMIC ensures 
+is before every /NL/ can also cause you to lose the cursor in some circumstances 
+and can cause cosmetic errors in assembly and merging. Writing more than a few 
+lines with more than 36 characters in them on any one display page can also 
+cause ASZMIC to position the cursor off the visible page, although this does no 
+harm.
+
+When you want to insert lines in a text you should position the cursor 
+on the line above the desired insertion point, hit Shift W to get to the end of 
+the line and then hit /NL/ to create a new blank line. Shift 7 followed by Shift 
+6 will take you back to the beginning of a line. Remember that Shift Q rubs out 
+under & forwards whilst Shift 0 rubs out backwards.
+
+5.4	PRINTING
+
+The way the printer operates is determined by 2 bits in ASSFLG. This flag is 
+set automatically by the Assembler (it is in fact the options byte) and zeroed 
+at assembly termination (unless you used the Break key to escape from an assembly) 
+so if you want to control the printer you have to set these bits yourself. 
+Bit 1 set to 1 will route almost everything ASZMIC, as opposed to you, writes 
+to printer and Bit 5 will set the printer in fine pitch mode with 64 chars per 
+line.
+
+You can fool the printer into writing double height characters if you want. If 
+you write a line of up to 32 characters and then pad it out with blanks (no 
+/NL/ ) to a total of 48 characters, and then type in the 32 characters again in 
+EXACTLY the same order you will get, not a long line with 2 messages, but 
+a single message with double height characters when the line is printed. 
+This can be effective for titling, and if you do it a lot you will learn to use 
+the merge facility as a convenient way of generating the double texts. If you 
+get the number of blanks wrong the effect is, well, interesting but hardly 
+legible. This technique will also work for fine pitch printing but double up 
+to 64 chars of message and 32 padding blanks.
+
+Remeber the use of the Break key to get you out of print situations when you 
+have forgotten the terminating filemark. Finally, printing takes place indirectly, 
+that is ASZMIC jumps to the print routine via an address in RAM. If you alter 
+the contents of PRTJMP to the address of your own print routine then ASZMIC 
+will use yours instead of the Sinclair interface built in. Print is entered with 
+the stack containing the start of the line to be printed, and your routine must 
+clear this and exit with a RET with HL pointing at the first character after the 
+/NL/ which terminated the line.
+
+5.5	CASSETTE OPERATIONS
+
+Your cassette recorder should function with ASZMIC at the same volume and tone 
+settings as with Basic. ASZMIC should in fact work rather more reliably since it 
+maintains a tone to the recorder until just before recording starts; so that the 
+automatic gain control on most low cost cassette recorders will not be so 
+obtrusive as it is for Basic. If you want to set up your recorder for a new tape 
+brand then try recording a sequence of blanks ( KoS "NULL" :7000 :7FFF ); 
+just after switch on when the program area is empty works very well. Try loading 
+it back in with your recorder volume control set to minimum and then watch the 
+effect as you slowly increase the volume. The screen will change from "white & 
+swimmy" to a series of well defined striated bands to a predominantly black 
+screen when the volume is too high. The volume control is best set in the middle 
+of the "band" region.
+
+5.5.1	HEADERS & FILES
+
+Since there are 2 types of "file" we can manipulate with cassette; genuine 
+text files and defined regions of memory, we have to give each tape file a 
+seperate identification since memory regions do not have file names. When 
+you issue a save command to ASZMIC it writes out the command itself as a 
+header and then pauses before writing out the file proper. On playback the 
+syntax of the save command represents a virtually unique character sequence 
+which ASZMIC recognises, and causes it to be displayed for a few seconds 
+to identify what is on tape. If the identification in the header and the 
+Load command correspond then ASZMIC checks the rest of the header to find 
+out if it is loading text or memory and reacts accordingly. You always come 
+back from Load in Edit mode. There are a couple of extra features associated 
+with loading a memory region. The first is that the region into which the 
+saved program/data is loaded is offset by the contents of the OFFSET variable, 
+so you can do a relocated load from tape. The second is that if you analysed 
+the contents of LABSTK & LABEND and wrote out a Symbol Table to tape, then if 
+you followed the 'end of region' definition with a space and then the letter L 
+ASZMIC will recognise the load as a Symbol Table and set LABEND accordingly. 
+LABSTK is unchanged so you must have the same size memory and not have 
+relocated the Symbol Table before the save. A small feature but Symbol 
+Tables are sometimes worth saving for library or debug purposes.
+The physical seperation of header and file on tape gives you the chance to 
+do some very complex things by juggling and over-recording. This is for the 
+benefit of those hardy souls who are not content till they have abused a 
+system to a maximum, or the more practical who wish to recover a poor 
+recording.  The details you have to work out for yourself. Note that if 
+RDCASS is called before the tape has run onto the half-second silence 
+before a file or header it can pick up rubbish (depending on volume setting 
+and screen contents at record time). The silence will, however, synchronise 
+it onto a byte boundary so that the file may be displaced but will not be 
+corrupted.
+
+
+5.5.2	CREATING BASIC PROGRAMS
+
+There IS one creative abuse of the cassette recorder which we must mention. 
+For those of you who do not have a board which holds both ASZMIC 
+and BASIC Roms the cassette recorder is the most accessible form of 
+communication between the two. In the Application notes you will find a 
+listing for a general purpose program which simulates the context of a Basic 
+program with a single REM in it. By placing your own code at the indicated 
+point you can cause it to be incorporated into the REM. A cassette save of 
+the program will then be loadable by Basic, for the example given the 
+identifier "123456789" is used, and you can then add lines of genuine Basic 
+and reference the code in the REM by a USR (16514). Your code should not 
+affect the HL' register. You will need to use the OFFSET facility when 
+assembling the program. On a 16K system ORG .4000 and OFFSET = :3000 works 
+very well, but you must have a 9 byte header since the first 9 bytes 
+of the variables in Basic are not recorded.
+
+If you want to go back in the other direction (it takes all sorts.....) then 
+you must start by initiating a save of a memory region large 
+enough to hold the Basic program. You can abort it with Break as soon as the 
+memory starts to be written out; all you want is the header. Then back the tape 
+so that you are just before the data which began to be recorded. If you then 
+perform your save of a basic program it can be loaded back by ASZMIC. You will 
+have to abort the load manually when the Basic program is complete. 
+Alternatively you can write a very small program which uses RDCASS to get bytes 
+from the tape and store them. This latter approach is probably quicker and more 
+controllable.
+
+In the beginning ASZMIC had a super fast cassette interface with parity 
+checking and lots of goodies, plus an offset ASCII character set and an 
+RS232 style printer interface. We changed it all to give you Sinclair 
+compatibility on characters, printer & cassette so we hope that someone 
+does make use of this, otherwise it was all wasted.
+
+	THE ASSEMBLER	chapter 6
+
+
+
+Before discussing the Assemhler section of ASZMIC we should look at what an 
+assembler does for us. Unlike BASIC, assembler statements are closely 
+related to the actual operations of the Z80 cpu. The Z80 has a well defined 
+set of logical, arithmetic and data movement operations which it can 
+perform     operations which are relatively easy to understand even if it 
+takes a little time and practice to use them to perform 'useful' work. 
+Unfortunately the instructions which direct these operations when they are 
+read in from memory are more meaningful to the digital decoding logic in the 
+Z80 than they are to flesh and blood.
+
+6.1	MNEMONICS
+
+The first thing an assembler can do for us is to allow us to write down the 
+instructions for the Z80 in a form which is more expressive for us, and then 
+translate them to the Z80 codes; for example CCF as an abbreviation for 
+Complement Carry Flag is easier to remember than hexadecimal 3F. This can 
+be extended further by allowing us express the Z80 instructions in terms 
+of operations on operands meaningful in terms of the Z80 internal architecture 
+(which is relatively comprehensible) and having the assembler decode the fields 
+down into valid instructions. The assembler thus enables us to write Z80 
+instructions in terms of our conceptual picture of the ZOO.
+
+6.2	SYMBOLS
+
+The other thing that the assembler can do for us is to allow us to use symbols 
+instead of the binary codes that the ZOO enjoys to represent data and 
+addresses. Data items can be written in the decimal or character formats 
+which we are used too. The ZOO works with defined addresses in memory. Very 
+often we do not know as we code a program where its constituent routines 
+and entry points lie. We can give them symbolic names, called LABELS, and 
+let the assembler bear the burden of assigning precise addresses to them.
+
+Some of the symbols the assembler uses are self-defining, things like numeric 
+constants, and the rest tend to be labels which can either be explicitly 
+defined with a directive to the assembler, or can appear as the first field 
+of a statement in which case they are assigned the address at which the code 
+generated by that statement will lie in memory. This address is called the 
+location of the code, the assembler keeps track of it by an internal variable 
+called the location counter, and there is a special symbol, the $ sign, which 
+the assembler interprets every time it encounters it as the value of the 
+location counter at the point of encounter. Thus the statements:-
+
+LABLAB 	JP LABLAB
+	JP $
+
+have the same effect when assembled.
+
+6.3	HOW DOES IT DO IT?
+
+When the assembler reads through your program for the first time, and it 
+encounters a label used as an argument in a statement, then if the label has 
+been previously defined to the assembler the address or value associated with 
+it can be incorporated in the instruction, but if the label is something like 
+a jump address further down in the program then the poor old assembler is 
+stuck for a value. The solution to this problem is that the assembler always 
+assembles your program twice (makes what the refined refer to as a second pass 
+over over the program). The first pass pretends to generate code, but really 
+only generates a table (The Symbol Table) which at its conclusion contains 
+a defined value for every label. The second pass can then reference the Symbol 
+Table to substitute valid values for symbols and generate executable (object) 
+code, fancy listings and error messages. Whilst we are talking about the Symbol 
+Table let us slip in a few definitions. A label which is encountered as an 
+argument before it is defined is called a forward reference, a label which 
+is defined more than once in a program is called a duplicate definition, and a 
+label which is referenced but never defined within the program is called 
+an unsatisfied reference unless you have found some way to define it into 
+the Symbol Table ( e.g. Immediate statements or use of force pass 2 
+option) externally in which case it is called, surprisingly enough, an external 
+reference.
+
+6.4	OPTIONS
+
+When you use the A command to tell the Command Interpreter to invoke 
+the Assembler you specify a file which is to be assembled, and also an OPTIONS 
+field, which tells the Assembler how it is to work. Some of the options are 
+pretty obvious. You can elect to generate an assembly listing...very important 
+when debugging your program. You can elect to have the listing and any error 
+messages directed to printer, with 64 characters per line if you want. 
+You can suppress the generation of object code...............
+..useful in the first stages of checking a program and in other circumstances
+too.
+Then you can select some less obvious options. They are concerned with the 
+linking together of seperate programs into a functioning whole. Normally 
+when you initiate an assembly you zero out the Symbol Table, but you can elect 
+to preserve it if you wish. Why? To allow your program to use external 
+references defined in it. You can also elect that the assembler will proceed 
+immediately to pass 2, which from our discussion earlier should be disasterous 
+Why? Because when coupled with the Symbol Table preservation option this allows 
+us to assemble together many seperate programs with cross-references into a 
+functioning whole.
+If you look in Appendix 3 at the A command it summarises the options available 
+and the numbers which represent them. The options field is just the sum of the 
+numbers for the options you want . So if a listing on printer, normal pitch, 
+but with no object code is your desire the options field becomes 64+2+1  or, 
+if your mental arithmetic is good and your patience weak, you can write 67 
+directly
+
+6.5	OFFSETS
+
+There is a variable called OFFSET, whose location you will find in 
+Appendix 4, which has a special significance for both assembly and loading 
+from cassette. The value of this variable is normally zero, and it is used 
+as a relocation offset by the Assembler.
+The way it works is this:-   Normally when you code a program you expect 
+it to be assembled at the location you have specified with an ORG staement 
+so that it will execute at that location. We say that in that case the 
+EXECUTION LOCATION COUNTER and the LOAD LOCATION COUNTER are synchronous. 
+But what happens if you are writing a program which will not be executed 
+after assembly, but will instead be written out to an EPROM programmer to 
+generate an EPROM which is supposed to execute starting at location zero. 
+You have to write an ORG 0 statement at the start of the program so that the 
+program is internally consistent, but if you just left it at that the assembler 
+would try to generate the object code on top of the ASZMIC Rom. This would do 
+no harm but your object code would be lost. You need some way to tell ASZMIC 
+that it must place the object code somewhere else.
+The OFFSET variable is the technique you use to achieve this. When ASZMIC is 
+writing out object code it adds the contents of the OFFSET variable to the 
+execution address to generate a load address at which each object byte is 
+to be situated. If, before an assembly, you set OFFSET to :7000 then 
+code which is supposed to execute starting at location 0 will in fact be loaded 
+into memory starting at address :7000.
+Remember to reset OFFSET to 0 when you are finished. ASZMIC 
+will not do it automatically for you and you will have a fine old time 
+wondering where your next assembly has vanished to.
+
+6.6	ASSEMBLING
+
+You invoke the assembler by typing in A followed by the name of the file 
+you wish to assemble and, unless you want to take the default of object code, 
+no listing, error messages on screen, and new symbol table, an options 
+field to control the assembly.
+
+You must obviously have first written the program you wish to assemble, using 
+the Editor or loading in a previously written file from cassette. Make sure 
+that the file containing the program obeys ASZMIC conventions i.e. that it 
+starts with a filename whose first character is a filemark, and that it is 
+terminated by a filemark as the first character of the line after the final 
+program line. Within the file the program lines, assembly statements, are 
+written according to the conventions used by ZILOG and MOSTEK, the 
+manufactures of Z80 chips (the only exception is the EQU directive). These 
+conventions are, in brief, that the first character of the statement should 
+be a blank unless you wish to specify a label at that point, and that any label 
+be terminated by = or blank. There then follows an op-code or directive 
+which must be terminated by at least one blank. If the op-code or directive 
+needs it there then come one or two arguments. If there are two arguments 
+they must be seperated by a comma without any preceding or following blanks. 
+The final field (argument, op-code or directive) that you write may be 
+terminated by a /NL/, a blank or a ; (semicolon). If a semicolon is found 
+then any characters after it on the line are treated as comments.
+
+If the first character of a statement is a semicolon then the whole statement 
+is treated as a comment. If a label starting in column 1 of the statement is 
+terminated by an = (equals) sign then the assembler assumes you are using 
+an EQU directive to define the label, and searches for an argument after 
+the = sign (you can have intervening blanks if you want) which is evaluated 
+and assigned to the label.
+
+Please note that the Assembler exits by using an RST 0 instruction instead 
+of a RET, so that you can use the O command to see the end of the 
+region for object code in the IX and IY registers.
+
+6.6.1	DIRECTIVES
+
+The ASZMIC assembler has two genuine directives, ORG and =, which do not 
+generate executable code, and three pseudo-directives, DEFB, DEFW, and DEFM 
+which do not generate EXECUTABLE code but produce object code which is a 
+representation of the data values expressed in the argument after the directive 
+itself. We touched on = in the last paragraph; so we will look 
+at ORG now. ORG causes the following argument to be evaluated and transferred 
+to the execution location counter (the IX register). You can use it at program 
+start to define where the program expects to be executing (and where object 
+code will be located if you have left OFFSET at 0) and in the middle of a 
+program to generate space. A cunning use of ORG in mid-program is a 
+statement of the type:-
+
+    ORG $+20
+
+which will reserve 20 bytes of empty space in mid-program for use as a buffer 
+or whatever. ZILOG use a DEFS directive for this purpose which we did not 
+implement in ASZMIC because it was redundant. You cannot use forward references 
+in ORG or = directives (there are ways round this but please phone your 
+friendly local university computer department to find out about them 
+rather than us).
+
+DEFB will quite simply generate one byte of object code with the value, modulo 
+256, of the argument in it. DEFW will generate 2 bytes but with the least 
+significant byte first in the way the Z80 expects so that:-
+
+ DEFW :1234
+
+will produce what looks like  :3412 in memory.
+DEFM searches for a " (quote) sign and then transforms every character 
+after it to a byte in memory according to the Sinclair values assigned to each 
+character, until it finds another " which tells it to stop. This means that 
+you cannot have " signs in a DEFM argument. Do not try coding two together 
+to get round this, it just does not work.
+
+6.6.2	OP-CODES and ARGUMENTS
+
+Op-codes are the mnemonic representation of Z80 operations. You can read about 
+them in the Z80 assembly manual of your choice, and remind yourself 
+about what they are and what they do by browsing thru appendix 5. Arguments 
+are expressed in the standard ASZMIC form which you have been using already. 
+They are defined for you in the "FIELDS" paragraph of Appendix 1.
+The only argument you will encounter which you do not use generally 
+throughout ASZMIC is the $ (dollar) symbol, which represents the value of 
+the execution location counter at the start of the statement in which the $ 
+occurs. This has been a short paragraph for a large topic because this is 
+the information which you will hopefully have gleaned from your book on Z80 
+Assembly Programming.
+
+
+6.6.3	COMMENTS
+
+Comments are always said to be a VERY GOOD THING in a program of any sort, 
+and are particularly desirable in assembler programs because the code tends 
+to obscure function by detail ( the Devil's Data Dictionary claims that by 
+the time the average professional programmer has reached the twelvth line 
+of a program he has completely forgotten what the first six did). We follow ZILOG 
+conventions by allowing you to terminate a statement with a semicolon 
+and then fill up the rest of the line with commentary. Unfortunately the 
+screen can only have 36 characters on a line (32 for the printer) so that by the 
+time you have allowed 16 positions for location and code in an assembly listing 
+you are liable to lose long arguments from the program statement, never mind 
+comments tagged onto the end. They are still useful in the source code (sorry, 
+source code is the name for the programs you input to the Assembler). Option 
+bit 5 will remove the truncation effect, and also set the printer in fine 
+pitch mode to give you up to 64 characters per line.
+
+The assembly listing consists of four distinct fields. The first is the 
+single byte error flag which is placed in  column 1. The second is the 
+four hexadecimal digit location at which the code generated from each 
+statement will lie (i.e. the value of the Execution Location Counter at the start of each statement); the third is a hexadecimal representation of the 
+one to four bytes of code which each statement can generate (note that DEFM 
+can generate up to 5 bytes before truncation); the fourth is as much of the original 
+statement as the Assembler can fit into a 32 character line.
+
+The listing, or error messages if a listing is not selected by the OPTIONS 
+field, will be routed to printer instead of to screen if bit 1 of the 
+OPTIONS byte is set.
+
+6.10 LIBRARIES
+
+If you are just beginning with assembly programming you can ignore this 
+section and the next one. They describe slightly exotic functions which you 
+probably will not want to use for a while. A library is a piece of object 
+code which contains frequently used routines accessible to many different 
+and independent programs. If you write a program which needs such a routine 
+you could always load in the source code from cassette (or microdrive when 
+they become available), merge it into your program and then assemble the 
+whole, but after a while you tend to find this a cumbersome and unecessary 
+procedure. How much more pleasant to load in your collection of useful object 
+code routines once (things like input and output routines, drivers for special 
+peripherals, multiplication and division routines and the like) and have 
+them available for all comers when required. Such a collection of routines 
+is called a library (no prizes for guessing why) and is characterised by the 
+fact that the routines within it are internally self sufficient1 and do not 
+need to reference any external program. A library contains definitions, but 
+no external references.
+
+How would you use such a set of routines with ASZMIC? To begin with you would 
+assemble the library modules (module=constituent program) and save both the object 
+code (the library itself), AND THE SYMBOL TABLE WHICH ITS ASSEMBLY HAD 
+GENERATED. When you needed to assemble a program which referenced (used) some 
+routine in the library you would first load in the Symbol Table as 
+described earlier, and then perform an assembly with bit 2 ("4") of the 
+OPTIONS field set. This would mean that your program would start off 
+with a Symbol Table which defined the addresses of all the names in the 
+library programs, and references made to them would not be flagged as errors. 
+Of course when you came to execute the program you would have to be sure 
+that you had remembered to load the library into memory otherwise the result 
+would be disaster.
+
+6.11 CROSS REFERENCING
+
+The next stage in your development as a jejeune assembler prorammer is to 
+write programmes so large that you do not have enough memory to assemble 
+them as a single entity, or to cooperate with friends or colleagues 
+to write separate sections of the same programme. In this case you are 
+faced with a situation rather different from that we met with libraries, 
+because each separately coded and assembled section contains not only 
+definitions which other sections can use, but references to the other sections 
+as well. How do you handle a situation like this? It is probably simplest 
+to postulate an example with three separately coded but mutually (sic) 
+dependent programmes; PROGA, PROGB and PROGC. PROGA is coded and as its 
+final statement has    ENDA=$. PROGB starts with an  ORG ENDA
+and terminates with an  ENDB=$. PROGC starts with an  ORG ENDB statement.
+
+If you then assemble PROGA with an OPTIONS byte which includes bit 6 
+(no object code) and then assemble both PROGB and PROGC with an OPTIONS byte 
+which includes a setting of both bits 6 and 2 ( see Appendix 3) then you 
+will have built up a symbol table which includes label definitions from all 
+all three programs. You then assemble all three programs again, but this 
+time using an options field which includes both bits 7 and 2, and you will 
+have at the conclusion a single piece of object code which is internally 
+self consistent, always assuming that you have not made any errors.
+What you did was to suppress object code the first time you assembled the 
+three programs in sequence so that at the end you were left with a Symbol 
+Table which contained all the symbol definitions for all 3 programs, plus a 
+bunch of error messages which, providing they refer only to unsatisfied cross 
+references, are irrelevant. Because PROGB and PROGC were assembled 
+selecting the symbol table preservation option the definitions ENDA and ENDB 
+were available in the Symbol Table at the time the ORG statements were assembled 
+so that the programs are automatically assembled to lie together in memory. The 
+second time we assembled each program we used a preserve Symbol Table option 
+so that all the definitions were available but, since the purpose of the 
+first pass of any assembly is just to build up the Symbol Table and we had done 
+that already, we also used a bit 7 (Force Pass 2) option to prevent the 
+creation of a lot of duplicate definitions.
+
+6.12 VALETE
+
+That pretty much covers all we wanted to say about the Assembler. The next 
+chapter tells you how to debug your assembled object code. It is a very good 
+idea to save your object code on cassette before you try to execute it for the 
+first time, since mistakes can wipe out the system, and if you want to use 
+program labels in your DEBUG commands you might also save the Symbol 
+Table. Remember that ASZMIC comes back in EDIT mode after an assembly and, 
+please, always start each program with an ORG directive.
+
+	PROGRAM EXECUTION AND TEST	Chapter 7
+
+When you have written and assembled a program you naturally want to execute 
+it. ASZMIC gives you two major commands for program execution and one for single 
+stepping thru a program (we are discounting possibilities such as referencing 
+the program in an immediate statement using CALL or JP). We shall start 
+by looking at the DEBUG statements available for program testing.
+
+7.1	THE J COMMAND
+
+This is your primary command for program test. It can be specified with an 
+address field, in which case the first instruction executed is at the address 
+specified, or by itself, in which case the address stored
+in PCl when last a Break condition occurred will be used as a transfer address. 
+The J command is characterised by the fact that all the registers are loaded up 
+from the register image area (REGIM) before execution, and that the I register 
+is set to 1 to facilitate non-maskable interrupt (NMI) handling and Break 
+conditions. If your program does not perform register initialisation then you 
+can initialise the register image area using I or D commands.
+
+This is all straightforward, but _if you J to your program and it contains a 
+fault, then your chances of getting back to ASZMIC to find out what happened 
+are slim unless you have an NMI interrupt button fitted to break you out of 
+unforeseen loops. Your first line of defence against the self-immolating 
+program is the breakpoint.
+
+7.2	BREAKPOINT
+
+A breakpoint is an RST 0 code. It can be inserted via the B command, in 
+which case ASZMIC will handle the restoration of the original byte and 
+manipulate the saved Program pointer value so that you can continue with 
+the instruction when you wish, or you can insert it yourself by the D 
+command or by placing it in the original code in which case you must perform 
+any skipping or replacement needed yourself. The conventional way to use a 
+breakpoint is to divide your program into logical sections, and then use 
+the B command to place a breakpoint at the end of the first section. When you 
+execute the program and come to the breakpoint you can check using the DEBUG 
+D and O commands that everything has gone as you wish, and then move the breakpoint 
+to the end of the next section and use the J command to execute the second 
+section. The process is repeated until you identify a section which fails. Very 
+often the mere identification of the part of the program which is failing will 
+concentrate your mind most wondreously and enable you to isolate and correct 
+the mistake. Remember that the RST 0 code is removed, and the original byte 
+replaced, when the breakpoint is encountered; so if you want to break again 
+at that point use the 3 commands G  B  J to get you thru the breakpoint, 
+restore it, and restart execution. If you have a breakpoint active
+ and load in another program on top of the one in which you had the breakpoint 
+then subsequent moving of the Breakpoint will restore the byte from the old 
+program into the new. Remember that you cannot single step through
+a breakpoint without single stepping into the breakpoint handler.
+
+7.3	THE G COMMAND
+
+When you have isolated the section of a program which is failing you can then 
+examine its functioning in detail using the G command. This is the ASZMIC 
+single step feature. It has the effect of the J command but with an automatic 
+Break condition occurring after each instruction. Break conditions always 
+cause context saving in the REGIM area. If you want to step thru a number of 
+instructions before coming back to ASZMIC you can specify a step count as a 
+second field in the G command. In that case you have to specify the first 
+field, the address to GO to, explicitly even if it is the stored Program 
+Counter value.
+
+
+The use of a step count with the G command can be extremely useful. Remember 
+that although you do not return to ASZMIC until the step count is exhausted 
+there is a break with context save and restoration after every instruction 
+so that execution is very much slower than it would be normally. Since the 
+single step feature works by using the ZX8l NMI coupled timer to simulate 
+a breakpoint, the breakpoint and single step breaks are handled by the same 
+code, and this gives you the facility to simulate a Rom breakpoint. If you 
+have a home cooked Eprom with routines starting at :2000, and you want a 
+breakpoint at :2122, then you use a B :2122-1 command and execute the Eprom 
+routine with a G :2000 32767 command. ASZMIC will then single step through 
+the Eprom code until it has executed the instruction before that at :2122, 
+and then it will think that it has encountered a breakpoint and stop 
+the single stepping.
+
+The G command uses the ZX8l NMI interrupt timer in a special way, and is 
+thus not fully compatible with routines which drive the display since they 
+require an I register with 14 in it and an enabled maskable interrupt. 
+A little ingenuity with breakpoints and single stepping over non critical 
+sections will probably see you through problems like that.
+
+7.4	THE O COMMAND
+
+This command, which displays the saved registers from the REGIM context 
+save area, really comes into its own when you are program testing. The 
+registers are displayed as 2 lines in the order:-
+
+PC	HL	HL'	BC'	DE'	AF'
+AF	BC	DE	IX	IY	SP
+
+The ' (prime) registers are the Z80 alternate registers. PC is the 
+Program Counter which tells you which instruction you are next due to execute. 
+SP is the Stack Pointer and the rest are the standard register pairs. We 
+are sorry that we could not print up headers above the dumped registers, but 
+it takes as much ROM space as a printer interface to do that and it burns up 
+the text area twice as quickly, so we felt that it was better to ask you to 
+refer to the documentation.
+
+The O command is usefully placed as a Shift Macro when you are debugging 
+a program (i.e. hit Shift T and type O on the top line). Every Break 
+condition, be it breakpoint or single step, then gives you an automatic 
+register dump. If you have important variables in your program which you 
+also want to dump out each breakpoint you can concatenate commands on 
+the Shift Macro line, using ;/ (semicolon slash) as a delimiter between 
+each command and starting the command immediately after the /. This facility 
+is really meant for dump commands but most Debug commands WILL work there; 
+but do not use an I command since it will then chase its own tail for 
+eternity (purists call this a reiterative loop).
+
+7.5	THE I COMMAND
+
+We are told that some CP/M debugs have the equivalent of the I command in 
+them, which proves that it is such a good idea that many people will 
+discover it independently, not that we ripped off the notion from CP/M. 
+The I command enables you to write a line of assembler which is then 
+immediately assembled and executed for you. Before execution the registers 
+are loaded up using an internal form of the J command, and after the 
+assembled instruction is executed a breakpoint is forced 
+to save the context again, so that the I commands execute in the context 
+of your program. Providing you still have the original assembly Symbol Table 
+intact you can specify labels from your program in I commands, just as in 
+other Debug commands. The only snag is that an I command will change the 
+stored PC value, so remember to J or G to a specific address if you have 
+used I before them or you will start executing the ASZMIC stack. Use of I 
+is a good way to rectify some unimportant omissions in a program and continue 
+with mainstream testing.
+
+The I command is normally used for priming registers, but any executable 
+command can be given. If you do not leave a space between the I and the start 
+of the assembler statement then you will be presumed to have started the 
+statement with a label which you are declaring via the = directive. The 
+only snag is that the label declaration logic in ASZMIC uses /NL/ 
+as a delimiter so that the I is taken to be part of the label. You can declare 
+any label you like so long as it starts with I. Henry Ford would approve.
+
+7.6	THE D, F & C COMMANDS
+
+These commands are fairly straightforward in their operation, and we really 
+only mention them to preserve an illusion of completeness. Dump, and Modify, 
+are the kernel commands of any debug system. Fill is valuable for initialising 
+buffer or workspace areas to an initial value. C, whilst having its primary 
+use in the relocation of code assembled or loaded using OFFSET, can often be 
+useful to reinitialise complex data arrays from a 'spare' copy in memory when 
+you want to return to an earlier stage in a program for re-testing without 
+the trouble of reloading the program. F and C are excellent ways of wiping 
+out the system, so check for typing errors before hitting /NL/.
+
+7.7	VALETE
+
+Debugging a program, even more than writing one, is a black art in which luck, 
+logic and intuition are inextricably blended. Logic and intuition you must 
+supply for yourself, but we wish you all the luck in the world.
+
+	GRAPHICS & SPECIAL OPS	Chapter 8
+
+
+Aszmic offers high resolution graphics facilities. The display driver in 
+the Basic Rom uses a fixed number of rasters (lines) for every character 
+which it displays. This severely limits the graphics possibilities 
+available with Basic unless you install special hardware. ASZMIC has a 
+programmable driver which allows you to set the parameters which control 
+display yourself, and has also substituted for the Sinclair graphics 
+characters a special set which are independent of the hardware offsetting 
+based on raster count. The effect is that from a machine language 
+program you can plot on a 255 x 144 matrix, maintain a continuous display 
+(ZX81 only), and still have time to do computation for movement effects. 
+We suspect that although ASZMIC was really designed as a development 
+station for assembly language programs, and to a lesser extent as a 
+teaching tool, many people may use it just because it is the cheapest 
+way to give yourself a convincing 'Dungeons & Dragons' scenario on 
+the ZX computers.
+
+8.1	THE ASYNCHRONOUS DRIVER
+
+In the Application notes this program is identified as the KERNEL routine. 
+Its function is to create a blank display file, display it 50 times a second, 
+handle syncs & keyboard read, and hand over control to the user program when 
+it is not busy. From a user point of view all his program has to do is 
+manipulate the display file contents; the KERNEL takes care of all the rest. 
+If you are using a ZX80 you cannot use the KERNEL but must instead 
+build up your display, send it out using OFRM1, and handle 
+timing and frame sync yourself. If you have a ZX81 and use KERNEL then your 
+program can act as if the mechanism of display was invisible to it. Do not 
+take KERNEL as sacrosanct; we wrote it quickly (as did we all the graphics 
+examples) just to show thw possibilities. You can probably do better yourself 
+You might start by tuning NNN and IDLE (rasters at bottom of frame and sync 
+pulse length tuning respectively) so that they suit your television.
+
+8.2	PLOT
+
+The PLOT routine in the Application notes is fed by a subroutine CALL with 
+the B register containing the X coordinate and the C register containing 
+the V coordinate relative to screen bottom left. It computes the byte in the 
+display that contains the point, decodes what is in the byte and inserts 
+the new point, and then encodes the byte back again. UNPLOT does the same but 
+deletes the relevant point instead. It does not check for point out of range; 
+that you can put in yourself. It uses a shift and subtract algorithm to 
+compute line address, and a little bit of fiddling with the high order bit 
+in the desired byte to convert to and from the four points (pixels) which 
+each byte can contain.
+
+8.3	LINE
+
+There is another subroutine given which will use PLOT to generate a line 
+beteen two specified points. If the line is between XY & X'Y' then D=y, E=X, 
+B=Y' & C=X' when the subroutine is called. It uses a successive incrementing 
+algorithm to calculate the points needed with the increment maximised to 
+avoid redundent plotting. It works in theory, and in practice too, but other 
+algorithms can give lines which are subjectively more pleasing; particularly 
+when the line subtends only a small angle to one of the axes. A 'dotted line' 
+algorithm in particular can often look much neater since one tends to join 
+up the dots mentally with a much higher resolution than the screen can 
+achieve; but we hesitated to provide any 'psychological' subroutines. They 
+seemed to be straying too far from our path of self-imposed utilitarianism. 
+ULINE deletes a line between the two specified points.
+
+8.4	UPROG's
+
+This is the unlovely name we give to the application programs which create 
+requests for points and lines which PLOT & LINE generate, and KERNEL 
+displays. We offer two examples. STRUCTURES will generate diamond 
+patterns using plot which can look like futuristic space cages. MOIRE will 
+just write tightly packed lines to give a watered silk (who wears watered 
+silk nowadays?) effect. We suggest that you get down and write your own UPROG 
+to get the feel of the graphics. One useful technique that you can use is to 
+achieve translation of images on the screen by use of LDIR instructions. A 
+move of less than 37 bytes will translate on the X axis, and a multiple of 36 
+will give V translation. This is a much easier way of moving composite 
+images than painstakingly deleting and re-drawing them. You CAN also mix text 
+and graphics by starting the text on a raster ('V') which is a multiple of 8 
+from screen top and writing it 8 times on sucessive lines (V's). Remember 
+that if you put a byte with bit 6 set to 1 in the display then the 
+Sinclair hardware will try to execute it as an instruction, with results 
+varying from minimal to a full blooded system crash
+
+8.6	OTHER RESOLUTIONS
+
+You can alter the vertical resolution of each pixel by altering PIXSIZE in 
+the KERNEL, and the total number of vertical pixels by changing RASTERS, and 
+the number of blank lines at screen top by changing TOPS. If the product 
+of PIXSIZE and RASTERS is summed with TOPS and NNN, and the result is around 
+300, then you will still probably have a synchronised display. Cheap portable 
+T.V's seem most tolerant of liberties taken with display timing, and costly 
+colour sets the least. We have to be a bit general about this since there 
+are over ten billion display type alternatives. Choose one by muttering to 
+yourself
+
+"TOPS changes blank space at screen top"
+"NNN controls my compute time per frame"
+"RASTERS controls the number of active lines in the display"
+"PIXSIZE sets the vertical size of each pixel"
+
+and looking at your application. We do not frankly see anyone wanting to 
+use a PIXSIZE larger than 2. Remember to change CLEAR and DISPEND if you 
+change the display file size or position.
+
+8.7	SPECIAL OPERATIONS
+
+When ASZMIC initialises at startup, it tests location :1000 at the end of 
+initialisation to see if there is a JP instruction there, and if so does a 
+CALL :1000. This means that you can add your own ROM onto a system with 
+ASZMIC and cause it to integrate itself into ASZMIC. You have seen already 
+how DADDR can be used to intercept coommand handling, PRTJMP to link in your 
+own printer routine and INTJMP to take over break conditions after context 
+save (that is what KERNEL does). There is one final reflection that we have 
+not previously mentioned. KEYJMP normally contains the address KEYRET. If 
+you put the address of your own handler there it can take over key 
+interpretation (BC contains the undecoded result from KEYBRD) and then either 
+jump back to keyret or RET to LIX if you have done all the work yourself.
+
+The address SAVMEM can be used as a jump point if you ever want to reset ASZMIC whilst still retaining data in high memory, or to initialise it for a 
+>16K memory. The HL register is loaded up with the address which is to be taken as the top of memory and then a JP made to SAVMEM. This 
+roughly corresponds to a Basic "NEW" with RAMTOP altered
+
+When you are debugging programmes it can be quite useful to have an external 
+non-maskable interrupt button. The J command supports this by loading up the 
+I register with 1 so that a single NMI pulse gives the effect of a breakpoint. 
+You should, of course, use a Schmitt debounced monostable to provide this 
+but we got pretty good mileage out of a 300 pF capacitor wielded on ZX80, 
+where in the absence of a G command you really need NMI. Failure to debounce 
+correctly may cause the screen to assume an "heiroglyphic" appearence but the 
+first key pressed cures this. On ZX80 bad debouncing can also fool ASZMIC 
+into thinking that it is living in a ZX8l; easily cured by providing a further 
+270 NMI pulses so perhaps you had better build a proper circuit instead.
+
+8.8	THE END
+
+We would like to apologise for a slight flippancy which seems to have 
+manifested itself in places in this documentation. We have felt increasingly 
+frustrated by our inability to do any more than sketch out the bare bones 
+of ASZMIC usage unless we issue a 3 volume set in a year or two: and 
+this manifests itself as a seeming lack of seriousness. There is just so 
+much which you can do with ASZMIC. We hope that you find it stimulating 
+and useful. In the future there will probably be quite a lot of supporting 
+hardware and software developed for it, and we are scheduled to work on a 
+microdrive version, so with luck it will prove a long term extension to the 
+capabilities of your ZX80/81.
+
+			C FRAZER JOHNSON
+			Nykoeping	Sept. 1982
+
+	GENERAL INFORMATION	APPENDIX 1
+
+
+
+INITIALISATION
+
+After turning on a ZX80/81 equipped with ZX.ASZMIC memory has been divided 
+into 3 partitions  The first consists of system variables, buffers, stack 
+and register image area (REGIM). The second, which lies between DSPBGN and 
+(TXTLIM), is the text area. The third is the program and data area which lies 
+between (TXTLIM) and the top of memory. This area is sized to one quarter of 
+the available memory on the system. The pointers LABEND and LABSTK both point 
+to the top of memory. These pointers define the Symbol Table, and assembler 
+operations will cause (LABEND) to be the address of the current bottom of the 
+Symbol Table. (LABSTK) is always the top of available memory. The IY 
+register is loaded with :4000, the I register with 14, and the interrupt mode 
+set to 1.
+
+ If any key is held depressed for more than half a second it will 
+repeat at a rate of around 8 per second until released.
+
+The screen contains 34 lines of up to 36 characters each. The ZX81 hardware 
+automatically generates a new line for longer lines but since the EDIT display 
+logic works by counting /NL/ characters this is a facility which should be 
+used sparingly.
+
+EDIT & DEBUG Modes
+
+ASZMIC has 2 modes: EDIT mode, identified by a fast blinking cursor, and 
+DEBUG mode, identified by a slower blink rate. The difference between them 
+is that in DEBUG mode the typing of a /NL/ (newline) causes the line just 
+terminated to be passed to the Command Interpreter. If the first letter of 
+this line lies in the range A-P then some action will be taken, since the 
+line is then assumed to be a command. It is otherwise ignored.
+
+Keystrokes which do not pass control to the Command Interpreter use a 
+vertical synchronisation clock which does its best to hold the screen steady 
+whilst the keystroke is processed. The Command Interpreter disables the 
+clock for the duration of its operations. The overall effect is that scrolling 
+and cursor operations generate a slight flicker but still maintain a readable 
+display. This feature is not available on ZX80.
+
+FIELDS
+
+The Assembler and Command Interpreter both use a subroutine called GETFLD, 
+which is a general purpose field interpreter. The fields which are valid as 
+arguments are:-
+
+a) A decimal number containing the characters 0-9 (1 to 5 digits)
+
+b) A hexadecimal number identified by a : (colon) prefix and containing the 
+   characters 0-9 A-F (1 to 4 digits)
+
+c) A $ sign, meaning the current contents of the IX register (used as a 
+   location counter by the Assembler).
+
+d) One or two characters enclosed in quotation marks (").
+
+   Items a) thru d) are self defining fields
+
+e) A Symbol. This is a character string consisting of 3 or more characters in 
+   the range A-Z 0-9 . (period) and starting with a character in the range A-Z. 
+   A symbol is only meaningful when it has been defined by appearance in the 
+   label field of an assembled statement (via A or I commands). If a symbol 
+   is preceded by a ? (question mark) WHEN REFERENCED AS AN ARGUMENT then the 
+   rules for minimum number of characters and alphabetic start character are 
+   relaxed. The ? is purely to identify the following string as a symbol, 
+   and is not a part of the symbol itself.
+
+f) Any combination of items a) thru f) seperated by + or - characters.
+   + causes subfield addition, - causes subfield subtraction. Parentheses
+   are not used. ( A left parenthesis will cause BFLAG to be set non 
+   zero).
+
+Fields are terminated by a blank or comma , but not both.
+
+Examples:-
+
+"A*"
+12345
+:12345
+FUDGE
+ACCOUNTS.PAYABLE
+$
+12345+"A*"+:12345-FUDGE+$-?HL+ACCOUNTS.PAYABLE
+
+
+FILES
+
+A file is a portion of the text area which is identified by a filename 
+at its start and a filemark (o) as the first character of its terminating line. 
+The filename should have a filemark (o) as its first character and can contain 
+the characters A-Z 0-9 . (period).
+
+Example
+
+NOTHING
+RUBBISH
+FILEl
+THIS IS AN
+EXAMPLE OF
+A FILE
+
+MORE RUBBISH
+
+The file FILE1 is defined as the 3 lines
+
+THIS IS AN
+EXAMPLE OF
+A FILE
+
+and may be used by commands such as A (not recommended in this case) P, K & E. 
+The user can define as many files as he wishes, providing each filename is 
+unique.
+
+PARTITIONS
+
+The user can create more file or program space for himself by manipulating 
+the TXTLIM pointer which defines the boundary between text and program areas.
+ Use Dump & Modify or Immediate statements. The symbol table may be relocated 
+by altering LABEND (low memory bottom of Symbol Table) & LABSTK (high memory 
+table top) pointers, and moving the content of memory between them if the table 
+was not empty.
+
+If a non standard memory unit is attached to the ZX80/8l then the ways in 
+which memory can be divided up will depend on the decoding which the unit 
+provides. Bear in mind that execution of a program over the 32K boundary can 
+activate the ZX80/81 display logic hardware, which also relies on duplicate 
+mapping of the 16-32K & 48-64K regions for its effect.
+
+USE OF ASZMIC ROUTINES
+
+Internal subroutines exist in ASZMIC to aid the user in handling I/O 
+and various encoding and decoding functions. These must normally be used from 
+an ASZMIC context (System variables internally consistent, IY=:4000, I=14, IM 1, 
+22 bytes of stack available). Routines include:-
+
+GETFLD	decode a field
+PUTDE	encode a hex number
+WRITA	encode a single hex byte
+WSTRNG	write contents of print buffer to screen
+NRM2	write a character to screen
+OUTFRM	write out a frame to screen
+KEYBRD	do basic keyboard decode
+KEYINT	translate decode to a character
+RDCASS	read a character from cassette
+WRCASS	write a character to cassette
+PRNTER	write a line to printer
+
+& many others. See the application notes for definitions ,calling sequences 
+and examples.
+
+ASSEMBLER
+
+The Assembler is a small, very fast subprogram within ASZMIC which will accept 
+all standard ZILOG mnemonics for assembler statements. The DEFM,DEFW,DEFB & ORG 
+directives are supported. The EQU directive is supported in a nonstandard form 
+Instead of LABEL EQU value    use LABEL=value   without imbedded blanks. 
+The DEFS value directive is not supported: use ORG $+value instead, which has 
+the same effect of reserving (value) bytes of free space. There are no 
+conditional compilation, listing control or macro directives (hence the SET 
+directive is not implemented).
+
+A comments field may be appended after every assembler statement if preceded 
+by a ; (semicolon). A ; in column 1 makes the whole line commentary.
+
+Always start each file to be assembled with an ORG directive. ASZMIC will 
+probably default you at (TXTLIM) but this is not a design feature and may be 
+withdrawn.
+
+ORG & EQU directives may not use forward references.
+
+Assembler options (see A command in appendix 3) can be used to control object 
+code generation and routing of listings.
+
+Errors tested for include label errors (undefined and doubly defined), Op-Code & 
+relative jump range errors. An error is indicated by a non blank column 1 
+and error lines are listed even if no list option has been specified.
+
+Use of the Symbol Table preservation option, combined with the "force pass 2" 
+flag, enables many seperate programs with cross references to be assembled 
+seperately to generate a single piece of internally consistent object code. 
+The OFFSET variable can be used to generate an offset between load and 
+execution counters which enables code to be loaded at one location for subsequent 
+movement to and execution at another.
+
+	THE SHIFT KEYS	APPENDIX 2
+
+
+
+
+These are the keys which control the editing and macro functions of ZX.ASZMIC.
+
+
+Shift 0 ..... TYPING RUBOUT
+
+ The cursor is moved 1 position to the left, the character under it is deleted 
+ and all subsequent characters to the right are shifted left 1 place. 
+Positioning the cursor to the start of a line and then using
+ Shift 0 will delete the preceding /NL/ to concatenate the two lines.
+
+Shift 9 ..... HOME TO DEBUG MODE
+
+ Set ASZMIC in DEBUG mode. Remember the current cursor position for use 
+ by the Shift E keyin. Move the cursor to the bottom line of the bottom page 
+ and move the display file pointers so that this line appears on screen. The 
+ DEBUG mode flag automatically causes the cursor to assume a slow blink.
+
+Shift 8 ..... CURSOR RIGHT
+
+ Move the cursor I character to the right but never onto a /NL/ character.
+
+Shift 7 ..... CURSOR UP
+
+ Position the cursor at the left of the line above its current position. If 
+ necessary scroll down the display so that the cursor remains on screen. 
+ Do not move cursor onto or past an End-of-Data character.
+
+Shift 6 ..... CURSOR DOWN
+
+ Like CURSOR UP, but cursor moves down & scrolling is upwards.
+
+Shift 5 ..... CURSOR LEFT
+
+ Move cursor 1 character to left, but never onto a /NL/ character.
+
+Shift 4 ..... PAGE FLIP UP
+
+ Move the display start up 27 lines. Position the cursor at the left of the 
+ third line down from the new top of screen. Do not move display onto or over 
+ an End-of-Data character.
+
+Shift 3 ..... PAGE FLIP DOWN
+
+ As for PAGE FLIP UP, but the display is moved down 27 lines. If you move 
+ to the final page then the cursor is positioned at the bottom line.
+
+Shift 2 ..... DELETE FILE
+
+ All text from the current cursor position right to the first filemark () 
+ detected is deleted. No action if a terminating filemark not detected. If 
+ the deletion moves the current cursor position onto the final display page 
+ then the cursor is homed onto the bottom line.
+
+Shift 1 ..... DELETE LINE
+
+ Delete the line which currently contains the cursor. Position cursor at 
+ start of next line. Do nothing if the cursor is currently on the bottom 
+ line of the final page
+
+Shift T ..... GO TO DISPLAY TOP
+
+ Move the cursor to the Shift Macro definition line at the top of the display. 
+ Display page is altered accordingly.
+
+Shift R ..... SHIFT MACRO EXECUTION
+
+ Independent of the current ASZMIC mode (EDIT/DEBUG) pass the contents of 
+ the Shift Macro line to the Command Interpreter for execution. Cursor 
+ and display page are unchanged unless as a result of the executed DEBUG 
+ commands. If the line is empty no action results.
+
+Shift E ..... EDIT RETURN
+
+ Change the ASZMIC mode to EDIT. Position the cursor at the location it 
+ had when HOME (shift 9) was last pressed. Alter display page if required to 
+ keep cursor on screen. Effect unpredictable if editing has taken place whilst 
+ in DEBUG mode. Fast blinking cursor identifies EDIT mode.
+
+Shift W ..... RIGHT JUSTIFY CURSOR
+
+ Move the cursor to the rightmost position of the current line.
+        (note:- There is no corresponding left justification key. Use CURSOR 
+        UP followed by CURSOR DOWN instead)
+
+Shift Q ..... EDIT RUBOUT
+
+ Like TYPING RUBOUT, but the cursor is not shifted left and it is the 
+ character at the current cursor position which is deleted. It is not 
+ possible to delete the last character on a line with a edit rubout i.e. one which 
+ lies beteeen 2 /NL/ characters.
+
+Shift G ..... MERGE
+
+ Search down from beginning of display file to find a merge character (>). 
+ Copy all text after it up to but not including a filemark (o) into the text 
+ position identified by the current cursor position. Effect disastrous if 
+ merge and filemark characters missing. In DEBUG mode if a /NL/ is copied then 
+ the line it terminates is passed to the command interpreter, thus making the 
+ copied text into a Command Macro. In DEBUG mode Shift G has the same effect 
+as a M> command (see M in Appendix 3). 
+UNSUPPORTED FEATURE:-  The Shift D & Shift F keys may be implemented on 
+your system. They are like Shift G but with start character * and < 
+respectively.
+
+
+
+
+ Input of a normal character causes everything under & to the right of 
+ the cursor to be shifted right one place and the character input is placed 
+ under the cursor. The cursor is then moved one position to the right. The 
+ EOD pointer is incremented.
+
+ Input of a /NL/ character will cause a trailing blank to be appended 
+ to the line if the previous character was non-blank. The cursor is advanced 
+ past the /NL/ to the start of the next line. The display page is moved down 
+ one line (i.e. text is scrolled up a line). The EOD pointer is incremented 
+ as required.
+
+ If input of a character would cause the EOD pointer to be incremented past 
+ the (TXTLIM) text area upper partition then the character is ignored.
+
+	DEBUG COMMANDS	APPENDIX 3
+
+
+
+
+
+Whenever a /NL/ character is written to the text area by ASZMIC when in 
+DEBUG mode the line just terminated is passed to the Command Interpreter, 
+which identifies the command by the first letter on the line and calls the 
+appropriate handler subroutine. A first character not in the range A-P is 
+ignored.
+Several DEBUG commands may be concatenated on a single line by using the 
+seperator character sequence ;/ (semicolon slash) and commencing the next 
+command immediately after the slash e.g.
+D 0 3;/D 5 3;/D :7000 10 
+The contents of the Shift Macro line are also passed to the Command Interpreter 
+when a Shift R key is typed, and this line is also executed whenever a 
+BREAK condition is encountered (Breakpoint,RST 0,Single Step,External NMI ).
+
+
+A ..... ASSEMBLE
+        A filename options
+
+The named file is identified and assembled down to its terminating filemark 
+() under the control of the option field. If no option field is specified 
+the default is a 2 pass assembly with object code (executable machine code) 
+generation but no assembly listing and no preservation of a previous symbol 
+table.
+
+The option field is converted to an 8-bit byte whose bits when set represent 
+the following options :-
+
+  BIT 7..(128).. force second pass
+  BIT 6..( 64).. do not generate object code
+  BIT 5..( 32).. Fine pitch mode on printer. No truncation of listing lines.
+  BIT 2..(  4).. keep and add onto a previous Symbol Table
+  BIT 1..(  2).. direct listing output to printer
+  BIT 0..(  1).. generate assembly listing
+
+Thus an option field to generate a listing on printer without object code 
+would be :43 (decimal 67) or 64+2+1 (you can write it like that).
+
+Assembler lines start with either a ; in column 1, in which case the line is 
+treated as a comment; another non-blank character, in which case the 
+character is assumed to be the first character of a symbol to be defined, 
+or a blank. There then follows an Op-Code or assembly directive delimited by 
+a blank, plus up to 2 argument fields seperated by a comma. A comment 
+field can terminate the line if it is preceded by a ; (semicolon). The file 
+is terminated by a line with a filemark (o) in column 1.
+
+Example: -
+
+EXAMPLE
+ ORG :7000
+NRM2=:492 ;CHECK VALUE FOR YOUR SYSTEM
+START LD HL,$+120 ;ACTUALLY THE ADDRESS OF TABLE
+ LD B,TABLEND-TABLE
+LOOP LD A, (HL)
+ PUSH HL
+ PUSH BC
+ CALL NRM2
+ POP BC
+ POP HL
+ INC HL
+ DJNZ LOOP
+; AND NOW EXIT TO ASZMIC
+ RST 0
+;
+ ORG :7000+120
+TABLE DEFM "TEST"
+TABLEND=$
+
+A $EXAMPLE 
+
+NOTE:- If the variable OFFSET is non-zero its value will be used to relocate 
+the object code produced, although the code itself will be generated to 
+execute at its ORG'd location.
+
+B ..... BREAKPOINT
+
+        B address
+        B
+
+If an address is specified then the current breakpoint is removed (saved 
+byte substituted back at the current breakpoint address) and the address 
+specified becomes the new breakpoint address. The byte at that address is 
+saved and a RST 0 (:C7) code substituted. When the breakpoint is encountered 
+in the course of program execution the saved byte is automatically restored 
+ready for recommencement of execution. If the B command is given without an 
+address then a RST 0 code is placed at the current breakpoint address.
+
+C ..... COPY
+
+        C from to bytecount
+
+An intelligent copy operation of the specified number of bytes from the 
+first address specified to the second. If the source and destination ranges 
+overlap the copy will proceed so as not to corrupt the data in the destination 
+range.
+
+D ..... DUMP
+
+        D address bytecount
+        D address
+
+In the first case a formatted dump of the specified number of bytes starting 
+at the address specified is produced. There are 8 hexadecimal bytes to a line 
+preceeded by a hexadecimal address. Long dumps may cause screen blanking for 
+a few seconds whilst the dump is generated. Break key aborts a dump.
+
+The second example is of a Dump & Modify mode. The contents of the address 
+specified is displayed and ASZMIC waits for input. Successive bytes are placed 
+in memory starting at the prompt address. Input is terminated by a . (period) 
+after the prompt. This is the only case where hexadecimal fields do not have 
+to be preceded by a : (colon). The colon is assumed, and decimal values must 
+be input as 0+decimal field.
+NOTE:- If bit 1 of ASSFLG has been set to route dump output to the printer 
+then the user must precede input on each line by at least 7 blanks.
+
+E .... EDIT
+
+       E
+       E symbol
+
+If no argument is specified ASZMIC merely sets itself in EDIT mode (fast cursor 
+blink). In addition, if a symbol is specified, the symbol is searched up for 
+and the cursor placed at its start. The display page is altered if needed.
+No action is taken if the string is not found. (Any character other than  . 
+0-9 A-Z will terminate the string comparison operation. o can be first char.)
+
+F ..... FILL
+        F from to fillerbyte
+
+The specified range is filled with the filler byte.
+
+G ..... GO      ***  ZX81 ONLY  ***
+
+        G
+        G address
+        G address stepcount
+
+This is ASZMIC's single step feature. If no arguments are specified 
+then the context is restored from the register image area, and execution of 
+the instruction at the saved Program Counter address (PC1) takes place. A 
+single step break is generated at the end of the instruction, the new context 
+is saved in the register image area, (if the INTJMP variable has been 
+modified to contain an address other than INTRET a jump to (INTJMP) occurs 
+at this point) and the Shift Macro line is executed before returning control 
+to ASZMIC.
+
+If an address is specified then it overwrites the saved Program Counter address 
+(PC1) & becomes the address of the instruction to be executed.
+
+If a stepcount is specified then the operation proceeds as above, but after 
+context save and before Macro execution the saved step count is 
+decremented &, if still positive, then context is restored & the next 
+instruction executed. The rate of execution is typically a hundredth of 
+normal, so a large stepcount may take some time to work thru. Maximum 
+stepcount is :7FFF (decimal 32767). The G command will not work on ZX80.
+
+NOTE:- The single step feature can be used to simulate a ROM breakpoint. Set 
+the breakpoint for the desired address-I & use G address 32767. Break 
+handling logic will then think it has reached a breakpoint; & terminate single 
+stepping, when the stop address is reached.
+
+H ..... HORRIBLE JUMP
+        H address
+
+This is not really so nasty. It is just a straightforward jump to the 
+specified address in the context of the ASZMIC Command Interpreter. HL register 
+points to the command line after the address, & the routine jumped to can do 
+processing in the ASZMIC context, terminating with a simple RET. An easy way 
+to link in your own commands.
+
+I ..... IMMEDIATE
+        I assembler line
+
+An unusual feature which enables immediate assembly and execution of assembler 
+statements. The assembler line follows immediately after the I (i.e. if a blank 
+follows the I then no label has been specified). The line is assembled into 
+object code in  low stack, followed by a break code, and then executed 
+immediately using an internal form of the J command. It thus operates in the 
+saved program context of the REGIM area. After execution the new context is 
+saved just as for a normal BREAK.
+Labels should only be defined via the Label=value statement form in immediate 
+statements, & the directives ORG, DEFM, DEFB, DEFW & the JR and DJNZ 
+instructions should be avoided.
+
+J ..... JUMP
+
+        J
+        J address
+
+This is just like the G command, except that there is no single step 
+break in execution, which continues under the program logic unless the B 
+command has been used to insert a breakpoint somewhere in the logic flow. 
+The effect of a breakpoint, or an externally generated NMI interrupt, is 
+similar to the single step interrupt.
+
+K ..... CASSETTE SAVE
+
+        KS "i.d." ofilename
+        KS "i.d." from to 
+        KS "i.d." from to  L
+
+ASZMIC uses the same recording protocol as the standard ZX80/81, but the way 
+in which it is used is rather different. ASZMIC can save either files or 
+regions of memory (which presumably contain programs or data). When you type 
+a K command there is a S second wait to allow you to turn on your recorder, 
+then the command line itself is written out to tape to identify the file, a 
+further S second pause ensues, and the file or memory region is written out.
+
+The command must start with the 5 character sequence  K  FILEMARK  S  SPACE 
+QUOTE as shown above since this is used to identify a title line to the 
+cassette load routine.
+The string enclosed in quotes identifies the file for the load routine, just 
+like a standard ZX80/81. The filename or memory region to be saved is then 
+indicated. If the memory range is followed by space L then the load command 
+will alter LABEND to contain the "from" value when the region is loaded.
+
+L ..... LOAD
+
+        L "i.d."
+
+In response to this command the cassette input is scanned continuously, and if 
+a valid title line is found it is written to screen and the display activated
+for 5 seconds, thus generating a running catalogue of the tape contents. If 
+the "i.d."s of the Load Command and the saved title line match then the title 
+line is analysed to determine if a file or memory load is required, and the 
+following file is loaded. In the case of memory load the program/data is loaded 
+in the region specified on the title line unless the variable OFFSET has 
+been set to a non zero value, in which case this value is used as a 
+relocation offset for the region. If the region range in the title line is 
+followed by an L then the region will be presumed to be a Symbol Table, and 
+LABEND will be modified to contain the "from" value. This presumes 
+that save & load took place on the same size system.
+Both K & L commands can be aborted by the Break key, which simulates a BREAK
+condition.
+
+M ..... MACRO
+
+        M character
+
+This is very like Shift G, but you can specify the start identifier yourself 
+instead of using > as a default. Terminator is o as usual. Do not specify M 
+by itself, always give a character after it and remember it is the 
+first occurrence of the character (except for the Shift macro line) which 
+defines macro start.
+
+N ..... NEW
+
+        N
+
+Loads up BC with (TXTLIM). Sets HL to :3CA (Basic NEW command implementation) 
+Jumps to (TXTLIM). Used for special board ops.
+
+O ..... OLD REGISTERS
+
+        O
+
+The register image area is dumped as 2 lines of 6 four hexadecimal digit numbers 
+The registers appear in the order:-
+
+PC	HL	HL'	BC'	DE'	AF'
+AF	BC	DE	IX	lY	SP
+
+where PC is the Program Counter, SP the Stack Pointer, and the prime suffix (') 
+indicates one of the alternate registers. We recommend that the user place an 
+O command in the Shift Macro line as a useful default, since the registers will 
+then be displayed whenever a BREAK condition occurs.
+
+P ..... PRINT
+
+        P filename
+
+The named file is written out to printer until a terminating file mark is 
+encountered as the first character of a line. The operation may be aborted 
+at any time by pressing the Break key.
+NOTE:- If PRTJMP variable is set to a value other than PRTRET then the 
+address in it will be used as the address of the Print Line routine.
+	SYMBOL ADDRESSES	APPENDIX 4
+
+
+TO ENSURE THAT THE ASZMIC ROM CORRESPONDS TO THE VERSION DESCRIBED HERE; 
+CHECK THE 2 BYTES AT MKDEF AGAINST THE DECLARED VARIABLE "VRSION" IN 
+THE LIST. THEY SHOULD CORRESPOND; I.E VRSION E04 HAS MKDEF 04 0E .
+
+ACOM2	0891	DCLPl	0881	EX3IR	0A3B	GHXVAL	0BDE
+ACOMIN	08C4	DCOMM	057A	EX3IRX	0A42	GROUP0	095F
+ACOMM	052D	DCOMX	057F	EXCFl	09A2	GROUPl	095F
+AF1	40A6	DCONT	0895	EXCF2	09D0	GROUP2	097C
+AF2	40A4	DEl	40AA	EXCF3	0A3l	GROUP3	0A49
+ARG1	4001	DE2	40A2	EXTNAC	09CC	GROUP4	0A4D
+ARG2	4003!	DECLOK	08A2	EXTNHL	0A27	GROUPS	0AAC
+ASEXIT	086D	DEFMNT	0934	FCOMM	0602	GROUP6	0AB9
+ASSFLG	4005	DELAYS	00DC	FILCHR	000C	GROUP7	0AD0
+ASSMBL	0870	DFILE	4023	FLDFND	4076	GROUP8	0AE3
+AUDUMP	0223	DFLIP	032E	FND2	0C83	GROUP9	0AF3
+AXX	0547	DIGCON	0327	FNDLBL	0C72	GROUPA	0B03
+BADDR	4007	DLLP1	00D6	FNDLCR	0028	GROUPB	0B30
+BC1	40A8	DLLP5	00D4	FNDRCR	0030	GROUPC	0B3C
+BC2	40A0	DLN1	03E0	FRAMES	4070	GROUPD	0B61
+BCOMM	054C	DLOOP1	058E	FRMSND	00E5	GROUPE	0B68
+BFLAG	4075	DLOOP2	0585	FRMSNX	00E8	GROUPF	0B71
+BFLGST	0C2E	DLY05	00D2	GlCOMN	096E	HASH	08C7
+BIGMEM	01A7	DMD2	05ED	G2IN2	0B88	HASHDN	08DC
+BLONE	055E	DMDLP1	05DE	G2SBCN	0B76	HCOMM	0652
+BOPSAV	4006	DMODIN	05CB	G2SUB	0008	HFLIP	0070
+BRKCHK	030D	DMOUT	05B0	G34TAB	0AA2	HL1	409C
+BRKOD	00C7	DMPMOD	05B3	G3G4	0A83	HL2	409E
+CALLAS	0823	DMPREG	0733	G42ER	0A40	HLRIN	0CD0
+CCC	0BC3	DOLLAR	0C1E	G4IN2	0A69	HLRTST	0CD7
+CCOMM	0561	DONCHR	0C6E	G4IN3	0A76	HMCHK	03F9
+CDLP1	0481	DONE	0CB9	G4IN4	0A79	HOME2	0434
+CHRTAB	0D92	DOTTIM	0804	G4REG	0A57	HOME3	0448
+CINCRT	0470	DPG1	03FE	G6INX	0ACE	HOMLP1	044A
+CKINV	0C9F	DSPBGN	40B4	G6PA	0AC7	HRTIN1	0950
+CLDIR	0577	DSPSET	019E	G8NIXY	0AFl	HRTLP	0953
+CLNLP	0945	DSPTCH	0947	G92	0B00	HSHDN2	08FE
+CLNUP	0941	ECOMM	05F0	GAHERE	0B18	HSHERR	0913
+CLPRLD	0BE8	ECPOSN	401D	GANOBR	0B23	HSHLP1	08CB
+CMDSUB	0295	EDCODE	0080	GARNDX	0B12	IAENT	061A
+CMPSTR	02A3			GAUNC	0B1B	ICOMM	0655
+CMPSTX	02B0	EDEXIT	05F7	GB01	0B3A	IGNBLK	0020
+CMRTXi	0512	EDIN	0ACA	GBCOND	0B37	IMTAB	0AB6
+CMSM1	02C3	EDINX	0AC9	GCENTX	022A	INHERE	0C9F
+COMINC	0C23	EDLP1	0775	GCHERE	0B48	INICON	017E
+COMINT	0507	EDLP2	0776	GCINX2	0978	INIT	017C
+COMMND	052D	ELEM1	4072	GCNTSB	0250	INIT2	0189
+COMRTX	0511	EOD	4021	GCOM2	0973	INIT3	0183
+COMXTB	051D	EODCHR	0005	GCOMM	0615	INTJMP	4019
+CONLIN	0023	EODOK	04B8	GCUNC	0B5D	INTRET	0lFC
+CRCHAR	0076	EX102	09E1	GDLOOP	0B63	IX1	40AC
+		EX103	0A11	GELOOP	0B69	IXIY	4074
+CREN1	045B	EX104	09F6	GET2	0059	IYl	40AE
+CRGEN1	0457	EX105	0A47	GETCHR	0226	JCOMM	0667
+CRHNDL	0C24	EX107	0A81	GETFLD	0010	JGENT	0617
+CSTR1	02B3	EX1213	09BB	GFCHAR	0C61	JMP2	063D
+CTAB	0D04	EX1NN	09AC	GFDCLN	0BE1	JMPTYP	064D
+CTAB2	0D4B	EX1NTA	09BE	GFDHEX	0ClA	JPTAB	0BCE
+CUDRET	048D	EX2DBR	0A13	GFDLBL	0C89	KBD1	00F8
+CUDRTX	0487	EX2IND	0A2A	GFDLBX	0C86	KBD2	00FA
+CURSOR	401F	EX2NAF	09F9	GFDNUM	0C40	KCOMM	066B
+DADDR	401B	EX2NAG	0A07	GFDREG	0CBD	KEYADD	027F
+DBTLIM	0584	EX2NB	09E3	GFDTNM	0C38	KEYBRD	014
+KEYINT	0277	NRMCHR	0491	RLOAD	0CE5	WRC1	0783
+KEYINX	0275	NULIN2	04E6	RUBDNO	0380	WRC2	078B
+KEYJMP	4017	NULINE	04D9	RUBOK	0378	WRCASS	0780
+KEYRET	0254	NXTPLN	0818	SAVMEM	018D	WREG	073C
+KYRDLP	014F	NXTSTP	087A	SAVSTR	001B	WREGL	0742
+LABEND	4027	OCOMM	0733	SFILE	067E	WRITA	031E
+LABSTK	4029	OFFSET	400B	SHFT0	0426	WSTR1	02F2
+LBINX	08AC	OFRM1	016D	SHFT1	03BE	WSTRG2	02E2
+LCOMM	0687	OFRM2	0171	SHFT2	03E2	WSTRLP	02DC
+LDF2	0719	OUTFRM	0169	SHFT3	0408	WSTRNG	02D6
+LDLP1	06C3	PARSE	0826	SHFT4	0412	Xl	0010
+LDLP2	06D2	PC1	409A	SHFT5	0423
+LDLP3	0703	PCHAR	07F8	SHFT6	0473	X2	0020
+LDLPB	08A4	PCOMM	0752	SHFT7	04SF
+LDN2	06BC	PDOT	0809	SHFT8	0456	X3	0030
+LDN6	06BB	PDOTX	07F9	SHFT9	042D
+LINEND	00C1	PRBUFF	402B	SHFTD	0339	ZXJPND	0507
+LIX	022D			SHFTE	0398	ZXJPTB	04F5
+LIX2	0236	PRCLR	0301	SHFTF	0330
+LIXIMM	023B	PREADY	07D9	SHFTG	0341
+LIXSUB	00AD	PRIGET	09245	SHFTQ	036C
+LODFIL	0716	PRNTER	07CD	SHFTR	03B1
+LOOPGF	0BF0	PROFF	081E	SHFTT	03B7
+		PRTJMP	4015	SHFTW	0394
+LSTEXP	406E	PRTRET	07D2	SHIFTS	0339
+LX	4000	PSLP	0756	SHOME	03AE
+		PTCON	00CB	SINGLE	0107
+LY	4015	PUTA	0B9D	SINGLX	01F2
+		PUTB	0B9C	SNLP1	0698
+LZ	406E	PUTDE	0319	SNLP2	06A8
+		PUTDEF	0316	SP1	4080
+MCOMM	01724	PUTENT	0BAE	SRECUR	0679
+MFLAG	4000	PUTNN	0B8E	SSCNT	4009
+MIDWAY	0C70	PUTNNX	0B92	START	0000
+MKDEF	0016	PUTOUT	0BBF	STENT	039F
+MRGCHR	0017	QCOMM	0762	STKLOW	407A
+MRGIN	0352	QUOTE	000B	STMEND	400F
+MRGLP1	035B	RASCON	07E2	STRBOK	0773
+MSKINT	004A	RASPRS	0043	STRCDB	0763
+MSMTCH	02D0	RASTER	0705	STRSCH	0762
+NCOMM	0728	RCOMM	0762	TABLE	0082
+NEGEND	0CB0	RCOMP	0D99	TEMP	400D
+NEGFLG	4077	RCOMPX	0DB0	TEMP2	406C
+NEGNOT	OCAF	RDC1	07A2
+NGENT	0CB4	RDC2	07A4	TIMING	0066
+NGHNDL	0C33	RDC3	0782	TXTLIM	4025
+NLBLF	0C45	RDC4	0784	UPDG1	0418
+NLONP	0023	RDC5	07C5	UPDG2	0421
+NOBRK1	0623	RDCASS	07A2	USAMOD	4011
+NOBXRK	061E	RDCX	0780	V	0040
+NOGCNT	061F	REG	4078
+NOLIST	0859	REGCOD	4079
+NORMSV	0690	REGIM	409A
+NOTBRK	0215			VRSION	0E04
+NOTHL	0CEA	REPEAT	406F	WCNORM	08F8
+NOTIXY	096C	RESTOR	0628	WCRPT	08E1
+NRM2	0492	RETNR	0C24	WCTAB	0DC7
+NRM4	04A6	RLB	0B96	WCTABX	0DE4
+
+	ASZMIC SUBROUTINES	Application Note  1
+
+
+Appendix 4 contains a variable YRSION which de+ines the model 
+number of ASZMIC which you are using. This is also stored as a DEFW at 
+MKDEF in the Rom so you can check that the addresses given in App. 4 
+are correct for the Rom you are using.
+
+
+NAME ... BRKCHK
+
+FUNCTION ... Check break key; simulate BREAK condition if pressed 
+
+CALLING SEOUENCE ... CALL BRKCHK
+
+EFFECT .... Also sets synch pulse level low
+
+USES ... Abort routines
+                **********************
+
+
+NAME ... CMPSTR
+
+FUNCTION ... Compare two strings
+
+CALLING SEOUENCE ... CALL CMPSTR  (HL) points to found string-1,(DE) to base string
+
+EFFECT end comparison on encountering a /NL/ or any character < - (if the found 
+string is not preceded by a character less than . (period) then the 
+comparison is declared invalid. If the first character of the found (& base) 
+strings is a filemark then a /NL/ must precede the o in the found string for 
+the comparison to be accepted).
+If strings are the same then carry reset, HL points at the beginning 
+of the found string, DE points at the base string delimiter. If the strings are 
+not identical carry is set and HL,DE unchanged.
+REGISTERS USED ... A,HL,DE
+
+USES ... String identification
+                **********************
+
+
+NAME ... COMMANDS
+
+FUNCTION ... 
+
+CALLING SEOUENCE ... All commands have form *COMM, where * is DEBUG letter. 
+HL points at first non-blank char after DEBUG letter. They exit by RET (to LIX).
+
+EFFECT ... Performs actions appropriate to the Command.
+
+USES ... 
+                **********************
+
+
+NAME ... DFLIP
+
+FUNCTION ... Set address jumped to for Command Interpretation
+
+CALLING SEOUENCE . . . CALL DFLIP  HL contains new Command Int. address
+
+EFFECT ... Loads HL into DADDR, takes old value and returns
+           with it on stack. Uses HL.
+
+USES ... User handling of newline character i.e. ASZMIC EDITOR used 
+         as an input routine for user programs.
+                **********************
+
+
+NAME ... DELAY5
+
+FUNCTION ... Display for 5 seconds
+
+CALLING SEQUENCE ... CALL DELAY5
+
+EFFECT ... Send out a display for 5 seconds & return to caller. 
+           FRAMES is loaded with 250 & FRMSND invoked. See FRMSND for details 
+           of return. There is another delay called DLYO5 which sets sync 
+           low and then loops for half a second before returning (uses A & DE).
+
+USES ... 
+                **********************
+
+
+NAME ... EDLP1
+
+FUNCTION ... Entry point for STRSCH which expects DE to point
+             to base string, HL to point to high end of search region 
+             and BC to be search region size in bytes+1.
+
+CALLING SEQUENCE ... CALL EDLP1   registers as above
+
+EFFECT ... See STRSCH
+
+USES ... Table search
+                **********************
+
+NAME ... FNDLCR
+
+FUNCTION ... find first newline char to left
+
+CALLING SEQUENCE ... RST 40    HL points to text
+
+EFFECT ... Positions HL to the left of the first newline found 
+           left (below) its initial position. Uses A & HL.
+
+USES ... Syntax analysis, text manipulation.
+                **********************
+
+
+NAME ... FNDRCR
+
+FUNCTION ... Find first newline char to right
+
+CALLING SEQUENCE ... RST 48   HL points to current text position
+
+EFFECT ... Positions KL to the right of the first newline char found 
+           right (above) its initial position. Uses A & HL.
+
+USES ... See FNDLCR
+                **********************
+
+
+NAME ... FRMSND
+
+FUNCTION ... Tramsmit a display file to screen until FRAMES
+             (if positive) becomes zero or a key is pressed.
+
+CALLING SEQUENCE ... CALL FRMSND     DFILE must contain address of a valid display file.
+
+EFFECT ... Sends display file to screen; generates sync pulses;
+           reads keyboard and performs debounce; blinks cursor; returns 
+           with carry set if key pressed,reset if FRAMES timeout. 
+           KEYBRD value lies in BC and STMEND, not HL.
+
+USES ... Display
+                **********************
+
+
+NAME ... GETFLD
+
+FUNCTION ... Analyse a field down to a 16 bit value
+
+CALLING SEQUENCE ... RST 16    HL points at or before field start
+
+EFFECT ... HL advanced to field terminator; field converted to 2 bytes in 
+           DE and ELEM1. Zero flag set on return if no field found. Any 
+           argument recognisable to ASZMIC may be in the field. Uses all 
+           registers except BC, IX, IY,I.
+
+USES ... Myriad
+                **********************
+
+NAME ... GET2
+
+FUNCTION ... Analyse up to 2 fields
+
+CALLING SEQUENCE ... CALL GET2   HL points at or before start of fields.
+
+EFFECT ... Uses GETFLD. Loads ARG1 and BC with first field value, ARG2 
+           and DE with second field value. Zero flag set on return if less than 
+           2 fields found before ; or /NL/ terminator. HLpoints after last field 
+           processed. I,IX,IY unaffected.
+
+USES ... Syntax analysis
+                **********************
+
+
+NAME ... IGNBLK
+
+FUNCTION ... Advance HL register to point at a non-blank character
+
+CALLING SEQUENCE ... RST 32   HL points at character string
+
+EFFECT ... HL advanced until a non-zero byte pointed to. A contains (HL).
+
+USES ... Syntax analysis
+                **********************
+
+
+NAME ... KEYBRD
+
+FUNCTION ... Scan keyboard matrix
+
+CALLING SEQUENCE ... CALL KEYBRD
+
+EFFECT ... Read the keyboard matrix into H (D5-D1 + shift as DO), 
+           plus 8 address line bits in L. Both H & L = :FF if no key 
+           pressed. Uses A,BC,DE,HL. HL also stored in STMEND. 
+           See ZX81 construction leaflet for key-address/data line connection.
+
+USES ... Read keyboard; Initiate vertical sync pulse.
+                **********************
+
+
+NAME ... KEYINT
+
+FUNCTION ... Decode a key stroke
+
+CALLING SEQUENCE ... CALL KEYINT   BC contains HL pattern obtained from KEYBRD
+
+EFFECT ... Both B & C must contain at least one zero bit if routine 
+           is to return. Carry set on return if unallowed multiple key 
+           depressions. Otherwise HL is absolute address of byte containing 
+           the legal character and A is offset from TABLE start (HL=TABLE-1+(A)).
+           Note that the shifted keys A-G,Q-t,1-0 do not return a valid char.
+
+USES ... Keyboard read interpretation
+                ***********************
+
+
+NAME ... LIX
+
+FUNCTION ... Return point for all handlers in ASZMIC
+
+CALLING SEQUENCE ... 
+
+EFFECT ... 
+
+USES ... 
+                **********************
+
+
+NAME ... MSKINT
+
+FUNCTION ... Setup some aspects of ASZMIC context
+
+CALLING SEQUENCE ... CALL MSKINT
+
+EFFECT ... Loads I=14,IY=:4OOO, resets bit 0 of MFLAG, sets interrupt 
+          mode 1. Uses A register.
+
+USES ... Programs entered by J command may need this if they use ASZMIC routines
+                **********************
+
+
+NAME ... OUTFRM
+
+FUNCTION ... Transmit a single frame to screen
+
+CALLING SEQUENCE ... CALL OUTFRM    valid DFILE content required. B should 
+                     contain the number of lines to be written and C should 
+                     contain the number of blank rasters at screen top.
+
+EFFECT ... Display a frame
+
+USES ... Display
+                **********************
+
+NAME ... OFRM1
+
+FUNCTION ... Special purpose OUTFRM
+
+CALLING SEQUENCE ... CALL OFRM1   like OUTFRM but in addition D 
+                     register must be loaded with no of rasters per line.
+
+EFFECT ... 
+
+USES ... Graphics
+                **********************
+
+NAME ... OFRM2
+
+FUNCTION ... Specialised display
+
+CALLING SEQUENCE ... CALL OFRM2    like OFRMI but in addition user is 
+                     responsible for the OUT instruction to 
+                     clear the vertical sync pulse and to load A with the 
+                     number of Ml's before the first horizontal sync pulse 
+                     is required.
+
+EFFECT ... 
+
+USES ... Sophisticated graphics
+                **********************
+
+NAME ... PRCLR
+
+FUNCTION ... Clear printer buffer to zeroes
+
+CALLING SEQUENCE ... CALL PRCLR
+
+EFFECT ... Blanks out PRBUFF. Uses HL,BC,DE.
+
+USES ... User abuse of PRBUFF
+                **********************
+
+NAME ... PRNTER
+
+FUNCTION ... Print a line on Sinclair printer
+
+CALLING SEQUENCE ... CALL PRNTER    HL points at start of line to be 
+                     written. Line is written out to printer until a /NL/ 
+                     is encountered. On return HL points to char after the 
+                     terminating /NL/. Uses AF, BC,DE,HL.
+
+EFFECT ... 
+
+USES ... Printing
+                **********************
+
+NAME ... PUTDE
+
+FUNCTION ... Hexadecimal encode
+
+CALLING SEQUENCE ... CALL PUTDE   HL points to output region, DE contains the 
+                     number to be encoded into the region.
+
+EFFECT ... Uses WRITA to encode the contents of the DE register 
+           as four hexadecimal digits starting at (HL). HL is incremented
+           past the last digit. PUTDEF is an entry point which presets HL to
+           PRBUFF+1. Uses HL, A.
+
+USES ... Output routines
+                **********************
+
+NAME ... RDCASS
+
+FUNCTION ... Read a byte from cassette recorder.
+
+CALLING SEQUENCE ... CALL RDCASS
+
+EFFECT ... Returns with a byte read from cassette in the A register. Can 
+           be aborted by Break key. Uses A,HL,BC,DE.
+           You have about 800 microseconds to process the byte before 
+           RDCASS must be called again to catch the next byte.
+
+USES ... Specialised tape analysis
+                **********************
+
+NAME ... SHIFTS
+
+FUNCTION ... 
+
+CALLING SEQUENCE ... All Shift commands are c&lled by the sequence 
+                     CALL SHFT* where * is the shifted character and must 
+                     have HL=(CURSOR) on entry. They perform action approprate 
+                     to the shift and then return to caller.
+
+EFFECT ... 
+
+USES ... 
+                **********************
+
+NAME ... START
+
+FUNCTION ... Breakpoint or , if 1=0, Restart
+
+CALLING SEQUENCE ... RST 0
+
+EFFECT ... Restart initialises ASZMIC. Breakpoint causes
+           saving of context and return to ASZMIC
+
+USES ... Monitor return
+                **********************
+
+NAME ... STRSCH
+
+FUNCTION ... String search
+
+CALLING SEQUENCE ... CALL STRSCH    HL points at first char of base string
+
+EFFECT ... If (HL)<DSPBGN+40 then HL first loaded from CURSOR (Shift 
+           Macro use). Text area from (HL) to DSPBGN+50 searched to find 
+           a destination string which matches the base string. Uses CMPSTR 
+           so carry set if not found or set if found and HL & DE as for 
+           CMPSTR except that if not found HL points at DSPGN+39. Uses
+         AF,BC,DE,HL.  EDLPI is an entry point which expects DE to point to 
+         base string, HL to point to high end of search region and BC to be 
+         no of bytes to be searched+1.
+
+USES ... Syntax analysis
+                *********************
+
+NAME ... WRCASS
+
+FUNCTION ... Write a byte to cassette recorder
+
+CALLING SEQUENCE ... CALL WRCASS    HL points to byte to be written out.
+
+EFFECT ... Byte written out using Sinclair BASIC standard. On return HL 
+           has been incremented and A contains byte just written. Uses 
+           AF, BC, DE, HL.
+
+USES ... Special cassette operations
+                **********************
+
+NAME ... WRITA
+
+FUNCTION ... Encode a byte
+
+CALLING SEQUENCE ... CALL WRITA    A contains number, HL points to encode region
+
+EFFECT ... Number encoded as 2 hex digits. HL incremented past second
+
+USES ... output
+                **********************
+
+NAME ... WSTRNG
+
+FUNCTION ... Write out PRBUFF to screen or printer
+
+CALLING SEQUENCE ... Call WSTRNG    PRBUFF contains at least I non blank char.
+
+EFFECT ... Presets B to length of PRBUFF. Fills PRBUFF backwards with
+           /NL/'s until a non-blank char found. Drops thru to WSTRG2. Uses A,B,HL
+
+USES ... Output
+                **********************
+
+NAME ... WSTRG2
+
+FUNCTION ... See WSTRNG
+
+CALLING SEQUENCE ... CALL WSTRG2    B preset to max no chars to write
+
+EFFECT ... If bit 1 of ASSFLG is set then PRNTER invoked followed by PRCLR 
+           and return. Presets DE to PRBUFF. Drops thru to WSTR1.
+
+USES ... 
+                **********************
+
+NAME ... WSTR1
+
+FUNCTION ... Write string to screen
+
+CALLING SEQUENCE ... CALL WSTR1    DE points at string start. B preset to 
+                     max no of chars to be written.
+
+EFFECT ... Writes out from (DE) to screen, increments until B count
+           exhausted or a /NL/ written. Drops thru to PRCLR. Uses all 
+           registers except IX,IY,I.
+
+USES ... Output
+                **********************
+
+		EXAMPLES
+
+
+Invoke by H command. Use = directives to declare the addresses of the
+undefined symbols as defined in Appendix 4. USE AN ORG DIRECTIVE APPROPRIATE
+TO YOUR SYSTEM MEMORY SIZE.
+
+1 Write a char to screen
+
+START LD A,'X'
+ CALL NRM2
+ RET
+
+
+2 WRITE OUT A STRING TO SCREEN
+
+START LD DE,STRING
+ LD B,7
+ CALL WSTRl
+ RET
+STRING DEFM "ABCDEFG"
+
+
+3 ADD 2 NUMBERS AND DISPLAY RESULT. CALL BY H START NOl NO2
+
+START RST 16 ;GETFLD
+ PUSH DE
+ RST 16 ;GET 2ND NO
+ POP HL
+ ADD KL,DE
+ EX DE,HL
+ CALL PUTDEF
+ LD (HL),:76
+ CALL WSTRNG
+ RET
+
+
+4 PALINDROME. INVOKE WITH H START. IMPORTANT BECAUSE IT SHOWS YOU HOW 
+  TO LINK IN YOUR OWN PROGRAM AS A COMMAND INTERPRETER, AND HOW TO 
+  RESTORE ASZMIC AT END. AFTER THE H START YOU TYPE IN THE LINE
+TO BE INVERTED.
+
+START LD HL,HANDLE; ADDRESS OF USER C.I.
+ CALL DFLIP; SWAP CI ADDRESSES
+ JP LIX ;JUMP TO ASZMIC  CONTEXT STILL ON STACK
+;
+HANDLE RST 48; FNDRCR
+ RST 40; FNDLCR
+ SET 7, (IY) ; SET EDIT MODE
+ LOOP LD A, (HL)
+ PUSH HL
+ PUSH AF
+ CALL NRM2
+ POP AF
+ POP HL; CHAR WRITTEN
+ DEC HL
+ CP :76 ;DID WE WRITE A /NL/?
+ JR NZ,LOOP; LOOP IF NOT
+ POP AF ;CLEAR LIX RETURN ON STACK
+ POP HL ;ASZMIC CI ADDRESS STORED BY DFLIP
+ LD (DADDR),HL; RESTORE ASZMIC CI ADDRESS
+ RES 7,(IY) ;ONLY IF YOU WANT TO RETURN IN DEBUG MODE
+ RET
+
+
+5 PRINT NUMBERS FROM 0 TO 6.  USE H START
+
+START XOR A
+ LD HL,PRBUFF
+LOOP LD B,A; SAVE A
+ CALL WRITA
+ LD A,B; RESTORE
+ INC HL; SPACE
+ INC A
+ CP 7
+ JR NZ,LOOP
+ CALL WSTRNG
+ RET
+
+
+6 PRINT A LINE
+
+START LD HL,TEXT
+ CALL PRNTER
+ RET
+TEXT DEFM "SAMPLE TEXT"
+ DEFB :76; /NL/
+
+
+
+
+7 CREATE A BASIC PROGRAM WITH A SINGLE REM STATEMENT WHICH CONTAINS 
+  MACHINE CODE WHICH YOU CAN WRITE YOURSELF .  SEE THE FINAL SECTION 
+  IN CHAPTER 5 .
+
+
+ ORG :4000
+ DEFM "l2345678"
+ DEFB "9"+128 ;FINAL TITLE CHAR INVERTED A LA ZX8l
+ DEFB 0
+ DEFW 1
+ DEFW DFILE
+ DEFW DFILE+1
+ DEFW VARS
+ DEFW 0
+ DEFW VARS+1
+ ORG $+9
+ DEFW MEMBOT
+ DEFW 512
+ DEFW 0
+ DEFW :FDBF
+ DEFW :37FF
+ DEFW DFILE
+ ORG $+9
+ DEFW -l
+ DEFW 0
+ DEFW :2l8C
+ DEFW :4018
+ ORG $+32
+ DEFB :76
+MEMBOT ORG $+32
+ DEFW 256
+ DEFW DFILE-PROG
+PROG DEFB :EA ;REM
+;
+;
+;  PUT HERE THE CODE WHICH YOU WANT TO BE INCLUDED IN THE REM
+;
+;
+DFILE=$+1
+ DEFW :7676
+ DEFW :7676
+ DEFW :7676
+ DEFW :7676
+ DEFW :7676
+ DEFW :7676
+ DEFW :7676
+ DEFW :7676
+ DEFW :7676
+ DEFW :7676
+ DEFW :7676
+ DEFW :7676
+ DEFW :7676
+VARS DEFB 128
+
+
+8  GRAPHICS PROGRAMS . .. ... SEE DESCRIPTION IN CHAPTER 8
+  ENTER BY H :7000
+
+
+;DEFINITIONS FOR E04 ASZMIC     CHECK FOR YOUR VRSION
+ ORG :7000
+INTJMP=:4019
+DFILE=:4023
+PCONE=:409A
+TXTLIM=:4025
+FRAMES=:4070
+OFRM1=:16D
+MFLAG=:4000
+RESTOR=:628
+KEYBRD=:145
+STMEND=:400F
+SAVMEM=:18D
+NNN=46
+TOPS=1
+PIXSI ZE=1
+IDLE=30        1
+RASTERS=255
+DISPEND=:	6501
+DSTART=:	4100
+;
+; KERNEL ROUTINE
+;
+KERNEL LD HL,ONEP
+  LD (INTJMP),HL ;INTERCEPT BREAK PROCESSING BY OWN HANDLER
+  CALL CLEAR ;SETUP DISPLAY
+  LD HL,UPROG
+  LD (PCONE),HL ;PRIME CONTEXT SAVE TO RETURN TO UPROG
+;
+ONEP CALL KEYBRD ;READ KEYBOARD (RAW)
+  LD HL, (FRAMES)
+  INC HL
+  LD (FRAMES),HL ;BUMP FRAME COUNT
+  LD B, IDLE
+  DJNZ $ ;YOU JUST KEEP ME HANGIN' ON
+  LD D,PIXSIZE
+  LD B,RASTERS
+  LD C, TOPS
+  CALL OFRKl ;WRITE OUT A PART FRAME
+  LD A,1
+  LD (MFLAG),A ;LET NMI INTERRUPT HANDLER KNOW IT MUST BREAK ON 0 COUNT
+  LD C,NNN+NNN+1 ;SETUP C FOR B COMMAND
+  EXX
+  JP RESTOR ;GO INTO MIDDLE OF B HANDLING
+;
+;SETUP DISPLAY FILE,,,,COULD BE IMPROVED
+;
+CLEAR LD HL,DSTART
+  LD DE,DSTART+2
+  LD BC,:2400
+  LD (HL),:76 ;/NL/
+  LD (DFILE),HL
+  INC HL
+  LD (HL),0
+  LDIR
+  RET
+;
+; PLOT & UNPLOT SUBROUTINES     Y->B    X->C
+;
+PLOT LD D,15
+  JR $+4
+UNPLOT LD D,0
+  LD A,3 ;MASK FOR PIXEL NO IN BYTE
+  AND C
+  SRL C
+  SRL C
+  INC A ;C IS NOW X BYTE, NOT PIXEL
+  LD E,l6 ;BIT MASK
+LOOP1 SRL E
+  DEC A
+  JR NZ,LOOP1 ;LOOP UNTIL 0-3 CONVERTED TO 8,4,2,1 IN E
+  CP D ;UNPLOT
+  JR NZ,ENT2 ;J IF NOT
+  LD A,E
+  CPL
+  LD D,A ;MASK OUT BYTE
+ENT2 PUSH DE
+  LD HL,DISPEND ;PREPARE TO COMPUTE Y ADDRESS
+  LD DE,:l200
+  LD A,B
+  LD B,8
+LOOP2 RLCA
+  JR NC,NOSUBT
+  OR A
+  SBC HL,DE ;SUBTRACT ONLY IF BINARY POWER PRESENT IN Y VALUE
+NOSUBT SRL D
+  RR E ;SHIFT SUBTRACTOR
+  DJNZ LOOP2
+  ADD HL,BC ;ADD ON X TO GET TARGET BYTE
+; NOW PROCESS THE BYTE TO PUT IN THE PIXEL
+  POP DE
+  LD A, (HL)
+  BIT 7,A ;GET ROUND INVERSE TRICKERY
+  JR Z,$+3
+  CPL ;CONVERT 7,2,l,0 TO 3,2,1,0
+  AND 15
+;
+  OR E
+  AND D ;PIXEL NOW IN
+; REENCODE
+  CP 8
+  JR C,NOTINV ;DO NOT NEED INVERSION
+  CPL
+  AND :87
+NOTINV LD (HL),A
+;
+;FOLLOWING CODE JUST CAUSES SUBROUTINE TO LOOP AROUND UNTIL
+;A FRAME HAS BEEN SENT. IT IS NOT ESSENTIAL BUT SLOWS PLOTTING
+;DOWN A BIT
+;
+NLINE LD DE,FRAMES
+ LD A, (DE)
+  LD B,A
+LOOPX LD A, (DE)
+  CP B
+  JR Z,LOOPX
+;END OF DELAY CODE
+  RET
+;
+;LINE OR UNLINE FROM XY TO X'Y'
+;
+; X->E  Y->D  X'->C  Y'->B
+;
+LINE LD A,15
+  JR $+3
+UNLINE XOR A
+  LD (DORDEL),A ;MEMORY TO DETERMINE PLOT OR UNPLOT
+ LD HL,XMID
+;INIT CELLS
+  XOR A
+  LD (HL),A
+  INC HL
+  LD (HL),E
+  INC HL
+  LD (HL),A
+  INC HL
+  LD (HL),D
+  INC HL
+  LD (HL),C
+  INC HL
+  LD (HL),B
+;
+;NOW CALCULATETHE INCREMENTS
+;
+  LD L,C
+  LD D,A
+  LD H,A
+  SBC HL,DE
+  PUSH HL ;X'-X
+  LD L,B
+  LD H,A
+  LD A, (YMID+l)
+  LD E,A
+  SBC HL,DE ;HL NOW Y'-Y
+  POP DE
+;LEFT JUSTIFY INCREMENTS TILL ONE >= 128/256
+JUSTIFY LD C,L
+  LD A,H
+  RLCA
+  RL L
+  ADC A,0
+  EX AF,AF'
+  LD B,E
+  LD A,D
+  RLCA
+  RL E
+  ADC A,0
+  JR NZ,JSTDUN
+  EX AF,AF'
+  JR Z,JUSTIFY
+JSTDUN LD E,B
+  LD B,H
+;
+; DE IS XINC   BC IS YINC
+;
+LLOOP LD HL, (XMID)
+  ADD HL,DE ;INCREMENT
+  LD (XMID),HL
+  LD HL, (YMID)
+  ADD HL,BC
+  LD (YMID),HL
+  EXX ;PRESERVE INCREMENTS
+LPLOT LD A, (XKID+l)
+  LD C,A ;X
+  LD A, (YMID+1)
+  LD B,A ;Y
+  LD A, (DORDEL)
+  LD D,A
+  CALL UNPLOT+2  ;PLOT OR UNPLOT THE NEW POINT
+  LD HL,XPRIM
+  LD A,(XMID+l)
+  CP (HL)
+  INC HL
+  EX AF,AF'
+  LD A,(YMID+1)
+  CP (HL)
+  EXX
+  JR NZ,NYLIM ;HAVE NOT REACHED Y LIMIT
+  LD BC,0 ;ZERO YINC IF AT Y LIMIT
+NYLIM EX AF,AF'
+  JR NZ,NXLIM
+  LD DE,0 ;ZERO XINC IF A X LIMIT
+NXLIM  LD A,D ;USE XINC + YINC BOTH 0 AS END OF LINE TEST
+  OR E
+  OR B
+  OR C
+  JR NZ,LLOOP
+  RET
+;
+;DATA REGION
+;
+XMID DEFW 0 ;ORDER IS IMPORTANT
+YMID DEFW 0
+XPRIM DEFB 0
+YPRIM DEFB 0
+DORDEL DEFB 0
+;
+
+**********************************************************
+
+MOIRE
+
+**********************************************************
+
+UPROG LD SP,:7F00
+MAINLOOP LD DE,:4078
+ LD BC,:101
+MLOOP PUSH DE
+ PUSH BC
+ CALL LINE
+ POP BC
+ POP DE
+ INC D
+ INC D
+ INC B
+ INC B
+ INC B
+ INC B
+ LD A, 250
+ CP B
+ JR C,OUTCOD
+ LD A, (STMEND)
+ AND 1
+ JR NZ,MLOOP
+; ZXCV PRESSED HERE
+ LD HL,:8000 ;FIRST LOC OF UNAVAILABLE MEMORY
+ JP SAVMEM
+OUTCOD CALL CLEAR
+ JP MAINLOOP
+
+
+
+**********************************************************
+
+STRUCTURES
+
+***********************************************************
+
+UPROG LD SP,:7F00
+ JR OUTCOD
+MAINLOOP LD IX,XVAR
+ CALL PROSUB
+ LD IX,YVAR
+ CALL PROSUB
+ LD B,(IX+VAR)
+ LD A, (XVAR)
+ LD C,A
+ CALL PLOT
+ LD A, (STMEND)
+ AND 1
+ JR Z,OUTCOD
+ JR MAINLOOP
+;
+OUTCOD LD HL,DUMMY
+ LD DE,XVAR
+ LD BC, 12
+ LDIR ;INIT VARIABLE REGION
+ CALL CLEAR
+ LD HL, (FRAMES)
+ LD A, (HL)
+ AND 15
+ INC A
+ LD (XVAR+1),A
+ INC HL
+ LD A, (HL)
+ AND 7
+ INC A
+ LD (YVAR+1),A
+ JR MAINLOOP
+;
+PROSUB LD A,(IX+VAR)
+ ADD A, (IX+DIR)
+ LD (IX+VAR),A
+ CP (IX+MAX)
+ JR NC,OUTCOD
+ CP (IX+LOW)
+ JR NC,POSCHEK
+ LD A,(IX+INC)
+ CPL
+ ADD A, (IX+LOW)
+ LD (IX+LOW),A
+ CALL DIDLIM
+POSCHEK LD A, (IX+VAR)
+ CP (IX+HIGH)
+ RET C
+ LD A, (IX+INC)
+ ADD A, (IX+HIGH)
+ LD (IX+HIGH),A
+;
+DIDLIM LD A, (IX+DIR)
+ NEG
+ LD (IX+DIR),A
+ LD A, (IX+INC)
+;
+ DEC A
+ JR NZ,$+3
+ INC A
+;
+ LD (IX+INC),A
+ RET
+;
+; DATA
+;
+VAR=0
+INC=1
+DIR=2
+LOW=3
+HIGH=4
+MAX=5
+
+XVAR ORG $+6
+YVAR ORG $+6
+DUMMY  DEFB 75
+ DEFB B
+ DEFB -1
+ DEFB 70
+ DEFB 90
+ DEFB 135
+ DEFB 110
+ DEFB 12
+ DEFB 1
+ DEFB 90
+ DEFB 130
+ DEFB 240
+ DEFB 0
+
+
+
+

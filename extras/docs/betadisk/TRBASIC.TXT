@@ -1,0 +1,135 @@
+     ÖÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ·
+     º Work in TR-Dos from command line and from Basic.  º
+     º                  (file level)                     º
+     ÓÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ½
+
+TR-Dos  line  commands  use  BASIC syntax (TR-Dos calls BASIC
+line editor) and are like BASIC commands for work with tape.
+The common syntax:
+
+       command [ <file> [,<file>] ]
+
+where <file> = "[d:]filename" <type> [<attrs>]
+       d: - drive,
+       "filename" - BASIC string (any 8 symbols)
+       <type> - one of following types supported by TR-Dos:
+            <nothing> - Basic program;
+            CODE - code block;
+            DATA - numeric or symbol array;
+            # - random access file.
+       <attrs> include start and ,maybe, length of block for
+            CODE, array name for DATA, another stuff for
+            specific commands.
+Any  strings  or  numbers  in command can be replaced by BASIC
+variables.Example:
+
+
+
+ Commands:
+
+*"d" -choose drive d: (A, B, C, D);
+
+CAT [#channel] - output disk catalog in brief format into the
+channel.
+
+LIST [#channel] - output catalog in detailed format.
+
+LOAD <file>    \
+SAVE <file>     |  the same as BASIC commands
+MERGE <file>    |
+VERIFY <file>  /
+
+RUN  <file>  - load BASIC or CODE file and run it (code files
+executing  from  start  address).When  file  is not specified,
+TR-Dos  runs  the  file  "boot" (it executes also after TR-Dos
+restart).
+Example: RUN "mons4b" CODE 30000
+
+GOTO <file> -load and execute file containing memory copy
+made with Magic Button. If filename starts with $, IM 2 is set
+before running.
+
+ERASE <file> - delete file from disk
+
+MOVE  -  remove deleted files from disk. When deleted file is
+situated  in  the  middle  of the disk, sectors occupied by it
+cannot be overwritten. This command removes that blanks.
+
+FORMAT  "[$]label"  - format disk. Label can be as long as 11
+symbols, but most of utilities show 8 of them. If $ is at the
+beginning of the label, disk is formatted as single-sided one.
+
+NEW "newname",<file> -rename file.
+Example: NEW "File 1","file1"CODE
+
+COPY [s][b] <file1>, <file2> - copy file1 to file2. "s" mode
+is  for  machines  with  one  drive (pause for disk change is
+made), when "b" is set, the whole disk is copied.
+Example:    COPY "A:News"CODE,"C:archive"
+
+PEEK "filename" Addr,Sec - read sector from specified file
+into memory from start address Addr.
+
+POKE "filename" Addr, Sec -write sector into file.
+
+OPEN #stream,"filename"[r|w] - open file for read or write.
+Basic stream is opened, and Basic program can access it with
+operators PRINT #stream;<string>, INPUT #stream;s$
+and INKEY$ #stream.
+
+OPEN  #stream,"filename"RND,Rec_size  -  open file for random
+access with specified record size.
+
+CLOSE #stream - close previously opened file.
+
+All  these  commands  can  be  executed from BASIC program by
+adding them to the following prefix:
+
+       RANDOMIZE USR 15619:REM:
+
+or, if you need the error code,
+
+       LET a=USR 15619:REM:
+       PRINT USR 15619:REM:
+
+etc.
+15619  is  an  entry  point  for  TR-Dos command processor. It
+requires  the  command string address to be specified in Basic
+system  variable CH_ADD (23645/46) and can be called both from
+BASIC and Assembler. It returns an error code in BC:
+0 - OK
+1 - No file
+2 - File exists
+3 - No space, Out of RAM
+4 - Directory full
+5 - Rec O/F
+6 - No disk
+10- Stream opened
+11- Not disk file
+12- *ERROR*
+13- Verify error
+14- Array not found
+...
+
+BASIC program example:
+
+10 RANDOMIZE USR 15619:REM:CAT
+20 INPUT "File to open: ";f$
+30 LET a=USR 15619:REM:OPEN #4,f$,R
+40 IF a=1 THEN PRINT "NO FILE!":STOP
+50 INPUT #4;A$:PRINT A$
+...
+100 RANDOMIZE USR 15619:REM:CLOSE #4
+120 RANDOMIZE USR 15616
+
+
+RANDOMIZE USR 15616 - TR-Dos command line call.
+
+Other entry points:
+15649 - initialize
+15635 - system functions call
+102 (NMI)- Magic Button routine
+I'll describe them later.
+
+         Igor Yudincev (igor@karlson.kai.ksu.ras.ru), 27.06.97
+         Text is written in IS-Editor 1.1

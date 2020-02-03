@@ -1,0 +1,79 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+  <td align="center" valign="bottom" width="80%">&nbsp;</td>
+  <td align="right" valign="bottom" width="10%"><a
+  href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+</table>
+
+<hr>
+
+<p><font size="4"><b>DC_In, read from CLI</b></font> </p>
+
+<p><tt>RST 20H, DEFW $0E0C</tt> <br>
+&nbsp; </p>
+
+<p><font size="3">IN:</font></p>
+
+<pre><font size="3">&nbsp;   DC = timeout for OS_Cli(CL_RIM)/OS_Pbt()</font></pre>
+
+<p><font size="3">OUT, if call successful :</font></p>
+
+<pre><font size="3">&nbsp;   DE = cli_instreamT </font></pre>
+
+<p><font size="3">OUT, if call failed :</font></p>
+
+<pre>   Fc = 1
+  A = Error code (RC_Eof, RC_Time, RC_Susp, RC_Esc)</pre>
+
+<p>Registers affected after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BC..HL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF..DE../.... different</pre>
+
+<p>Notes: </p>
+
+<blockquote>
+ <p>Internal operating system usage. <br>
+ Handles .[;*&lt;&gt;=DJST] and [#|~] and also produces input
+ tee. <br>
+ cli_instreamT stream might have been closed before returning.</p>
+</blockquote>
+
+<p>Bugs: </p>
+
+<blockquote>
+ <p>&quot;.T[;DS]&quot; are not flagged as errors but act like
+ &quot;.[;DS]&quot; <br>
+ &quot;..&quot; doesn't stand for &quot;.&quot; as documented.</p>
+</blockquote>
+
+<p>Related calls: </p>
+
+<blockquote>
+ <p><a href="dcicl.html">DC_Icl</a>, Invoke new CLI<br>
+ <a href="dcout.html">DC_Out</a>, Write to CLI<br>
+ <a href="dcprt.html">DC_Prt</a>, Print to CLI<br>
+ <a href="dcxin.html">DC_Xin</a>, Examine CLI input<br>
+ <a href="dcrbd.html">DC_Rbd</a>, Rebind streams<br>
+ <a href="dcgen.html">DC_Gen</a>, screen driver SOH call<br>
+ <a href="oscli.html">OS_Cli</a>, CLI interface</p>
+</blockquote>
+</body>
+</html>

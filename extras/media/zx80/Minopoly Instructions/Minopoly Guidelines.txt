@@ -1,0 +1,39 @@
+**Minopoly**
+
+This is a condensed version of the classic board game Monopoly. The idea is to make as much as you can buying and renting properties on a traditional board. 
+
+There are 9 rounds of buying covering all the properties except the railway stations. 
+
+You are randomly given 1 of 3 properties to buy. The text file **Minopoly Round by Round** shows the details. You can keep track of your purchases by the legend provided after each round; 1 means the first property in the group, 2 the 2nd and 3 the 3rd. If you didn't buy then '0' is displayed by that round. Better still, use the cards from a Monopoly game if you have one. This has the advantage of giving you the full legend for any property.
+
+After each round is a 'Chance' or 'Community Chest' type round taken from the cards in the game. There are three rounds of 'Collection of Rents' based on the values of houses on the given property. Here's how it works through the game:
+
+1st set:
+Rent value without any houses
+
+2nd set:
+Value of 1 house for first 3 rounds. Rent value without houses for rounds 4 to 6
+
+3rd set:
+Value of 2 houses for all rounds
+
+But be careful. You are also required to pay 'Building Costs' on all the properties you own based on various amounts which affect the value of a given property, so it's not a good idea to buy everything in sight hoping to make a profit! Here's how it works through the game:
+
+1st set:
+Building Costs based on value of 1 house on each propety.
+
+2nd set:
+Building Costs based on cost of house on each property.
+
+3rd set: 
+Building Costs based on mortgage value.
+
+You are given £1500 to start, as in the board game.
+
+With skill and luck you can make a good profit out of the £1500 pound that is given.
+
+Keep an eye on your properties, if you manage to score all in a colour group, you get a hefty bonus based on 4 houses in that group at the end of the game.
+
+But - BE CAREFUL. If you have less than zero in money, you go to jail and the game ends.
+
+I hope you enjoy my game especially written for the mighty ZX80.

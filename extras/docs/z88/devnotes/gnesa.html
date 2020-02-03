@@ -1,0 +1,89 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Esa, read &amp; write to filename
+segments</font></b>
+<p><tt>RST 20H, DEFW $5E09</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = manipulator command
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A7:&nbsp; 1 = write, 0 read
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A0:&nbsp; 1 = extension, 0 = name
+&nbsp;&nbsp;&nbsp;&nbsp; HL/DE = filename and buffer pointers
+
+&nbsp;&nbsp;&nbsp;&nbsp; A7 = 0 (reading): HL = filename, DE = buffer
+&nbsp;&nbsp;&nbsp;&nbsp; A7 = 1 (writing): HL = new segment, DE = buffer
+
+&nbsp;&nbsp;&nbsp;&nbsp; B = segment number (+/- 64)
+&nbsp;&nbsp;&nbsp;&nbsp; Positive indexes start at the device name (B=0). Negative indexes start
+&nbsp;&nbsp;&nbsp;&nbsp; at the filename (B=255,-1).
+
+&nbsp;&nbsp;&nbsp;&nbsp; C = Limit of buffer space to use (only relevant for writing). C should
+&nbsp;&nbsp;&nbsp;&nbsp; not be zero.</pre>
+
+<pre></pre>
+<b>A7 = 0 (reading):</b>
+<p>OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_IVF ($17), bad filename</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different
+
+</pre>
+<b>A7 = 1 (writing):</b>
+<p>OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; B = number of filename segments returned
+&nbsp;&nbsp;&nbsp;&nbsp; C = number of characters returned
+&nbsp;&nbsp;&nbsp;&nbsp; DE = indexes terminating null of filename
+</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+
+</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......HL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBCDE../.... different
+</pre>
+Notes:
+<blockquote>To write a segment a valid filename must be placed in the buffer
+pointed to by DE and the replacement segment is point to by HL. If the
+new segment is an extension then the first three characters are used.<br>
+<BR></blockquote>
+Bugs:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Unreliable with small filenames.
+</pre>
+Related calls:
+<p><a href='gnfcm.html'>GN_Fcm</a>, compress a filename
+<br><a href='gnfex.html'>GN_Fex</a>, expand a filename
+<br><a href='gnopw.html'>GN_Opw</a>, Open wildcard handler
+<br><a href='gnpfs.html'>GN_Pfs</a>, parse filename segment
+<br><a href='gnprs.html'>GN_Prs</a>, parse filename
+<br><a href='gnwcl.html'>GN_Wcl</a>, close wildcard handle
+<br><a href='gnwfn.html'>GN_Wfn</a>, fetch next match for wildcard string (handle)
+<br><a href='gnwsm.html'>GN_Wsm</a>, match filename segment to wildcard string
+</body>
+</html>

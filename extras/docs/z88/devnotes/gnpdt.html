@@ -1,0 +1,81 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Pdt, convert an internal date
+to an ASCII string</font></b>
+<p><tt>RST 20H, DEFW $0809</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; HL = 0,1,2 not allowed
+&nbsp;&nbsp;&nbsp;&nbsp; HL > 255, HL points to 3 byte internal date (low byte first)
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 0, result to stream IX
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 1, result to filter IX
+&nbsp;&nbsp;&nbsp;&nbsp; DE = 2, not allowed
+&nbsp;&nbsp;&nbsp;&nbsp; DE > 255, result written at (DE)
+
+&nbsp;&nbsp;&nbsp;&nbsp; A0 = 1, enable zero blanking
+&nbsp;&nbsp;&nbsp;&nbsp; A1 = 1, output leading space
+&nbsp;&nbsp;&nbsp;&nbsp; A2 = 1, output trailing space
+&nbsp;&nbsp;&nbsp;&nbsp; A3 = 1, force American format (day, month, date, year)
+&nbsp;&nbsp;&nbsp;&nbsp; A4 = 1, force European format (day, date, month year)
+&nbsp;&nbsp;&nbsp;&nbsp; A5 = 1, force C as inter-field delimiter
+&nbsp;&nbsp;&nbsp;&nbsp; A6 = 1, date suffix output
+&nbsp;&nbsp;&nbsp;&nbsp; A7 = 1, century output
+
+&nbsp;&nbsp;&nbsp;&nbsp; B0 = 1, output text month, reset for numeric month
+&nbsp;&nbsp;&nbsp;&nbsp; B1 = 1, output expanded day, reset for compressed day
+&nbsp;&nbsp;&nbsp;&nbsp; B2 = 1, output expanded month, reset for numeric month
+&nbsp;&nbsp;&nbsp;&nbsp; B3 = 1, output day, reset for no day
+&nbsp;&nbsp;&nbsp;&nbsp; B4 - B7, undefined
+
+&nbsp;&nbsp;&nbsp;&nbsp; C = optional inter-field delimiter (A5 = 1)
+&nbsp;&nbsp;&nbsp;&nbsp; IX = optional output handle (if DE = 0,1)</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; DE = points to next character after result (if DE(in) > 255), else
+&nbsp;&nbsp;&nbsp;&nbsp; contains number of characters written to destination.</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad parameters
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ROOM ($07), no room to perform conversion</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BC..HL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF..DE../.... different</pre>
+Notes:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A3 = A4 = 0 will output in system defined format.
+&nbsp;&nbsp;&nbsp;&nbsp; A3 = A4 = 1 undefined result.
+&nbsp;&nbsp;&nbsp;&nbsp; A5 = 0 will use space as inter-field delimiter.
+</pre>
+Bugs:
+<blockquote>Will fail if source or destination addresses are in segment
+2.<br>
+<BR></blockquote>
+Related calls:
+<blockquote><a href='gndei.html'>GN_Dei</a>, convert zoned format date to internal format
+<br><a href='gndie.html'>GN_Die</a>, convert internal format date to zoned format
+<br><a href='gngdt.html'>GN_Gdt</a>, convert an ASCII string to an internal binary date
+<br><a href='gngmd.html'>GN_Gmd</a>, Get (read) machine date in internal format
+<br><a href='gnpmd.html'>GN_Pmd</a>, put (set) machine date</blockquote>
+
+</body>
+</html>

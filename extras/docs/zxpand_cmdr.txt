@@ -1,0 +1,85 @@
+
+-lecturas que se producen al cargar CMDR pero despues de hacer fclose y sin hacer fopen. revisar:
+debido a funcion setjoy. los valores de joystick deben volver incorrectos y hacen que puerto BC (registro B) se corrompa:
+calling worker function 0x472313
+zxpand_COM_FileClose
+In Port ZXPand 0x8007 asked, PC after=0x87e
+zxpand read operation. command: 4 (file control port)
+zxpand read operation result: 0x40
+Devolviendo valor 0x40
+Out Port ZXPand 0xE007 value : 0xb3 (N), PC after=0x4485
+zxpand write operation. command: 7 (interface control) value: 0xB3
+
+
+
+Out Port ZXPand 0xFE07 value : 0xff (?), PC after=0x50eb
+zxpand write operation. command: 7 (interface control) value: 0xFF
+Info: Autoenabling AY Chip
+Out Port ZXPand 0xFD07 value : 0xff (?), PC after=0x50eb
+zxpand write operation. command: 7 (interface control) value: 0xFF
+Out Port ZXPand 0xFB07 value : 0xff (?), PC after=0x50eb
+zxpand write operation. command: 7 (interface control) value: 0xFF
+Out Port ZXPand 0xF707 value : 0xff (?), PC after=0x50eb
+zxpand write operation. command: 7 (interface control) value: 0xFF
+Out Port ZXPand 0xEF07 value : 0xff (?), PC after=0x50eb
+zxpand write operation. command: 7 (interface control) value: 0xFF
+Out Port ZXPand 0xDF07 value : 0xff (?), PC after=0x50eb
+zxpand write operation. command: 6 (put data to file) value: 0xFF
+calling worker function 0x4723f2
+trying to write to a non opened file. error
+
+
+Out Port ZXPand 0xBF07 value : 0xff (?), PC after=0x50eb
+zxpand write operation. command: 5 (get data from file) value: 0xFF
+calling worker function 0x472350
+trying to read from a non opened file. error
+Out Port ZXPand 0x7F07 value : 0xff (?), PC after=0x50eb
+zxpand write operation. command: 3 (directory control port) value: 0xFF
+calling worker function 0x472d9e
+
+
+
+Out Port ZXPand 0x7 value : 0xff (?), PC after=0x1f85
+zxpand write operation. command: 0 (data channel) value: 0xFF
+Out Port ZXPand 0x4007 value : 0x98 (/), PC after=0x1fde
+zxpand write operation. command: 2 (put data into globalbuffer) value: 0x98
+Out Port ZXPand 0x4007 value : 0x0 ( ), PC after=0x1fe6
+zxpand write operation. command: 2 (put data into globalbuffer) value: 0x00
+Out Port ZXPand 0x6007 value : 0x0 ( ), PC after=0x4120
+zxpand write operation. command: 3 (directory control port) value: 0x00
+calling worker function 0x472b0f
+abriendo directorio /
+zxpand_get_final_directory. dir: / zxpand_root_dir: /home/chernandez/docs cesar/spectrum/aux_zesarux/zxpand/CMDR
+directorio final total: /home/chernandez/docs cesar/spectrum/aux_zesarux/zxpand/CMDR
+
+Parece ser un error de programacion. esto hace:
+; Transfer the setup table in RAM to the joystick board
+
+        ld h,$80
+        ld b,$fe
+        ld d,$08
+l09:
+        ld e,$3a
+        ld l,$03
+l08:
+        ld a,(hl)
+        ld c,l
+        inc hl
+        inc hl           ; only consider addresses with A0=1; this is necessary because an
+                         ; OUT to a port with A0=A1=0 will cause a system crash
+        out (c),a
+        dec e
+        jr nz,l08
+
+        ld a,b
+        rlca
+        ld b,a
+        inc h
+        dec d
+        jr nz,l09
+
+
+el puerto final esta en BC, el valor de B se va alterando con el RLC...
+
+
+

@@ -1,0 +1,89 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Esp, return an extended pointer
+to a system error message</font></b>
+<p><tt>RST 20H, DEFW $4C09</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = system error code requesting a pointer to a string</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; Fz = 1, error is fatal
+&nbsp;&nbsp;&nbsp;&nbsp; Fz = 0, useful error message
+&nbsp;&nbsp;&nbsp;&nbsp; BHL = pointer to error message string
+
+</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A..CDE../IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; .FB...HL/.... different</pre>
+Notes:
+<blockquote>The following is a list of messages produced by GN_Esp. All
+other values of A(in), and hence any error codes not in the list below,
+will give the message "Internal Error" and these errors are all fatal.</blockquote>
+
+<pre>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; Return code values:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Message:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fatility</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_ESC&nbsp;&nbsp;&nbsp; $01&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Escape</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_TIM&nbsp;&nbsp;&nbsp; $02&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Timeout</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_UNK&nbsp;&nbsp;&nbsp; $03&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Internal Error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Error is fatal</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD&nbsp;&nbsp;&nbsp; $04&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Internal Error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Error is fatal</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_MS&nbsp;&nbsp;&nbsp;&nbsp; $05&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Internal Error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Error is fatal</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_NA&nbsp;&nbsp;&nbsp;&nbsp; $06&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Internal Error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Error is fatal</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_ROOM&nbsp;&nbsp; $07&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No Room</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND&nbsp;&nbsp; $08&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bad handle&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Error is fatal</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_EOF&nbsp;&nbsp;&nbsp; $09&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End of file</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_FLF&nbsp;&nbsp;&nbsp; $0A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filter full</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_OVF&nbsp;&nbsp;&nbsp; $0B&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Overflow</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_SNTX&nbsp;&nbsp; $0C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bad syntax</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_WRAP&nbsp;&nbsp; $0D&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Wrap</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_PUSH&nbsp;&nbsp; $0E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cannot satisfy request</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_ERR&nbsp;&nbsp;&nbsp; $0F&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Internal Error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Error is fatal</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_TYPE&nbsp;&nbsp; $10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Unexpected type&nbsp;&nbsp;&nbsp;&nbsp; Error is fatal</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_PRE&nbsp;&nbsp;&nbsp; $11&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; No room</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_ONF&nbsp;&nbsp;&nbsp; $12&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; File not found</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_RP&nbsp;&nbsp;&nbsp;&nbsp; $13&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Read protected</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_WP&nbsp;&nbsp;&nbsp;&nbsp; $14&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Write protected</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_USE&nbsp;&nbsp;&nbsp; $15&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In use</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_FAIL&nbsp;&nbsp; $16&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cannot satisfy request</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_IVF&nbsp;&nbsp;&nbsp; $17&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bad filename</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_FTM&nbsp;&nbsp;&nbsp; $18&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; File type mismatch</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_EXIS&nbsp;&nbsp; $19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Already exists</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_DVZ&nbsp;&nbsp;&nbsp; $46&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Divide by 0</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_TBG&nbsp;&nbsp;&nbsp; $47&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Number too big</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_NVR&nbsp;&nbsp;&nbsp; $48&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -ve root</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_LRG&nbsp;&nbsp;&nbsp; $49&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Log range</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_ACL&nbsp;&nbsp;&nbsp; $4A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Accuracy lost</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_EXR&nbsp;&nbsp;&nbsp; $4B&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exponent range</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_BDN&nbsp;&nbsp;&nbsp; $4C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bad number</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_DRAW&nbsp;&nbsp; $66&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Redraw</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_QUIT&nbsp;&nbsp; $67&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Unknown error&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Error is fatal</tt>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp; RC_SUSP&nbsp;&nbsp; $69&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Suspended</tt>
+</pre>
+<p><br>Related calls:
+<blockquote><a href='gnerr.html'>GN_Err</a>, display an interactive error box
+<br><a href='oserc.html'>OS_Erc</a>, get error context
+<br><a href='oserh.html'>OS_Erh</a>, set error handler
+<br><a href='osesc.html'>OS_Esc</a>, examine special condition</blockquote>
+
+</body>
+</html>

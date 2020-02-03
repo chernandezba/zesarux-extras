@@ -1,0 +1,52 @@
+New list:
+https://docs.google.com/spreadsheets/d/1CFjp6sRIPRTShESC_1I5-pR6v7kTymk0hhUC1TN9sgc/edit#gid=0
+
+ZEsarUX emulates all of them except:
+
+LDIRSCALE
+LDPIRX
+
+
+Including some of the obsolete list
+
+Obsolete list:
+
+New Z80 opcodes on the NEXT (more to come)
+(Note: those with a - on the first column are emulated in ZEsarUX)
+======================================================================================
+-   swapnib           ED 23          4+4  A bits 7-4 swap with A bits 3-0
+-   mirror a          ED 24          4+4 mirror the bits in A     
+-   ld  hl,sp         ED 25          4+4 transfer SP to HL
+-   test N            ED 27           4+4+3 And A with $XX and set all flags. A is not affected.
+-   mul  d,e          ED 30          4+4  D*E = DE
+-   add  hl,a         ED 31          4+4  Add A to HL (no flags set)
+-   add  de,a         ED 32          4+4 Add A to DE (no flags set)
+-   add  bc,a         ED 33          4+4 Add A to BC (no flags set)
+-   add  hl,$0000     ED 34 LO HI     Add XXXX to HL (no flags set)
+-   add  de,$0000     ED 35 LO HI     Add XXXX to DE (no flags set)
+-   add  bc,$0000     ED 36 LO HI     Add XXXX to BC (no flags set)
+-   inc dehl          ED 37          4+4 increment 32bit DEHL
+-   dec dehl          ED 38          4+4 increment 32bit DEHL
+-   add dehl,a        ED 39          4+4 Add A to 32bit DEHL
+-   add dehl,bc       ED 3A          4+4 Add BC to 32bit DEHL
+-   add dehl,$0000    ED 3B LO HI    4+4+3+3 Add $0000 to 32bit DEHL
+-   sub dehl,a        ED 3C          4+4 Subtract A from 32bit DEHL
+-   sub dehl,bc       ED 3D          4+4 Subtract BC from 32bit DEHL
+-   outinb            ED 90              As OUTI but B is not incremented
+-   nextreg reg,val   ED 91 reg,val  4+4+3+3 Set a NEXT register (like doing out($243b),reg then out($253b),val )
+-   nextreg reg,a     ED 92 reg      4+4+3   Set a NEXT register using A (like doing out($243b),reg then out($253b),A )
+-   pixeldn           ED 93           Move down a line on the ULA screen
+-   pixelad           ED 94           using D,E (as Y,X) calculate the ULA screen address and store in HL
+-   setae             ED 95           Using the lower 3 bits of E (X coordinate), set the correct bit value in A
+-   ldix              ED A4           As LDI,  but if byte==A does not copy
+-   LDWS              ED A5           (DE) = (HL) : D++ : L++ 14Ts. BC is not modified. Flags are set as if an INC D instruction was executed.
+-   ldirx             ED B4           As LDIR, but if byte==A does not copy
+-   lddx              ED AC           As LDD,  but if byte==A does not copy, and DE is incremented
+-   lddrx             ED BC           As LDDR,  but if byte==A does not copy
+   ldirscale         ED B6           As LDIRX,  if(hl)!=A then (de)=(hl); HL_E'+=BC'; DE+=DE'; dec BC; Loop.
+-   ldpirx            ED B7           (de) = ( (hl&$fff8)+(E&7) ) when != A
+-   push NN        ED 8A HI LO   4+4+3+3+3+3 (3+3 for read, 3+3 for write)  push 16bit immediate value. ATTENTION: big endian!
+
+
+see also
+https://docs.google.com/spreadsheets/d/1CFjp6sRIPRTShESC_1I5-pR6v7kTymk0hhUC1TN9sgc/edit#gid=0

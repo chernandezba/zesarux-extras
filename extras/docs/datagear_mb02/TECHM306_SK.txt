@@ -1,0 +1,765 @@
+####################################################
+## 03 Busy soft: Techman operaŸn‚ho syst‚mu MB-02 ##
+####################################################
+      Index: 960331163326   Pr¡sne tajn‚ !!!
+
+  Obsah
+
+    1. ROM-BIOS
+       - popis
+       - volania
+         -- str nkovanie
+         -- presmerovanie load-save
+
+    2. FDC-BIOS 26
+       - popis
+       - slu§by
+       - çtrukt£ry d t
+         -- fyzick‚ Ÿ¡slo
+         -- status
+
+    3. BS-DOS 306
+       - popis
+       - slu§by
+       - syst‚mov‚ premenn‚
+
+    4. Form t disku
+       - BOOT sektor
+       - DIRS sektor
+       - adres rov‚ sektory a polo§ky
+       - File alocation table
+
+---------------------------------------------------------------------------
+          *** ROM-BIOS ***
+
+ROM-BIOS sl£§i na prep¡nanie ramiek a povolenie alebo zak zanie z pisu do
+ramiek. Tie§ zabezpeŸuje komunik ciu medzi jednotlivìmi ramkami - keÔ treba
+zavolaœ podprogram z jednej ramky do druhej, priŸom pam„œ nad #4000 nemo§no
+pou§iœ.
+
+Volania:
+ call #3C98 ... zapne ROM-ramku, zak §e z pis
+ call #3C9A ... zapne DOS-ramku, zak §e z pis
+ call #3C9C ... zapne ROM-ramku, povol¡ z pis
+ call #3C9E ... zapne DOS-ramku, povol¡ z pis
+
+Tieto volania funguj£ nez visle od toho, ktor  ramka je pr ve zapnut 
+(pristr nkovan ) a Ÿi je povolenì alebo zak zanì z pis.
+Z sadne sa neodpor£Ÿa prep¡naœ ramky pomocou OUT preto§e jednotliv‚ adresy
+portov sa m“§u na jednotlivìch hardweroch meniœ (aj sa menia!) ale tieto
+volania s£ vçade rovnak‚ (s£ çtandardizovan‚).
+
+S£Ÿasœou ROM-biosu s£ aj volania urŸuj£ce orient ciu LOAD-SAVE rut¡n v romke
+na adres ch #4C6 a #562. S£ to tieto volania:
+
+ call #3CA2 ... presmeruje rutinky na kazetu
+ call #3CA4 ... presmeruje rutinky na disketu
+
+Ale tieto volania treba volaœ pri pristr nkovanej ROM-ramke.
+-----------------------------------------------------------------------------
+       *** FDC-BIOS ***
+
+FDC-BIOS sl£§i na ovl danie vçetkìch ostatnìch hardwarovo z vislìch zariaden¡
+- FDC a DMA kontrol‚ry, porty na ovl danie motorov mechan¡k, prep¡nanie HD/DD
+a podobne.  Cie–om FDC-biosu (nakoniec aj ROM-biosu) je zabezpeŸiœ hardwerov£
+nez vislosœ a pln£ prenosite–nosœ vçetkìch programov od samotn‚ho BS-dosu cez
+u§¡vate–sk‚ prostredie typu windows (napr. NS WINDOWS) a§ po samotn‚
+u§¡vate–sk‚ aplik cie. Preto vlastne sa neodpor£Ÿa prep¡naœ ramky outami alebo
+pou§¡vaœ priamy pr¡stup na perif‚rie, ale len cez tieto dva biosy.
+
+Vçetky Ÿasovo n roŸn‚ oper cie pri prenose bajtov medzi pameœou a diskom
+sa robia pomocou FDC a DMA kontrol‚rov, preto sa pri diskovìch oper ci ch
+ani nezakazuje ani nepovo–uje preruçenie. U§¡vate– preto m“§e k–udne
+nechaœ cez preruçenie IM2 vykon vaœ –ubovo–n£ rutinku. Na t£to
+rutiku s£ vçak kladen‚ urŸit‚ ohraniŸenia - presne tak‚ ist‚ ako na rutinku
+popisovan£ pri slu§be SETMLT (#10), ale s tìm rozdielom, §e rutinka v preruçen¡
+samozrejme nesmie meniœ §iadne registre.
+
+Vçetky slu§by FDC-biosu sa volaj£ inçtrukciou RST #18 pri nastr nkovanej
+DOS-ramke, priŸom v registri A je v§dy Ÿ¡slo volanej slu§by.  V ostatnìch
+registroch s£ potom Ôalçie parametre pre volan£ slu§bu.
+
+  ¬¡slo slu§by: Mnemotechnickì n zov slu§by
+             I: register=hodnota  [vstupn‚ parametre v registroch]
+             O: register=hodnota  [vìstup‚ parametre v registroch]
+ ...struŸnì slovnì popis danej slu§by...
+
+ #00: RESET
+   O: A=status
+ Resetuje FDC kontrol‚r.
+ T£tu slu§bu je vhodn‚ zavolaœ v§dy na zaŸiatku pr ce s FDC-biosom.
+
+ #01: STATUS
+   O: A=status
+ Vracia v registri A status. Inak niŸ in‚ nerob¡.
+ Status-bajt je pop¡sanì ni§çie.
+
+ #02: RESTORE
+   O: A=status
+ Presunie hlaviŸku aktivovanej mechaniky na nult£ stupu.
+
+ #03: SEEK
+   I: D=stopa
+   O: A=status
+ Presunie hlaviŸku aktivovanej mechaniky na dan£ stopu.
+
+ #04: RDSEC
+   I: DE=fyzick‚ Ÿ¡slo sektora, HL=adresa
+   O: A=status
+ PreŸ¡tanie sektora DE z diskety na adresu HL.
+
+ #05: WRSEC
+   I: DE=fyzick‚ Ÿ¡slo sektora, HL=adresa
+   O: A=status
+ Z pis sektora DE na disketu z adresy HL.
+
+ #06: RDTRK
+   I: D=stopa, bit7,E=strana, HL=adresa
+   O: A=status
+ PreŸ¡tanie stopy z diskety na adresu HL.
+
+ #07: WRTRK
+   I: D=stopa, bit7,E=strana, HL=adresa
+   O: A=status
+ Z pis stopy na disketu z adresy HL.
+ T to funkcia sa pou§¡va pri form tovan¡ diskety.
+
+ #08: RDADD
+   I: D=stopa, bit7,E=strana, HL=adresa
+   O: A=status
+ PreŸ¡tanie identifik cie sektora z diskety na adresu HL.
+
+ #09: RE¦IM
+   I: E=0 pre DD, 1 pre HD, 2 pre ED, ...
+   O: Z=re§im nastavenì, NZ=error
+ Nastavenie hustoty z znamu na aktivovanej mechanike.
+ Ak je pri n vrate pr¡znak NZ tak mechanika danì re§im nepodporuje.
+
+ #0C: AKTIVE
+   I: E=Ÿ¡slo mechaniky
+   O: A=vìsledok
+ Aktivizuje dan£ mechaniku (roztoŸ¡ motor a povol¡ enable)
+ Ak bola pred tìm niektor  mechanika akt¡vna, vypne ju volan¡m PASIVE.
+ Vìsledok aktiviz cie danej mechaniky m“§e byœ:
+   0 ... unknown disk ... tak  mechanika neexistuje
+   1 ... disk not ready ... v mechanike nie je disketa (alebo otvoren‚ dvierka)
+   2 ... disk activated ... disk aktivny, disketa nebola vymenena
+   3 ... disk activated ... disk aktivny, ale bola vymenena disketa
+ Po ne£speçnìch pr¡padoch 0 a 1 ostan£ vçetky mechaniky vypnut‚.
+
+ #0D: PASIVE
+ Vyp¡na akt¡vnu mechaniku (zdruç¡ enable).
+ ¬i povyp¡na aj toŸiace sa motory, to z vis¡ od nastavenia SETOFF.
+
+ #0E: INFO
+   I: E=Ÿ¡slo mechaniky
+   O: DE=inform cie o mechanike
+ T to slu§ba vracia tieto inform cie o danej mechnike:
+   D = poŸet st“p
+   E = podporovan‚ re§imy (bit 0=DD, bit 1=HD, bit 2=ED, ...)
+ Ak dan  mechanika neexistuje, v registri DE sa vr ti nula.
+
+ #0F: SETMAX
+   I: BC=maxim lna pren çan  d–§ka
+ Nastavuje maxim lny poŸet bajtov, ktorì prenesie DMA kontrol‚r pri  vykon van¡
+ slu§ieb RDSEC a§ RDADD. Vìznam to m  vtedy, ak nie je vopred zn my poŸet
+ bajtov ktor‚ sa maj£ naŸ¡taœ pri volan¡ tìchto slu§ieb.
+ [napr. pri Ÿ¡tan¡ stopy, alebo ak nie je zn ma d–§ka sektora]
+ Obsluha si takto m“§e ve–mi jednoducho zabezpeŸiœ, aby Ÿ¡tan‚ data ani
+ omylom nepremazali Ÿasœ pamete ktor  le§¡ nad buffrom pre Ÿ¡tan‚ data.
+
+ #10: SETMLT
+   I: HL=adresa rutinky, alebo nula
+ KeÔ§e poŸas samotn‚ho prenosu d t medzi diskom a pameœou nie je potrebn 
+ £Ÿaœ procesora, m“§e sa procesor venovaœ inej Ÿinnosti. Pomocou tejto slu§by
+ sa FDC-biosu odovzd va adresa rutinky, ktor  bude zavolan  pr ve poŸas tohto
+ prenosu d t. Rutinka m“§e vykon vaœ –ubovo–n£ Ÿinnosœ, ale keÔ§e sa t to
+ rutinka vol  poŸas DMA oper cie s diskom, s£ na åu kladen‚ tieto obmedzenia:
+   - nesmie ruçiœ prenos d t !!! [nesmie siahaœ na DMA, FDC a porty mechan¡k]
+   - nemala by obsahovaœ presn‚ Ÿasov‚ sluŸky [lebo DMA vtedy zdr§uje pameœ]
+   - nemala by trvaœ viac ako 5-10 ms [ale toto nie je kritick‚]
+   - mus¡ sa poctivo vr tiœ inçtrukciou RET nasp„œ do DOS-ramky
+   - m“§e meniœ vçetky registre
+
+ #11: SETOFF
+   I: E=m¢d vyp¡nania motorov
+ Tu sa urŸuje, Ÿi slu§ba PASIVE bude (E=#00) alebo nebude (E=#ff) vyp¡naœ aj
+ motor pri deaktiv cii mechaniky. Nevyp¡naœ motor m  vìznam napr. vtedy, keÔ
+ sa kop¡ruje ve–mi ve–a d t [§e sa nemestia naraz do pamete] medzi dvomi
+ mechanikami - netreba zbytoŸne Ÿakaœ na rozt Ÿanie motorov mechan¡k.
+
+
+Fyzick‚ Ÿ¡slo sektora v registri DE sa sklad  z tìchto £dajov:
+  bit 0-7,D ... Ÿ¡slo stopy
+  bit   7,E ... strana
+  bit 0-6,E ... Ÿ¡slo sektora na stope D
+
+Mnoh‚ slu§by vracaj£ v registri A çtrukt£ru zvan£ "status". Status je bajt,
+ktorì çpecifikuje vìsledok diskovej oper cie - ka§dì bit m  svoj vìznam.
+Ak je bit jednotkovì, znamen  to §e nastala çpecifikovan  chyba.
+V z tvork ch s£ nap¡san‚ slu§by, ktorìch sa tìka dan  chyba a teda pri ktorìch
+m  vìznam testovaœ tento bit.
+
+bit 0 ... time out ... oper cia by trvala dlhçie, ako sa patr¡ [#04-#08]
+bit 1 ... disk not ready ... mechanika nie je pripraven   [#04-#08]
+bit 2 ... lost data .... chyba pri prenose d t disk-pameœ [#04-#08]
+bit 2 ... track 0 ... hlava je na stope 0                 [#00-#03]
+bit 3 ... CRC error ... pri Ÿ¡tan¡ nesed¡ kontrolnì s£Ÿet [#04,#06,#08]
+bit 4 ... record not found ... nenaçiel sa sektor         [#04,#05,#08]
+bit 4 ... seek error ... mechanika nem  nult£ stopu (?!)  [#02]
+bit 5 ... break ... pri diskovej oper cii bol stlaŸen‚ QW [#04-#08]
+bit 6 ... write protect ... disk chr nenì pred z pisom    [#00-#02,#03,#05,#07]
+bit 7 ... not ready ... chyba aktiviz cie mechaniky       [#04-#08]
+
+------------------------------------------------------------------------------
+        *** BS-DOS ***
+
+BS-DOS je u§ hardwerovo nez visl  Ÿasœ operaŸn‚ho syst‚mu ktor  poskytuje
+u§¡vate–ovi vçetky mo§n‚ slu§by od tìch ni§ç¡ch ako napr. vìpis jedn‚ho
+znaku, nastavenie aktu lnej mechaniky a§ po slu§by najvyççej £rovne ako
+napr. emul cia load-save rut¡n na adres ch #4C6 a #562 alebo interpret
+basicovìch pr¡kazov a funkci¡ ovl d j£cich disketov‚ jednutky.
+
+Slu§by operaŸn‚ho syst‚mu s£ logicky rozdelen‚ do çtyroch skup¡n.
+Prv£ skupinu tvoria slu§by #00-#0F a #34. S£ to mal‚ pomocn‚ podprogramy,
+ako napr¡klad vìpis jedn‚ho znaku, p¡pnutie alebo jednoduch‚ prevody.
+Druh£ skupinu tvoria slu§by #10-#1F a #30. S£ to z kladn‚ diskov‚ oper cie,
+ako napr¡klad nastavenie aktu lneho disku, adres ra, prep¡sanie adres rovej
+polo§ky, zistenie vo–n‚ho miesta na diskete alebo zmazanie CACHE pamet¡.
+Tretiu skupinu tvoria slu§by #22-#2F a #33. S£ to diskov‚ oper cie vyççej
+£rovne ktor‚ viac-menej zodpovedaj£ jednotlivìm basicovìm pr¡kazom.
+Napr¡klad zmazanie s£borov, presunutie do in‚ho adres ra alebo katal¢g.
+ætvrt£ skupinu tvoria slu§by #20,#21,#31,#32. S£ to slu§by urŸen‚ na
+çpeci lne £Ÿely a pre u§¡vate–a prakticky nepou§iœe–n‚. Sem patr¡ emul cia
+romkovìch load-save rut¡n (#4C6 a #562) a basicovì interpreter.
+
+Niektor‚ slu§by vracaj£ alebo vy§aduj£ zadaœ 32-bitov£ hodnotu.
+T to hodnota sa zad va v§dy v registroch DE a HL tak, §e plat¡:
+DEHL hodnota = 256^3*D + 256^2*E + 256^1*H + 256^0*L
+[Teda v D je najvyçç¡ bajt a v L najni§ç¡.]
+
+Slu§by oznaŸen‚ hviezdiŸkou v§dy vracaj£ v pr¡znaku CY inform ciu o tom, ako
+dopadli. V pr¡pade, §e CY je pri n vrate nastaven‚, slu§ba prebehla v poriadku.
+Ak sa pri vykon van¡ slu§by vyskytne nejak  chyba, na ktor£ u§¡vate– odpovie
+RETRY a slu§ba potom prebehne v poriadku, tie§ sa vr ti s nastavenìm CY.
+Ak vçak u§¡vate– odpovie ABORT, slu§ba sa vr ti s nulovìm CY.
+
+Vçetky slu§by BS-DOSu sa volaj£ inçtrukciou RST #20 pri nastr nkovanej
+DOS-ramke, priŸom v registri A je v§dy Ÿ¡slo volanej slu§by.  V ostatnìch
+registroch s£ potom Ôalçie parametre pre volan£ slu§bu.
+
+  ¬¡slo slu§by: Mnemotechnickì n zov slu§by [hviezdiŸka]
+             I: register=hodnota  [vstupn‚ parametre v registroch]
+             O: register=hodnota  [vìstup‚ parametre v registroch]
+ ...struŸnì slovnì popis danej slu§by...
+
+ #00: GETVER
+   O: BC=verzia operaŸn‚ho syst‚mu, IX=adresa pomocn‚ho d tov‚ho buffera
+ Pod–a tejto slu§by si aplikaŸn‚ programy m“§u ve–mi –ahko zistiœ s akou
+ verziou dosu spolupracuj£ a pred¡sœ tak niektorìm komplik ci m ktor‚ by
+ vznikli keby program volal nejak£ slu§bu v starçej verzii dosu, kde t to
+ slu§ba eçte nie je implementovan .
+ Do pomocn‚ho d tov‚ho buffera sa ukladaj£ r“zne inform cie o Ÿinnosti
+ syst‚mu - napr¡klad inform cie o chybe, ak nejak  nastane. Bli§çie o
+ tomto viÔ v popise slu§by #35:SDMSX.
+
+ #01: DISP
+   I: E=ascii k¢d znaku
+ Toto je print-rutinka vypiduj£ca jeden znak. Poz¡cia vìpisu je dan  syst‚movou
+ premennou XXX a YYY, sp“sob vypisovania sa urŸuje slu§bou SDDX [#0C] a
+ v pr¡pade §e vìpis prebieha na obrazovke je farba vìpisu urŸen  syst‚movou
+ premennou COLOR.
+ T to slu§ba nevie sprac£vaœ §iadne riadiace k¢dy ako napr. CR,LF.
+ Vypisuje iba platn‚ vyp¡sate–n‚ znaky od k¢du #1E vyççie.
+
+ #02: ENTER
+ Presunie kurzor vypisovania na zaŸiatok Ôalçieho riadku tak, §e do zvyçku
+ riadku na ktorom je kurzor a§ do konca riadku vypisuje medzery.
+
+ #03: TAB
+   I: E=Ÿ¡slo st’pca
+ Vypisuje medzery dovtedy, pokìm poz¡cia vìpisu nebude v danom st–pci.
+
+ #04: TXXT
+   I: HL=adresa textu
+ Vypisuje text ulo§enì na danej adrese. Text mus¡ konŸiœ bajtom nula.
+
+ #05: DEC8X
+   I: E=hodnota, C=znak pre nevìznamn‚ nuly
+ Vypisuje osembitov‚ desiatkov‚ Ÿ¡slo, priŸom naniesto zaŸiatoŸnìch n£l vyp¡çe
+ znak v registri C. Ak teda chcete maœ Ÿ¡sla zarovnan‚ vpravo, vlo§te do C
+ medzeru, ak chcete mat vyp¡san‚ iba platn‚ Ÿ¡slice, vlo§te do C k¢d #00.
+ Na samotnì vìpis znakov sa vol  slu§ba DISP.
+
+ #06: DEC16X
+   I: HL=hodnota, C=znak pre nevìznamn‚ nuly
+ Vypisuje 16-bitov‚ Ÿislo, inak presne tak isto ako DEC8X.
+
+ #07: DEC32X
+   I: DEHL=hodnota
+   I: C=znak pre nevìznamn‚ nuly, B=maxim lna d’§ka Ÿ¡sla [max 10 znakov!]
+ Vypisuje 32-bitov£ hodnotu ako desiatkov‚ Ÿ¡slo. Ak chcete aby d’§ka Ÿ¡sla
+ nepresiahla napr. 8 znakov, vlo§te do B hodnotu 8.
+
+ #08: DEC32
+   I: DEHL
+   O: DEHL = DEHL-1
+
+ #09: INC32
+   I: DEHL
+   O: DEHO = DEHL+1
+
+ #0A: ADD32
+   I: DEHL,BC
+   O: DEHL = DEHL+BC
+
+ #0B: SUB32
+   I: DEHL,BC
+   O: DEHL = DEHL-BC
+ Tieto çtyri slu§by XXX32 sl£§ia pre 32-bitov£ aritmetiku.
+
+ #0C: SDDX
+   I: E=m¢d vìpisu
+ UrŸenie sp“sobu vypisovania znakov pre slu§bu DISP.
+ E=0...slu§ba DISP bude vypisovaœ znaky norm lne na obrazovku.
+ Poz¡cia vìpisu je dan  syst‚movìmi premennìmi XXX (st’pec) a YYY (riadok).
+ Po ka§dom vyp¡sanom znaku sa poz¡cia posunie doprava, alebo na zaŸiatok
+ Ôalçieho riadku, ak je u§ celkom na kraji. A je na poslednom riadku,
+ presunie sa na prvì riadok obrazovky.
+ E=1...slu§ba DISP bude vypisovaœ znaky tak, §e ich bude ukladaœ do pameti
+ na adresu dan£ syst‚movou premennou XXX (ni§ç¡ bajt) a YYY (vyçç¡ bajt).
+ Toto vypisovanie "do pameti" sa d  ve–mi vìhodne pou§iœ napr. ak chcete
+ vyp¡saœ 32-bitov‚ Ÿ¡slo, ale chcete pou§iœ nejak£ vlastn£ print-rutinku.
+ Pomocou SDDX nastav¡te vypisovanie do pameti, do XXX ulo§¡te adresu nejak‚ho
+ buffera, zavol te slu§bu DEC32X, no a v bufferi m te toto Ÿ¡slo v textovom
+ tvare a m“§ete ho vyp¡saœ vlastnou print-rutinkou.
+
+ #0D: BEEP
+ P¡pnutie na AY - nemen¡ farbu borderu. T¢n sa vytv ra rìchlym striedan¡m
+ hodn“t #00 a #0F v registri #0A [hlasitosœ kan lu C]. Ak pr ve na AY hraje
+ nejak  hudba z preruçenia, potom p¡putie bude "modulovan‚" touto hudbou.
+ Po p¡pnut¡ sa do registra #0A vr ti p“vodn  hodnoda ak£ mal pred zaŸiatkom
+ p¡pnutia. Ostatn‚ registre AY sa pri p¡pnut¡ ani nenastavuj£ ani nemenia.
+
+ #0E: PREVODX
+   I: HL=logick‚ Ÿ¡slo sektora, E=pocet sektorov na stopu
+   O: HL=DE=fyzick‚ Ÿ¡slo sektora
+ Celì BS-DOS pracuje s logickìmi Ÿ¡slami sektorov, avçak FDC-BIOS pracuje iba
+ s vìhradne fyzickìmi Ÿ¡slami. Preto v§dy vtedy, keÔ treba v BS-dose zavolaœ
+ nejak£ slu§bu FDC-biosu tak sa pred tìm vol  t to slu§ba PREVODX.
+ Defin¡cia fyzick‚ho Ÿ¡sla sektoru je v popise FDC-biosu.
+
+ #0F: HOWSEC
+   I: DEHL=d’§ka s£boru
+   O: BC=poŸet sektorov ak Z, error ak NZ
+ T to slu§ba vypoŸ¡ta, ko–ko sektorov by na disku zaberal s£bor s d’§kou DEHL.
+ Ak by mal poŸet sektorov presiahnuœ 65536, tak do BC sa ulo§¡ iba dolnìch
+ 16 bitov tejto hodnoty a vynuluje sa priznak zero (NZ). Ak je poŸet sektorov
+ pod 65536 tak bude zero nastavene (Z).
+
+ #10: KUKNI *
+ Aktualiz cia vn£tornìch CACHE pamet¡. Skontroluje disketu v aktu lnej
+ mechanike a nastav¡ pod–a nej obsah tìchto pamet¡.
+
+ #11: KUINI *
+ Aktualiz cia CACHE pamet¡ ako #10 KUKNI, ale s tìm §e pred tìm vyma§e starì
+ obsah pamet¡. To znamen , §e v§dy d“jde z znovunaŸ¡taniu vçetkìch inform ci¡
+ z diskety.
+
+ #12: GETCST *
+   O: D=aktu lny adres r, E=aktu lny disk, HL=load-kurzor
+ T to slu§ba zisœuje aktu lnu cestu [disk a adres r] a na ktorom s£bore je
+ pretoŸen  virtu lna kazeta.
+
+ #13: SETDRV
+   I: E=Ÿ¡slo mechaniky
+ Nastavenie aktu lnej mechaniky. Ak u§¡vate– nastav¡ mechaniku, ktor  fyzicky
+ neexistuje, chyba nenastane hneÔ ale a§ pri fyzickom pr¡stupe na t£to
+ mechaniku.
+
+ #14: SETDIR *
+   I: E=Ÿ¡slo adres ra
+ Nastavenie aktu lneho adres ra na diskete vlo§enej do aktu lnej mechaniky.
+
+ #15: SETLCX *
+   I: BC=load-kurzor
+ PretoŸenie virtu lnej kazety na s£bor s Ÿ¡slom BC na diskete vlo§enej do
+ aktu lnej mechaniky. Znamen  to, §e pri volan¡ load-rutinky na #562 sa bude
+ pr ve tento s£bor ako prvì sprac£vaœ.
+
+ #16: GETSUB *
+   I: BC=Ÿ¡slo s£boru (load-kurzor), IX=adresa 32-bajtov‚ho buffera
+   O: zero=platnosœ £dajov v bufferi
+ T to slu§ba vr ti v bufferi 32-bajtov£ adres rov£ polo§ku dan‚ho s£boru.
+ V pr¡pade §e adres rov  polo§ka s takìmto Ÿ¡slom neexistuje [adres r je
+ kratç¡ ako £daj v BC] tak slu§ba sa vr ti s nastavenìm zero-pr¡znakom.
+ Presn  çpecifik cia çtrukt£ry adres rovej polo§ky je v Ÿasti popisuj£cej
+ form t diskety.
+
+ #18: KOLKOX *
+   O: DE=poŸet adres rovìch polo§iek v aktu lnom adres ri.
+ T to slu§ba vracia inìmi slovami povedan‚ d’§ku aktu lneho adres ra.
+ M  to vìznam vtedy, ak chcete do pameti naŸ¡taœ adres r slu§bou GETSUB
+ a potrebujete zistit §e ko–ko polo§iek sa v adres ri nach dza.
+
+ #19: SEASX *
+   I: HL=adresa 10-znakov‚ho mena, E=typ s£boru
+   O: zero=pr¡znak Ÿi sa tak‚ meno naçlo
+ H–adanie s£boru s danìm menom a typom v aktu lnom adres ri. Meno mus¡ byœ
+ 10 znakov‚. V registri E je typ s£boru (0=basic;1,2=data,3=bytes;...atd)
+ Ak je v E hodnota 255 tak typ s£boru sa nekontroluje a porovn va sa iba
+ 10 znakov‚ meno. T to slu§ba pracuje tak, §e h–ad  danì s£bor od aktu lnej
+ poz¡cie load-kurzoru smerom ku koncu adres ra. KeÔ sa dostane na koniec,
+ pokraŸuje zase od zaŸiatku adres ra. H–adanie konŸ¡ vtedy, ak sa alebo
+ danì s£bor n jde alebo ak sa pr¡de na vìchodiskov‚ miesto h–adania.
+ Ak sa danì s£bor n jde, load-kurzor sa naå nastav¡ a slu§ba sa vr ti
+ s nastavenìm zerom (Z), ak sa nen jde, load-kurzor sa nemen¡ a bude NZ.
+ T to slu§ba sa vyu§¡va napriklad vtedy, ak do basicov‚ho pr¡kazu pre
+ nastavenie load-kurzora zad te reœazcovì parameter [meno s£boru].
+
+ #1A: SEADX *
+   I: HL=adresa 10-znakov‚ho mena
+   O: zero=pr¡znak Ÿi sa tak‚ meno naçlo, A=Ÿ¡slo adres ra (ak sa naçiel)
+ H–adanie adres ra s danìm menom. T to slu§ba pracuje tak, §e h–ad  danì
+ adres r smerom k adres ru 255. KeÔ sa tam dostane, pokraŸuje zase
+ od adres ra 0. H–adanie konŸ¡ vtedy, ak sa alebo danì adres r n jde alebo
+ ak sa pr¡de na vìchodiskov‚ miesto h–adania. Ak sa danì adres r n jde,
+ slu§ba vr ti jeho Ÿ¡slo v registri A s nastavenìm zerom (Z), ak sa nen jde,
+ bude NZ.
+ T to slu§ba sa vyu§¡va napr¡klad vtedy, ak do basicov‚ho pr¡kazu pre
+ nastavenie adres ra zad te reœazcovì parameter [meno adres ra].
+
+ #1B: OWSUB *
+   I: HL=Ÿ¡slo s£boru, IX=adresa 32-bajtov‚ho buffera
+ Prep¡sanie adres rovej polo§ky. V bufferi sa mus¡ nech dzaœ nov  polo§ka,
+ ktorou sa nahrad¡ star  adres rov  polo§ka patriaca s£boru s Ÿ¡slom HL.
+ Ak s£bor s Ÿ¡slom HL neexistuje [adres r je kratç¡ ako HL] vtedy sa nevykon 
+ §iadna Ÿinnosœ.
+ T£to slu§bu pou§¡vajte ve–mi opratrne, lebo jej neuv §enìm pou§it¡m mo§no
+ ve–mi –ahko pokaziœ integritu d t ulo§enìch na diskete.
+ Odpor£Ÿanì postup pou§itia je takìto: Najpr si slu§bou GETSUB ulo§te
+ dan£ polo§ku do buffera, potom spravte v polo§ke ulo§enej v bufferi potrebn‚
+ zmeny a nakoniec slu§bou OWSUB u§ modifikovan£ polo§ku ulo§te sp„œ na disk.
+ Meniœ m“§ete d tum, Ÿas, £daje v magnetof¢novej hlaviŸke a adresu tela.
+ Ostatn‚ £daje sa neopor£Ÿa meniœ. V §iadnom pr¡pade nemente zaŸiatoŸnì
+ sektor s£boru !!!
+ T£tu slu§bu vyu§¡va napr¡klad basicovì pr¡kaz RENAME.
+
+ #1E: KILLX
+ Zruçenie vn£tornìch CAHCE pamet¡ pre disketu. T£to slu§bu je potrebn‚ zavolaœ
+ v§dy vtedym, keÔ sa boli zmenen‚ data na diskete inak ako prostredn¡ctvom
+ basicovìch pr¡kazov alebo çtandartnìch slu§ieb BS-dosu. Vyu§¡va ju napr.
+ form tovac¡ program.
+
+ #1F: FREEX *
+   O: DEHL=vo–n‚ miesto v bajtoch, BC=vo–n‚ miesto v sektoroch
+ Vracia ve–kosœ vo–n‚ho miesta na diskete v aktu lnej mechanike.
+
+ #20: EMM562 *
+ Emul cia rom-load rutinky na adrese #562, pre u§¡vate–a inak nezauj¡mav‚
+ Emuluje aj load, aj verify. Vyu§¡vaj£ sa pri tom slu§by #22 LOA1X a #24 VERIX.
+
+ #21: EMM4C6 *
+ Emul cia rom-save rutinky na adrese #4C6, pre u§¡vate–a inak nezauj¡mav‚
+ Vyu§¡vaj£ sa pri tom slu§by #26 CREATX, #25 SAVEX a #24 VERIX.
+
+ #22: LOA1X *
+ #23: LOA2X *
+ #24: VERIX *
+ #25: SAVEX *
+   I: HL=Ÿ¡slo s£boru, IX=adresa pameti, BC=zaŸiatoŸnì sektor, E=poŸet sektorov
+ Toto s£ çtyri komplexn‚ slu§by, pomocou ktorìch je mo§n‚ Ÿ¡taœ (LOA1X,LOA2X),
+ zapisovaœ (SAVEX) alebo skontrolovaœ (VERIX) urŸit£ Ÿasœ s£boru.
+ HL obsahuje Ÿ¡slo s£boru ktor‚ çpecifikuje s£bor, s ktorìm sa bude pracovaœ,
+ IX ukazuje na zaŸiatok pameti kam sa bude loadovaœ, pr¡padne odkia– sa bude
+ sejvovaœ alebo obsah ktorej sa skontroluje s obsahom s£boru.
+ BC je Ÿ¡slo znamenaj£ce od ktor‚ho sektora zaŸ¡na Ÿasœ s£boru s ktorou budeme
+ pracovaœ. Sektory sa poŸ¡taju od nuly, Ÿi§e BC=0 je £plne prvì sektor s£boru.
+ E je poŸet sektorov ktor‚ loadujeme, sejvujeme alebo verifikujeme.
+ S£Ÿet BC+E nesmie byœ veŸç¡ ako celkovì poŸet sektorov dan‚ho s£boru.
+ Celkovì poŸet sektorov sa najjednoduchçie d  zistiœ pou§it¡m slu§by HOWSEC.
+ Roziely medzi LOA1X a LOA2X s£ tieto: Ak d’§ka s£boru nie je celoŸ¡selnì
+ n sobok 1024, potom LOA1X nahr va iba pr¡sluçn£ Ÿasœ posledn‚ho sektora,
+ zatia– Ÿo LOA2X nahr va celì poslednì sektor. Ak by sa mali nahr van‚ data
+ ulo§iœ pod adresu #4000 tak LOA1X tieto data neuklad  do pameti. Tìm je
+ operaŸnì syst‚m chr nenì pred prep¡san¡m. Naproti tomu LOA2X niŸ nekontroluje
+ a nahr va v§dy cel‚ sektory. Tìmto p dom je LOA1X bezpeŸnejçie, ale LOA2X je
+ rìchlejçie a mo§no tìm nahr vaœ aj pod #4000.
+ VERIX je norm lne verify, to znamen  §e fyzicky kontroluje obsah danej Ÿasti
+ s£boru s obsahom pameti. V pr¡pade zistenej nezhody vyp¡çe chybovì oznam,
+ v ktorom uvedie adresu prv‚ho a posledn‚ho nezhodn‚ho bajtu a tie§ celkovì
+ poŸet nezhodnìch bajtov.
+
+ #26: CREATX *
+   I: IX=adresa 32-bajtovej adres rovej polo§ky
+   O: HL=Ÿ¡slo vytvoren‚ho s£boru
+ Alok cia miesta na disku pre danì s£bor. T to slu§ba pracuje tak, §e najprv
+ n jde vo–n£ polo§ku v adres ri, do nej presunie dan£ adres rov£ polo§ku
+ z adresy IX, pod–a d’§ky tela v tejto polo§ke naalokuje pr¡sluçnì poŸet
+ vo–nìch sektorov vo FATke na disku a do adres rovej polo§ky nastav¡ Ÿ¡slo
+ prv‚ho sektora. Tìmto vlastne priprav¡ danì s£bor tak, aby slu§ba SAVEX
+ do neho mohla bez probl‚mov ulo§iœ danì obsah.
+ Slu§by #23-#26 vyu§¡va napr. kop¡rovac¡ program CDD takto: Najprv pomocou
+ LOA2X naŸ¡ta do pameti s£bor, ktorì potom sejvne pomocou CREATX a SAVEX.
+
+ #27: UTRASX *
+ Utrasenie aktu lneho adres ra - presne ako basicovì pr¡kaz PRESS.
+
+ #28: ERASEX *
+   I: BC=Ÿ¡slo s£boru
+ Zmazanie dan‚ho s£boru v aktu lnom adres ri. Ak BC=0 tak sa zma§e celì
+ adres r. Ak je adres r nepr zdny [obsahuje nezmazan‚ s£bory] tak sa eçte pred
+ zmazan¡m vyp¡çe ot zka ktorou je treba potvrdiœ zmazanie vçetkìch s£borov
+ v tomoto adres ri.
+
+ #29: ERASIX *
+   I: BC..HL=interval s£borov
+ Zmazanie s£borov poŸn£c BC-tym a§ po HL-ty vŸ¡tane. Mazanie cel‚ho intervalu
+ s£borov naraz m  tu ve–mi ve–k£ vìhodu §e je to ove–a ove–a ove–a rìchlejçie
+ ako mazanie s£boru po jednom a viac sa pri tom çetr¡ disketa - napr¡klad tak
+ §e FATka sa zapisuje iba raz na konci po zmazan¡ vçetkìch s£borov v intervale.
+
+ #2A: MOVEXX *
+   I: BC=Ÿ¡slo s£boru, E=cie–ovì adres r
+ Presunutie s£boru do adres ra E. Funguje presne ako basicovì pr¡kaz MOVE BC,E
+ Ak je BC=0 [pres£va sa celì adres r] tak potom sa len aktu lny adres r vymen¡
+ so çpecifikovanìm. Ak cie–ovì adres r a aktu lny je ten istì, tak sa danì
+ s£bor iba presunie na koniec tohto adres ra. Toto sa d  ve–mi dobre pou§iœ
+ na usporad£vanie s£borov v adres ri.
+
+ #2B: MOVEIX *
+   I: BC..HL=interval s£borov, E=cie–ovì adres r
+ Presunutie intervalom çpecifikovanìch s£borov do adres ra E. Funguje presne
+ tak isto ako basicovì pr¡kaz MOVE E;BC TO HL. S£bory sa postupne jeden po
+ druhom poŸ¡naj£c s£borom BC a konŸiac s£borom HL pres£vaj£ do adres ra E
+ presne tak isto ako v slu§be MOVEXX.
+
+ #2C: CATX *
+   I: BC=çpecifik cia adres ra
+ Vìpis katal¢gu çpecifikovan‚ho adres ra. Ak B=1 tak sa bude vypisovaœ aktu lny
+ adres r, ak B=0 tak sa bude vypisovaœ adres r C. To, Ÿi sa bud£ vypisovaœ aj
+ zmazan‚ s£bory (CAT!) je urŸen‚ nultìm bitom syst‚movej premennej OPTIO.
+ Ako print-rutinka sa pri vypisovan¡ adres ra pou§¡va slu§ba DISP.
+
+ #2D: SEAXXX *
+   I: DE=adresa reœazca, BC=d’§ka reœazca (max 10)
+ H–adanie reœazca vo vçetkìch men ch s£borov a adres rov. Je to vlastne to ist‚
+ ako basicovì pr¡kaz SEARCH "reœazec". To, Ÿi sa bud£ preh–ad vaœ aj zmazan‚
+ s£bory (SEARCH!) je urŸen‚ nultìm bitom syst‚movej premennej OPTIO.
+ Ako print-rutinka sa pri vypisovan¡ pou§¡va slu§ba DISP.
+
+ #2E: CATXD *
+   I: BC=çpecifik cia adres ra, L=Ÿ¡slo mechaniky
+ Pracuje presne tak isto ako CATX ale vypisuje katal¢g aktu lneho adres ra
+ na diskete v mechanike L. Je to vlastne basicovì pr¡kaz CAT #L
+
+ #2F: SEAXXD *
+   I: DE=adresa reœazca, BC=d’§ka reœazca (max 10), L=Ÿ¡slo mechaniky
+ Pracuje presne takisto ako SEAXXX ale preh–ad va men  a adres re na diskete
+ v mechanike L. Je to vlastne basicovì pr¡kaz SEARCH #L,"reœazec"
+
+ #30: START
+ Start operaŸn‚ho syst‚mu po nabootovan¡ zo syst‚movej diskety. Pre u§¡vate–a
+ nem  §iadny praktickì vìznam.
+
+ #31: BASIC
+ Interpret basicovìch pr¡kazov. Pre u§¡vate–a nem  §iadny praktickì vìznam.
+
+ #32: FUNKC
+ Interpret basicovìch funkci¡. Pre u§¡vate–a nem  §iadny praktickì vìznam.
+
+ #33: FORMX *
+ Rìchly form t diskety. Je to vlastne vìkonn  rutinka pr¡kazu FORMAT.
+ Pred zmazan¡m celej diskety sa eçte vyp¡çe ot zka, ktorou je treba zmazanie
+ diskety potvrdiœ.
+
+ #34: MESSX
+   I: HL=adresa textu
+   O: CY=pr¡znak reakcie u§¡vate–a
+ T to slu§ba rob¡ nasleduj£cu Ÿinnosœ: Najpr si odpamet  obrazovku, potom
+ zobraz¡ çtandartn‚ chybov‚ okienko, do ktor‚ho nap¡çe danì text. V okienku
+ sa tie§ vyp¡çe toto: ENTER=OK/RTR,SPACE=ABORT. Po zobrazen¡ okienka sa Ÿak 
+ na stlaŸenie enteru alebo medzery. KeÔ u§¡vate– stlaŸ¡ jednu z tìchto dvoch
+ kl ves, okienko sa zma§e, na obrazovku sa vr ti jej p“vodnì obsah a slu§ba
+ v CY vr ti inform ciu o tom, ak£ kl vesu stlaŸil u§¡vate–. Ak stlaŸil ENTER
+ bude C, ak medzeru bude NC.
+ Pozor ! D“le§it‚: Text nesmie byœ dlhç¡ ako 28 bajtov a mus¡ konŸiœ bajtami
+ #00,#C9. Teda napr¡klad mus¡ vyzeraœ nejak takto: DB 'bla-bla-bla',#00,#C9
+
+ #35: SDMSX
+   I: HL=adresa rutinky, alebo nula.
+ Presmerovanie vìpisov oznamov a chybovìch hlasen¡. BS-DOS obsahuje v sebe
+ rutinku, ktor  vçetky oznamy a chybov‚ hl senia vypisuje do r mika v
+ hornej tretine obrazu. Niekedy ale ale vhodn‚, ak m  u§¡vate– mo§nosœ si
+ nap¡saœ vlastn£ rutinku, ktor  mu bude vypisovat chyby a reagovaœ na
+ kl vesy tak ako sa to dizajnovo hod¡ do jeho u§¡vate–sk‚ho programu.
+ Pr ve na tento £Ÿel je tu t to slu§ba.
+ V registri HL mus¡ byœ adresa obslu§nej rutinky na vìpis chybov‚ho
+ hl senia, alebo nula. Ak je v HL nula, nastav¡ sa vn£torne vektor
+ vìpisovej rutinky na defaultn£ vn£torn£ rutinku.
+
+ #36: UNERAX *
+   I: BC=Ÿ¡slo s£boru
+ Obnovenie dan‚ho s£boru v aktu lnom adres ri. Ak BC=0 tak sa obnov¡ zmazanì
+ adres r. Pri obnovovan¡ adres ra sa s£bory v åom neobnovuj£ automaticky.
+ Slu§bami #36 a #37 sa d  do p“vodn‚ho stavu obnoviœ disketa, ktor  bola
+ zmazan  QuickForm tom (#33).
+
+ #37: UNERIX *
+   I: BC..HL=interval s£borov
+ Obnovenie s£borov poŸn£c BC-tym a§ po HL vŸ¡tane. Obnovenie cel‚ho intervalu
+ s£borov naraz m  tu ve–mi ve–k£ vìhodu §e je to ove–a ove–a ove–a rìchlejçie
+ ako obnovenie s£boru po jednom a viac sa pri tom çetr¡ disketa - napr¡klad tak
+ §e FAT sa zapisuje iba raz na konci po obnoveni vçetkìch s£borov v intervale.
+ Pozn mka: Ak nastane pri niektorom s£bore z intervalu chyba "Can't unerase"
+ tak vçetky s£bory z tohto intervalu ostan£ v p“vodnom stave a ani jeden nebude
+ obnovenì.
+
+
+    Bli§ç¡ popis k slu§b m #34:MESSX a #35:SDMSX
+
+U§¡vate–sk  rutinka vypisuj£ca oznam alebo chybov‚ hl senie dostane
+potrebn‚ inform cie umiestnen‚ v pam„ti - konkr‚tne v pomocnom d tovom
+bufferi, ktor‚ho b zov£ adresu [zaŸiatok] vracia slu§ba #00:GETVER v
+registri IX.  V tomto bufferi sa pri potrebe vyp¡saœ nejakì oznam alebo
+chybov‚ hl senie nachadzaj£ tak‚to £daje:
+
+ Buffer + #80 ... text oznamu alebo chybov‚ho hl senia ukonŸenì bajtom #00
+      + #C0 ... (dva bajty) fyzick‚ Ÿ¡slo sektora, pri ktorom doçlo ku chybe
+      + #C2 ... Ÿ¡slo sektora na stope [vypoŸ¡tan‚ z fyzick‚ho Ÿ¡sla]
+      + #C3 ... farba, akou by sa malo vypisovaœ hl senie
+
+Ak je Ÿ¡slo sektora (#C2) nula, potom sa jedn  o obyŸajnì oznam (napr
+generovanì slu§bou #34:MESSX) a vtedy £daje o Ÿ¡sle sektora nemaj£ §iadny
+vìznam.
+
+Rutinka mus¡ nielen vyp¡saœ hl senie, ale aj spracovaœ u§¡vate–ovu vo–bu
+medzi mo§nosœami RETRY alebo ABORT.  Na vìstupe z rutinky mus¡ byœ v
+CARRY pr¡znak po§adovanej vo–by: CY=1 pre retry a CY=0 pre abort.
+
+Pri pr ci m“§e t to rutinka vyu§¡vaœ slu§by #00 a§ #0F operaŸn‚ho
+syst‚mu. Nesmie niŸ robiœ s diskom a ani volaœ slu§by dosu pracuj£ce s
+diskom. Zo slu§ieb dosu m“§e vyu§¡vaœ len slu§by #00 a§ #0F. M“§e meniœ
+vçetky registre.
+
+
+Niektor‚ syst‚mov‚ premenn‚ BS-dosu:
+
+   #03E0 XXX ....... st’pec alebo ni§ç¡ bajt poz¡cie vìpisu
+   #03E1 YYY ....... riadok alebo vyçç¡ bajt poz¡cie vìpisu
+   #03E2 COLOR ..... farba vìpisu, ak vìpis prebieha na obrazovku
+   #03E3 OPTIO ..... r“zne pr¡znaky pr ce BS-dosu (jednotliv‚ bity)
+   #03EE DISK ...... Ÿ¡slo aktu lnej mechaniky [toto nastavuje slu§ba SETDRV]
+
+ Bity syst‚movej premennej OPTIO:
+
+   bit 0 .... sp“sob vìpisu katal¢gu a preh–ad vania adres rov
+              0 = berie do £vahy iba platn‚ s£bory
+              1 = berie do £vahy aj zmazan‚ adres rov‚ polo§ky
+   bit 1 .... sp“sob vìpisu katal¢gu
+              0 = vypisuje od zaŸiatku katal¢gu (od s£boru 1)
+              1 = vypisuje od aktu lnej poz¡cie load-kurzora
+   bit 7 .... naŸ¡tavanie disku pred z pisovìmi oper ciami
+              0 = v§dy nanovo naŸ¡ta potrebn‚ inform cie z diskety
+              1 = berie inform cie z CACHE pamete (ak tam s£)
+   In‚ bity s£ nepou§it‚, ale z d“vodu kompatibility ich treba nechaœ nulov‚.
+
+-------------------------------------------------------------------------------
+      *** StruŸn‚ info o form te diskety ***
+
+BOOT sektor:
+ fyzick‚ Ÿ¡slo: stopa 0 strana 0 sektor 1
+ logick‚ Ÿ¡slo: 0
+ Tento sektor obsahuje:
+
+  #00-#01 ... Skok na syst‚movì zav dzaŸ
+  #02 ....... nepou§it‚, obyŸajne je tu #80
+  #03 ....... tu mus¡ byœ #02 (znaŸka MB-02)
+  #04-#05 ... poŸet fyzickìch st“p na disku (v„Ÿçinou 80 alebo 82)
+  #06-#07 ... poŸet sektorov na stope (poŸ¡taj£ sa od 1)
+  #08-#09 ... poŸet povrchov na disku (çtandartne 2)
+  #0A-#0B ... poŸet sektorov na cluster (çtandartne 1)
+  #0C-#0D ... logick‚ Ÿ¡slo sektora DIRS
+  #0E-#0F ... poŸet sektorov FAT (1 a§ 4)
+  #10-#11 ... d’§ka FAT (#400 * poŸet sektorov FAT)
+  #12-#13 ... logick‚ Ÿ¡slo prv‚ho sektora prvej FAT
+  #14-#16 ... logick‚ Ÿ¡slo prv‚ho sektora druhej FAT
+
+  #20 ....... tu mus¡ byœ #00 (znaŸka MB-02)
+  #21-#24 ... d tum a Ÿas form tovania (k¢dovanie ako PC)
+  #25 ....... tu mus¡ byœ #00 (znaŸka MB-02)
+  #26-#2F ... meno diskety
+  #30-#3F ... rozç¡renie mena diskety
+  #40-#5F ... syst‚mov  identifik cia diskety
+
+ Pod–a bajtov oznaŸnìch ako "znaŸka" rozpozn va BS-DOS §e sa jedn  o
+ disketu zo syst‚mu MB-02. V boote s£ zap¡san‚ Ÿ¡sla prvìch sektorov FAT.
+ Òalçie sektory FAT sa daj£ najsœ priamo pod–a FAT - lebo obidve FAT s£
+ ulo§en‚ ako s£bory - riadne sekvencie sektorov.
+
+DIRS sektor
+ Jeho logick‚ Ÿ¡slo je zaznaŸen‚ v BOOTe na offsete #0C-#0D
+ Tento sektor obsahuje 256 çtvorbajtovìch polo§iek, kde ka§d 
+ jedna polo§ka znamen  jeden adres r.
+ Vìznam bajtov v tejto polo§ke:
+
+  #00 ....... identifik cia polo§ky
+              #80 = platn  polo§ka a adres r existuje
+              in‚ = adres r neexistuje a neplatn  polo§ka
+  #01 ....... xor mena adres ra (k“li rìchlejçiemu h–adaniu)
+  #02,#03 ... logick‚ Ÿ¡slo prv‚ho sektora adres ra (len bity 0-13)
+
+Adres rov‚ sektory
+ Logick‚ Ÿ¡slo prv‚ho sektora ka§d‚ho adres ra je ulo§en‚ v
+ bajtoch #02-#03 polo§iek v sektore DIRS.
+ Obsahuj£ 32 bajtov‚ polo§ky. Vìznam bajtov v polo§ke:
+
+  #00 ....... identifik cia polo§ky
+              #90 = s£bor obsahuje iba hlaviŸku
+              #A0 = s£bor obsahuje iba telo
+              #B0 = s£bor obsahuje aj hlavu aj telo
+              #80 = s£bor neobsahuje hlavu ani telo (nest va sa Ÿasto)
+              In‚ hodnoty znamenaj£ neplatn£ adres rov£ polo§ku.
+  #01-#04 ... d tum a Ÿas vytvorenia s£boru
+  #05-#15 ... klasick  magnetof¢nov  hlaviŸka
+  #16-#17 ... adresa tela
+  #18-#1B ... d’§ka tela (#18=najni§ç¡, #1B=najvyçç¡ bajt)
+  #1C ....... flagbajt tela
+  #1D ....... atrib£ty s£boru
+  #1E-#1F ... logick‚ Ÿ¡slo prv‚ho sektora tela (iba bity 0-13)
+
+ T to 32-bajtov  çtrukt£ra sa odborne nazìva "adres rov  polo§ka".
+ S tìmito polo§kami pracuj£ slu§by GETSUB a OWSUB.
+
+ Nult  adres rov  polo§ka m  çpeci lny vìznam - je v§dy platn  a obsahuje
+ tak‚to bajty:
+
+  #00 ....... identifik tor (v„Ÿçinou #80)
+  #01-#04 ... d tum a Ÿas vytvorenia adres ra
+  #05 ....... Ÿ¡slo nad-adres ra (do ktor‚ho patr¡ tento adres r)
+  #06-#0f ... meno adres ra
+  #10-#1f ... rozç¡renie mena adres ra
+
+
+File alocation table
+ FAT obsahuje 16-bitov‚ polo§ky. ka§d  çpecifikuje jeden sektor na diskete.
+ Vìznam jednotlivìch bitov v polo§ke:
+
+ Bit 15: 0 ... neobsadenì, vo–nì sektor pripravenì na pou§itie
+         1 ... obsadenì, vyu§itì sektor [obsahuje £daje alebo je chybnì]
+     14: 0 ... poslednì sektor s£boru
+         1 ... priebe§nì sektor, nie poslednì
+   0-13: [bit14=0] poŸet bajtov v sektore do konca s£boru
+         [bit14=1] logick‚ Ÿ¡slo nasleduj£ceho sektora v s£bore
+
+ Pozor, ak bity 8-15 obsahuj£ sam‚ jednotky, potom vìznam hodnoty
+ v bitoch 0-7 je takìto:
+
+   #00 ... çpeci lny sektor na slu§obn‚ £cely [boot, zalohovac¡ sektor]
+   #F? ... nepou§itelnì sektor:
+       #FC - chybnì sektor [CRC error]
+       #FD - chybnì sektor [Rec. mot found]
+       #FE - neexistuj£ci sektor [druh  strana jednostrann‚ho disku]
+       #FF - neexistuj£ci sektor [za fyzickìm okrajom diskety]
+
+-------------------------------------------------------------------------------

@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Standard Input-Output and the CLI</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="intarith.html">Previous</a></td>
+
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="bottom" width="10%"><a href="prfilter.html">Next</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+
+<b><font size="+1">13. Standard Input / Output and the CLI</font></b>
+<br>
+&nbsp;
+</p>
+<p>The Z88 operating system has, at any one time, a standard input source
+and a standard output destination. A number of calls use these standard
+I/O streams:
+</p>
+<pre><a href="osin.html">OS_In</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read a character from standard input<br><a href="ostin.html">OS_Tin</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; timed read a character from standard output<br><a href="osout.html">OS_Out</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; write a character to standard output<br><a href="gnsop.html">GN_Sop</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; write a string to standard output<br><a href="gnsoe.html">GN_Soe</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; write a string at extended address to standard output<br><a href="gnsip.html">GN_Sip</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fetch an input line using standard I/O<br><a href="gnsdo.html">GN_Sdo</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; write date to standard output</pre>
+
+Initially standard input and output are bound to the keyboard and screen
+respectively, but may be redefined to any file or device. The user may
+do this via the Command Line Interpreter (CLI). CLI commands are prefixed
+by a full stop and must be the first thing on the line.
+<pre><i>.&lt; INFILE</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; take input from file/device "INFILE"<br><i>.&gt; OUTFILE</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; send output to file/device "OUTFILE"</pre>
+
+which binds the standard input to "infile" and the standard output to "outfile".
+Redirection can also be done as T-fashion, where the ordinary streams remain
+in place, but copies of their contents are sent to a file or a device.
+<pre><i>.T&lt; INFILE</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; send copy of input to file/device "INFILE"<br><i>.T&gt; INFILE</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; send copy of output to file/device "OUTFILE"</pre>
+
+The printer output can be redirected in both ways:
+<pre><i>.= PRTFILE</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; redirect pre-filter printer output to file/device<br><i>.T= PRTFILE</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; as <i>.=</i>, but also send the output to the printer filter.</pre>
+
+Certain keystroke operations (such as &lt;SQUARE&gt; and &lt;DIAMOND&gt; sequences)
+have a special representation which is used when input is redirected. These
+sequences are generated when input is T-redirected and can be used in ordinary
+redirection to simulate the effect of the keyboard. Note that there are
+some keyboard features which have no representation, such as: the CAPS
+LOCK key, &lt;SHIFT&gt; or &lt;DIAMOND&gt; with &lt;ESC&gt;, the effect of holding
+down &lt;SHIFT&gt; and &lt;DIAMOND&gt; to stop output scrolling.
+<pre><i>Sequence</i>&nbsp;&nbsp;&nbsp; <i>Significance<br><br></i>#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; holding down &lt;SQUARE&gt; and pressing another key<br>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; holding down &lt;DIAMON&gt; and pressing another key<br>~A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pressing &lt;SQUARE&gt; and releasing it before another keypress<br>~C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pressing &lt;DIAMOND&gt; and releasing it before another keypress<br>|[&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;ESC&gt; key<br>~E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;ENTER&gt; key<br>~S&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;SHIFT&gt; key (only generated if &lt;SHIFT&gt; had an effect)<br>~I&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;INDEX&gt; key<br>~M&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;MENU&gt; key<br>~H&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;HELP&gt; key<br>~X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;DEL&gt; key<br>~U&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;UP&gt; arrow key<br>~D&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;DOWN&gt; arrow key<br>~L&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;LEFT&gt; arrow key<br>~R&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;RIGHT&gt; arrow key<br>##&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a single # (hash) character<br>||&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a single | character<br>~~&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a single ~ tilde (pronounced 'tilda' or 'twiddle')</pre>
+
+The CLI also has the following commands:
+<pre>.S&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; suspend the current CLI but maintain all rebindings<br>.D n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; delay for n centiseconds (if &lt;ESC&gt; is pressed during a delay then<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; subsequent delays will fail for the rest of the current CLI)<br>.J&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Jammer. Ignore all special sequences for the rest of the CLI (eg.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; after this command #B will generate '#B' and try and enter a BBC<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BASIC application)<br>.* file&nbsp;&nbsp;&nbsp;&nbsp; Invoke a new CLI file<br>.;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CLI comment (rest of line until CR is ignore by CLI)</pre>
+
+NOTE: The CLI command '..' was intended to produce a single dot. This in
+fact does not work. Any number of dots at the start of the line will be
+ignored. One way around this bug is to use '~.' at the start of a line
+to generate a full stop. Subsequent dots (ie. ones which do not appear
+as the first character of the line) are treated like ordinary alpha characters.
+<p>CLI files can invoke other CLI files. A CLI file is terminated when
+the end of a file is reached or a suspension command is issued. CLI's can
+be forcibly removed one at a time by pressing &lt;SHIFT&gt; and &lt;ESC&gt;,
+or all current CLI's can be removed by using &lt;DIAMOND&gt; and &lt;ESC&gt;.
+Note that &lt;DIAMOND&gt; must be actually held down while &lt;ESC&gt; is pressed,
+ie. the usual latching operation does not apply. The CLI can be accessed
+by BBC BASIC by using the *CLI command or the OSCLI command. For example,
+to create a 10 second delay:
+</p>
+<p><tt>*CLI .D 100</tt>
+<br>
+<tt>OSCLI ("*CLI .D 100"): REM these two lines are equivalent</tt>
+</p>
+<p>Most CLI use will be in the form of executable files, consisting of
+lines of CLI commands and text. These can be generated in PipeDream and
+saved as text files. Or generated by hand and then executed. CLI files
+can be executed from the FILER (using &lt;&gt;EX command) or from BBC BASIC
+using:
+</p>
+<p><tt>OSCLI ("*CLI .*"+fname$)</tt>
+</p>
+<p>where <i>fname$</i> contains the filename. Typical CLI files consist
+of short sequences like:
+</p>
+<p><tt>.T&gt; copyout .S</tt>
+</p>
+<p>The first line sends a copy of all output to the file 'copyout', and
+the second line maintains this new binding on exit from the CLI file. The
+binding (T-output to 'copyout') will now stay in place until the CLI is
+terminated by &lt;SHIFT&gt;&lt;ESC&gt; to remove the current CLI (or &lt;&gt;&lt;ESC&gt;,
+which removes all CLI's running). This situation will generally be undesirable,
+because it requires user intervention, since the program cannot simulate
+the effect of &lt;SHIFT&gt; &lt;ESC&gt;. Ideally the CLI should be avoided. Redirection
+can be easily achieved in applications by using file I/O, however, if necessary
+the CLI can be accessed fairly directly from an application. The operating
+system call <a href="dcicl.html">DC_Icl</a> invokes a new CLI, and is effectively the equivalent
+of BASIC's *CLI. The call <a href="dcrbd.html">DC_Rbd</a> is used to directly rebind streams in
+the current CLI layer and can also terminate the CLI.
+</p>
+<p><b>Example</b>
+</p>
+<p>The program below starts a CLI, using <a href="dcrbd.html">DC_Rbd</a>, rebinds the T-output stream,
+and finally closes the stream and terminates the CLI. Refer to "System
+Calls Reference" for details of the calls used:
+</p>
+<p>
+</p>
+<hr width="100%">
+<pre>include "director.def"&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; director and CLI call definitions<br>include "stdio.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; standard I/O call defs. &amp; parameters<br>include "fileio.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; standard file I/O call defs. &amp; parameters<br>include "errors.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; error code calls and definitions</pre>
+
+<tt>; entry point is .main</tt>
+<br>
+<tt>; on entry, (name) contains the address of a buffer which hold
+a filename</tt>
+<br>
+<tt>; to be used with the CLI, and (scratch) holds the address of a
+scratch</tt>
+<br>
+<tt>; buffer which need be no more than a few bytes in length</tt>
+<pre>.main&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; hl, cli_string&nbsp;&nbsp;&nbsp;&nbsp; ; string to pass the CLI<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; c, 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; length<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; b, 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; must be zero<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="dcicl.html">DC_Icl</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; invoke a new CLI<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; bc, 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; key read to allow CLI to be processed<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="ostin.html">OS_Tin</a>)<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; b, 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; HL is a local address<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; hl, (name)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; filename<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; de, (scratch)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; address of scratch buffer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; c, 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; explicit filename length<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, OP_OUT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; open a file for output<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnopf.html">GN_Opf</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; open...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; nc, rebind<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnerr.html">GN_Err</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; display error in box<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; note that on exit the CLI will<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; still be active</pre>
+
+<tt>; code to rebind standard output</tt>
+<pre>.rebind&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, 4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; T-output code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="dcrbd.html">DC_Rbd</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; rebind to stream IX<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; nc, continue<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gncl.html">GN_Cl</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; something has gone badly wrong<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; attempt to close the file and exit</pre>
+
+<tt>; write to standard output, and hence also to the file</tt>
+<pre>.continue&nbsp;&nbsp; ld&nbsp;&nbsp; hl, message<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnsop.html">GN_Sop</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; output message to std. output and file<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; ix, 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; close off CLI and file<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, 4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; T-output code<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="dcrbd.html">DC_Rbd</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; close file and quit CLI<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; return (ignore all errors)<br><br>.message&nbsp;&nbsp;&nbsp; defm "This should go to the file and the screen.", 0<br>.cli_string defm ".S", 0<br></pre>
+<p>
+</p>
+<hr width="100%">
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <td align="left" valign="top" width="33%"><a href="intarith.html">Previous</a></td>
+
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="top" width="33%"><a href="prfilter.html">Next</a></td>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="top" width="33%">Integer arithmetic</td>
+
+   <td align="center" valign="top" width="34%">Standard Input / Output and the CLI</td>
+
+   <td align="right" valign="top" width="33%">The Printer filter</td>
+
+ </tr>
+
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,228 @@
+##################################################################
+## 01 Busy soft: Chybov‚ hl senia operaŸn‚ho syst‚mu BS-DOS 306 ##
+##################################################################
+           Index: 960331161846
+
+Vçetky chybov‚ hl senia operaŸn‚ho syst‚mu BS-DOS s£ zaraden‚ do dvoch
+hlavnìch skup¡n. Do prvej skupiny patria chybov‚ hl senia jadra operaŸn‚ho
+syst‚mu, druh£ skupinu zase tvoria chybov‚ hl senia basicov‚ho interpretera
+novìch pr¡kazov a funkci¡.
+
+Jadro BS-DOS je stavan‚ tak, aby mohlo be§aœ absol£tne nez visle od
+basicovìch syst‚movìch premennìch a obsahu ostatnej Ÿasti pam„te. U§¡vate–
+teda m“§e maœ od adresy #4000 a§ po #FFFF svoje vlastn‚ d ta, ktor‚ mu
+operaŸnì syst‚m nebude niŸiœ (staŸ¡ cca 6 bajtov na z sobn¡k). Tomuto boli aj
+prisp“soben‚ vìpisy prvej skupiny chybovìch hl sen¡. Pri vìpise chyby sa
+najprv odpam„t  horn  tretina obrazovky, potom sa do r mika vyp¡çe chyba a po
+stlaŸen¡ ENTER/SPACE sa znovu obnov¡ p“vodnì obsah obrazovky. Jedna d“le§it 
+pozn mka: PoŸas vìpisu chyby je samozrejme horn  tretina obrazovky zmenen 
+(tìm vìpisom) -> na toto si treba d vaœ pozor pri tvorbe rutiniek be§iacich z
+preruçenia ktor‚ by vyu§¡vali t£to Ÿasœ obrazovky.
+
+Druh£, mençiu skupinu tvoria chyby interpretera novìch basicovìch pr¡kazov a
+funkci¡. BS-DOS obsahuje v sebe ako nadstavbu samotn‚ho jadra aj tento
+interpreter, ktorì tvor¡ ak‚si rozhranie medzi jadrom operaŸn‚ho syst‚mu a
+samotnìm hlavnìm interpreterom basicu (romkou). Chyby z tejto druhej skupiny
+s£ interpreterom generovan‚ ako klasick‚ basicov‚ chybov‚ hl senia a m“§u byœ
+aj presne takìm istìm sp“sobom oçetrovan‚.
+
+Jednotliv‚ chybov‚ hl senia jadra operaŸn‚ho syst‚mu BS-DOS sa vypisuj£ do
+hviezdiŸkov‚ho r mika v takomto tvare:
+
+      ===============================
+          N zov chybov‚ho hl senia
+           drv/dir/sub: file_name
+               trk, sid, sec
+        Enter=ok/retry, Space=abort
+      ===============================
+
+Kde: drv = Ÿ¡slo mechaniky kde nastala chyba
+     dir = Ÿ¡slo adres ra kde nastala chyba
+     sub = Ÿ¡slo s£boru kde nastala chyba
+     trk = Ÿ¡slo stopy na disku (cylindra)
+     sid = Ÿ¡slo strany na disku
+     sec = Ÿ¡slo sektora na stope
+
+File_name bli§çie çpecifikuje miesto vzniku chyby. Ak chyba nastane na
+nejakom konkr‚tnom s£bore, potom file_name obyŸajne znamen  meno tohto
+s£boru.
+
+Mie vçetky £daje maj£ za ka§dìch okolnost¡ nejakì vìznam. Napr¡klad ak sa
+jedn  o chybu napr. Can't read the disk tak potom £daje ako dir,sub,file_name
+nemaj£ §iadny zmysel.
+
+Teraz nasleduje popis jednotlyvìch chybovìch hl sen¡ pod–a tejto legendy:
+
+ - N zov chybov‚ho hl senia
+ - (funkcie pri ktorìch sa chyba m“§e vyskytn£t - pr¡kazy,slu§by)
+ - Textovì opis chyby pr¡padne situ cie pri ktorej m“§e chyba nastaœ.
+
+
+      ### Chybov‚ hl senia jadra operaŸn‚ho syst‚mu BS-DOS 302 ###
+
+
+ File not found
+ (NEW,#562)
+ Pri zavolan¡ #562 sa na disku v aktu lnom adres ri od aktu lnej poz¡cie h–ad 
+ s£bor, ktorì m  presne takì ist£ d’§ku a flagbyte ako parametre zadan‚ v
+ registroch DE a A. T to chyba sa vyp¡çe vtedy, ak sa takì s£bor v tomto
+ adres ri nenach dza.
+ Pri NEW sa vyp¡çe vtedy ak sa v aktu lnom alebo hlavnom koreåovom (nultom)
+ nenach dza s£bor ktorì by bol "basic" alebo "code" a mal dan‚ meno.
+
+ File too short
+ (loa1x,loa2x,verix,savex)
+ Pokus o naŸ¡tanie v„Ÿçieho mno§stva sektorov, ne§ sa nach dza do konca s£boru.
+
+ Can't unerase
+ (UNERASE,unerax,unerix)
+ Pri pokuse o obnovenie suboru/adresara sa zistilo ze niektore jeho sektory
+ boli medzitym prepisane a tym padom ho nie je mozne obnovit na povodny tvar.
+ Alebo sa pok£çate obnoviœ adres r, ktorì eçte nikdy predtìm neexistoval.
+
+ Error at XXX-YYY:ZZZ
+ (VERIFY,#562,verix)
+ Pri verifik cii sa zistila diferencia medzi obsahom s£boru a obsahom pam„te.
+ XXX je adresa prv‚ho rozdielneho bajtu, YYY je adresa posledn‚ho rozdielneho
+ bajtu a ZZZ je celkovì poŸet rozdielnych bajtov.
+ T to funkcia sa d  ve–mi pekne pou§iœ na porovn vanie obsahu dvoch oblast¡
+ pam„ti (jednu oblasœ sejvneme a verifneme s druhou) alebo na porovn vanie
+ obsahu dvoch s£borov (jeden loadneme a verifneme s druhìm).
+
+ File too length
+ (DTAPE,creatx)
+ Pri DTAPE to znamen  §e danì s£bor sa nemest¡ do pam„ti. S£bory sa nahr vaj£
+ do map„ti od RAMTOPu a§ do konca #FFFF. Ak sa s£bor nemest¡ do pam„ti,
+ odpor£Ÿa sa zn¡§iœ hodnotu RAMTOPu.
+ Pri volan¡ slu§by CREATX t to chyba znamen  §e s£bor by mal maœ viac ako
+ 65535 sektorov. BS-DOS 289 m  iba 16-bitov£ logiku, preto nie je schopnì
+ takìto s£bor spracovaœ.
+
+ Disk full
+ (#4C6,creatx)
+ S£bor vy§aduje na uchovanie viac miesta ne§ je k dispoz¡cii na disku.
+
+ Disk not ready
+ (akìko–vek pr¡stup na disk)
+ T to klasick  chyba chyba znamen  §e v mechanike nie je vlo§en  disketa,
+ disketa sa nejak nem“§e ot Ÿaœ alebo proste nie s£ zavret‚ dvierka.
+ [Chyba generovan  FDC biosom]
+
+ Unknown disk
+ (akìko–vek pristup na disk)
+ U§¡vate– pri nastavovan¡ aktu lnej mechaniky nastavil tak‚ Ÿ¡slo, ktor‚
+ nezodpoved  §iadnej diskovej mechanike (ani virtu lnej).
+ Pozor !!! T to chyba sa prejav¡ a§ pri skutoŸnom pokuse o pr¡stup na tento
+ disk, nie pri jeho nastavovan¡ ako aktu lny.
+
+ Directory too length
+ (ak ko–vek pr ca s adres rmi)
+ U§¡vate– sa pok£ça pracovaœ s adres rom, ktorì obsahuje viac ako 65280
+ adres rovìch polo§iek. Na disku takìto adres r m“§e norm lne byœ, ale
+ BS-DOS 289 vÔaka len 16-bitovej logike nedok §e spracovaœ takìto dlhì
+ adres r.
+
+ Directory full
+ (#4C6,MOVE,creatx,movexx,moveix)
+ U§¡vate– sa pok£ça pridaœ novì s£bor do adres ra, v ktorom je u§ 65280
+ adres rovìch polo§iek. Pozri predch dzaj£cu chybu.
+
+ Data integrity error XXX
+ (akìkolvek pr¡stup na disk
+ D ta s£ na diskete chr nen‚ viacerìmi kontrolnìmi s£Ÿtami a paritami. T to
+ chyba sa vyp¡çe v pr¡pade, §e nesed¡ Ÿo len jedna kontrola d t.
+
+ Can't read the disk
+ (akìko–vek pr¡stup na disk)
+ OperaŸn‚mu syst‚mu sa nepodarilo naŸ¡taœ BOOT sektor diskety. M“§e to
+ znamenaœ §e disketa v“bec nie je naform tovan , alebo §e m  ve–mi zl£ nult£
+ stopu, alebo §e je naform tovan  v inej hustote z znamu ako HD alebo DD.
+
+ Seek error
+ (pr¡stup na disk)
+ Znamen  §e FDC radiŸ nem“§e n jsœ nult£ stopu na diskovej mechanike.
+ [Chyba generovan  FDC biosom]
+
+ Break
+ (pr¡stup na disk)
+ U§¡vate– stlaŸil Q+W poŸas Ÿ¡tania alebo z pisu sektoru (stopy,adresy).
+ [Chyba generovan  FDC biosom]
+
+ Ready error
+ (pr¡stup na disk)
+ Chyba aktiviz cie disketovej mechaniky.
+ [Chyba generovan  FDC biosom]
+
+ Write protect
+ (akìko–vek z pis na disk,kuini)
+ Disk je chr nenì proti z pisu. T to chyba sa negeneruje a§ pri skutoŸnom
+ z pise na disk, ale hneÔ na zaŸiatku pr¡kazu alebo funkcie ktor  sa nieŸo
+ chyst  na disk zap¡saœ.
+ [Chyba generovan  FDC biosom]
+
+ CRC error
+ (ak‚ko–vek Ÿ¡tanie z disku)
+ Nesed¡ kontrolnì CRC s£Ÿet pri Ÿ¡tan¡ sektora z disku.
+ [Chyba generovan  FDC biosom]
+
+ Data lost
+ (pr¡stup na disk)
+ Pri DMA prenose medzi FDC radiŸom a pam„œou doçlo ku strate d t. T to chyba
+ m“§e nastaœ napr. vtedy ak z preruçenia be§¡ nejakì program, ktorì poŸas
+ diskovej oper cie preprogramuje DMA radiŸ.
+ [Chyba generovan  FDC biosom]
+
+ Time out
+ (pr¡stup na disk)
+ ¬as diskovej oper cie presiahol maxim lnu povolen£ hranicu. M“§e to nastaœ z
+ najr“znejç¡ch d“vodov - napr. §e disketa je v mechanike nejak zaseknut  a
+ nem“§e sa vo–ne ot Ÿaœ.
+ [Chyba generovan  FDC biosom]
+
+ Record not found
+ (pr¡stup na disk)
+ Pri Ÿ¡tan¡ alebo z pise sektora sa na skope nenaçla sektorov  identifikaŸn 
+ znaŸka. M“§e to byœ sp“soben‚ napr. nekvalitnou disketou.
+ [Chyba generovan  FDC biosom]
+
+ Unknown format
+ (akìko–vek pr¡stup na disk)
+ Pokus o naŸ¡tanie diskety ktor  nie je naform tovan  pre MB-02.
+
+ System error XXX
+ BS-DOS obsahuje v sebe r“zne kontroly svojej Ÿinnosti - rob¡ si r“zne
+ kontroln‚ s£Ÿty, testuje, Ÿi vìsledky danej op‚racie su aspoå troçku
+ pravdepodobn‚ a tak podobne. Toto hl senie sa vypisuje v§dy vtedy, keÔ tieto
+ kontroly zistia d ku nezrovnalosœ. ¬¡slo XXX podrobnejçie çpecifikuje o ak£
+ konkr‚tnu chybu sa jedn .
+ Tak to situ cia mo§e nastat napr¡klad vtedy ak je operaŸny syst‚m nejak
+ neçœastne poçkodenì d kym u§¡vate–skìm programom. Preto sa v pr¡pade
+ objavenia tohto hl senia odpor£Ÿa syst‚m okam§ite prebootovaœ. V pr¡pade §e
+ m te v pam„ti d ke nesejvnut‚ data tak si ich sejvnite na nejak£ pomocn£
+ disketu, ktor£ nebudete –utovaœ, keÔ o åu n hodou pr¡dete...
+
+
+      ### Chybov‚ hl senia basicov‚ho interpretera BS-DOS 302 ###
+
+
+ Invalid I/O device
+ (ak kolvek chyba dosu)
+ T to chyba sa generuje vtedy, ak pri vykon van¡ nejakej funkcie
+ basicov‚ho interpretera nastala –ubovo–n  chyba dosu a u§¡vate–
+ si zvolil mo§nosœ ABORT.
+
+ Invalid file name
+ (LOAD,MERGE,VERIFY,$,` [znak libra])
+ U§¡vate– zadal meno s£boru, ktor‚ sa v nenach dza v aktu lnom adres ri alebo
+ tak‚ meno adres ra ktor‚ sa nenach dza na aktu lnom disku.
+
+ Invalid argument
+ (NEW)
+ Pokus o spustenie s£boru v NEW, krorì sa tìmto pr¡kazom sp£çœaœ ned .
+ Sp£çœaœ sa daj£ iba basicy a potom bytesy, ktor‚ sa zmestia do pam„ti
+ od svojej zaŸiatoŸnej adresy (ktor  mus¡ byœ v„Ÿçia alebo rovn  ako #4000).
+
+
+Vçetky ostatn‚ chybov‚ hl senia interpretera maj£ takì istì vìznam ako
+p“vodn‚ chybov‚ hl senia v samotnej romke.
+_______________________________________________________________________________

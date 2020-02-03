@@ -1,0 +1,3 @@
+Dado el tema del inves con el poke a la rom, envia su color "real" , el blanco, pero al siguiente ciclo de reloj envia el color 0.
+Para emularlo es muy simple, como en mi emulador dibujo el borde en base a los t-estados de cada linea, cuando hay un out al border, en modo inves, le envio el color real, e inmediatamente después al siguiente ciclo, le envio el color generado con el poke a la rom.
+Si te fijas en tu video y en mi captura, esos puntos realmente no son puntos, sino que son de 2 pixeles de ancho; esto tiene lógica, cada t-estado del spectrum se usa para dibujar 2 pixeles, por tanto ese efecto de "nieve" o como se quiera llamar debe tener 2 pixeles de ancho y no solo 1

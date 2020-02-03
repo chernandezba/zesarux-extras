@@ -1,0 +1,13 @@
+sector size: 2 (512 bytes)
+sectors 9 per track lo normal
+42 pistas
+
+
+
+hisoft basic v1.2 plus 3
+
+primer sector: CHRN:
+
+(track, side , sector id, sector size)
+
+0 0 41 02

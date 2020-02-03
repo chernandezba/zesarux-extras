@@ -1,0 +1,262 @@
+Installer v2.03
+===============
+
+(c) Garry Lancaster, 2001
+
+
+Introduction
+------------
+Installer is a utility that allows you to run proper Z88 applications 
+and popdowns without having to go through the tedious process of 
+blowing them to EPROMs. Instead, it uses free space found in your Z88's 
+RAM to hold the applications, where they can be run exactly as if they 
+were on a ROM card.
+
+From version 2, Installer also includes support for "Packages" and 
+further enhancements to the Z88's operating system. These are mainly of 
+interest to developers, and more comprehensive documentation can be 
+found on the Z88 Forever! website. However, it is useful to know what
+these packages are doing on your Z88, so please read the short
+description of them later on.
+
+Version 2 also includes numerous minor improvements to the previous
+release, and a new facility "SlowMo" which is handy for slowing down those
+tricky games!
+
+With v2.03, there is a "fix" for the Z88 operating system which allows you
+to run multiple instances of the Diary application (one for work, one for
+home?) rather than being restricted to just one.
+
+
+Adding the card for the first time
+----------------------------------
+The first time you insert the Z88 Forever! compilation (containing
+Installer v2.03) into your Z88, certain special features should be
+enabled. To do this, do one of the following:
+
+   (a) 	reset your Z88 (make sure all your data is backed up first!)
+
+OR (b)	enter Installer and type theses special commands:
+		<>CHON
+		<>OZPL
+	(these must be typed; you cannot just select them from the menu)
+
+Once this is done, all the special features provided by Installer are
+active, and future applications that use them will work correctly. Note
+that every time you do a reset, Bootstrap will automatically set them up
+again, so you'll never need to follow this procedure again.
+
+
+Upgrading from a previous version
+---------------------------------
+Simply install the new card and run Installer v2.03, and the new features will
+be automatically enabled.
+
+
+Installing an application
+-------------------------
+Applications which can be installed by the Installer popdown are 
+supplied in two or more files, depending on the amount of free space 
+they require.
+
+The main application information file has an extension of .APP, and the 
+files containing the application itself have extensions from .AP0 up to
+a maximum of .AP7 (16K applications have only a .AP0 file, while 32K 
+applications have both an .AP0 and .AP1 file, etc).
+
+To install an application into RAM, enter the Z88's Filer popdown and 
+mark the relevant .APP file by pressing ENTER or TAB. Then, activate 
+Installer by pressing []ZI ([] represents the square key).
+
+Alternatively, start Installer, choose the Install menu option, and 
+type in the name of the application file (without the .APP extension).  
+
+If you now look in the Index, you will see the application in the list, 
+and can start it by pressing ENTER in the usual way, or using its hotkey.
+
+You can install as many applications as you like, provided you have 
+enough free 16K banks in your RAM devices. To check this, you can use 
+the FreeRam utility (which is also on Z88 Forever) - this shows a 
+graphical display of the RAM available. A 16K bank is 8 dots wide and 
+8 dots high in this display, and only entirely free 16K banks can be 
+used by applications. If you have enough free space in total to install 
+an application, but not enough completely free banks, you will probably 
+have to close some applications and delete some files until space is 
+available in the right places.
+
+Please note that no applications can be installed in the internal 
+:RAM.0 memory (even if you have 128K or 512K available there). This is 
+because the Z88 only checks slots 1-3 for applications.
+
+
+Reserving banks for use with applications
+-----------------------------------------
+If you want to install a large number of applications in RAM, or if you 
+have limited available RAM (perhaps only a 128K card), you will 
+probably often find that although you have enough space in total to 
+install an application, you do not have any totally free banks. To 
+overcome this problem, Installer includes a menu option to reserve 
+banks for use with applications before you transfer the files to the 
+Z88.
+
+It is most effective to use this option just after a hard reset, when 
+the maximum free space is available. Simply select the number of banks 
+that you will require for your applications, and they will be reserved 
+for application use. You can do this as many times as you like.
+
+It is now possible to transfer the application files and install them 
+in the usual way. During installation, reserved banks are used up first 
+before other free banks are sought. Note that if an error occurs during 
+installation, or when you uninstall the application, banks are not 
+reserved again; you must choose the reserve banks option again.
+
+
+Freeing reserved banks
+----------------------
+If you wish to release reserved banks back to the general Z88 memory, 
+use the Free banks option. This is a protected option (so you must type 
+the command in full) and releases all reserved banks in every slot so 
+that they can again be used for files or general workspace.
+
+
+Slot information
+----------------
+The slot information display that appears when you start Installer 
+shows the size of any ROM or RAM cards (EPROM cards are ignored). RAM 
+cards that have been modified by Installer will also show the amount of 
+RAM which is currently used by applications or reserved for future use. 
+This display can be updated after changes using the menu option.
+
+You will also notice a column headed "Safe", which will contain either a
+question mark (?) or asterisk (*) for every slot that contains RAM. This
+column indicates whether applications installed in this slot will be safe
+from corruption by OZ during a soft reset operation, since during this
+process the Z88 uses some memory before Bootstrap has a chance to properly
+re-protect any installed applications.
+
+If the safe column is marked with "*", then all is well. If, however, it
+contains a "?", if you need to do a soft reset you should always uninstall
+and reinstall applications in that slot afterwards, in case they are
+affected. To make a slot safe, and avoid having to remember to do this,
+you should delete one or more of the oldest files on the RAM device and
+re-enter Installer, until a "*" appears in the column.
+
+
+Uninstalling an application
+---------------------------
+Every time you install an application, a file with the application 
+name and an extension of .APU is created. To uninstall an application, 
+you simply mark this .APU file in the Filer and activate Installer with 
+[]ZI, in a similar way to installation.
+
+Alternatively, use the Uninstall option from Installer's menu, and type 
+in the application name (without the .APU extension).
+
+The program will not allow you to uninstall an application if there are 
+any applications or packages active in the same slot. This is a safety
+feature, designed to prevent some nasty crashes! To be able to uninstall an 
+application, first KILL off any applications using the same slot in the 
+Index, and deregister all packages.
+
+
+Uninstalling all RAM applications
+---------------------------------
+If you accidentally delete an .APU file, the Installer program has no 
+way of knowing how to uninstall a particular application. In this case, 
+you can choose to uninstall every RAM application at the same time.
+
+To do this, use the Purge menu option in Installer. This is a protected 
+command, so you must type it in full. Only slots containing no active 
+applications or packages will be purged.
+
+
+SlowMo
+------
+This facility allows you to slow down the Z88 by up to 100%. This might
+seem a strange thing to want to do, but it could be useful if you're
+finding one of the many available games a little tricky!
+
+To activate the SlowMo, type <>SLOW (or select the command using the Z88's
+MENU key), then enter the percentage speed reduction you would like. To
+turn the SlowMo off again, select the command again and just press ENTER
+when asked for the percentage value.
+
+
+Packages
+--------
+Packages are special programs that are designed to be usable by many
+different applications (as "shared libraries"). They aren't of much
+interest to most users, since they are handled automatically by Installer
+and the applications that use them. However, you should be aware of them
+and how to deal with them.
+
+All packages are provided with a particular application (for example,
+Installer itself provides a package called "Packages", and ZSock provides
+a package also called "ZSock" which is required by all Internet
+applications). You can check which packages are currently in use with the
+"Packages" option on the main menu. Full details of what this information
+means are provided in the documentation included with the Installer
+toolkit.
+
+If you have installed an application into RAM that comes with a package,
+you will need to deregister the package before Installer will let you
+uninstall any application in the same slot. To do this, type <>PD (or
+select the command using the MENU key); if all is well, this will display
+"deregistered" next to the appropriate package name. If it shows "in use"
+instead, an application is using the package - KILL off any likely
+applications in the Index before trying again.
+
+It's also possible to deregister a single package - use the <>PK option
+and enter the package ID (shown on the "List Packages" display).
+
+Finally, if you move the ROM card containing Installer into a different
+slot in your Z88, applications wont be able to use any packages until you
+have re-run Installer, so you ought to do this as soon as you have moved
+the card.
+
+
+Special Features
+----------------
+These menu options provide a means to turn the various facilities provided
+by Installer on and off. Full details are in the Installer Toolkit
+documentation. Do not use these options unless you know what you're
+doing!!
+
+
+Error messages
+--------------
+It is possible for various errors to occur when installing and 
+uninstalling applications. The most common errors are:
+
+Already Exists
+	The application is already installed (an .APU file was found)
+No Room
+	Not enough free 16K banks could be found for installation
+File Not Found
+	One of the installation files is missing
+End Of File
+	One of the installation files is invalid
+Cannot Satisfy Request
+	Could not find a valid application to uninstall; or application
+	or package was active in same slot
+File Type Mismatch
+	Selected file was not a valid .APP or .APU file
+
+
+Obtaining installable RAM applications
+--------------------------------------
+Most of the application ROMs on the Z88 Forever! website are now 
+available in RAM-installable format.
+
+Z88 software developers can also obtain a kit containing details of the 
+application file format, and a tool for creating .APP files quickly and 
+easily.
+
+
+Comments
+--------
+If you encounter any problems using Installer, or have any other 
+comments or suggestions to make, please contact me via the Z88 Forever!
+website.
+
+Garry Lancaster, 14th May 2001

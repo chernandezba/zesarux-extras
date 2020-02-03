@@ -1,0 +1,164 @@
+* PC peripheral chip (zx8302 ic23) registers
+        nolist
+
+* The peripheral chip is selected by addresses in the range $18000 to $1bfff.
+* The hardware does not decode bits 13-7 and 4-2 of addresses, so the following
+* are actually the minimum addresses that perform the given functions.
+* On some older ql's, bit 6 is also not decoded, but later m/c's distinguish
+* the mc_stat register by decoding it as having bit 6 set.
+* It could be unwise to assume that bits 13-7 can be anything but zero.
+* It would be novel to redefine the $1800x versions by adding $1c, thus making
+* the whole set more conveniently addressable.
+
+* read addresses
+
+pc_clock equ    $18000  real time clock in seconds (long word)
+
+pc_ipcrd equ    $18020  IPC read address
+pc_intr equ     $18021  bits 4..0 set as pending level 2 interrupts
+pc_trak1 equ    $18022  microdrive read track1
+pc_trak2 equ    $18023  microdrive read track2
+
+* write addresses
+
+*pc_clc0 equ    $18000  writing anything here resets the clock
+*pc_clc1 equ    $18001  clock selected bytes of time
+pc_tctrl equ    $18002  transmit control
+pc_ipcwr equ    $18003  IPC write address
+
+pc_mctrl equ    $18020  microdrive/link control register
+*pc_intr equ    $18021  7..5 masks and 4..0 to clear interrupt
+pc_tdata equ    $18022  transmit register
+
+*mc_stat equ    $18023  on some ql's this controls the video display.
+**FIX: chernandezba : This is $18063, not $18023
+
+*************** pc_clock function:
+* Reading the longword at pc_clock gets the current time.
+* Writing anything to pc_clock resets the clock to zero.
+* Bytes written to pc_clock+1 increment selected bytes of the current time as
+* follows: a zero in bit 4 will increment the msb (to be read back from
+* pc_clock) and subsequently a zero in bits 3, 2 and 1 will increment the bytes
+* of lesser significance. Bits 7-5 and 0 are not significant.
+* Clock setting, etc, could be speeded up by writing combinations of zero bits,
+* but there is strange management of carries which make it far too awkward.
+* As soon as the sign bit of a byte is set, the next more significant byte can
+* no longer be incremented directly, only by propagation of carry.
+* On a crash, there is a chance that there may be rubbish written to memory,
+* and, what with the lack of decode as well, the clock often gets messed up.
+* It gets reset to one of $0w0x0y0z, where w/x/y/z are small, typically 0.
+
+*************** pc_tctrl transmit control register values
+* The values set in bits 4..3 of the transmit control register select the
+* device to which data written to pc_tdata applies.
+* At boot, zero is written here. A zero was also written to pc_tdata, but this
+* has been removed. It had the effect of sending a spurious null to the ser1
+* port, which should not have been done.
+
+pc..diro equ    7       direct output (e.g. to network)
+*   ?    equ    6       0
+*   ?    equ    5       0
+pc..serb equ    4       0=serial io
+pc..sern equ    3       serial port number
+*baud2  equ     2       \
+*baud1  equ     1        > three bit baud rate
+*baud0  equ     0       /
+
+pc.bmask equ    %00000111       baud rate mask
+pc.notmd equ    %11100111       all bits except mode control
+pc.mdvmd equ    %00010000       microdrive mode
+pc.netmd equ    %00011000       network mode
+
+*************** pc_ipcwr is used to send serial commands and data to IPC.
+* The pattern %000011x0 is written here (with x always 1 when serial data is
+* supposed to be being fetched), then bit 6 of pc_ipcrd is examined, waiting
+* for it to go to zero, indicating that the data bit has been received by the
+* IPC and/or that a return bit is ready in bit 7 of pc_ipcrd.
+* Nibbles and bytes are sent most significant bit first.
+* The sound control function has two 16 bit parameters and, in uncharacteristic
+* fashion, these need their least significant byte to be sent first.
+* At boot time, %00000001 is written here. at a guess, one of bits 0, 2 or 4 is
+* used as a flag "data bit awaiting transmission".
+* Note that the PC and the IPC are only connected by two wires, comctl and
+* comdata, and the protocol on these is pretty obscure!
+
+*   ?   equ     7       0
+*   ?   equ     6       0
+*   ?   equ     5       0
+*   ?   equ     4       0
+*   ?   equ     3       1
+*   ?   equ     2       1
+*   ?   equ     1       data bit for IPC (comctl/wr 
+*   ?   equ     0       0
+
+*************** pc_ipcrd and pc_mctrl read.
+* This returns miscellaneous data bits appertaining to the IPC link, serial
+* output control, microdrives and the network.
+
+*   ?   equ     7       data bit from IPC
+*   ?   equ     6       set when bit 7 is OK and IPC is ready to receive
+pc..cts2 equ    5       CTS on port 2 (set if ser2 transmit held up)
+pc..dtr1 equ    4       DTR on port 1 (set if ser1 transmit held up)
+pc..gap  equ    3       gap: set normally, or gap is present on running mdv
+pc..rxrd equ    2       microdrive read buffer ready
+pc..txfl equ    1       xmit buffer full (mdv or ser)
+*   ?    equ    0       network input bit. 1 if active. (netin)
+
+*************** pc_mctrl microdrive control write register
+* Selecting a drive is done by clocking a bit along the chain of drives.
+* pc..sel is set on the first byte sent and clear on as many more as are
+* needed to get to the right drive number.
+* Clocking through eight bytes with pc..sel clear selects "mdv9_", or rather,
+* as the ql only permits "mdv1_" to "mdv8_", deselects all.
+* Anyone who connects more than six external drives will get a shock when the
+* seventh one keeps getting selected!
+* The clocking is done by pc..sclk transitioning from set to clear, and the
+* hardware is expected to be able to manage with one transition each 25us.
+* At boot, %0110 was written here, immediately followed by deselecting.
+* now just the deselection is done.
+*  ?    equ     7
+*  ?    equ     6
+*  ?    equ     5
+*  ?    equ     4
+pc..eras equ    3       microdrive erase
+pc..writ equ    2       microdrive write
+pc..sclk equ    1       microdrive select clock bit
+pc..sel equ     0       microdrive select bit
+
+pc.read equ     1<<pc..sclk             read (or idle) microdrive
+pc.selec equ    pc.read!1<<pc..sel      select bit set
+pc.desel equ    pc.read                 select bit not set
+pc.erase equ    pc.read!1<<pc..eras     erase on / write off
+pc.write equ    pc.erase!1<<pc..writ    erase and write
+
+*************** pc_intr is read to supply the current set of pending
+* interrupts, and is written to clear them and/or enable some of them.
+* sv_intr holds the current setting and is managed carefully, on a bit basis.
+* The three msbs must be set to enable their corresponding interrupts.
+* On read, bit 7 is the baud rate clock, pulsing up and down once per bit.
+* Bit 6 is normally set, but is clear while an mdv is running. dunno why...
+* Bit 5 is the lsb of 1/65536ths of a second, i.e. straight x2 crystal.
+* The five lsbs are set on read to indicate which interrupts are pending and
+* writing a set bit will clear such an interrupt once it has been serviced.
+* At boot, $1f is written here twice, then $c0 is put in sv_intr to start off
+* with transmit and IPC interrupts enabled.
+* The second write of $1f, one gathers, is because a bug in the h/w sometmes
+* causes the first one to fail.
+* The IPC interface interrupt deserves a mention. It was useless, and was
+* ignored on Minerva until v1.94. Then Hermes finally got it right, and uses it
+* to signal serial input buffer data ready (every 8 bytes).
+* It actually also happens whenever data transfer goes on between the CPU and
+* the IPC, which could be a problem for people who do not use mt.ipcom, but
+* all internal routines clear this interrupt before returning.
+
+pc.maskt equ    1<<7    transmit mask register
+pc.maski equ    1<<6    interface mask register
+pc.maskg equ    1<<5    gap mask register
+
+pc.intre equ    1<<4    external interrupt register
+pc.intrf equ    1<<3    frame interrupt register
+pc.intrt equ    1<<2    transmit interrupt register
+pc.intri equ    1<<1    interface interrupt register
+pc.intrg equ    1<<0    gap interrupt register
+
+        list

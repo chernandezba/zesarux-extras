@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tbody>
+ <tr>
+   <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+   <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+
+  </tbody>
+</table>
+<hr>
+<p><font size="4"><b>OS_Si, low level serial
+interface</b></font>
+</p>
+<p><tt>RST 20H, DEFB $8D</tt> </p>
+<p>IN: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; L = reason code<br>&nbsp;&nbsp;&nbsp;&nbsp; Other register parameters depend on reason code</pre>
+<p>OUT: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Depends on reason code, see below.<br>&nbsp;&nbsp;&nbsp;&nbsp; IX will always be unchanged.</pre>
+<p>Notes: </p>
+<blockquote>
+
+  <p>Full details of this call's reason codes are found below.
+Other information of this call can be found in the "The Serial
+Interface" section.</p>
+  <p></p>
+</blockquote>
+<p><b>SI_HRD (L = $00), Serial hard reset</b> </p>
+<pre>IN:  -<br>OUT: Fc = 0</pre>
+<p>Registers changed after return: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different</pre>
+<p>This resets the UART in the gate array. This call should not
+need to be used. <br>
+&nbsp; &nbsp; </p>
+<p><b>SI_SFT (L = $03), serial soft rest</b> </p>
+<pre>IN:&nbsp; -<br>OUT: -<br><br>Registers changed after return:</pre>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......../IXIY/..bcdehl same<br>&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/..../af...... different</pre>
+<p>This call should be useful to install new panel settings or
+when starting low level (ie. using SI_GBT, SI_PBT etc.) serial
+operations. It carries out the following: <br>
+<br>
+1. Empty receive and transmit buffers.<br>
+2. Reset the XON/XOFF flags.<br>
+3. Reset baud rates, parity and flow control settings to the
+PANEL values.<br>
+4. Assert RTS.<br>
+5. Resets the serial port timeout to its default of 10 minutes.&nbsp;</p>
+<p><b>SI_INT (L = $06), interrupt entry point</b></p>
+<p>Internal operating system usage only.</p>
+<p> </p>
+<p><b>SI_GBT (L = $09), get byte from serial port</b>
+</p>
+<pre>IN:&nbsp; BC = timeout in centiseconds</pre>
+<p>Out if call succeeded: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp; A = byte received<br>&nbsp;&nbsp;&nbsp;&nbsp; BC = remaining time</pre>
+<p>Out if call failed: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp; A = RC_TIME ($02) (if no data available before timeout)</pre>
+<p>Registers changed after return: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ....DE../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AFBC..HL/.... different<br><br></pre>
+<p><b>SI_PBT (L = $0C), put byte to serial port</b> </p>
+<pre>IN:&nbsp; BC = timeout in centiseconds. If BC = $FFFF then default timeout.<br>&nbsp;&nbsp;&nbsp;&nbsp; A = byte to send</pre>
+<p>Out if call succeeded: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp; BC = remaining time</pre>
+<p>Out if call failed: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp; A = RC_TIME ($02)</pre>
+<p>Registers changed after return: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ....DE../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AFBC..HL/.... different</pre>
+<p>This call will return immediatly if there is space in the
+transmit buffer, otherwise it will wait until there is space for
+as long as the timeout. If the timeout is exceeded it will return
+with an error. <br>
+ </p>
+<p><b>SI_ENQ (L = $0F), Status enquiry</b> </p>
+<pre>IN:&nbsp; -</pre>
+<pre>OUT: </pre>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; B = number of full slots in the Tx (transmit) buffer<br>&nbsp;&nbsp;&nbsp;&nbsp; C = number of empty slots in the Tx (transmit) buffer<br>&nbsp;&nbsp;&nbsp;&nbsp; D = number of full slots in the Rx (receive) buffer<br>&nbsp;&nbsp;&nbsp;&nbsp; E = number of empty slots in the Rx (receive) buffer<br><br>&nbsp;&nbsp;&nbsp;&nbsp; A0 = 1, CTS level (inverse of the value on the D-connector)<br>&nbsp;&nbsp;&nbsp;&nbsp; A1 = 1, DCD level (inverse of the value on the D-connector)<br>&nbsp;&nbsp;&nbsp;&nbsp; A2 = 1, Rx register full<br>&nbsp;&nbsp;&nbsp;&nbsp; A3 =&nbsp;&nbsp;&nbsp; undefined<br>&nbsp;&nbsp;&nbsp;&nbsp; A4 = 1, Tx Register empty<br>&nbsp;&nbsp;&nbsp;&nbsp; A5 = 1, CTS interrupt<br>&nbsp;&nbsp;&nbsp;&nbsp; A6 = 1, DCD interrupt<br>&nbsp;&nbsp;&nbsp;&nbsp; A7 = 1, Rx shift register full</pre>
+<p>Registers changed after return: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/.... different</pre>
+<p>A slot, in this context, is the set of bits required to
+transmit on character. This will include 8 data bits plus start
+and stop bits. <br>
+&nbsp; </p>
+<p><b>SI_FTX (L = $12), Flush transmit buffer</b> </p>
+<pre>IN:&nbsp; -</pre>
+<pre>OUT: Fc = 0</pre>
+<p>Registers changed after return: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different<br><br></pre>
+<p><b>SI_FRX (L = $15), Flush receive buffer</b> </p>
+<pre>IN:&nbsp; -</pre>
+<pre>OUT: Fc = 0</pre>
+<p>Registers changed after return: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different<br><br></pre>
+<p><b>SI_TMO (L = $18), set default timeout</b> </p>
+<pre>IN:  BC = new value for default timeout</pre>
+<pre>OUT: Fc = 0</pre>
+<p>Registers changed after return: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different</pre>
+<p>If you set the default to $FFFF then when the default is used
+(by setting a timeout value of $FFFF in get and put byte
+routines) then the system will wait forever. A soft reset sets
+the default timeout to 10 minutes. This timeout is completely
+independent of the system timeout, which is set by the Panel. </p>
+</body>
+</html>

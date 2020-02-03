@@ -1,0 +1,242 @@
+Z80 Module Assembler 2.8.0, (c) InterLogic 1993-2009, Paulo Custodio 2011-2015                    Thu Nov 12 18:42:43 2015
+Page 001                                                                                          'testspritechip_asm.sym'
+
+
+
+
+Local Module Symbols:
+
+alto                            = 0006
+altoactual                      = 0011
+ancho                           = 0004
+anchoactual                     = 000D
+atributosprite                  = 000A
+atributosprite2                 = 08FE
+boss_incremento_x               = 0CB4
+boss_x                          = 0CB0
+boss_y                          = 0CB2
+bucle                           = 007C
+bucle1                          = 0023
+bucle2                          = 002F
+buf_color                       = 073D
+buf_colour_type                 = 0740
+buf_palette                     = 0742
+buf_parametro_scroll            = 0606
+cambio_color                    = 0186
+cambio_color2                   = 0195
+cambio_color3                   = 01A2
+cambiocolor_si_incrementa       = 08A4
+cambiocolor_si_incrementa2      = 08B3
+cambiocolor_sprite              = 0758
+cambiocolor_sprite1             = 0862
+cambiocolor_sprite2             = 0867
+cambiocolor_sprite3             = 086D
+cambiocolor_sprite4             = 0870
+cambiocolor_sprite_err          = 0744
+cambiocolor_sprite_i            = 0852
+cambiocolor_sprite_no_i         = 0844
+cambiocolor_sprite_pide_paleta  = 07A4
+cambiocolor_sprite_pide_paleta_sigue
+                                = 07FA
+cambiocolor_sprite_sicero       = 0880
+cambiocolor_sprite_sicero2      = 088E
+cambiocolor_sprite_sicero3      = 088F
+conmutar_incremento_zoom        = 058B
+conmutar_incremento_zoom_8      = 0598
+conmutar_incremento_zoom_negativo
+                                = 059C
+conmutar_incremento_zoom_negativo_8
+                                = 05A5
+convert0                        = 010C
+convert00                       = 010A
+convert000                      = 0104
+convert1                        = 0112
+convert_nocol1                  = 011E
+convert_nocol2                  = 012B
+espera_no_tecla                 = 08D7
+espera_tecla                    = 08DF
+establece_color                 = 017B
+establece_sprite_incrementar_y  = 08F7
+establecesprite                 = 0013
+establecesprite_y_scroll        = 0966
+flag_cambio                     = 00DC
+incremento_color                = 019F
+incremento_hl_y_mete_atr2       = 0906
+incremento_sonic_saltar_aux     = 0C09
+
+Z80 Module Assembler 2.8.0, (c) InterLogic 1993-2009, Paulo Custodio 2011-2015                    Thu Nov 12 18:42:43 2015
+Page 002                                                                                          'testspritechip_asm.sym'
+
+
+incremento_x_sprite             = 01A7
+incremento_y_sprite             = 01A9
+incrementox                     = 0074
+incrementoy                     = 0076
+input_text                      = 05C0
+input_text0                     = 05CC
+input_text00                    = 05C2
+input_text1                     = 05CF
+input_text_no12                 = 05F2
+input_text_no13                 = 05DF
+lee_todas_teclas                = 08E7
+llenar_pantalla_caracteres_inc  = 01AE
+llenar_pantalla_caracteres_inc2 = 01B0
+llenar_pantalla_caracteres_inc3 = 01BA
+meter_atributos_sprite          = 08FF
+mover_sprite_boss               = 0C87
+mover_sprite_boss_conmutar      = 0C9A
+moversprites                    = 0420
+moversprites_espera             = 0423
+moversprites_inicio             = 01AB
+moversprites_inicio2            = 041A
+moversprites_texto_inicio       = 01C0
+notecla_a                       = 044A
+notecla_c                       = 04A1
+notecla_d                       = 052F
+notecla_e                       = 0583
+notecla_espacio                 = 0453
+notecla_f                       = 048D
+notecla_k                       = 053F
+notecla_l                       = 054F
+notecla_m                       = 0519
+notecla_n                       = 04F9
+notecla_o                       = 0466
+notecla_p                       = 047A
+notecla_q                       = 0436
+notecla_r                       = 0524
+notecla_s                       = 056F
+notecla_w                       = 055F
+notecla_x                       = 04BD
+notecla_y                       = 04D9
+noxcero                         = 009F
+noycero                         = 00C1
+pregunta_parametros_scroll      = 060A
+print_text                      = 05AC
+print_text1                     = 05B1
+print_text_hl                   = 05AA
+print_textfin                   = 05BA
+rebotar_pelota                  = 0078
+reset_last_key                  = 0586
+retorna_de_incremento_x         = 08ED
+retorna_de_incremento_y         = 08F2
+rutina_atoi                     = 08BA
+rutina_atoi2                    = 08C4
+rutina_atoi_buc                 = 08BD
+scroll_alto                     = 092C
+scroll_ancho                    = 092B
+scroll_pixeles                  = 092D
+scroll_relleno                  = 092E
+scroll_tipo                     = 092F
+scroll_wait_finish              = 091C
+scroll_wait_finish_buc          = 0924
+
+Z80 Module Assembler 2.8.0, (c) InterLogic 1993-2009, Paulo Custodio 2011-2015                    Thu Nov 12 18:42:43 2015
+Page 003                                                                                          'testspritechip_asm.sym'
+
+
+scroll_x                        = 0929
+scroll_y                        = 092A
+send_command_spritechip         = 0913
+send_parameters_scroll          = 0930
+siguebuc                        = 00CC
+siguey                          = 00AA
+sonic_agachar                   = 0C61
+sonic_agachar_buc               = 0C6C
+sonic_agachar_fin               = 0C7B
+sonic_andando_buc               = 0A75
+sonic_andando_buc_fin           = 0A9D
+sonic_andando_buc_speed0        = 0A9B
+sonic_andando_inicio            = 0A63
+sonic_andando_reiniciar_paso    = 0A6B
+sonic_background                = 5180
+sonic_boss                      = 44F8
+sonic_jumping_pass              = 0CAA
+sonic_lee_no_tecla_a            = 0A0D
+sonic_lee_no_tecla_espacio      = 09F3
+sonic_lee_no_tecla_p            = 0A38
+sonic_lee_no_tecla_q            = 0A00
+sonic_lee_tecla                 = 09E4
+sonic_reset_current_sprite      = 0AD6
+sonic_return_current_sprite     = 0B27
+sonic_return_current_sprite_jumping_no1
+                                = 0B74
+sonic_return_current_sprite_jumping_no2
+                                = 0B7C
+sonic_return_current_sprite_jumping_no3
+                                = 0B84
+sonic_return_current_sprite_no_jumping
+                                = 0B88
+sonic_return_current_sprite_no_running
+                                = 0B65
+sonic_return_current_sprite_no_stopped
+                                = 0B32
+sonic_return_current_sprite_walking_no1
+                                = 0B41
+sonic_return_current_sprite_walking_no2
+                                = 0B49
+sonic_return_current_sprite_walking_no3
+                                = 0B51
+sonic_return_current_sprite_walking_no4
+                                = 0B59
+sonic_return_current_sprite_walking_no5
+                                = 0B61
+sonic_saltando_siguiente        = 0C53
+sonic_saltando_siguiente2       = 0C5D
+sonic_saltar                    = 0BC5
+sonic_saltar_aux                = 0C0B
+sonic_saltar_subiendo           = 0C13
+sonic_saltar_subiendo2          = 0C31
+sonic_set_current_sprite        = 0AE0
+sonic_set_current_sprite2       = 0AE8
+sonic_set_sprite_boss           = 0B9B
+sonic_speed                     = 0CAB
+sonic_state                     = 0CA8
+sonic_wait                      = 0B8C
+sonic_wait2                     = 0B96
+sonic_wait_and_scroll           = 0AA8
+sonic_wait_and_scroll_izquierda = 0AC5
+
+Z80 Module Assembler 2.8.0, (c) InterLogic 1993-2009, Paulo Custodio 2011-2015                    Thu Nov 12 18:42:43 2015
+Page 004                                                                                          'testspritechip_asm.sym'
+
+
+sonic_walking_pass              = 0CA9
+sonic_x                         = 0CAC
+sonic_y                         = 0CAE
+sonicdemo                       = 096D
+sonicdemo_init_sprite_table     = 0B0A
+spr_alto                        = 00D9
+spr_ancho                       = 00D7
+spr_color                       = 00E4
+spr_color_orig                  = 00DB
+spr_color_rotado                = 00E1
+spr_contador_alto               = 00DF
+spr_contador_ancho              = 00DD
+spr_sonic_agachado1             = 4048
+spr_sonic_rolling1              = 2D88
+spr_sonic_rolling2              = 3238
+spr_sonic_rolling3              = 36E8
+spr_sonic_rolling4              = 3B98
+spr_sonic_stopped1              = 28D8
+spr_sonic_walking1              = 0CB8
+spr_sonic_walking2              = 1168
+spr_sonic_walking3              = 1618
+spr_sonic_walking4              = 1AC8
+spr_sonic_walking5              = 1F78
+spr_sonic_walking6              = 2428
+sprite_dest                     = 00D5
+sprite_orig                     = 00D3
+sprite_orig_trabajo             = 00E2
+sprites                         = 0008
+spritesonic                     = 0CA8
+tabla_sprites                   = 0CB6
+velocidad_maxima                = 0007
+xactual                         = 000B
+xinicial                        = 0000
+yactual                         = 000F
+yinicial                        = 0002
+
+
+Global Module Symbols:
+
+

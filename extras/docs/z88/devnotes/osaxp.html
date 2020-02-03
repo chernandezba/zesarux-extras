@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+
+<b><font size="+1">OS_Axp, allocate explicit page</font></b>
+</p>
+<p><tt>RST 20H, DEFB $D2</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = memory handle<br>&nbsp;&nbsp;&nbsp;&nbsp; B explicit bank<br>  H explicit page</pre>
+
+OUT, if call successfull:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0, OK</pre>
+
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_FAIL, failed to allocate memory</pre>
+
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different<br></pre>
+
+Notes:
+<blockquote>Internal operating system usage.<br>
+Since page are on 256 byte boundaries the L register is&nbsp;ignored.<br>
+  <br>
+This call could be useful for properly allocating 512 bytes or more contigous memory area.<br>
+The first page is allocated with OS_Mal.<br>
+Next pages are allocated&nbsp;with OS_Axp&nbsp;specifying B and H+1 (and more...). </blockquote>
+
+Bugs:
+</body>
+</html>

@@ -1,0 +1,35 @@
+
+
+sid.rar
+Velesoft converted a song with 3AYs and write  a quick test
+the second RAR is the SIDplayer
+copy sidplay to bin folder
+and
+.sidplay oceall5.dmp
+this sidplay is a rough test. It works, but it is not check if file exist and you cant abort.
+but it working and you can test the tunes on SID, when you write this part
+Thanks a lot!
+I will try it
+
+the IC selection still the same
+TS is 111111 XX
+I suppose 255 value for first chip, 254 for second and 253 for third, right?
+
+11 to 1st ay, 10 to 2nd, 01 to 3rd and 00 to SID
+yes
+I made a change to pan the channels, but you can start with these.
+TBBlue now uses bit 6 and 5 to pan
+1LR111XX
+its compatible with original TS, because the tracas are selected by 111111XX, got it?
+Example:
+select 2nd AY with audio on Right side only
+10111110
+2nd AY, left side only 11011110
+3rd AY, both sides: 11111101
+Great!
+I don't still emulate stereo so it's easier for me 😉
+
+
+
+
+so, no problem then... 😀

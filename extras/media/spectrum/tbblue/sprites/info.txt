@@ -1,0 +1,11 @@
+copy tospram and testspr2 to /bin
+.TOSPRRAM MINECRAF.spr
+
+.TESTSPR2
+Ok
+￼
+the first comand move the sprites to BRAM
+and the second one puts the sprites on screen
+
+you will see the jpg included here result.jpg
+

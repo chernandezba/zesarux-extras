@@ -1,0 +1,117 @@
+-Comandos siempre con bits 7 y 6 a 01 (o sea, sumando 64)
+http://elm-chan.org/docs/mmc/mmc_e.html
+http://www.retroleum.co.uk/electronics-articles/basic-mmc-card-access/
+
+-ejemplo al iniciar +3e con mmc:
+(Omitiendo lecturas repetidas:)
+
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0x493f
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xfe1f valor: 0xFE
+Puerto ZXMMC Write: 0x493f valor: 0x49
+Puerto ZXMMC Write: 0xff3f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Write: 0xff3f valor: 0xFF
+Puerto ZXMMC Write: 0xfe1f valor: 0xFE
+Puerto ZXMMC Write: 0x403f valor: 0x40
+Puerto ZXMMC Write: 0x953f valor: 0x95
+Puerto ZXMMC Read: 0x953f
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0x493f
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xfd1f valor: 0xFD
+Puerto ZXMMC Write: 0x493f valor: 0x49
+Puerto ZXMMC Write: 0xff3f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Write: 0xff3f valor: 0xFF
+Puerto ZXMMC Write: 0xfd1f valor: 0xFD
+Puerto ZXMMC Write: 0x403f valor: 0x40
+Puerto ZXMMC Write: 0x953f valor: 0x95
+Puerto ZXMMC Read: 0x953f
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0x513f
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xfe1f valor: 0xFE
+Puerto ZXMMC Write: 0x513f valor: 0x51
+Puerto ZXMMC Write: 0xff3f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0x513f
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xfe1f valor: 0xFE
+Puerto ZXMMC Write: 0x513f valor: 0x51
+Puerto ZXMMC Write: 0x13f valor: 0x01
+Puerto ZXMMC Write: 0xff3f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0x513f
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xfd1f valor: 0xFD
+Puerto ZXMMC Write: 0x513f valor: 0x51
+Puerto ZXMMC Write: 0xff3f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0x513f
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xfd1f valor: 0xFD
+Puerto ZXMMC Write: 0x513f valor: 0x51
+Puerto ZXMMC Write: 0x13f valor: 0x01
+Puerto ZXMMC Write: 0xff3f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0xff3f
+
+
+
+Simulando lectura comando 49h:
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0x493f
+Puerto ZXMMC Read: 0xff3f
+Puerto ZXMMC Write: 0xfe1f valor: 0xFE
+
+comando Puerto ZXMMC Write: 0x493f valor: 0x49
+ff de crc ? Puerto ZXMMC Write: 0xff3f valor: 0xFF
+leer byte ncr Puerto ZXMMC Read: 0xff3f
+leer command response (0) Puerto ZXMMC Read: 0xff3f
+mmc cuenta=2
+1 Puerto ZXMMC Read: 0x123f
+2 Puerto ZXMMC Read: 0x113f
+3 Puerto ZXMMC Read: 0x103f
+4 Puerto ZXMMC Read: 0xf3f
+5 Puerto ZXMMC Read: 0xe3f
+6 Puerto ZXMMC Read: 0xd3f
+7 Puerto ZXMMC Read: 0xc3f
+8 Puerto ZXMMC Read: 0xb3f
+9 Puerto ZXMMC Read: 0xa3f
+10 Puerto ZXMMC Read: 0x93f
+11 Puerto ZXMMC Read: 0x83f
+12 Puerto ZXMMC Read: 0x73f
+13 Puerto ZXMMC Read: 0x63f
+14 Puerto ZXMMC Read: 0x53f
+15 Puerto ZXMMC Read: 0x43f
+16 Puerto ZXMMC Read: 0x33f
+17 Puerto ZXMMC Read: 0x23f
+18 Puerto ZXMMC Read: 0x13f
+(16 bytes del CSD y los dos de CRC)
+Puerto ZXMMC Write: 0xff1f valor: 0xFF
+Puerto ZXMMC Read: 0xfe3f
+

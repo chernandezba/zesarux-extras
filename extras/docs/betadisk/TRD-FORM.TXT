@@ -1,0 +1,55 @@
+TR-DOS disk specs v1.0 - last revised on 9-28-1997
+
+- Max disk sides are 2
+- Max logical tracks per side are 80
+- Logical sectors per track are 16
+- Sector dimension is 256 bytes
+- Root directory is 8 sectors long starting from track 0, sector 1
+- Max root entries are 128
+- Root entry dimension is 16 bytes
+- Logical sector 8 (9th physical) holds disc info
+- Logical sectors from 0 to 15 are unused
+- Files are *NOT* fragmented
+
+Directory entry structure:
+
+------------------------------------------------------------------------------
+Offset | Length | Description
+------------------------------------------------------------------------------
+  00   |    7   | file name (*)
+  08   |    1   | file extension
+  09   |    2   | file start address
+  11   |    2   | file length in bytes
+  13   |    1   | file length in sectors
+  14   |    1   | starting sector on disk
+  15   |    1   | starting tack on disk
+------------------------------------------------------------------------------
+(*) If first byte is 1h then the file is deleted
+
+
+Logical sector 8 structure:
+
+------------------------------------------------------------------------------
+Offset | Lenght | Description
+------------------------------------------------------------------------------
+  000  |   1    | 0 - signals end of root directory
+  001  |  224   | unused (filled by 0)
+  225  |   1    | number of first free sector on disk
+  226  |   1    | the number of track of first free sector on disk
+  227  |   1    | disk type
+  228  |   1    | number of files on disk
+  229  |   2    | number of free sectors on disk
+  231  |   1    | TR-DOS ID byte (always 10h - 16 dec)
+  232  |   1    | unused (filled by 0)
+  233  |   9    | unused (filled by 20h - 32 dec)
+  243  |   1    | unused (filled by 0)
+  244  |   1    | number of deleted files on disk
+  245  |   8    | disk label (8 chars)
+  253  |   3    | end of disk info (filled by 0)
+------------------------------------------------------------------------------
+(*) Byte at offset 227 could be one of the following:
+
+    16h : 80 tracks, double sided
+    17h : 40 tracks, double sided
+    18h : 80 tracks, single sided
+    19h : 40 tracks, single sided

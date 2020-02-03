@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <TITLE>Z80 Quick Reference</TITLE>
+   <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</HEAD>
+<BODY>
+&nbsp;
+<BR>&nbsp;
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<TR>
+<TH COLSPAN="3">Z88 Developers' Notes</TH>
+</TR>
+
+<TR>
+<TD ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%"><A HREF="index.html">Contents</A></TD>
+</TR>
+</TABLE>
+
+<HR>
+<table style="font-size: 12px" border=0 WIDTH="100%" >
+<TR>
+<TD>&nbsp;</TD>
+
+<TD>
+<BR><B>Z80 Mnemonics Quick Reference</B></TD>
+
+<TD>
+<BR><B>Instruction Groups</B></TD>
+</TR>
+
+<TR>
+<TD WIDTH="10%">&nbsp;</TD>
+
+<TD WIDTH="50%">
+<TT><A HREF="z80instr.html#ari8">ADC</A>,&nbsp;
+<A HREF="z80instr.html#ari8">ADD</A>,&nbsp;
+<A HREF="z80instr.html#ari8">AND</A>,&nbsp;
+<A HREF="z80instr.html#bitmanip">BIT</A>,&nbsp;
+<A HREF="z80instr.html#callret">CALL</A>,
+<A HREF="z80instr.html#ari8">CCF</A>,&nbsp;
+<A HREF="z80instr.html#ari8">CP</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#exblk">CPD</A>,&nbsp;</TT>
+<BR>
+<TT><A HREF="z80instr.html#exblk">CPDR</A>,
+<A HREF="z80instr.html#exblk">CPI</A>,&nbsp;
+<A HREF="z80instr.html#exblk">CPIR</A>,
+<A HREF="z80instr.html#exblk">CPL</A>,&nbsp;
+<A HREF="z80instr.html#genari">DAA</A>,&nbsp;
+<A HREF="z80instr.html#ari8">DEC</A>,&nbsp;
+<A HREF="z80instr.html#genari">DI</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#jump">DJNZ</A></TT>
+<BR>
+<TT><A HREF="z80instr.html#genari">EI</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#exblk">EX</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#exblk">EXX</A>,&nbsp;
+<A HREF="z80instr.html#genari">HALT</A>,
+<A HREF="z80instr.html#genari">IM</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#inoutput">IN</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#inoutput">INC</A>,&nbsp;
+<A HREF="z80instr.html#inoutput">IND</A>,&nbsp;</TT>
+<BR>
+<TT><A HREF="z80instr.html#inoutput">INDR</A>,
+<A HREF="z80instr.html#inoutput">INI</A>,&nbsp;
+<A HREF="z80instr.html#inoutput">INIR</A>,
+<A HREF="z80instr.html#jump">JP</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#jump">JR</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#ld8">LD</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#exblk">LDD</A>,&nbsp;
+<A HREF="z80instr.html#exblk">LDDR</A>,</TT>
+<BR>
+<TT><A HREF="z80instr.html#exblk">LDI</A>,&nbsp;
+<A HREF="z80instr.html#exblk">LDIR</A>,
+<A HREF="z80instr.html#genari">NEG</A>,&nbsp;
+<A HREF="z80instr.html#genari">NOP</A>,&nbsp;
+<A HREF="z80instr.html#ari8">OR</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#inoutput">OTDR</A>,
+<A HREF="z80instr.html#inoutput">OTIR</A>,
+<A HREF="z80instr.html#inoutput">OUT</A>,&nbsp;</TT>
+<BR>
+<TT><A HREF="z80instr.html#inoutput">OUTD</A>,
+<A HREF="z80instr.html#inoutput">OUTI</A>,
+<A HREF="z80instr.html#ari16">POP</A>,&nbsp;
+<A HREF="z80instr.html#ari16">PUSH</A>,
+<A HREF="z80instr.html#bitmanip">RES</A>,&nbsp;
+<A HREF="z80instr.html#callret">RET</A>,&nbsp;
+<A HREF="z80instr.html#callret">RETI</A>,
+<A HREF="z80instr.html#callret">RETN</A>,</TT>
+<BR>
+<TT><A HREF="z80instr.html#rotshft">RL</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#rotshft">RLA</A>,&nbsp;
+<A HREF="z80instr.html#rotshft">RLC</A>,&nbsp;
+<A HREF="z80instr.html#rotshft">RLCA</A>,
+<A HREF="z80instr.html#rotshft2">RLD</A>,&nbsp;
+<A HREF="z80instr.html#rotshft2">RR</A>,&nbsp;&nbsp;
+<A HREF="z80instr.html#rotshft">RRA</A>,&nbsp;
+<A HREF="z80instr.html#rotshft">RRCA</A>,</TT>
+<BR><TT><A HREF="z80instr.html#rotshft2">RRD</A>,&nbsp;
+<A HREF="z80instr.html#callret">RST</A>,&nbsp;
+<A HREF="z80instr.html#ari8">SBC</A>,&nbsp;
+<A HREF="z80instr.html#genari">SCF</A>,&nbsp;
+<A HREF="z80instr.html#bitmanip">SET</A>,&nbsp;
+<A HREF="z80instr.html#rotshft">SLA</A>,&nbsp;
+<A HREF="z80instr.html#rotshft">SRA</A>,&nbsp;
+<A HREF="z80instr.html#rotshft">SRL</A>,&nbsp;</TT>
+<BR>
+<TT><A HREF="z80instr.html#ari8">SUB</A>,&nbsp;
+<A HREF="z80instr.html#ld8">XOR</A>&nbsp;&nbsp;</TT></TD>
+
+<TD WIDTH="40%">
+<A HREF="z80instr.html#rules">Notation rules</A>
+<BR><A HREF="z80instr.html#genari">General purpose arithmetic and cpu control</A>
+<BR><A HREF="z80instr.html#ld8">8 bits load</A>
+<BR><A HREF="z80instr.html#ld16">16 bits load</A>
+<BR><A HREF="z80instr.html#exblk">Exchange, block transfer and search</A>
+<BR><A HREF="z80instr.html#ari8">8 bits arithmetic and logic</A>
+<BR><A HREF="z80instr.html#ari16">16 bits arithmetic</A>
+<BR><A HREF="z80instr.html#rotshft">Rotate and shift</A>
+<BR><A HREF="z80instr.html#rotshft2">Rotate and shift (continued)</A>
+<BR><A HREF="z80instr.html#bitmanip">Bit manipulation</A>
+<BR><A HREF="z80instr.html#jump">Jump</A>
+<BR><A HREF="z80instr.html#callret">Call and return</A>
+<BR><A HREF="z80instr.html#inoutput">Input and output</A>
+<BR>&nbsp;</TD>
+</TR>
+
+<TR>
+<TD>&nbsp;</TD>
+
+<TD>&nbsp;</TD>
+
+<TD>&nbsp;</TD>
+</TR>
+</TABLE>
+
+<HR>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<TR>
+<TD ALIGN=CENTER VALIGN=TOP WIDTH="34%"><A HREF="index.html">Contents</A></TD>
+</TR>
+</TABLE>
+
+</BODY>
+</HTML>

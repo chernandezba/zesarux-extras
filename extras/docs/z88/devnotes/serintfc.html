@@ -1,0 +1,165 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>The Serial Interface</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="lists.html">Previous</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%"><a href="index.html">Contents</a></td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="wldcdhan.html">Next</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p><b><font size=+1>18. The Serial Interface</font></b>
+<p>The Z88 has a single serial port which has to be shared by all applications,
+so it is important that applications use the system to access the port
+to avoid interfering with the correct operation of other applications running
+in the machine. The system runs the serial port using interrupts and buffering,
+so most of its operation is transparent, but there are certain operations,
+such as directly controlling the RTS line (required for auto-dialing by
+some modems), which the system calls do not support and in these cases
+the hardware is accessed more directly - see the "Hardware" section of
+these notes. The serial port specification is reproduced here for convenience:
+<pre>Baud rates  75, 300, 600, 1200, 2400, 9600, 19200, 38400.
+   Send and receive rates are independent.
+
+Parity  None, Odd, Even, Mark, Space. Note the Z88 generates the
+   appropriate parity, and will ignore, but not strip, the parity of
+   incoming data.
+
+Flow  Hardware handshaking with or without XON/XOFF.
+
+Timeout  Output: 10 minutes is the default value
+   Input: infinite is the default value
+
+Buffer  Output: 95 bytes
+   Input: 127 bytes</pre>
+<b>Using the Serial Port</b>
+<p>The serial port is accessed by opening the device :COM.0, using <a href="gnopf.html">GN_Opf</a>,
+and then using the standard file I/O routines: <a href="osgb.html">OS_Gb</a>,
+<a href="osgbt.html">OS_Gbt</a>,
+<a href="ospb.html">OS_Pb</a>, <a href="ospbt.html">OS_Pbt</a> and <a href="osmv.html">OS_Mv</a>.
+The device should be closed after the operation is complete. For most application
+this level of access should be sufficient, however, it may be necessary
+to change the serial port parameters from within an application. This is
+done by writing new values to the Panel, using the
+<a href="ossp.html">OS_Sp</a>
+call, and then issuing a soft reset command to the serial driver. Changing
+the Panel setting may affect other software in the machine, so should not
+be undertaken lightly. It would be appropriate to reset the Panel to its
+original setting after serial port operations are complete. This can be
+achieved by first reading the Panel settings with <a href="osnq.html">OS_Nq</a>.
+The "EazyLink" and "PCLINK II" popdowns use this technique.
+<a href="ossp.html">OS_Sp</a> and <a href="osnq.html">OS_Nq</a>
+are covered in detail in the "Miscellaneous useful routines" section.
+<p>The serial soft reset operation is carried out by opening the <a href="ossi.html">OS_Si</a>
+call. The <a href="ossi.html">OS_Si</a> call provides a low level access
+to the serial port. The call can perform nine different operations depending
+on the reason code passed to it:
+<pre><i>Reason code</i>    <i>Action</i>
+SI_HRD ($00)   Hard reset the serial port
+SI_SFT ($03)   Soft reset the serial port
+SI_INT ($06)   Interrupt entry point (System use only).
+SI_GBT ($09)   Get byte from serial port
+SI_PBT ($0C)   Put byte to serial port
+SI_ENQ ($0F)   Status enquiry
+SI_FTX ($12)   Flush Tx (transmit) buffer
+SI_FRX ($15)   Flush Rx (receive) buffer
+SI_TMO ($18)   Set timeout</pre>
+This operating system call used for low level serial port communication
+uses the following interface:
+<p>
+<hr WIDTH="100%">
+<br><b><font size=+1>OS_Si, low level serial interface</font></b>
+<p><tt>RST 20H, DEFB $8D</tt>
+<p>IN:<pre>
+   IX = handle returned from <a href="gnopf.html">GN_Opf</a> of ":COM.0"
+   L = reason code
+   Other register usage depends on L</pre>
+OUT:<pre>
+   Depends on reason code
+   IX will always be unchanged
+
+<hr WIDTH="100%"></pre>
+The serial various reason code parameters are descibed in detail in the
+"System calls Reference" section.
+<br>&nbsp;
+<p><b>Flow Control</b>
+<p>Flow control can be controlled either be software or hardware. The hardware
+handshaking is always active, so if you want to use software exclusively
+you will need to wire a cable to set the handshaking lines high at all
+times - ie. pins 5, 8 and 9 together on the Z88 D-connector.
+<p>An external device can ask the Z88 to stop sending by either sending
+an XOFF character or by de-asserting (bringing low) the CTS line. With
+software flow control, transmission can only stop when the XOFF character
+has been processed, so there is potentially a slight delay in response,
+while previously sent characters are read. With hardware control, transmission
+stops on the next character boundary. Transmission is resumed on the receipt
+of an XON character, in the case of software control, or be re-asserting
+CTS, ie. bringing it high. The output buffer is around 95 bytes long.
+<p>If software control is used, the Z88 will send an XOFF to an external
+device once the receive buffer is more than half full. Characters will
+continue to be received until there are only 15 character spaces left in
+the buffer. At this point an XOFF will be sent for every character subsequently
+sent by the external device. If the receive buffer overflows then data
+is lost forever. The Z88 will send an XON when the receive buffer has been
+cleared to less than a quarter full. Under hardware control, the Z88 will
+de-assert (bring low) RTS when the receive buffer is more than half full
+and the re-assert (bring high) when it has become less than a quarter full.
+The input buffer is around 127 bytes long.
+<p>NOTE: When working with software handshaking the performance of the
+serial port is seriously reduced. When working at speeds of 9600 baud or
+above, the software handshaking will not work unless there is an intercharacter
+gap, ie. some time is left between the sending of each character. The gap
+allows the Z88 to catch up with serial operations, and without it the machine
+may loose characters.
+<br>&nbsp;
+<p><b>Serial Port Lines</b>
+<p>The following table describes the 9-pin D-connector of the Z88:
+<pre><i>Pin</i>   <i>Signal type</i>      <i>direction</i>
+1 -   unswitched +5V at 10&#181;A  output
+2 TxD  transmit data   output
+3 RxD  receive data   input
+4 RTS  ready to send   output
+5 CTS  clear to send   input
+6 -   not used
+7 GND  Ground
+8 DCD  data carrier detect  input
+9 DTR  switched +5V at 10mA output</pre>
+NOTE: DTR is high when the machine is awake. The machine is always awake
+when the the screen is active, but even if asleep, the machine will wake
+every minute or so to carry out various housekeeping tasks, such as checking
+for alarms, and at these times DTR will go high. Pin 1 will show a signal
+if there is power available to the machine.
+<p>
+<hr WIDTH="100%">
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<td ALIGN=LEFT VALIGN=TOP WIDTH="33%"><a href="lists.html">Previous</a></td>
+
+<td ALIGN=CENTER VALIGN=TOP WIDTH="34%"><a href="index.html">Contents</a></td>
+
+<td ALIGN=RIGHT VALIGN=TOP WIDTH="33%"><a href="wldcdhan.html">Next</a></td>
+</tr>
+
+<tr>
+<td ALIGN=LEFT VALIGN=TOP WIDTH="33%">Linked lists</td>
+
+<td ALIGN=CENTER VALIGN=TOP WIDTH="34%">The Serial Interface</td>
+
+<td ALIGN=RIGHT VALIGN=TOP WIDTH="33%">The Wildcard Handler</td>
+</tr>
+</table>
+
+</body>
+</html>

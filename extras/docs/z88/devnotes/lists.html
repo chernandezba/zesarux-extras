@@ -1,0 +1,117 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>Linked lists</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="alarms.html">Previous</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%"><a href="index.html">Contents</a></td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="serintfc.html">Next</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+<b><font size=+1>17. Linked lists</font></b>
+<p>The Z88 incorporates useful system calls or implementing linked list
+structures. These calls can be used to insert and delete members or fetch
+the next member. This is very valuable on the Z88, where the memory allocated
+to a process may be very highly fragmented. For setting up large symbol
+tables or other big data structures, linked lists (or binary trees) are
+the only realistic arrangement. For instance, PipeDream and Diary uses
+linked lists of text blocks to store the current pages.
+<p>The conventional structure of a linked list is a set of records, each
+containing a pointer to the next record:
+<pre>addr1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFW addr2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; &lt;first record contents here>
+
+addr2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFW addr3
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; &lt;second record contents here>
+
+addr3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFW addr4
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; &lt;third record contents here></pre>
+etc.
+<p>If you want to be able to step back as well as forwards, it would normally
+be necessary to store both a forward and a backward pointer within each
+record. However, the novel system used on the Z88 allows forward and backwards
+steps while only necessitating the storage of one pointer in the block.
+You can't get something for nothing, and the price is that to step forward
+one needs not only the address of the current entry, but also that of the
+previous entry. This should not be a handicap as you will normally step
+through the linked list record by record, but it does mean that if you
+jump into the list without knowledge of an adjacent member, you are lost.
+<p>The way this is implemented is to store within each record the XOR of
+the forward and backward pointers. In the case of the first and last records,
+one of these pointers does not exist, it is assumed zero when calculating
+the XOR expression. For the Z88 the pointers are three byte extended addresses,
+although note that if the most significant byte is zero this will not be
+taken to mean that the address is local, but rather as referring to bank
+0 (ROM). A typical arrangement is as follows:
+<p><tt>; note DEFP stands for DEFINE POINTER (3 bytes long)</tt>
+<pre>addr(n)&nbsp;&nbsp;&nbsp;&nbsp; DEFP addr(n-1) XOR addr(n+1)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; nth record here
+
+addr(n+1)&nbsp;&nbsp; DEFP addr(n) XOR addr(n+2)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; n+1th record here
+
+addr(n+2)&nbsp;&nbsp; DEFP addr(n+1) XOR addr(n+3)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; n+2th record here</pre>
+Now if we want to step forward from addr(n+1), and assuming we know addr(n),
+then we can find addr(n+2) as follows:
+<p>addr(n+2) = (*addr(n+1)) XOR addr(n)
+<p>Where * denotes 'the contents of'. Stepping backwards is symmetrical,
+the advantage of using XOR rather than, say, addition. Thus only one 'fetch
+next entry' routine is needed and it can be used to move in either direction.
+<p>To delete entry (n+1) and link together entries (n) and (n+2), we can
+do:
+<p>*addr(n) = (*addr(n)) XOR addr(n+1) XOR addr(n+2) *addr(n+2) = (*addr(n+2))
+XOR addr(n+1) XOR addr(n)
+<p>which again display the attractive symmetry of the scheme. This is the
+algorithm used by <a href='gnxdl.html'>GN_Xdl</a>.
+<p>If we now wanted to put entry (n+1) back again, we would use the routine
+<a href='gnxin.html'>GN_Xin</a>, which will do:
+<p>*addr(n+1) = addr(n) XOR addr(n+2) *addr(n) = (*addr(n)) XOR addr(n+1)
+XOR addr(n+2) *addr(n+2) = (*addr(n+2)) XOR addr(n+1) XOR addr(n)
+<p>Although a good understanding of how the linked lists works is helpful,
+the system calls do most of the hard work for you. The calls provided are:
+<pre><a href='gnxin.html'>GN_Xin</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Insert an entry into a linked list. You pass this call the extended
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pointer of the entry to insert and the extended pointers of the
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; previous and next entry.
+
+<a href='gnxnx.html'>GN_Xnx</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Index adjacent entry in list. You pass this call the extended
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pointer of the current entry and either the previous entry (to step
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; forward) or of the next entry (to step back). It leaves the
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; registers set up so another step (in the same direction) can be
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; taken.
+
+<a href='gnxdl.html'>GN_Xdl</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Delete an entry. You pass the extended pointer of the current and
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; previous entry, and this routine updates the pointers and returns
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the extended pointer of the previous and next entries to the old
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; current entry, now deleted.
+</pre>
+
+<p>
+<hr WIDTH="100%">
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<td ALIGN=LEFT VALIGN=TOP WIDTH="33%"><a href="alarms.html">Previous</a></td>
+<td ALIGN=CENTER VALIGN=TOP WIDTH="34%"><a href="index.html">Contents</a></td>
+<td ALIGN=RIGHT VALIGN=TOP WIDTH="33%"><a href="serintfc.html">Next</a></td>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=TOP WIDTH="33%">Handling Alarms</td>
+<td ALIGN=CENTER VALIGN=TOP WIDTH="34%">Linked lists</td>
+<td ALIGN=RIGHT VALIGN=TOP WIDTH="33%">The Serial Interface</td>
+</tr>
+</table>
+
+</body>
+</html>

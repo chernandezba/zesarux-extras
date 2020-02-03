@@ -1,0 +1,328 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+
+ <tr>
+
+   <th colspan="3">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+
+<hr>
+<p><font size="4"><b>OS_Nq, enquire</b></font>
+</p>
+
+<p><tt>RST 20H, DEFB $66</tt> </p>
+
+<p>IN: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BC = enquiry code<br>&nbsp;&nbsp;&nbsp;&nbsp; ADEHLIX parameters</pre>
+
+<p>OUT if call succeeded: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp; Depends on BC and other arguments</pre>
+
+<p>Out if call failed: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp; A = return code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), incorrect reason code or parameters<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_UNK ($03), unknown request<br></pre>
+
+<p>Reasons are :</p>
+
+<pre><em>Window management</em><i><tt><br></tt></i><a href="#wbox"><tt>NQ_WBOX</tt></a><tt> ($8300), return window information</tt> <br><a href="#wcur"><tt>NQ_WCUR</tt></a><tt> ($8303), return cursort information</tt> <br><a href="#rds"><tt>NQ_RDS</tt></a><tt> ($8306), read text from the screen</tt> <br><i><br></i><em>Process Management</em><br><a href="#ain">NQ_Ain</a> ($8600), application enquiry (system use only)<i><br></i><a href="#Khn">NQ_Khn</a> ($8603), read keyboard handle (use ":INP" device instead)<br><a href="#Shn">NQ_Shn</a> ($8606), read screen handle (use ":SCR" device instead)<br><a href="#Phn">NQ_Phn</a> ($8609), read printer indirected handle<br><a href="#Nhn">NQ_Nhn</a> ($860C), read null handle (use ":NUL" device instead)<br><a href="#Wai">NQ_Wai</a> ($860F), Who am I? (system use only)<br><a href="#Com">NQ_Com</a> ($8612), read comms handle (use ":COM" device instead)<br><a href="#Ihn">NQ_Ihn</a> ($8615), read IN handle (use ":INP" device instead)<br><a href="#Ohn">NQ_Ohn</a> ($8618), read OUT handle (use ":OUT" device instead)<br><a href="#Rhn">NQ_Rhn</a> ($861B), read direct printer handle<br><i><br></i><em>Memory Management </em><br><a href="#Mfs">NQ_Mfs</a> ($8900), read free space information (system use only)<br><a href="#Slt">NQ_Slt</a> ($8903), read slot type information (system use only)<br><a href="#NQ_Mfp">NQ_Mfp</a> ($8906), get total of free RAM pages in slot (OZ 4.2 and newer)<br><br><em>Director and CLI </em><br><a href="#Dev">NQ_Dev</a> ($8C00), fetch current device<br><a href="#Dir">NQ_Dir</a> ($8C03), fetch current directory<br><a href="#Fnm">NQ_Fnm</a> ($8C06), fetch current filename match string<br><br><em>Director and CLI handles </em><br><a href="#Dmh">NQ_Dmh</a> ($8C09), fetch Director special memory handle (system use only)<br><a href="#Inp">NQ_Inp</a> ($8C0C), read std. input handle<br><a href="#Out">NQ_Out</a> ($8C0F), read std. output handle<br><a href="#Prt">NQ_Prt</a> ($8C12), read printer stream handle<br><a href="#Tin">NQ_Tin</a> ($8C15), read input-T handle<br><a href="#Tot">NQ_Tot</a> ($8C18), read output-T handle<br><a href="#Tpr">NQ_Tpr</a> ($8C1B), read printer-T stream handle<br><a href="#Chn">NQ_Chn</a> ($8C1E), read comms handle<br><i><br></i><em>Panel and Printer Editor values </em><br>Please refer to <a href="ossp.html">OS_Sp</a> for Panel and Printer Editor value parameter reason codes. </pre>
+
+<p>Notes: </p>
+
+<blockquote>
+  <p>This call may fail if called from segment 2.<br>
+
+  <br>
+
+  </p>
+
+</blockquote>
+
+<p>Related calls: </p>
+
+<blockquote>
+  <p><a href="dcsp.html">DC_Sp</a>, DC specify<br>
+
+  <a href="dcnq.html">DC_Nq</a>, DC enquire<br>
+
+  <a href="ossp.html">OS_Sp</a>, specify</p>
+
+</blockquote>
+
+<hr>
+<p>In the description of each reason code which follow, only
+successful calls are considered. In some cases it is possible
+that other error codes will be returned. With luck this should be
+clear from the context. <br>
+
+&nbsp; </p>
+
+<p><b>Window Management</b> </p>
+
+<p>The following enquiry calls are for fetching low level window
+information: </p>
+
+<p><a name="wbox"></a><i><tt>NQ_WBOX
+(BC = $8300), return window
+information</tt></i> </p>
+
+<p>IN: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = window ID (ASCII '1' - '8') or A = 0 for current window</pre>
+
+<p>OUT: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = window id (ASCII '1' to '8')<br>&nbsp;&nbsp;&nbsp;&nbsp; C = width<br>&nbsp;&nbsp;&nbsp;&nbsp; B = depth<br>&nbsp;&nbsp;&nbsp;&nbsp; E = offset from left of screen (always 0)<br>&nbsp;&nbsp;&nbsp;&nbsp; D = offset from top of screen (always 0)</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/.... different</pre>
+
+<p>Notes: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; D and E return 0 always, ie. offset of start of window relative to<br>&nbsp;&nbsp;&nbsp;&nbsp; start of window, not the screen.<br><br></pre>
+
+<p><a name="wcur"></a><i><tt>NQ_WCUR
+(BC = $8303), return cursort
+information</tt></i> </p>
+
+<p>IN: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = window ID (ASCII '1' - '8') or A = 0 for current window</pre>
+
+<p>OUT: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = window ID (ASCII '1' to '8')<br>&nbsp;&nbsp;&nbsp;&nbsp; C = x coordinate of cursor<br>&nbsp;&nbsp;&nbsp;&nbsp; B = y coordinate of cursor<br>&nbsp;&nbsp;&nbsp;&nbsp; D = bit 7 set if cursor is ON</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/.... different<br></pre>
+
+<p><a name="rds"></a><i><tt>NQ_RDS
+(BC = $8306), read text from
+the screen</tt></i> </p>
+
+<p>IN: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; DE = pointer to a buffer to store text<br>&nbsp;&nbsp;&nbsp;&nbsp; HL = number of bytes to read</pre>
+
+<p>OUT: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different<br></pre>
+
+<p>Notes: </p>
+
+<blockquote>
+  <p>This call reads text from the current window starting at the
+current cursor position. Screen locations which have not been written
+to are read as NUL (not as SPC) and all the screen locations return
+same value, ie. if the window width is 40 characters then 40 bytes will
+be returned for that line. If more than a whole line of characters is
+to be read then reading resumes at the start of the next line. The
+cursor position is not affected by this call, but if a ludicrously
+large value of HL is used then the screen may be affected.<br>
+
+  <br>
+
+  <br>
+
+  </p>
+
+</blockquote>
+
+<p><b>Process Management</b> </p>
+
+<p>The following codes use/return system handles: <br>
+
+&nbsp; </p>
+
+<p><a name="ain"></a><i>NQ_Ain
+($8600)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Application
+enquiry (system
+use only)<br>
+
+<br>
+
+</i>IN:&nbsp; IX = application handle from <a href="ospoll.html">OS_Poll</a></p>
+
+<p>OUT, if call successful: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp; BHL = pointer to application name (null-terminated)<br> BDE = pointer to application DOR<br>&nbsp;&nbsp;&nbsp;&nbsp; A = CLI-related attributes<br>&nbsp;&nbsp;&nbsp;&nbsp; C = preferred code letter.</pre>
+
+<p>OUT, if call failed: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp; A = RC_HAND</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/.... different<br></pre>
+
+<pre><i>NQ_</i><a name="Khn"><i>Khn</i></a><i> ($8603)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read keyboard handle (use ":INP" device instead)<br><br></i>IN:&nbsp; -<br>OUT: IX = keyboard handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br></pre>
+
+<pre><i>NQ_</i><a name="Shn"><i>Shn</i></a><i> ($8606)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read screen handle (use ":SCR" device instead)<br><br></i>IN:&nbsp; -<br>OUT: IX = screen handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br></pre>
+
+<pre><i>NQ_</i><a name="Phn"><i>Phn</i></a><i> ($8609)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read printer indirected handle<br><br></i>IN:&nbsp; -<br>OUT: IX = printer indirected handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br></pre>
+
+<pre><i>NQ_</i><a name="Nhn"><i>Nhn</i></a><i> ($860C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read null handle (use ":NUL" device instead)<br><br></i>IN:&nbsp; -<br>OUT: IX = null handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br></pre>
+
+<pre><i>NQ_</i><a name="Wai"><i>Wai</i></a><i> ($860F)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Who am I? (system use only)<br><br></i>IN:&nbsp; -</pre>
+
+<p><tt>OUT: IX = static process handle</tt> </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BC = dynamic process handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A...DEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .FBC..../IX.. different<br><br><br><br><i>NQ_</i><a name="Com"><i>Com</i></a><i> ($8612)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read comms handle (use ":COM" device instead)<br><br></i>IN:&nbsp; -<br>OUT: IX = comms handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br><br><i>NQ_</i><a name="Ihn"><i>Ihn</i></a><i> ($8615)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read IN handle (use ":INP" device instead)<br><br></i>IN:&nbsp; -<br>OUT: IX = IN handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br><br><i>NQ_</i><a name="Ohn"><i>Ohn</i></a><i> ($8618)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read OUT handle (use ":OUT" device instead)<br><br></i>IN:&nbsp; -<br>OUT: IX = OUT handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br><br><i>NQ_</i><a name="Rhn"><i>Rhn</i></a><i> ($861B)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read direct printer handle<br><br></i>IN:&nbsp; -<br>OUT: IX = printer direct handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br></pre>
+
+<p><b>Memory Management</b> </p>
+
+<pre><i>NQ_</i><a name="Mfs"><i>Mfs</i></a><i> ($8900), read free space information (system use only)<br><br></i>IN:&nbsp; -<br>OUT: ABC = free space info (A = MSB, C = LSB)</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/.... different<br><br><br><i>NQ_</i><a name="Slt"><i>Slt</i></a><i> ($8903), read slot type information (system use only)<br><br></i>IN:&nbsp; D = slot<br>&nbsp;&nbsp;&nbsp;&nbsp; E = bank<br><br>OUT: A = configuration (bank usage definition):&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BU_NOT = 0&nbsp;&nbsp;&nbsp;&nbsp; bank is empty<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BU_EPR = 1&nbsp;&nbsp;&nbsp;&nbsp; bank is EPROM<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BU_ROM = 2&nbsp;&nbsp;&nbsp;&nbsp; bank is ROM<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BU_WRK = 4&nbsp;&nbsp;&nbsp;&nbsp; work memory<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BU_FIX = 8&nbsp;&nbsp;&nbsp;&nbsp; fixed memory<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BU_RES = 16&nbsp;&nbsp;&nbsp; reserved memory<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BU_APL = 32&nbsp;&nbsp;&nbsp; bank is application RAM<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BU_FRE = 128&nbsp;&nbsp; bank is available RAM</pre>
+
+<pre>Registers changed after return: </pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different<br><br><br><br><a name="NQ_Mfp"></a>NQ_Mfp ($8906), Get total of free RAM pages in slot A <br><br>IN:<br> A = slot number (0 for internal)<br><br>OUT:<br> Fc = 0, it is a RAM device<br> A = total number of banks in Ram Card ($40 for 1MB)<br> DE = free pages (1 page = 256 bytes)<br><br> Fc = 1, it is not a RAM device<br> A = RC_ONF (Object not found)<br><br>Registers changed after return:<br> ..BC..HL/IXIY same<br> AF..DE../... different<br><br>This is a new system API call which was implemented in OZ 4.2. <br>Calling OS_Nq with BC = NQ_Mfp will return Fc = 1, A = RC_Unk in previous OZ releases.</pre>
+
+<p>&nbsp;</p>
+
+<p><b>Director and CLI</b> </p>
+
+<p>These enquiries return extended pointers of a null-terminated
+string in BHL: <br>
+
+&nbsp; </p>
+
+<pre>IN:&nbsp; -<br><br><i>NQ_</i><a name="Dev"><i>Dev</i></a><i> ($8C00)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fetch current device<br>NQ_</i><a name="Dir"><i>Dir</i></a><i> ($8C03)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fetch current directory<br>NQ_</i><a name="Fnm"><i>Fnm </i></a><i>($8C06)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fetch current filename match string</i></pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A..CDE../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .FB...HL/.... different<br><br></pre>
+
+<p><b>Director and CLI handles</b> </p>
+
+<p>The following calls return system handles in IX </p>
+
+<pre><i>NQ_</i><a name="Dmh"><i>Dmh</i></a><i> ($8C09)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fetch Director special memory handle (system use only)<br><br></i>IN:&nbsp; -<br>OUT: IX = memory handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br><br><i>NQ_</i><a name="Inp"><i>Inp</i></a><i> ($8C0C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read std. input handle<br><br></i>IN:&nbsp; -<br>OUT: IX = input stream handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br><br><i>NQ_</i><a name="Out"><i>Out</i></a><i> ($8C0F)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read std. output handle<br><br></i>IN:&nbsp; -<br>OUT: IX = output stream handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br><br><i>NQ_</i><a name="Prt"><i>Prt</i></a><i> ($8C12)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read printer stream handle<br><br></i>IN:&nbsp; -<br>OUT: IX = printer stream handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br><br><i>NQ_</i><a name="Tin"><i>Tin</i></a><i> ($8C15)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read input-T handle<br><br></i>IN:&nbsp; -<br>OUT: IX = input tee stream handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br><br><i>NQ_</i><a name="Tot"><i>Tot</i></a><i> ($8C18)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read output-T handle<br><br></i>IN:&nbsp; -<br>OUT: IX = output tee stream handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br><br><i>NQ_</i><a name="Tpr"><i>Tpr</i></a><i> ($8C1B)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read printer-T stream handle<br><br></i>IN:&nbsp; -<br>OUT: IX = printer tee stream handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br><br><i>NQ_</i><a name="Chn"><i>Chn</i></a><i> ($8C1E)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; read comms handle<br><br></i>IN:&nbsp; -<br>OUT: IX = printer comms handle</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../IX.. different<br><br></pre>
+
+<p><b>Panel and Printer Editor values</b> </p>
+
+<p>All the Panel and Printer Editor codes can be used to read
+values via OS_Nq in the following manner: </p>
+
+<p>IN: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BC = PA_xxx<br>&nbsp;&nbsp;&nbsp;&nbsp; A = number of bytes to read<br>&nbsp;&nbsp;&nbsp;&nbsp; DE = buffer for bytes to be read</pre>
+
+<p>OUT: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = number of bytes actually read<br></pre>
+
+<p>SI_SFT calls OS_NQ in an undocumented way for reading Panel
+settings. </p>
+
+<pre>In: A is not set before call.<br> DE is set to 2.<br><br>Out: Result is picked up in E or possibly DE for two-byte returns.<br></pre>
+
+<p>Please refer to <a href="ossp.html">OS_Sp</a>
+for Panel and
+Printer Editor value parameter reason codes. </p>
+
+</body>
+</html>

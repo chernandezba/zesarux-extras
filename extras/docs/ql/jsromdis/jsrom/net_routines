@@ -1,0 +1,212 @@
+
+*********************************************************
+*                                                       *
+*     NET_ROUTINES   net_routines                       *
+*                                                       *
+*********************************************************       
+        
+L05478 BTST    #$04,$00A0(A6)
+       BNE.S   L0549A
+       LEA     $00018020,A3
+       LEA     -$001E(A3),A2
+       MOVEQ   #$18,D0
+       JSR     L00420
+       NOP                 * !!! to conform asm - leave it out !!!
+       ORI.W   #$0700,SR
+       MOVEQ   #$00,D7
+       RTS
+
+L0549A ADDQ.W  #4,A7
+       MOVEQ   #-$01,D0
+       BRA     L055A8
+
+L054A2 MOVEM.L D4-D7,-(A7)
+       CLR.W   $001C(A0)
+       BSR.S   L05478
+L054AC MOVE.W  #$16E2,D4
+L054B0 MOVE.W  #$01B5,D0
+L054B4 BTST    D7,(A3)
+       BEQ.S   L054BE
+       DBF     D4,L054B0
+       BRA.S   L05532
+
+L054BE DBF     D0,L054B4
+       MOVE.W  #$0C34,D0
+L054C6 BTST    D7,(A3)
+       BNE.S   L054D0
+       DBF     D0,L054C6
+       BRA.S   L05532
+
+L054D0 MOVE.W  #$00DA,D0
+L054D4 DBF     D0,L054D4
+       LEA     $0020(A0),A1
+       MOVEQ   #$08,D1
+       BSR     L055B4
+       BLT.S   L054AC
+       SUB.B   -(A1),D3
+       CMP.B   (A1),D3
+       BNE.S   L054AC
+       SUBQ.W  #7,A1
+       MOVE.W  $0018(A0),D3
+       ROR.W   #8,D3
+       TST.B   D3
+       BEQ.S   L05500
+       CMP.B   $0019(A0),D3
+       BEQ.S   L05500
+       CMP.W   (A1),D3
+       BRA.S   L05504
+
+L05500 DC.L   $B6290000   * ½ CMP.B  $0000(A1),D3
+* !!! ABOVE INSERTED 'CAUSE ASM COMPILES SHORT (CORRECT) TO:
+* CMP.B  (A1),D3 - 2 BYTES LESS AND FASTER - CHANGE IT !!!
+L05504 BNE.S   L05532
+       MOVE.W  $0002(A1),D6
+       SUB.W   $001A(A0),D6
+       BNE.S   L05516
+       MOVE.L  $0004(A1),$001C(A0)
+
+L05516 BSR     L0563A
+       MOVE.B  $001D(A0),D1
+       BSR     L055B4
+       BNE.S   L05532
+       CMP.B   $001E(A0),D3
+       BNE.S   L05532
+       BSR     L0563A
+       TST.W   D6
+       BEQ.S   L05592
+L05532 CLR.W   $001C(A0)
+       BRA.S   L055A0
+
+L05538 MOVEM.L D4-D7,-(A7)
+       BSR     L05478
+       MOVE.B  $001D(A0),D1
+       MOVEQ   #$00,D3
+       LEA     $0020(A0),A1
+L0554A ADD.B   (A1)+,D3
+       SUBQ.B  #1,D1
+       BNE.S   L0554A
+       MOVE.B  D3,$001E(A0)
+       MOVEQ   #$07,D1
+       MOVEQ   #$00,D3
+       LEA     $0018(A0),A1
+L0555C ADD.B   (A1)+,D3
+       SUBQ.B  #1,D1
+       BNE.S   L0555C
+       MOVE.B  D3,(A1)
+       SUBQ.W  #7,A1
+       BSR     L055F2
+       BNE.S   L055A2
+       MOVEQ   #$08,D1
+       MOVEQ   #$01,D5
+L05570 BSR     L05648
+       MOVEQ   #$01,D1
+       LEA     $001F(A0),A1
+       BSR.S   L055B4
+       BEQ.S   L05586
+       TST.B   $0018(A0)
+       BNE.S   L055A0
+       MOVEQ   #$01,D3
+L05586 SUBQ.B  #1,D3
+       BNE.S   L055A0
+       MOVE.B  $001D(A0),D1
+       DBF     D5,L05570
+L05592 ADDQ.B  #1,$001A(A0)
+       BCC.S   L0559C
+       ADDQ.B  #1,$001B(A0)
+L0559C MOVEQ   #$00,D0
+       BRA.S   L055A2
+
+L055A0 MOVEQ   #-$01,D0
+L055A2 JSR     L00452
+       NOP                * !!! to conform asm - leave it out !!!
+L055A8 ANDI.W  #$F8FF,SR
+       MOVEM.L (A7)+,D4-D7
+       TST.L   D0
+       RTS
+
+L055B4 MOVE.W  #$018F,D0
+       MOVEQ   #$00,D3
+L055BA BTST    D7,(A3)
+       BEQ.S   L055C0
+       BRA.S   L055C6
+
+L055C0 DBF     D0,L055BA
+       BRA.S   L055EE
+
+L055C6 MOVEQ   #$46,D0
+L055C8 BTST    D7,(A3)
+       DBEQ    D4,L055C8
+       BNE.S   L055EE
+       MOVEQ   #$07,D4
+       MOVEQ   #$13,D0
+L055D4 ROR.B   D0,D7
+       MOVE.B  (A3),D0
+       ROXR.B  #1,D0
+       ROXR.B  #1,D2
+       MOVEQ   #$06,D0
+       DBF     D4,L055D4
+       MOVE.B  D2,(A1)+
+       ADD.B   D2,D3
+       SUBQ.B  #1,D1
+       BNE.S   L055C6
+L055EA MOVEQ   #$00,D0
+       RTS
+
+L055EE MOVEQ   #-$01,D0
+       RTS
+
+L055F2 MOVEQ   #$73,D0
+       MULU    $002E(A6),D0
+       MOVE.W  D0,$002E(A6)
+       EXT.W   D0
+       ADDI.W  #$0297,D0
+L05602 BTST    D7,(A3)
+       BNE.S   L055EE
+       DBF     D0,L05602
+       MOVE.B  $0019(A0),D4
+       NOT.B   D4
+       MOVE.B  $00A0(A6),D2
+       MOVEQ   #$09,D1
+L05616 LSL.B   #1,D4
+       ROL.B   #1,D2
+       ROXR.B  #1,D2
+       MOVE.B  D2,(A2)
+       BMI.S   L0562E
+       MOVEQ   #$05,D0
+L05622 BTST    D7,(A3)
+       BEQ.S   L05628
+       BRA.S   L055EE
+
+L05628 DBF     D0,L05622
+       BRA.S   L05634
+
+L0562E MOVEQ   #$10,D0
+L05630 DBF     D0,L05630
+L05634 DBF     D1,L05616
+L05638 BRA.S   L055EA
+
+L0563A TST.B   $0018(A0)
+       BEQ.S   L055EA
+       MOVEQ   #$01,D1
+       MOVE.W  #$FF01,D4
+       BRA.S   L0564C
+
+L05648 MOVEQ   #-$01,D4
+L0564A MOVE.B  (A1)+,D4
+L0564C LSL.W   #1,D4
+       ROL.W   #2,D4
+       MOVEQ   #$0C,D3
+       MOVE.B  $00A0(A6),D0
+L05656 ASR.W   #1,D4
+       ROL.B   #1,D0
+       ROXR.B  #1,D0
+       MOVEQ   #$00,D7
+       MOVE.B  D0,(A2)
+       SUBQ.W  #1,D3
+       BGE.S   L05656
+       SUBQ.B  #1,D1
+       BNE.S   L0564A
+       MOVE.B  $00A0(A6),(A2)
+       BRA.S   L05638
+
+****** END NET_ROUTINES net_routines

@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml">
+<HEAD>
+<TITLE>Entrevista con César Hernández Bañó, creador del emulador ZEsarUX - El Mundo del Spectrum</TITLE>
+
+
+</HEAD>
+<body>
+
+
+	<A href="http://elmundodelspectrum.com/contenido.php?id=1705&d=Entrevista-con-Cesar-Hernandez-Ba%F1o+-creador-del-emulador-ZEsarUX" class="titular">Entrevista con César Hernández Bañó, creador del emulador ZEsarUX</A>
+	<BR />
+	<P class="fechanoticia">JMV - lunes, 18 de septiembre de 2017</P><P align='center'><TABLE width='450' cellpadding='0' cellspacing='0' align='center' border='0'><TR><TD colspan='2'><A rel='lightbox' href='pix/201709/69bnd83e-4611-zoom.jpg'><IMG src='pix/201709/69bnd83e-4611.jpg' width='450' alt='' title='' border='0' /></A></TD></TR><TR><TD colspan='2' bgcolor='#1d5a8d'><IMG src='pix/magic.gif' width='2' height='4' border='0' /></TD></TR><TR><TD colspan='2' align='right'><A rel='lightbox' href='pix/201709/69bnd83e-4611-zoom.jpg'><IMG src='pix/ampliar.gif' width='90' height='19' border='0' /></A></TD></TR><TR><TD align='left' class='pequeno'></TD><TD align='right' class='pequeno'></TD></TR></TABLE></P><P class='cuerpodeltexto'>Con motivo de la elaboración del libro El Mundo del Spectrum + pudimos entrevistar a <B>César Hernández Bañó</B>, cuyo emulador <B>ZEsarUX </B>es de lo mejorcito que puedes usar hoy día para experimentar el ZX Spectrum en plataformas modernas. La entrevista está resumida en el libro pero contenía información muy valiosa. Son preguntas concretas respondidas extensamente y hemos querido que todo ello figure aquí publicado en su totalidad. <br />
+<br />
+Y por cierto, enviadle una felicitación a César, que hoy es su cumpleaños. ¡Felicidades y sobre todo gracias por colaborar con nosotros con tanta amabilidad! Un abrazo.<br />
+<br />
+</P><P align='center'><TABLE width='450' cellpadding='0' cellspacing='0' align='center' border='0'><TR><TD colspan='2'><A rel='lightbox' href='pix/201709/unnamed-4800-zoom.jpg'><IMG src='pix/201709/unnamed-4800.jpg' width='450' alt='' title='' border='0' /></A></TD></TR><TR><TD colspan='2' bgcolor='#1d5a8d'><IMG src='pix/magic.gif' width='2' height='4' border='0' /></TD></TR><TR><TD colspan='2' align='right'><A rel='lightbox' href='pix/201709/unnamed-4800-zoom.jpg'><IMG src='pix/ampliar.gif' width='90' height='19' border='0' /></A></TD></TR><TR><TD align='left' class='pequeno'></TD><TD align='right' class='pequeno'></TD></TR></TABLE></P><P class='cuerpodeltexto'><br />
+<B>¿Qué modelo de ZX Spectrum o clon te ha resultado más complicado a la hora de implementar en tu emulador?</B><br />
+<br />
+Como clon de Spectrum, sin lugar a dudas, el Prism, de Jeff Braine. Tiene muchos modos de video diferentes, creo que más que ningún otro clon, y además a medida que iba desarrollando la emulación del Prism, Jeff iba añadiendo nuevos modos o modificando alguna característica. <br />
+<br />
+Afortunadamente, él siempre ha documentado todo muy bien como funciona y respondido muy rápidamente a todas mis preguntas. <br />
+Aparte de los clones de Spectrum, el otro ordenador que me ha costado más emular, ha sido el QL. Sobretodo la emulación del teclado: es una máquina de la que hay poca documentación, hay una comunidad muy reducida de usuarios y cuesta entender cómo funciona. Me pasé muchas horas de pruebas y depuración de la ROM para saber cómo emular el teclado. <br />
+<br />
+<br />
+<B>¿Qué consideración le darías al Next? ¿Un clon, una versión mejorada del Spectrum, una evolución,...? </B><br />
+<br />
+No se si realmente hay alguna definición de lo que es un clon de spectrum, o lo que es una mejora. Seguramente la gente más purista no estará de acuerdo conmigo, pero para mí, creo que todos los clones de Spectrum que hay actualmente son todos mejoras sobre el spectrum. Todos incluyen modos de video adicionales, o aumento de RAM, o lectura de tarjetas SD... Incluso el just speccy, que funciona con un z80 real y parece más similar a un spectrum, incorpora tarjeta sd y ULAplus... Por lo que para mí, todos los clones son mejoras del Spectrum original, incluido el Next <br />
+<br />
+Ahora, aparte de la definición de lo que es un clon para mí, se podría decir que el Next (y otros clones, como el ZX-Uno, el Prism, o el Chloe) son una posible evolución de lo que podría haber sido el Spectrum si se hubiese seguido fabricando por ejemplo en los años 90 o siguientes. Incorporan mejoras lógicas de lo que podría haber sido ese nuevo spectrum: aumento de la RAM de los 128kb hasta 512kb, alternativa al sistema de carga de cinta mediante tarjeta sd, nuevos modos de vídeo y gestión de Sprites (recordemos que el commodore o el Msx ya tenían sprites en aquella época), o mejoras en el sonido, como sonido estéreo o uso de más de 1 chip AY. <br />
+<br />
+Recordemos además que los soviéticos nos han llevado siempre ventaja en cuanto a diseños de clones y mejoras sobre spectrum. Actualmente está el zxevo/pentevo que es bastante impresionante <br />
+<br />
+<br />
+<B>¿Qué dificultades ofrece la emulación del Spectrum Next tal y como está concebido? ¿Cómo se aborda la emulación de un ordenador como este y qué información necesitas?</B><br />
+<br />
+Creo que ahora mismo la única dificultad que puede ofrecer el Next es la emulación del chip de sonido Sid. No se si realmente luego lo quitaran del modelo final y si estará para cuando publiquéis el libro. Pero de momento la situación actual es que han agregado el chip Sid (el mismo que el Commodore 64) y es mucho más complejo que el chip de sonido AY del spectrum 128. Por lo que he podido leer y también me comentó Miguel Ángel del equipo del zxuno, fue diseñado en su momento por alguien con conocimientos sólidos sobre música e instrumentos, pues vio que los chips de sonido que habían en la época (como el AY) no eran lo suficientemente realistas. <br />
+Realmente no se si finalmente incluiré emulación de dicho chip, y tampoco no se como plantearlo, me gustaría hacer por mi mismo la emulación de ese chip, como la mayoría de partes de ZEsarUX, pero es muy complejo. Hay también una implementación open source de emulación ese chip (creo que se llama resid) pero le eché un vistazo al código y casi ocupa más que todo mi emulador!<br />
+Respecto a cómo me planteo la emulación del Next y otras máquinas que he emulado... Primero lo que necesito lógicamente es toda la documentación del funcionamiento de la máquina: cómo gestiona la memoria adicional, que posibles modos de vídeo extra tiene, qué puertos emplea, si tiene teclas adicionales de gestión, posibles añadidos al sistema de sonido... en definitiva, documentación de todo aquello que tiene adicional con respecto a un spectrum "estandard". <br />
+En la mayoría de los casos de los clones que he emulado, la documentación suele estar bastante completa. Empiezo mirando cómo funciona todo y luego contacto con el autor de la máquina para primero, indicarle que voy a emularla, y segundo, suelo hacer varias (o muchas ;)) preguntas sobre esa documentación,, sobre algunos puntos que no hayan quedado claros. <br />
+Generalmente como suelo empezar con la emulación de la gestión de memoria, en cuanto la RAM y la rom funcionan como deben hacerlo en el clon, ya puedo iniciar la máquina y es un momento bastante satisfactorio, pues tienes una base completamente funcional. Luego a partir de ahí viene la emulación de modos de vídeo adicional y otras características. <br />
+<br />
+Normalmente también sucede que al ir programando la emulación de dicha máquina y hacer  preguntas, su autor acaba completando y mejorando la documentación. En parte es lógico, pues la mayoría de esos clones solo ZEsarUX los emula y antes a nadie (o casi nadie) se le había ocurrido mirar por dentro exactamente cómo funcionan y podían haber algunos apartados en la documentación que necesitasen mejorarse. <br />
+Respecto al caso concreto de Next: descubrí la máquina, como la mayoría de nosotros, cuando publicaron un vídeo de un render de la máquina, presentado en una feria. Indagando, me di cuenta que ese Next estaba basado en una implementación FPGA creada por Víctor Trucco y Fabio Belavenuto, (el tbblue) que ya tenía algunos años (creo que dos) y se estaba vendiendo en pequeñas tiradas. <br />
+A partir de entonces, me puse en contacto con Víctor para que me proporcionase documentación: no había nada de documentación de la máquina, pese a que afirmaban que el Next iba a tener documentación y sería open source (como están haciendo ya) en aquel entonces no había nada publicado <br />
+Víctor fue muy atento desde el primer momento y me fue pasando información de cómo funcionaba el tbblue. Hubieron algunos problemas al principio de idioma (él es portugués y habla poco de inglés y menos de español y yo puedo hablar inglés pero el portugués poquito) , pero no fue nada que no se pudiese resolver abusando de google translate y repetir varios mails con preguntas. <br />
+Posteriormente a medida que iba avanzando la campaña del Next, yo he continuado teniendo documentación en exclusiva, antes que se publicase, de cómo funcionaba las nuevas características, como la gestión de Sprites. <br />
+<br />
+Al final todo se resume en tener documentación y echarle horas, muchas horas <br />
+<br />
+<br />
+<B>¿Cómo ves el trabajo que estás haciendo con tu emulador, qué te gustaría que pensara la gente de él con el tiempo? ¿Es un trabajo de preservación global del Spectrum?</B><br />
+<br />
+Bueno antes que nada, esto es un hobby para mí. Lo fue durante unos años primero con mi emulador ZXSpectr, escrito en assembler del 8088 y para msdos. Y sigue siendo un hobby ahora el ZEsarUX. Yo soy un nostálgico empedernido, usaba mi spectrum mucho más allá de su muerte comercial (hasta el 1998 creo que lo tuve conectado en mi escritorio) y sigo enamorado (tecnológicamente hablando) de él. Crecí con un zx81, aprendí a sumar siendo muy pequeño con mi padre usando esa máquina, y posteriormente llegaron un spectrum gomas, un QL, un Inves y un +2A. <br />
+Cuando me pongo a programar algo en ZEsarUX me proporciona mucha satisfacción. Hay alguna cosas que quizá son un poco más monótonas (como intentar adivinar cómo funciona el teclado del ql) y otras mucho más agradecidas y divertidas (como programar un algoritmo para buscar vidas infinitas en juegos). <br />
+Pero sobretodo hay ese componente nostálgico. <br />
+Además, tengo un montón de cosas pendientes que mejorar o agregar. Muchas son ideas mias, que me vienen a la mente en algún momento, las agrego a la lista y ahí se quedan hasta que pueda agregarlas. A veces son cosas que no tengo idea de cómo hacerlas, pero un buen dia me viene la inspiración y se me ocurre la manera de hacerlas. <br />
+Otras veces son nuevas características que alguien inventa, como por ejemplo el scroll por hardware del zxuno, o los sprites en el next, y lo acabo implementando en ZEsarUX. <br />
+Respondiendo más concretamente a tus preguntas: me gustaría que la gente con el tiempo recordase ZEsarUX como lo que es, o lo que intento que sea: un proyecto de emulación open source de spectrum, sus clones, máquinas de Clive Sinclair, y alguna otra máquina de los años 80 de 8 bits. También me gustaría hacer hincapié en que es un emulador gratuito y siempre lo continuará siendo, y que todo lo que agrego es decisión mía (aunque siempre hay gente que sugiere cosas y yo intento incorporarlas) y solo mía. <br />
+Respecto a la otra pregunta, si, se podría considerar un trabajo de preservación global de spectrum: Siendo código en C para compatibles Unix me asegura que se pueda seguir compilando y ejecutando en todas las máquinas basadas en ese sistema que salgan en un futuro (en Windows se usa mingw, que da una capa de compatibilidad Unix). Además, siendo open source garantiza que cualquiera podría reusar el código en un futuro, en el caso que yo dejase de mantener el código (cosa que espero que no suceda nunca). Poniendome un tanto nostálgico y previniendo el futuro, me gustaría un dia que, yo teniendo 60, o 70, o quizá más años, pudiese ejecutar ZEsarUX en el equipo que tenga en ese momento y poder cargar el chase hq, o el jet Pac, o el gunfright, o cualquiera de las glorias de spectrum, con su pitido de carga y sus colores en el border... y que después de cargarlo y jugarlo un rato me dijese a mi mismo: porque no agrego una cosa nueva al emulador, que se me acaba de ocurrir? ;)<br />
+El tiempo dirá...<br />
+<br />
+<br />
+<B>¿Qué mejoras querrías incorporar en el futuro?</B><br />
+<br />
+Muchísimas! Tengo un listado de cosas pendientes (el TO-DO) extensísimo. Podría enumerarte muchas, aunque las que más tengo en mente ahora mismo, y que espero que estén para cuando esté libro salga publicado, son:<br />
+<br />
+-mejorar la emulacion del ql. Al menos que soporte la lectura y escritura de microdrives y floppy. Actualmente solo se puede cargar bloques de bytes (código máquina) pero no se pueden cargar bloques de programas en Basic (superbasic se llama en el ql)<br />
+<br />
+-emular el mk14. Es la maquina anterior al Zx 80 que hizo sinclair. Tiene la dificultad añadida de que no usa un Z80 sino otro procesador, aunque éste es muy sencillo. <br />
+<br />
+-emular el Msx. De manera muy básica, de manera similar a como emulo el cpc, e irlo mejorando muy poco a poco. Al final mi prioridad son los Spectrum y clones, pero el Msx está basado en z80 y chip ay, por lo que no es muy complicado<br />
+<br />
+-mejorar el dibujado de pantalla en spectrum. No acaba de ser 100% exacto, y hay algunos programas y juegos que usan color en alta resolución (como nirvana, overscan, bifrost) que suelen tener algún defecto (o "glitch") en pantalla. Sé por qué sucede pero esa parte de la emulación he preferido tener una solución intermedia, que no es 100% real, pero usa mucha menos cpu del equipo físico de la que usaría si lo hago mejor<br />
+<br />
+-mejorar el dibujado de pantalla en zx80 y 81. Si el spectrum puede ser complicado en cuando a emulación de pantalla, el zx80 y sobretodo el 81 lo es mucho más. Todos los modos de vídeo de alta resolución son muy sensibles al timing de la máquina. Yo lo tengo corregido mediante algunos "parches" o parámetros configurables en ZEsarUX; no es lo ideal, pero en la mayoría de casos funciona<br />
+<br />
+-mejorar el dibujado de pantalla del amstrad. Ahora solo se emula de manera muy básica y hay muchos juegos que usan modos de vídeo no estándar y no se ven bien<br />
+<br />
+-y finalmente intentar emular todo aquello que vaya saliendo nuevo para los clones, sobretodo el zxuno y el Next. Cada vez que anuncian algo nuevo me echo a temblar por pensar como lo emularé! ;)<br />
+<br />
+<br />
+<br />
+
+
+</body>
+</html>

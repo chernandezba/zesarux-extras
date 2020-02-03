@@ -1,0 +1,177 @@
+<HTML>
+<HEAD>
+  <!-- Created by AOLpress/1.2 -->
+  <TITLE>Mk14 Memory Map</TITLE>
+</HEAD>
+<BODY>
+<P>
+  <HR>
+<BIG><BIG><BIG><BIG>Science of Cambridge MK14 Memory
+Map</BIG></BIG></BIG></BIG> 
+  <HR>
+Only the first 12 bits of the program counter are decoded
+<P>
+<TABLE BORDER="3" CELLSPACING="3" CELLPADDING="2">
+  <TR>
+    <TD>
+      000-1FF
+    </TD>
+    <TD>
+      512 byte SCIOS ROM
+    </TD>
+    <TD>
+      Decoded by 0xxx
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      200-3FF
+    </TD>
+    <TD>
+      ROM Shadow / Expansion RAM
+    </TD>
+    <TD>
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      400-5FF
+    </TD>
+    <TD>
+      ROM Shadow / Expansion RAM
+    </TD>
+    <TD>
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      600-7FF
+    </TD>
+    <TD>
+      ROM Shadow / Expansion RAM
+    </TD>
+    <TD>
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      800-87F
+    </TD>
+    <TD>
+      128 bytes I/O chip RAM
+    </TD>
+    <TD>
+      Decoded by 1xx0
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      880-8FF
+    </TD>
+    <TD>
+      I/O Ports
+    </TD>
+    <TD>
+      Decoded by 1xx0
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      900-9FF
+    </TD>
+    <TD>
+      Keyboard &amp; Display
+    </TD>
+    <TD>
+      Decoded by 1x01
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      A00-AFF
+    </TD>
+    <TD>
+      I/O Port &amp; RAM Shadow
+    </TD>
+    <TD>
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      B00-BFF
+    </TD>
+    <TD>
+      256 bytes RAM (Extended) / VDU RAM
+    </TD>
+    <TD>
+      Decoded by 1011
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      C00-CFF
+    </TD>
+    <TD>
+      I/O Port &amp; RAM Shadow
+    </TD>
+    <TD>
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      D00-DFF
+    </TD>
+    <TD>
+      Keyboard &amp; Display Shadow
+    </TD>
+    <TD>
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      E00-EFF
+    </TD>
+    <TD>
+      I/O Port &amp; RAM Shadow
+    </TD>
+    <TD>
+    </TD>
+  </TR>
+  <TR>
+    <TD>
+      F00-FFF
+    </TD>
+    <TD>
+      256 bytes RAM (Standard) / VDU RAM
+    </TD>
+    <TD>
+      Decoded by 1111
+    </TD>
+  </TR>
+</TABLE>
+<P>
+<B>Keyboard Decoding </B>
+<P>
+On a READ the switch levels are read onto the bus via IC11 into bits D4-D7
+<P>
+On a WRITE the bits D0-D7 are latched (sort of !) via IC9 and IC10 into the
+video display latches (D0=Segment A,D7 = Decimal Point)
+<P>
+On any Access the lower 4 address bits are latched into IC12. These are decoded
+by IC13, dragging the appropriate line low to light the segments selected
+via IC9 and IC10
+<P>
+IC11 is normally read as 1111xxxx - if a key is pressed when the corresponding
+line is pulled low via IC13 then bits will be read as zero - this indicates
+a key is being pressed.
+<P>
+<B>RAM Expansion</B>
+<P>
+It is a standard Sinclair design that the 3 ROM Shadows between 0200 and
+07FF can be replaced by RAM, giving a theoretical total of 1.5k (expansion)
+1/4k (extended) 1/8k (RAM I/O Chip) 1/4k (Standard)
+<P>
+  <HR>
+<A HREF="index-1.htm" tppabs="http://members.aol.com/mk14emu/index.htm">Go back</A> 
+  <HR>
+</BODY></HTML>

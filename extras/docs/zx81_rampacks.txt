@@ -1,0 +1,48 @@
+http://nocash.emubase.de/zxdocs.htm#zx80zx81memorymapandsystemarea
+
+Memory Overview
+RAM is originated at 4000h, for 1K RAM: at 4000h-43FFh; 48K: at 4000h-FFFFh, the area below 4000h is used only when more than 48K are installed.
+In the ZX world, memory accesses can be split into three categories: data read, data write, and opcode read. Opcode read is sensed by the CPUs /M1 signal, and behaves different than normal data read in case that A15 is HIGH, ie. for addresses in range from 8000h-FFFFh.
+
+  address     code  read  write
+  0000..1FFF  ROM   ROM   ---    ;all ZX81's
+  2000..3FFF  RAM4  RAM4  RAM4   ;ZX81 with 56K only
+  4000..7FFF  RAM1  RAM1  RAM1   ;ZX81 with 16K or more RAM
+  8000..BFFF  VRAM2 RAM2  RAM2   ;ZX81 with 32K or more RAM
+  C000..FFFF  VRAM1 RAM3  RAM3   ;ZX81 with 48K or more RAM (*)
+  (*) That, for the RAM3 part, VRAM1 is of course found in all ZX with 16K
+
+The memory region 8000h-FFFFh cannot be used to execute machine code programs; any opcodes in that region with Bit 6 cleared are treated as video output (and are executed as NOPs).
+Opcodes/video data at C000-FFFFh are read from memory at 4000h-7FFFh - the software should usually write video data into memory at 4000h-7FFF, and 'execute' the data in the mirrored region at C000-FFFF.
+
+1K RAM
+Default ZX81 includes only 1K RAM at 4000h-43FFh. However, the default RAM and ROM select signals are mirroring ROM across 0000h-3FFFh and 8000h-BFFFh, and RAM at 4000h-7FFFh and (including 'data read' accesses) at C000h-FFFFh.
+The ZX81 mainboard provides space for either two 1K x 4bit SRAM chips, or one 1K x 8bit SRAM chip (with L1 jumper closed).
+
+2K RAM
+The american 'ZX81' (Timex TS1000) appears to have been delivered with 2K internal memory. The socket for 1K x 8bit SRAM on the ZX81 mainboard may be used (by closing L2 jumper) for a 2K x 8bit SRAM chip.
+
+16K RAM
+Even though above described 1K RAM signals are providing memory space for up to 16K RAM, the Memotech expansions (not sure about Sinclair or other expansions) are supplying their own RAM and ROM select signals; ROM is then located at 0000-1FFF only, and RAM at 4000-7FFFh only, all other areas are unused, typically 'FFh filled'. Except that, video memory opcode reads (but not data reads) from C000h-FFFFh are mirrored to 4000h-7FFFh as usually.
+Timex TS1500 has been delivered with 16K built-in RAM.
+
+The 16K RAM configuration may be more or less treated as standard configuration - programmers should recurse that below expansions of 32K or more RAM haven't been very popular - thus any programs that require more than 16K memory won't work on most ZX computers.
+
+32K RAM
+RAM is located at 4000h-BFFFh, whereas the upper half may be used to store data and/or to 'execute' video code, but not for normal machine code program code.
+Note that the BIOS memory detection ends at 8000h, the BIOS will detect only a maximum of 16K RAM - and the stack pointer will be then initiated at 8000h. Thus, loading large cassette files will overwrite the stack. When using more than 16K RAM, the RAMTOP identifier in the system area must be changed manually by POKE instructions, and then applied by a NEW instruction (or by a short program that moves stack data and stack pointers to the new addresses).
+Care should be taken that video memory may not cross the 7FFFh/8000h boundary; Video data at 7FFFh is executed by addressing FFFFh, and thus the next address will be 0000h instead 8000h! Ie. video memory may be located in either one of the two 16K blocks, not in both.
+
+48K RAM
+RAM is located at 4000h-FFFFh, same restrictions as for 32K RAM apply. The memory at C000h-FFFFh can be used as data storage only, but not for machine code execution, and not for video data 'execution'.
+When patching the RAMTOP value use the maximum of FFFFh (indicating 48K minus one byte), as video memory must be below C000h, BASIC program code is restricted to less than 32K as well, BASIC variables may use the additional memory though.
+Some 16K expansions can be combined with 32K expansions to gain a total of 48K RAM.
+
+64K RAM
+Even though called "64K" expansions, most or all of these expansions do not seem to support bank switching which'd allow to switch RAM into the 8K BIOS ROM area at 0000h-1FFFh, so only 56K of RAM at 2000h-FFFFh can be used.
+As for 48K RAM, the highest RAMTOP value would be FFFFh, the 'RAMBASE' is fixed at 4000h, so that the additional memory at 2000h-3FFFh cannot be used by the BIOS/BASIC interpreter.
+
+
+
+
+Note: Poke 16389,255  and NEW to enable 32kb to basic

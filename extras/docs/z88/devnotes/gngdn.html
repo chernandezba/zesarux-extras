@@ -1,0 +1,78 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Gdn, convert an ASCII string
+to a binary integer number</font></b>
+<p><tt>RST 20H, DEFW $1009</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; HL = local source pointer
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HL = 0, read from stream IX handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HL = 1, read from filter IX handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; HL = 2, not allowed
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; > 255, read string at (HL)
+&nbsp;&nbsp;&nbsp;&nbsp; DE = destination pointer.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DE = 0, 1 not allowed
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DE = 2, return integer in BC (converted to 16bit
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; range)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; > 255, store integer at (DE). (DE) = least
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; significant byte, (DE+3)= most significant byte.
+
+&nbsp;&nbsp;&nbsp;&nbsp; B = maximum number of characters to be read
+&nbsp;&nbsp;&nbsp;&nbsp; IX = source handle (if HL = 0,1)
+</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; Fz = 1, conversion recognised a number
+&nbsp;&nbsp;&nbsp;&nbsp; A = character which stopped conversion
+&nbsp;&nbsp;&nbsp;&nbsp; HL, if HL(in) &lt; 2, indexes conversion terminator
+&nbsp;&nbsp;&nbsp;&nbsp; HL, if HL(in) > 255, then points to conversion terminator.
+&nbsp;&nbsp;&nbsp;&nbsp; BC = result, if DE(in) = 2
+
+</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_OVF ($0B), overflow, result invalid
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_EOF ($09), reading an empty stream or filter
+</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ...DE../IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFB..HL/.... different
+</pre>
+Notes:
+<blockquote>Parsing will stop at the first non-decimal digit. If the source
+text was numeric by not supplied with a terminator, the routine will set
+Fz = 1 and exit with A=0 and Fc = 0.</blockquote>
+Bugs:
+<blockquote>This call will fail if the source or destination pointers are
+in segment 2.<br>
+<BR></blockquote>
+Related calls:
+<blockquote><a href='gnd16.html'>GN_D16</a>, 16bit unsigned division
+<br><a href='gnm16.html'>GN_M16</a>, 16bit unsigned multiplication
+<br><a href='gnd24.html'>GN_D24</a>, 24bit unsigned division
+<br><a href='gnm24.html'>GN_M24</a>, 24bit unsigned multiplication
+<br><a href='gnpdn.html'>GN_Pdn</a>, write number as decimal ASCII string</blockquote>
+
+</body>
+</html>

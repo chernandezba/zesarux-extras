@@ -1,0 +1,70 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Sip, system input line routine</font></b>
+<p><tt>RST 20H, DEFW $3909</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; DE = buffer for input string
+
+&nbsp;&nbsp;&nbsp;&nbsp; A0 = 1, buffer already contains data to be edited
+&nbsp;&nbsp;&nbsp;&nbsp; A1 = 1, force insert/overwrite mode (see A2)
+&nbsp;&nbsp;&nbsp;&nbsp; A2 = 1, 0 = insert mode, 1 = overwrite mode (ignored if A1 = 0)
+&nbsp;&nbsp;&nbsp;&nbsp; A3 = 1, return special characters, else ignore
+&nbsp;&nbsp;&nbsp;&nbsp; A4 = 1, return if wrap occurs
+&nbsp;&nbsp;&nbsp;&nbsp; A5 = 1, single line lock control
+&nbsp;&nbsp;&nbsp;&nbsp; A6 = 1, display in reverse video
+&nbsp;&nbsp;&nbsp;&nbsp; A7 = 1, if A3 = 1, allow for insert/overwrite return
+
+&nbsp;&nbsp;&nbsp;&nbsp; B = length of buffer
+&nbsp;&nbsp;&nbsp;&nbsp; C = cursor position, if A0 = 1 (set C = B if C > B)
+&nbsp;&nbsp;&nbsp;&nbsp; L = width of line, if A5 = 1 (incl. null-terminator)</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; B = length of line entered, including terminating null
+&nbsp;&nbsp;&nbsp;&nbsp; C = cursor position on exit
+&nbsp;&nbsp;&nbsp;&nbsp; A = character which caused end of input</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad arguments
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_WRAP ($0D), wrapping has occurred (only if A4 = 1)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_SUSP ($69), suspicion of suspension
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_DRAW ($66), application screen needs redrawing
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_QUIT ($67), kill request (e.g. from INDEX)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ESC ($01), if escape detection is enabled</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ....DEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBC..../.... different
+</pre>
+Notes:
+<p>Bugs:
+<blockquote>Crashes OZ while in a popdown and an error handler is installed
+in segment 2, when the popdown is pre-empted (with RC_QUIT) during the GN_Sip call.<br>
+<BR></blockquote>
+Related calls:
+<p><a href='osin.html'>OS_In</a>, read (wait for) character from standard input
+<br><a href='ospur.html'>OS_Pur</a>, purge keyboard buffer
+<br><a href='ostin.html'>OS_Tin</a>, read character from standard input, with timeout
+<br><a href='osxin.html'>OS_Xin</a>, examine input
+</body>
+</html>

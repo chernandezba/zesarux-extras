@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+
+<b><font size="+1">OS_Mal, allocate memory</font></b>
+</p>
+<p><tt>RST 20H, DEFB $54</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = 0, always<br>&nbsp;&nbsp;&nbsp;&nbsp; BC = requested size of reserved memory in bytes (2 to 256)<br>&nbsp;&nbsp;&nbsp;&nbsp; IX = memory handle (returned from <a href="osmop.html">OS_Mop</a>)</pre>
+
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp; HL = address of memory allocated (H14 &amp; H15 are memory are memory<br>&nbsp;&nbsp;&nbsp;&nbsp; mask)<br>&nbsp;&nbsp;&nbsp;&nbsp; B = bank number of allocated memory<br>&nbsp;&nbsp;&nbsp;&nbsp; C = segment specifier implied by HL (H14 &amp; H15)</pre>
+
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp; A = error code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), IX is not a valid memory handle<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ROOM ($07), no room to allocate block in MEMORY POOL<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ERR ($0F), if BC &gt; 256 bytes, fatal error</pre>
+
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ....DE../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AFBC..HL/.... different<br></pre>
+
+Notes:
+<blockquote>Remember "No Room" means the pool is exhausted, and not the
+whole of memory. If a subsequent <a href="osmop.html">OS_Mop</a> cannot allocate a pool, then memory
+is definitively exhausted.<br>
+
+  <br>
+
+The call WILL NOT automatically bind in the allocated memory into the Z80
+address space.<br>
+
+  <br>
+</blockquote>
+
+Bugs:
+<br>
+&nbsp;
+<p>Related calls:
+</p>
+<blockquote><a href="osbix.html">OS_Bix</a>, Bind in extended address
+  <br>
+
+  <a href="osbox.html">OS_Box</a>, restore bindings after <a href="osbix.html">OS_Bix</a>
+  <br>
+
+  <a href="osfc.html">OS_Fc</a>, select fast code (fast bank switching)
+  <br>
+
+  <a href="file:///H:/SVN/documentation/devnotes/osmal.html"></a><a href="osmcl.html">OS_Mcl</a>, close memory (free memory pool)
+  <br>
+
+  <a href="osmfr.html">OS_Mfr</a>, free (previously allocated block) memory
+  <br>
+
+  <a href="osmgb.html">OS_Mgb</a>, get current bank binding in segment
+  <br>
+
+  <a href="osmop.html">OS_Mop</a>, open memory (allocate memory pool)
+  <br>
+
+  <a href="osmpb.html">OS_Mpb</a>, set new bank binding in segment<br>
+
+  <a href="ozmgb.html">OZ_Mgb</a>, get current bank binding in segment<br>
+
+  <a href="ozmpb.html">OZ_Mpb</a>, set new bank binding in segment</blockquote>
+</body>
+</html>

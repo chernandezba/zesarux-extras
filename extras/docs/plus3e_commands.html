@@ -1,0 +1,409 @@
+<html>
+<head>
+<title>+3e Commands</title>
+</head>
+<body bgcolor="#F0F0FF" text="#000000">
+<h1 align=center>+3e Commands</h1>
+<p>All of the features provided with the +3e can be accessed using
+new commands added into +3 BASIC. The current commands are listed
+below:</p>
+<dl>
+<dt>Low-level commands</dt>
+<dd><ul>
+<li><a href="#formatto">FORMAT TO</a></li>
+</ul></dd>
+<dt>Partition management</dt>
+<dd><ul>
+<li><a href="#cattab">CAT TAB</a></li>
+<li><a href="#newdata">NEW DATA</a></li>
+<li><a href="#newexp">NEW EXP</a></li>
+<li><a href="#movebin">MOVE...BIN</a></li>
+<li><a href="#movefor">MOVE...FOR</a></li>
+</ul></dd>
+<dt>Drive mapping</dt>
+<dd><ul>
+<li><a href="#catasn">CAT ASN</a></li>
+<li><a href="#movein">MOVE...IN</a></li>
+<li><a href="#moveout">MOVE...OUT</a></li>
+<li><a href="#vermerge">LOAD/SAVE/VERIFY/MERGE d$</a></li>
+</ul></dd>
+<dt>Streams and channels</dt>
+<dd><ul>
+<li><a href="#opench">OPEN #</a></li>
+<li><a href="#closech">CLOSE #</a></li>
+<li><a href="#returnch">RETURN #</a></li>
+<li><a href="#gotoch">GOTO #</a></li>
+<li><a href="#dimch">DIM #</a></li>
+<li><a href="#nextch">NEXT #</a></li>
+</ul></dd>
+<dt>Miscellaneous commands</dt>
+<dd><ul>
+<li><a href="#specsnap">SPECTRUM f$</a></li>
+<li><a href="#specink">SPECTRUM INK</a></li>
+<li><a href="#specpaper">SPECTRUM PAPER</a></li>
+<li><a href="#specbright">SPECTRUM BRIGHT</a></li>
+<li><a href="#specflash">SPECTRUM FLASH</a></li>
+<li><a href="#specattr">SPECTRUM ATTR</a></li>
+</ul></dd>
+</dl>
+<p>Note that all "permanent" settings stored on your hard disk can be
+bypassed by holding down the CAPS SHIFT key when switching on the +3e.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="formatto"><h2>FORMAT TO 
+<em>unit,maxpart#[,cyls]</em></h2></a>
+<p>Use this command to format your hard disk so that it can be used by the
++3e. Once you have done this, you can use the <strong><a
+href="#newdata">NEW</a></strong>
+commands to create some partitions. The command requires the following
+parameters:</p>
+<dl>
+<dt>unit</dt>
+<dd>The hard disk unit to format; this is 0 for the master drive, and 1
+for the slave drive.</dd>
+<dt>maxpart#</dt>
+<dd>The maximum partition number (0-65535). This limits the number of
+partitions you will be able to create. Choose carefully, since too few
+partitions and you won't be able to easily manage your hard disk;
+too many will slow down certain commands. It's probably sensible to work
+out how many partitions you can fit on your disk (16Mb is the maximum
+partition size) and double this number.</dd>
+<dt>cyls</dt>
+<dd>An optional parameter limiting the number of cylinders to use. If
+this option is specified, then the first sector will not be overwritten,
+allowing the disk to be shared between IDEDOS and PC partitions (or with
+FATware if you are using a divIDE interface). See the
+<a href="sharingdisks.html">disk sharing</a> section for details.</dd>
+</dl>
+<h3>Examples</h3>
+<p><strong>FORMAT TO 0,15</strong></p>
+<p>Formats the master drive with a maximum partition
+number of 15, for exclusive use by the +3e.</p>
+<p><strong>FORMAT TO 1,31,300</strong></p>
+<p>Formats the slave drive with a maximum partition
+number of 31, using only cylinders 0-299. This disk can be shared with
+PC/Mac/Linux machines, or with FATware on the divIDE interface.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="cattab"><h2>CAT <em>[#stream]</em> TAB <em>[EXP]</em></h2></a>
+<p>This command displays a listing of the drives attached to your +3e
+(together with the number of cylinders, heads and sectors). If the
+hard disk(s) have been formatted by the +3e, this will also show a list
+of all the partitions on the drive.
+As with the +3's standard <strong>CAT</strong>
+command, you can send the catalog to any stream (eg #3 for the
+printer). If a drive letter is shown next to a partition, this
+indicates that it has a permanent assignment, and the partition will
+be assigned to this letter automatically on boot.</p>
+<p>By specifying the optional <strong>EXP</strong> keyword, you can get an
+expanded catalog, showing the starting and ending positions of each
+partitions (this is not usually useful, however!).</p>
+<h3>Examples</h3>
+<p><strong>CAT TAB</strong></p>
+<p>Displays a listing of the partitions on your hard disks.</p>
+<p><strong>CAT #3 TAB EXP</strong></p>
+<p>Sends an expanded listing of the partitions on your hard disks to
+stream 3.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="newdata"><h2>NEW DATA <em>part$,size</em></h2></a>
+<p>Creates a new partition ready for +3DOS to use. It requires the
+following parameters:</p>
+<dl>
+<dt>part$</dt>
+<dd>The name of the partition you want to create. Names are <em>not</em>
+case-sensitive, and can be up to 16 characters in length. You can include
+"0>" or "1>" immediately before the name to specify whether the partition
+should be created on the master (0) or slave (1) drive; if this is
+missing, the master drive is assumed.</dd>
+<dt>size</dt>
+<dd>The required size of the partition in megabytes, or Mb (1-16).</dd>
+</dl>
+<h3>Examples</h3>
+<p><strong>NEW DATA "0>Games",16</strong></p>
+<p><strong>NEW DATA "My Documents",16</strong></p>
+<p>Creates two 16Mb partitions on the master drive, called
+<em>Games</em> and <em>My Documents</em>.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="newexp"><h2>NEW EXP <em>part$,size</em></h2></a>
+<p>Creates a new swap partition. Swap partitions are available for the 
++3e system and application programs to use as an extension to normal
+memory; they <em>cannot</em> be used for storing files or data. It is
+recommended that you create two swap partitions on your
+master drive, both of around 1-4Mb in size.</p>
+<p>Parameters are identical to those used in the <a href="#newdata">NEW
+DATA</a> command.</p>
+<h3>Example</h3>
+<p><strong>NEW EXP "swap1",4</strong></p>
+<p>Creates a 4Mb swap partition on the master drive.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="movebin"><h2>MOVE <em>part$</em> BIN</h2></a>
+<p>Deletes the partition specified by <em>part$</em>. Doing this will
+destroy all files that were stored on the partition!</p>
+<h3>Example</h3>
+<p><strong>MOVE "Utilities" BIN</strong></p>
+<p>Deletes the partition named "Utilities" from the master drive.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="movefor"><h2>MOVE <em>part$</em> FOR <em>name$</em></h2></a>
+<p>Renames the partition specified by <em>part$</em> as <em>name$</em>.
+Note that the new name should <em>not</em> include a drive unit number,
+otherwise this will be included as part of the name.</p>
+<h3>Example</h3>
+<p><strong>MOVE "1>Utilities" FOR "Utils"</strong></p>
+<p>Renames the partition named "Utilities" on the slave drive to
+"Utils".</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="catasn"><h2>CAT <em>[#stream]</em> ASN </h2></a>
+<p>This command displays a listing of your current drive mappings. The
+display shows the drive letter followed by the partition currently
+mapped (using 0> to denote the master drive, and 1> to denote the slave
+drive). Floppy drives and the RAMdisk are also shown; these are devices
+numbered 2> (internal floppy), 3> (external floppy) and 4> (RAMdisk).</p>
+<p>As with the +3's standard <strong>CAT</strong>
+command, you can send the catalog to any stream (eg #3 for the
+printer).</p>
+<h3>Examples</h3>
+<p><strong>CAT ASN</strong></p>
+<p>Displays a listing of your current drive mappings.</p>
+<p><strong>CAT #3 ASN</strong></p>
+<p>Sends a listing of your current drive mappings to stream 3.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="movein"><h2>MOVE <em>drive$</em> IN <em>part$</em> 
+<em>[ASN]</em></h2></a>
+<p>With this command, you <em>map</em> a drive letter to any (data)
+partition on your hard disk. You can then access the new "drive" in the
+same way you would with any other drive.</p>
+<p>You can use any drive letter, A-P, provided it is not already in use,
+and each partition can only be mapped to one drive letter at a time. One
+final limitation in the current release of the ROMs, is that only
+two partitions can be mapped at any one time.</p>
+<p>It is also possible to map the internal and external floppy drives, and
+the RAMdisk to any drive letter (provided you have unmapped them
+from A:/B:/M: with the <a href="#moveout">MOVE...OUT</a> command first).
+To do this, just use the physical device code instead of a partition
+name. These codes are as follows:</p>
+<dl>
+<dt><strong>2></strong>
+<dd>Internal floppy drive</dd>
+<dt><strong>3></strong>
+<dd>External floppy drive (if you have only an internal drive, you can
+still use this device number, and will be asked to change disks as
+necessary)</dd>
+<dt><strong>4></strong>
+<dd>RAMdisk (note that some applications expect to find a drive M:, so if
+moving the RAMdisk to a different drive it is advisable to map a hard disk
+partition to drive M:)</dd>
+</dl>
+<p>Finally, by using the <em>ASN</em> option, you can make this assignment
+permanent (ie, it will automatically be set up every time you turn the +3e
+on). This is only effective if you have a hard disk.</p>
+<h3>Examples</h3>
+<p><strong>MOVE "C:" IN "Games"</strong></p>
+<p>Maps drive C: to the partition named "Games" on the master drive.
+It is now possible to use drive C: in +3 BASIC commands, such as 
+<strong>COPY "A:*.*" TO "C:"</strong> and <strong>CAT "C:"</strong></p>
+<p><strong>MOVE "D:" IN "4>" ASN</strong></p>
+<p>Maps drive D: to the RAMdisk, and makes this assignment permanent.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="moveout"><h2>MOVE <em>drive$</em> OUT <em>[ASN]</em></h2></a>
+<p>Removes the current mapping from the drive specified, leaving the drive
+letter free to be assigned to any other partition. It is also possible to
+unmap drives A:, B: and M: in this way, so that you can map them to a hard
+disk partition with the <a href="#movein">MOVE...IN</a> command. The
+physical floppy drives and RAMdisk can be reassigned to other drive
+letters if you wish.</p>
+<p>By specifying the <em>ASN</em> option, you can remove any permanent
+assignment for this drive letter, so that it is no longer automatically
+set up when you turn the +3e on.</p>
+<h3>Examples</h3>
+<p><strong>MOVE "C:" OUT</strong></p>
+<p>Removes the previous mapping from drive C:, which can now be mapped to
+a different partition if required.</p>
+<p><strong>MOVE "B:" OUT ASN</strong></p>
+<p>Unmaps drive B:, and ensures that nothing will be mapped to this letter
+next time you switch the +3e on.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="vermerge"><h2>LOAD <em>drive$</em> <em>[ASN]</em></h2></a>
+<h2>SAVE <em>drive$</em> <em>[ASN]</em></h2>
+<h2>VERIFY <em>drive$</em> <em>[ASN]</em></h2>
+<h2>MERGE <em>drive$</em> <em>[ASN]</em></h2>
+<p>These commands can now be used with the <strong>ASN</strong> option,
+which specifies that the new default drive assignment should be made
+permanent (ie, it will be set every time the +3e is switched on). This is
+only effective if you have a hard disk.</p>
+<p>Additionally, <strong>VERIFY</strong> and <strong>MERGE</strong> now
+work in the same way as the <strong>LOAD drive$</strong> command, so that
+they set the current default (load) drive for +3 BASIC.</p>
+<h3>Examples</h3>
+<p><strong>VERIFY "C:"</strong></p>
+<p>Sets the current default drive to C.</p>
+<p><strong>LOAD "E:" ASN</strong></p>
+<p>Sets the current default drive to E, and makes this assignment
+permanent.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="opench"><h2>OPEN #<em>n</em>, <em>f$</em></h2></a>
+<p>The streams and channels system of the +3e has been extended, and it is
+now possible to open streams to channels other than the three standard ones.
+The stream number <em>n</em> should be between 0 and 15; altering streams
+0-3 will change the behaviour of the system and should be used with care.
+For further details, please see the <a href="channels.html">extended channels
+</a> documentation, which also contains a demo of the window channels.</p>
+<p>The channel name <em>f$</em> can be any of the following (capitals or
+lower-case letters may be used):</p>
+<dl>
+<dt><strong>"K"</strong></dt>
+<dd>The standard input channel (keyboard and lower screen). Streams 0 & 1 are
+normally set to this channel.</dd>
+<dt><strong>"S"</strong></dt>
+<dd>The standard output channel (main screen). Stream 2 is
+normally set to this channel.</dd>
+<dt><strong>"P"</strong></dt>
+<dd>The standard printer channel (serial or parallel). Stream 3 is
+normally set to this channel.</dd>
+<dt><strong>"I><em>filename</em>"</strong></dt>
+<dd>This opens an input-only stream to an existing +3e file. If the filename
+is at least two characters long, you can omit the "I>" as this will be assumed
+(single-character names require the "I>" as otherwise they will be assumed to
+be standard channel names).</dd>
+<dt><strong>"O><em>filename</em>"</strong></dt>
+<dd>This creates a new +3e file and opens an output-only stream to it.</dd>
+<dt><strong>"U><em>filename</em>"</strong></dt>
+<dd>This opens an existing +3e file and opens an input/output-stream to it.</dd>
+<dt><strong>"M><em>address, len</em>"</strong></dt>
+<dd>This opens an input/output channel to the memory area at <em>address</em>,
+length <em>len</em>.</dd>
+<dt><strong>"V><em>x$</em>"</strong></dt>
+<dd>This opens an input/output channel to the variable <em>x$</em> which must
+be a character array with a single dimension, large enough to hold everything
+that will be output to it/input from it.</dd>
+<dt><strong>"W><em>line, col, ht, wid [, csize [, cset] ]</em>"</strong></dt>
+<dd>This opens an output-only channel to a text window on the screen, starting
+at character position (<em>line,col</em>), with a height of <em>ht</em>
+character rows and a width of <em>wid</em> characters. Optionally, a character
+size (<em>csize</em>) may be specified (3-8); this does not affect the
+definition details of the window, which are always specified in 8-bit wide
+characters. A user-supplied character set may also be specified, loaded at
+address <em>cset</em>.</dd>
+</dl>
+<p>Once a stream is opened, it can be used with the standard <strong>INPUT #
+</strong> and <strong>PRINT #</strong> commands, as well as the additional
+stream commands below.</p>
+<p><strong>NB:</strong> The <strong>INPUT #</strong> command currently does not
+work properly with file channels. However, you can simulate this command using
+the new <strong>NEXT #</strong> command below.</p>
+<h3>Examples</h3>
+<p><strong>OPEN #4,"o>a:test.txt"</strong></p>
+<p>Creates a file named <em>test.txt</em> on drive A: and opens an output-only
+channel to it, connected to stream 4.</p>
+<p><strong>OPEN #5,"stuff"</strong></p>
+<p>Opens an existing  file named <em>stuff</em> on the default drive and
+opens an input-only channel to it, connected to stream 5.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="closech"><h2>CLOSE #<em>n</em></h2></a>
+<p>Closes the channel attached to stream <em>n</em>. If <em>n</em> is 0-3, then
+the default channel for that stream is re-attached to it. Note that the bug in
+the standard Spectrum has been corrected, and it is now safe to "close" streams
+that are already closed.</p>
+<h3>Examples</h3>
+<p><strong>CLOSE #4</strong></p>
+<p>Closes the channel attached to stream 4.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="returnch"><h2>RETURN #<em>n</em>, <em>var</em></h2></a>
+<p>This command returns the current position of stream <em>n</em> and
+stores it in variable <em>var</em>. This is not supported on standard
+channels, which will fail with an invalid I/O device error.</p>
+<h3>Examples</h3>
+<p><strong>RETURN #4,fpos</strong></p>
+<p>Stores the current fileposition for stream 4 into the variable <em>fpos</em>
+.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="dimch"><h2>DIM #<em>n</em>, <em>var</em></h2></a>
+<p>This command returns the extent (or size) of stream <em>n</em> and
+stores it in variable <em>var</em>. This is not supported on standard
+channels, which will fail with an invalid I/O device error.</p>
+<p>Note that on the +3e, filesizes are always a multiple of 128 bytes.</p>
+<h3>Examples</h3>
+<p><strong>DIM #4,fsize</strong></p>
+<p>Stores the size of the file attached to stream 4 into the variable
+<em>fsize</em>.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="gotoch"><h2>GOTO #<em>n</em>, <em>m</em></h2></a>
+<p>This command sets the current position of stream <em>n</em> to <em>m</em>.
+This is not supported on standard
+channels, which will fail with an invalid I/O device error.</p>
+<h3>Examples</h3>
+<p><strong>GOTO #4,fpos</strong></p>
+<p>Sets the current fileposition for stream 4 to <em>fpos</em>.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="nextch"><h2>NEXT #<em>n</em>, <em>var</em></h2></a>
+<p>This command gets the next character of input from stream <em>n</em> and
+stores it in the variable <em>var</em>. If used on the standard "K" channel,
+this is similar to the <strong>INKEY$</strong> function, except that it
+always waits for the next character to become available (ie on the "K" channel,
+it waits for a keypress).</p>
+<p>You can use this command to simulate the <strong>INPUT #</strong> command
+for file channels.</p>
+<h3>Examples</h3>
+<p><strong>NEXT #0, x</strong></p>
+<p>Waits for the next character of input from stream 0 and stores it in
+variable <em>x</em>.</p>
+<pre><strong>
+  9000 LET a$=""
+  9010 NEXT #5,c
+  9020 IF c=13 THEN RETURN
+  9030 LET a$=a$+CHR$ c
+  9040 GO TO 9010
+</strong></pre>
+<p>The above subroutine inputs a string from stream 5 and returns it in <em>a$
+</em>.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="specsnap"><h2>SPECTRUM <em>f$</em></h2></a>
+<p>This command loads a snapshot file in the popular .Z80 or .SNA format and runs it.
+Both 48K and 128K snapshots are supported. A small amount of the screen will be
+corrupted by the snapshot loading process - this is normal, and should not cause
+a problem unless the snapshot has code in the screen area.</p>
+<p>Note that snapshot loading is only supported from hard disks/compactflash
+cards, not floppy disks. If you are using the +3e ROMs on a floppy-only
+system, you should instead use the snapshot loading programs on the
+<a href="software.html">software</a> page.</p>
+<h3>Examples</h3>
+<p><strong>SPECTRUM "trapdoor.z80"</strong></p>
+<p>Loads the "trapdoor.z80" snapshot from the default drive.</p>
+<p><strong>SPECTRUM "c:bounder.sna"</strong></p>
+<p>Loads the "bounder.sna" snapshot from drive C:.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="specink"><h2>SPECTRUM INK <em>i</em> <em>[ASN]</em></h2></a>
+<a name="specpaper"><h2>SPECTRUM PAPER <em>p</em> <em>[ASN]</em></h2></a>
+<a name="specbright"><h2>SPECTRUM BRIGHT <em>b</em>
+<em>[ASN]</em> </h2></a>
+<a name="specflash"><h2>SPECTRUM FLASH <em>f</em> <em>[ASN]</em></h2></a>
+<p>These four commands set the colours for the +3 Editor screen, allowing
+you to type programs in to the colour-scheme of your choice.</p>
+<p>Using the <em>ASN</em> option, makes the new +3 Editor
+<strong>and</strong> +3 BASIC colour scheme permanent, so that these
+colours will be used whenever you switch the +3e on (this is only
+effective if you have a hard disk).</p>
+<h3>Examples</h3>
+<p><strong>SPECTRUM INK 4:SPECTRUM PAPER 0</strong></p>
+<p>Sets the +3 Editor colours to green ink on black paper.</p>
+<p><strong>SPECTRUM PAPER 1:SPECTRUM INK 6 ASN</strong></p>
+<p>Sets the +3 Editor colours to yellow ink on blue paper, and then makes
+these colours the default on booting the +3e, together with whatever the
+current +3 BASIC colours are.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<a name="specattr"><h2>SPECTRUM ATTR <em>n</em> <em>[ASN]</em></h2></a>
+<p>Similarly to the previous colour commands, this sets the colours for
+the +3 Editor screen, but allows you to specify all attributes in one go.
+For ink <em>i</em>, paper <em>p</em>, bright <em>b</em> and flash
+<em>f</em>, the value is calculated as:
+<em>n=(128*f)+(64*b)+(8*p)+i</em><p>
+<p>Again, the <em>ASN</em> option sets both the +3 Editor and +3 BASIC
+colours that will be used every time the +3e is switched on.</p>
+<h3>Examples</h3>
+<p><strong>SPECTRUM ATTR 4</strong></p>
+<p>Sets the +3 Editor colours to green ink on black paper.</p>
+<p><strong>SPECTRUM ATTR 14 ASN</strong></p>
+<p>Sets the +3 Editor colours to yellow ink on blue paper, making
+these colours (and the current +3 BASIC colours) permanent on boot.</p>
+<p><img src="images/h-bar.gif" alt="__________________________________________________________________"></p>
+<p><a href="index.html">Back to ZX Spectrum +3e
+homepage</a></p>
+</body>
+</html>

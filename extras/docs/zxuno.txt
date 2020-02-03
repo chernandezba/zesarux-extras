@@ -1,0 +1,18 @@
+http://www.zxuno.com/index.php/ZX_Spectrum#La_memoria
+http://www.zxuno.com/index.php/Boot_Firmware
+http://www.zxuno.com/index.php/Entradas_de_ROMs_v1
+zxuno.speccy.org/ficheros/spi_datasheet.pdf 
+
+
+Actualizar manualmente bios teniendo nueva bios de 16kb en archivo FIRMWARE.ZX1
+
+#leemos primeros 32 kb originales
+dd if=zxuno.flash of=pflash1 bs=1k count=32
+#leemos a partir de los 48kb, saltando 16 kb de vieja bios
+dd if=zxuno.flash of=pflash2 bs=1k skip=48 count=99999
+
+#juntar todo
+cat pflash1 > nuevaflash
+cat FIRMWARE.ZX1 >> nuevaflash
+cat pflash2 >> nuevaflash 
+

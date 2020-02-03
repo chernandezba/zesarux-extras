@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+
+<b><font size="+1">OS_Frm, file read miscellaneous</font></b>
+</p>
+<p><tt>RST 20H, DEFB $48</tt>
+<br>
+&nbsp;
+</p>
+<pre>IN:&nbsp; A = reason code<br>&nbsp;&nbsp;&nbsp;&nbsp; FA_PTR ($01)&nbsp;&nbsp; return sequential pointer (32bit integer)<br>&nbsp;&nbsp;&nbsp;&nbsp; FA_EXT ($02)&nbsp;&nbsp; return extent (size) of file (32bit integer)<br>&nbsp;&nbsp;&nbsp;&nbsp; FA_EOF ($03)&nbsp;&nbsp; end of file enquiry<br>&nbsp;&nbsp;&nbsp;&nbsp; FA_BST ($04)&nbsp;&nbsp; buffer status (internal OZ usage)<br><br>&nbsp;&nbsp;&nbsp;&nbsp; DE = 0, return result in DEBC registers (D = MSB, C = LSB)<br>    <br>&nbsp;&nbsp;&nbsp;&nbsp; IX = file handle (previously obtained with <a href="gnopf.html">GN_Opf</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp; IX = $FFFF then system values are returned<br></pre>
+
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp; Fz = 1, end of file (FA_EOF)<br>&nbsp;&nbsp;&nbsp;&nbsp; Fz = 0, not end of file (FA_EOF)<br><br>&nbsp;&nbsp;&nbsp;&nbsp; DEBC = 32bit result (returned by FA_PTR, FA_EXT, FA_BST)<br>&nbsp;&nbsp;&nbsp;&nbsp; (D = most significant byte, C = least significant byte)</pre>
+
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp; A = error code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad handle</pre>
+
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......HL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AFBCDE../.... different<br><br></pre>
+
+Notes:<br>
+<span style="font-weight: bold;">System informations</span>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; If IX(in) = $FFFF then the following information is obtained:<br><br>&nbsp;&nbsp;&nbsp;&nbsp; FA_PTR:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DE = number of free handles<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BC = version number<br><br>&nbsp;&nbsp;&nbsp;&nbsp; FA_EXT:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEBC = estimate of free memory<br><br>&nbsp;&nbsp;&nbsp;&nbsp; FA_EOF:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fz = 1, if Z88 is expanded, else Fz = 0<br><br></pre>
+<span style="font-weight: bold;">Buffer status<br>
+</span>
+<pre>&nbsp; &nbsp; &nbsp;FA_BST&nbsp;only works with serial coms handle in IX (else Fc=1 and A=RC_Hand). It returns:<br>   D = Tx buffer used slots<br>   E = Tx buffer free slots<br>   H = Rx buffer used slots<br>   L = Rx buffer used slots<br>    Those information can be obtained by OS_Si/SI_Enq too.<br><span style="font-weight: bold;"></span></pre>
+<span style="font-family: monospace;"><br>
+</span>Bugs:
+<blockquote>DE must be 0, otherwise the call is unreliable. DE should have
+been interpreted as pointer to store file information but the bug was never
+fixed in V2.2 / 3.0.<br>
+
+  <br>
+</blockquote>
+
+Related calls:
+<blockquote><a href="gncl.html">GN_Cl</a>, close file
+  <br>
+  <a href="gndel.html">GN_Del</a>, delete a file from memory
+  <br>
+  <a href="gnopf.html">GN_Opf</a>, open file/resource (wildcard search)
+  <br>
+  <a href="gnren.html">GN_Ren</a>, rename file
+  <br>
+  <a href="oscl.html">OS_Cl</a>, internal close (OZ usage)
+  <br>
+  <a href="osdel.html">OS_Del</a>, file delete (internal OZ usage)
+  <br>
+  <a href="osfwm.html">OS_Fwm</a>, file write miscellaneous
+  <br>
+  <a href="osgb.html">OS_Gb</a>, get byte from file (or device)
+  <br>
+  <a href="osgbt.html">OS_Gbt</a>, get byte from file (or device) with timeout
+  <br>
+  <a href="osmv.html">OS_Mv</a>, move bytes between stream and memory
+  <br>
+  <a href="osop.html">OS_Op</a>, internal open (OZ usage)
+  <br>
+  <a href="ospb.html">OS_Pb</a>, write byte to file, device
+  <br>
+  <a href="ospbt.html">OS_Pbt</a>, write byte to file, device with timeout
+  <br>
+  <a href="osren.html">OS_Ren</a>, file rename (internal OZ usage)</blockquote>
+</body>
+</html>

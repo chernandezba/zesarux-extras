@@ -1,0 +1,15 @@
+http://speccy.info/Gigascreen
+
+Gigascreen (also Doublescreen ) - Video mode software for ZX Spectrum , as well as the completion of implementing it in hardware. Since the mid-1990s, often used in the demo and games.
+Video mode switching is realized by two screen areas or areas attributes the beginning of each video frame. Due to the inertia of color in different areas of the screen will be added. For example, alternating yellow in the first image and the second white, "by eye" will look like a shimmering bright yellow color, which is the result of a superposition of two color components. This allows you to get out of the standard 15-color palette of 102 colors, and use up to four colors in familiarity.
+To calculate the colors gigaskrina taken the following assumptions:
+"Contribution" of each half of the screen is estimated at 50%
+corresponding to each color component of the halves is 66% of the maximum video intensity of the non-Bright and Bright to 100%.
+The final formula is as follows:
+C = (C0 / 3 * 2 + C0 * I0 / 3 + C1 / 2 * 3 + C1 * I1 / 3) / 2, where
+C0, C1 - corresponding color (R, G, B) of 0 and 1 ekranki taking the values 0 or 1,
+I - Bright, 0 or 1.
+C - with the intensity of the resulting color in the range of 0-1, wherein 0 - the zero level of the video, 1 - max.
+
+For ZX Spectrum 48K use fullscreen Gigasreen possible due to the update attribute of the screen memory. On the ZX Spectrum 128K , which has two on-screen area, switching program changes one bit, enough time to interrupt switch the active screen.
+Reduces flicker is achieved by switching screens every line, with the change of phase of each frame, but a regular hatching this gives an unpleasant visual separation. Compromise - switching screens approximately every 2 lines, with a phase, gradually changing from frame to frame. The image "flowing."

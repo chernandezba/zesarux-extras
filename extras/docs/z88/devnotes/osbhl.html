@@ -1,0 +1,48 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Bhl, copy bytes from extended
+address</font></b>
+<p><tt>RST 20H, DEFW $DC06</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; C = number of bytes to copy (0 to 255)
+&nbsp;&nbsp;&nbsp;&nbsp; BHL = extended source pointer
+&nbsp;&nbsp;&nbsp;&nbsp; DE = local destination pointer</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0 always</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different
+</pre>
+Notes:
+<p>Bugs:
+<blockquote>The call does not work if the source pointer defines memory
+in segments 2 or 3.</blockquote>
+Related calls:
+<blockquote><a href='gncme.html'>GN_Cme</a>, compare null-terminated strings, one local, one extended
+<br><a href='gnrbe.html'>GN_Rbe</a>, read byte at extended address
+<br><a href='gnwbe.html'>GN_Wbe</a>, write byte at extended address
+<br><a href='osbde.html'>OS_Bde</a>, copy bytes to extended address</blockquote>
+
+</body>
+</html>

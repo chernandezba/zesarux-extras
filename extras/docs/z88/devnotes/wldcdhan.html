@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>The Wildcard Handler</title>
+  <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="serintfc.html">Previous</a></td>
+
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="bottom" width="10%"><a href="dors.html">Next</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+<b><font size="+1">19. The Wildcard Handler</font></b>
+</p>
+<p>The wildcard calls can be used to supplement the calls described in
+"File Input/Output". You can use the wildcard handler to gain control over
+the match selected, or indeed get all possible matches. The wildcard system
+recognizes the following character sequences:
+</p>
+<pre><b>*</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; match any number of characters, or none<br><b>?</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; match a single character<br><b>//</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; matches any number of directories, or none</pre>
+
+NOTE: <b>/</b> and <b>\</b> are interchangeable, but the system generates
+<b>/</b>
+<p>Normal use of the wildcard handler involves specifying a wildcard string
+and then getting, one by one, the possible explicit filenames that match
+it, if any actually do, which may then be used or discarded as required.
+The calls available are as follows:
+</p>
+<p><a href="gnopw.html">GN_Opw</a>
+</p>
+<blockquote>Open wildcard handler. This is given a pointer to a wildcard
+string and returns a wildcard handle in register IX associated with it.
+You can specify whether directories or files come first in the search and
+if directories and device paths are returned with each name.</blockquote>
+
+<a href="gnwfn.html">GN_Wfn</a>
+<blockquote>This gives the explicit filename of the next file which matches
+the string supplied to <a href="gnopw.html">GN_Opw</a>. It also returns the length and number of
+segments of the name it finds. If no more matches are available, the routine
+returns with Fc = 1 and A = RC_EOF.</blockquote>
+
+<a href="gnwcl.html">GN_Wcl</a>
+<blockquote>Close the wildcard handler. You simply supply the wildcard
+handle.A detailed description of the call parameters of these calls may
+be found in the "System Calls Reference" section.</blockquote>
+<p><b>Example</b>
+</p>
+<p>The following program demonstrates the use of the above sequence in
+providing a complete catalogue of the RAM filing system, by matching to
+the wildcard string ":RAM.*//*". Note that this program does not include
+a "Page Wait" mechanism so output will simply be scrolled - you can hold
+down &lt;SHIFT&gt; and &lt;DIAMOND&gt; to freeze scrolling temporarily.
+</p>
+<p>
+</p>
+<hr width="100%">
+<pre>include "fileio.def"&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get definitions for wildcard calls<br>include "stdio.def"&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get standard I/O definitions</pre>
+
+<tt>; the routine assumes that address of 40 bytes of scratch buffer is</tt>
+<br>
+<tt>; held at (scratch) in static workspace</tt>
+<pre>.main&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; b, 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; local pointer to wildcard string<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; hl, wildstring<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xor&nbsp; a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; directories returned first, do<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; not return parents<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnopw.html">GN_Opw</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; open wildcard handler<br>.nextname&nbsp;&nbsp; ld&nbsp;&nbsp; de, (scratch)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; pointer to buffer for returned filenames<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; c, 40&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; max. extent of buffer<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnwfn.html">GN_Wfn</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get next (or first) match<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; c, exit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; is it the last entry?<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; hl, (scratch)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; point at found filename match<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnsop.html">GN_Sop</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; write filename to std. output<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnnln.html">GN_Nln</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; print a newline<br><br>.exit&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnwcl.html">GN_Wcl</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; close wildcard handler<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret<br><br>.wildstring DEFM ":RAM.*//*", 0 &nbsp;&nbsp;&nbsp; ; change this if you like!<br></pre>
+<p>
+</p>
+<hr width="100%">
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <td align="left" valign="top" width="33%"><a href="serintfc.html">Previous</a></td>
+
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="top" width="33%"><a href="dors.html">Next</a></td>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="top" width="33%">The Serial Interface</td>
+
+   <td align="center" valign="top" width="34%">The Wildcard Handler</td>
+
+   <td align="right" valign="top" width="33%">Dors</td>
+
+ </tr>
+
+  </tbody>
+</table>
+</body>
+</html>

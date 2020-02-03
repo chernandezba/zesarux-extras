@@ -1,0 +1,348 @@
+package com.emubee.video;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import com.emubee.beans.State;
+import com.emubee.exceptions.BreakPointException;
+import com.emubee.hardware.Listener;
+
+public class CRTC6845 {
+   // TODO: Versions (currently only Type 2)
+   // TODO: Cursor
+   // TODO: Interlace
+   // TODO: Vertical adjust
+   // TODO: Light pen
+   
+   protected List<Listener> listeners;
+   protected int hcc;               // Horizontal Char Counter (0 - R0)   
+   protected int vcc;               // Vertical Char Counter (0 - R4)
+   protected int vlc;               // Vertical Line Counter (0 - R9)
+   protected boolean displayEnable;   // Display Enable (false: border, 1: screen)
+   protected boolean hSync;         // Horizontal Sync is active (R2 - R3)
+   protected boolean vSync;         // Vertical Sync is active (R7 - R3)
+   protected int ma;               // Refresh Memory Address
+   protected int ra;               // Raster Address. TODO: VLC = RA?
+   protected boolean firstSync;      // Check if Hsync & Vsync is the first in this frame
+   
+   // Registers
+   protected byte[] registers;
+   protected int index;
+   protected final static int REGISTERS = 18;
+   protected final static boolean[] REGISTER_WRITTABLE = {
+      // 0
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      // 10
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false
+   };
+   protected final static boolean[] REGISTER_READABLE = {
+      // 0
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      // 10
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+   };
+   protected final static int[] REGISTER_WRITE_MASK = {
+      // 0
+      0xFF,
+      0xFF,
+      0xFF,
+      0x0F,
+      0x7F,
+      0x1F,
+      0x3F,
+      0x3F,
+      0x03,
+      0x1F,
+      // 10
+      0x7F,
+      0x1F,
+      0x3F,
+      0xFF,
+      0x3F,
+      0xFF,
+      0,
+      0
+   };
+   
+   // Calculated variables
+   protected int maStart;            // Value of MA when CRTC screen starts
+   protected int screenWidth;         // Height & width of the screen in characters
+   protected int screenHeight;
+   protected int displayWidth;         // Height & width of the display in characters
+   protected int displayHeight;
+   protected int charHeight;         // Height of the character in lines
+   protected int borderLeft;         // Width of borders in characters
+   protected int borderTop;         // This is measured in lines!!!
+   protected int hSyncStart;         // Start of sync signals
+   protected int vSyncStart;
+   protected int hSyncWidth;         // Width & Height of sync signals (HSync: Characters, VSync: Lines)
+   protected int vSyncHeight;
+   
+   public CRTC6845() {
+      listeners = new ArrayList<Listener>();
+      reset();
+   }
+   
+   public void reset() {
+      registers = new byte[REGISTERS];
+      registers[0] = 63;
+      registers[1] = 40;
+      registers[2] = 46;
+      registers[3] = (byte) 0x8E;
+      registers[4] = 38;
+      registers[6] = 25;
+      registers[7] = 30;
+      registers[9] = 7;
+      index = 0;
+      hcc = 0;
+      vcc = 0;
+      vlc = 0;
+      displayEnable = true;
+      hSync = false;
+      vSync = false;
+      ma = 0;
+      firstSync = true;
+      recalculateInternalVariables();
+   }
+   
+   public void addListener(Listener listener) {
+      listeners.add(listener);
+   }
+   
+   public boolean update() throws BreakPointException {
+      BreakPointException bp = null;
+      boolean restart = false;
+      boolean oldVsync = vSync;
+      boolean oldHsync = hSync;
+
+      hcc++;
+      ma++;
+      // New line?
+      if (hcc > screenWidth) {
+         hcc = 0;
+         vlc++;
+         ra++;
+         ma = maStart + (displayWidth * vcc);
+         // New char?
+         if (vlc == charHeight) {
+            vlc = 0;
+            vcc++;
+            ma = maStart + (displayWidth * vcc);
+            // New screen?
+            if (vcc > screenHeight) {
+               vcc = 0;
+               ra = 0;
+               ma = maStart;
+               firstSync = true;
+            }
+         }
+         
+         // Vsync
+         if (vcc >= vSyncStart && (((vcc - vSyncStart) * charHeight + vlc) < vSyncHeight)) {
+            vSync = true;
+         } else {
+            vSync = false;
+         }
+         if (!vSync && oldVsync) {
+            Iterator<Listener> li = listeners.iterator();
+            while (li.hasNext()) {
+               Listener l = li.next();
+               try {
+                  l.listen("VSYNC");
+               } catch (BreakPointException e) {
+                  bp = e;
+               }
+            }
+         }
+      }
+      
+      // Hsync
+      if (hcc >= hSyncStart && ((hcc - hSyncStart) < hSyncWidth))  {
+         hSync = true;
+      } else {
+         hSync = false;
+      }
+      if (!hSync && oldHsync) {
+         Iterator<Listener> li = listeners.iterator();
+         while (li.hasNext()) {
+            Listener l = li.next();
+            try {
+               l.listen("HSYNC");
+            } catch (BreakPointException e) {
+               bp = e;
+            }
+         }
+      }
+      // Check top left on the monitor
+      if (firstSync && vSync && !oldHsync && hSync) {
+         restart = true;
+         firstSync = false;
+      }
+      
+      // Border
+      if (vcc < displayHeight && hcc < displayWidth) {
+         displayEnable = true;
+      } else {
+         displayEnable = false;
+      }
+      
+      if (bp != null) {
+         throw bp;
+      }
+      
+      return restart;
+   }
+   
+   public void selectRegister(byte data) {
+      index = data & 0x1F;
+   }
+   
+   protected void recalculateInternalVariables() {
+      maStart = ((registers[12] & 0x3F) << 8 | (registers[13] & 0xFF));
+      screenWidth = registers[0] & 0xFF;
+      screenHeight = registers[4] & 0xFF;
+      displayWidth = registers[1] & 0xFF;
+      displayHeight = registers[6] & 0xFF;
+      charHeight = (registers[9] & 0xFF) + 1;
+      hSyncStart = registers[2] & 0xFF;
+      vSyncStart = registers[7] & 0xFF;
+      hSyncWidth = registers[3] & 0x0F;
+      // TODO: Vsync height can be changed in some types
+      vSyncHeight = 16;
+      
+      borderLeft = screenWidth + 1 - (hSyncStart + hSyncWidth);
+      borderTop = ((screenHeight + 1) * charHeight) - ((vSyncStart * charHeight) + vSyncHeight);
+
+      if (borderTop < 0) {
+         borderTop = 0;
+      }
+      if (borderLeft < 0) {
+         borderLeft = 0;
+      }
+   }
+   
+   // Getters & Setters   
+   public byte getData(int port) {
+      // TODO: It depends on CRTC type
+      return 0;
+   }
+   
+   public void setRegister(byte data) {
+      if (index < REGISTERS && REGISTER_WRITTABLE[index]) {
+         registers[index] = (byte) (data & REGISTER_WRITE_MASK[index]);
+         recalculateInternalVariables();
+      }
+   }
+   
+   // Memory
+   public int getMA() {
+      return ma;
+   }
+   public int getRA() {
+      return vlc;   // TODO: Check
+   }
+   
+   // Position
+   public boolean isDisplayEnabled() {
+      return displayEnable;
+   }
+   public boolean isHSync() {
+      return hSync;
+   }
+   public boolean isVSync() {
+      return vSync;
+   }
+   public int getHCC() {
+      return hcc;
+   }   
+   public int getVCC() {
+      return vcc;
+   }   
+   public int getVLC() {
+      return vlc;
+   }
+   public int getVSyncHeight() {
+      return vSyncHeight;
+   }
+   public int getVSyncStart() {
+      return vSyncStart;
+   }
+   public int getHSyncWidth() {
+      return hSyncWidth;
+   }
+   public int getHSyncStart() {
+      return hSyncStart;
+   }
+   
+   // Border
+   public int getBorderLeft() {
+      return borderLeft;
+   }
+   public int getBorderTop() {
+      return borderTop;
+   }   
+   
+   // Size (*width: chars, *height: lines)
+   public int getTotalScreenWidth() {
+      return (screenWidth + 1);
+   }
+   public int getTotalScreenHeight() {
+      return ((screenHeight + 1) * charHeight);
+   }
+   public int getTotalDisplayWidth() {
+      return (screenWidth - hSyncWidth);
+   }   
+   public int getTotalDisplayHeight() {
+      return ((screenHeight + 1) * charHeight) - vSyncHeight;
+   }   
+   public int getCharHeight() {
+      return charHeight;
+   }
+   
+   public State getState() {
+      State state = new State();
+      state.setInt("index", index);
+      state.setByteArray("registers", registers);
+      return state;
+   }
+   
+   public void setState(State state) {
+      index = state.getInt("index");
+      byte[] buffer = state.getByteArray("registers");
+      System.arraycopy(buffer, 0, registers, 0, registers.length);
+      recalculateInternalVariables();
+   }
+}

@@ -1,0 +1,42 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+   <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Ust, update small timer</font></b>
+<p><tt>RST 20H, DEFB $78</tt>
+<br>&nbsp;
+<pre>IN:&nbsp; BC = new timer value</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; Fz = 0, old time value non-zero
+&nbsp;&nbsp;&nbsp;&nbsp; Fz = 1, old time value zero
+&nbsp;&nbsp;&nbsp;&nbsp; BC = old time value</pre>
+Notes:
+<blockquote>Internal operating system usage.<br>
+The timer latches at $0000. An initial value of $FFFF will not be decremented.
+The timer decrements once per centiseconds.<br>
+<br>
+This code uses same timer as <a href='ostin.html'>OS_Tin</a> and <a href='osdly.html'>OS_Dly</a>.<br>
+<br>
+<BR></blockquote>
+Bugs:
+</body>
+</html>

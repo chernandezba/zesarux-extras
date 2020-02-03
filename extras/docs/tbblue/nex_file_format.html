@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="client-nojs" lang="en-GB" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<title>NEX file format - SpecNext official Wiki</title>
+<script>document.documentElement.className = document.documentElement.className.replace( /(^|\s)client-nojs(\s|$)/, "$1client-js$2" );</script>
+<script>(window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"NEX_file_format","wgTitle":"NEX file format","wgCurRevisionId":1336,"wgRevisionId":1336,"wgArticleId":72,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":[],"wgBreakFrames":false,"wgPageContentLanguage":"en-gb","wgPageContentModel":"wikitext","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgMonthNamesShort":["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"wgRelevantPageName":"NEX_file_format","wgRelevantArticleId":72,"wgRequestId":"fccb5fea17eee9db2cf41157","wgIsProbablyEditable":false,"wgRelevantPageIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgCategoryTreePageCategoryOptions":"{\"mode\":0,\"hideprefix\":20,\"showcount\":true,\"namespaces\":false}","wgWikiEditorEnabledModules":[],"wgPageFormsAutocompleteValues":[],"wgPageFormsAutocompleteOnAllChars":false,"wgPageFormsFieldProperties":[],"wgPageFormsCargoFields":[],"wgPageFormsDependentFields":[],"wgPageFormsGridValues":[],"wgPageFormsGridParams":[],"wgPageFormsShowOnSelect":[],"wgPageFormsScriptPath":"/w/extensions/PageForms","edgValues":null,"wgPageFormsEDSettings":null,"wgAmericanDates":false,"wgCargoMapClusteringMinimum":80,"wgCargoMonthNames":["January","February","March","April","May","June","July","August","September","October","November","December"],"wgCargoMonthNamesShort":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"wgCargoWeekDays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"wgCargoWeekDaysShort":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]});mw.loader.state({"site.styles":"ready","noscript":"ready","user.styles":"ready","user":"ready","site":"ready","user.options":"loading","user.tokens":"loading","ext.smw.style":"ready","ext.smw.tooltip.styles":"ready","mediawiki.legacy.shared":"ready","mediawiki.legacy.commonPrint":"ready","mediawiki.sectionAnchor":"ready","skins.tweeki.bootstrap.styles":"ready","skins.tweeki.styles":"ready","skins.tweeki.corrections.styles":"ready","skins.tweeki.externallinks.styles":"ready","skins.tweeki.awesome.styles":"ready","skins.tweeki.bootstraptheme.styles":"ready"});mw.loader.implement("user.options@0qpjoud",function($,jQuery,require,module){/*@nomin*/mw.user.options.set({"variant":"en-gb"});
+});mw.loader.implement("user.tokens@1gifr9m",function($,jQuery,require,module){/*@nomin*/mw.user.tokens.set({"editToken":"+\\","patrolToken":"+\\","watchToken":"+\\","csrfToken":"+\\"});
+});mw.loader.load(["ext.smw.style","ext.smw.tooltips","mediawiki.page.startup","mediawiki.user","mediawiki.hidpi","mediawiki.page.ready","mediawiki.searchSuggest","skins.tweeki.scripts"]);});</script>
+<link rel="stylesheet" href="/w/load.php?debug=false&amp;lang=en-gb&amp;modules=ext.smw.style%7Cext.smw.tooltip.styles&amp;only=styles&amp;skin=tweeki"/>
+<link rel="stylesheet" href="/w/load.php?debug=false&amp;lang=en-gb&amp;modules=mediawiki.legacy.commonPrint%2Cshared%7Cmediawiki.sectionAnchor%7Cskins.tweeki.awesome.styles%7Cskins.tweeki.bootstrap.styles%7Cskins.tweeki.bootstraptheme.styles%7Cskins.tweeki.corrections.styles%7Cskins.tweeki.externallinks.styles%7Cskins.tweeki.styles&amp;only=styles&amp;skin=tweeki"/>
+<script async="" src="/w/load.php?debug=false&amp;lang=en-gb&amp;modules=startup&amp;only=scripts&amp;skin=tweeki"></script>
+<meta name="ResourceLoaderDynamicStyles" content=""/>
+<meta name="generator" content="MediaWiki 1.31.1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="alternate" type="application/rdf+xml" title="NEX file format" href="/w/index.php?title=Special:ExportRDF/NEX_file_format&amp;xmlmime=rdf"/>
+<link rel="shortcut icon" href="/favicon.ico"/>
+<link rel="search" type="application/opensearchdescription+xml" href="/w/opensearch_desc.php" title="SpecNext official Wiki (en-gb)"/>
+<link rel="EditURI" type="application/rsd+xml" href="https://specnext.dev/w/api.php?action=rsd"/>
+<!--[if lt IE 9]><script src="/w/load.php?debug=false&amp;lang=en-gb&amp;modules=html5shiv&amp;only=scripts&amp;skin=tweeki&amp;sync=1"></script><![endif]-->
+</head>
+<body class="mediawiki ltr sitedir-ltr mw-hide-empty-elt ns-0 ns-subject page-NEX_file_format rootpage-NEX_file_format skin-tweeki action-view tweeki-animateLayout">        <div class="container-fluid" role="main">
+            <header id="site-header" class="row rsrc-header" role="banner">
+                <div class="rsrc-header-img">
+                    <a href="/wiki" class="custom-logo-link" rel="home" itemprop="url"><img width="500" height="110" src="/logo.png"></a>
+                </div>
+            </header>
+            <!-- end main container -->
+        </div>
+
+        			<!-- navbar -->
+			<div id="mw-navigation" class="navbar navbar-default navbar-inverse" role="navigation">
+				<h2>Navigation menu</h2>
+				<div id="mw-head" class="navbar-inner">
+					<div class="container-fluid">
+				
+						<div class="navbar-header">
+							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+								<span class="sr-only">Toggle navigation</span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</button>
+
+							<div class="home-icon hidden-xs"><a href="/" class="navbar-brand"><i class="fa fa-home"></i></a></div>					
+						</div>
+
+						<div id="navbar" class="navbar-collapse collapse">
+													<ul class="nav navbar-nav navbar-left">
+							<li class="nav"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=NEX+file+format" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o">Login / Create Account</a></li>							</ul>
+						
+													<ul class="nav navbar-nav navbar-right">
+							</ul>
+			<form class="navbar-form navbar-right" action="/w/index.php" id="searchform">
+				<div class="form-group"><input type="search" name="search" placeholder="Search" title="Search SpecNext official Wiki [f]" accesskey="f" id="searchInput" class="search-query form-control"/><input type="submit" name="go" value="Go" title="Go to a page with this exact name if it exists" id="mw-searchButton" class="searchButton btn hidden"/>
+				</div>
+			</form><ul class="nav navbar-nav navbar-right">							</ul>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+			<!-- /navbar -->
+        		<div id="mw-page-base"></div>
+		<div id="mw-head-base"></div>
+		<a id="top"></a>
+
+		<!-- content -->
+		<div id="contentwrapper" class="rsrc-main user-loggedout not-editable container-fluid with-navbar ">
+
+			
+			<div class="row">
+				<div class="col-md-offset-0 col-md-9" role="main">
+							<div class="mw-body" id="content">
+			<div id="mw-js-message" style="display:none;"></div>
+									<h1 id="firstHeading" class="firstHeading page-header" lang="en-GB"><span dir="auto">NEX file format</span></h1>
+									<!-- bodyContent -->
+			<div id="bodyContent">
+								<div id="siteSub">From SpecNext official Wiki</div>
+								<div id="contentSub"></div>
+												<div id="jump-to-nav" class="mw-jump">
+					Jump to:					<a href="#mw-navigation">navigation</a>, 					<a href="#p-search">search</a>
+				</div>
+				<div id="mw-content-text" lang="en-GB" dir="ltr" class="mw-content-ltr"><div class="mw-parser-output"><p>The NEX file format was designed as very simple and straightforward format to load self-contained applications into memory and start them. Through various extensions it did reach v1.2 at this moment, which allows even for more complex use cases.
+</p><p>The official distribution sports some goodies for NEX files:
+</p>
+<ul><li><a rel="nofollow" class="external text" href="https://gitlab.com/thesmog358/tbblue/blob/master/src/asm/nexload/nexload.asm">nexload.asm</a></li>
+<li><a rel="nofollow" class="external text" href="https://gitlab.com/thesmog358/tbblue/blob/master/src/c/NexCreator.c">NexCreator.c</a></li></ul>
+<p>Additional resources:
+</p>
+<ul><li><a rel="nofollow" class="external text" href="https://github.com/varmfskii/zxnext_tools">Varmfskii's ZX Next tools</a></li>
+<li><a rel="nofollow" class="external text" href="https://github.com/ped7g/ZXSpectrumNextMisc/tree/master/nexload2">Ped's nexload2.asm</a> (rewritten from scratch)</li>
+<li><a rel="nofollow" class="external text" href="https://github.com/z00m128/sjasmplus/releases">Z00m's sjasmplus</a> has support for <a rel="nofollow" class="external text" href="http://z00m128.github.io/sjasmplus/documentation.html#c_savenex">NEX saving</a> since v1.13.0</li></ul>
+<hr />
+<p>The basic structure of the file is:
+</p>
+<table class="wikitable">
+
+<tbody><tr>
+<th>block size</th>
+<th>optional</th>
+<th>description
+</th></tr>
+<tr>
+<td style="text-align:right;">512</td>
+<td></td>
+<td>"Next" string followed by file header, containing also map of memory banks stored in the file
+</td></tr>
+<tr>
+<td style="text-align:right;">512</td>
+<td>*</td>
+<td>optional palette (for Layer2 or LoRes screen)
+</td></tr>
+<tr>
+<td style="text-align:right;">49152</td>
+<td>*</td>
+<td>Layer2 loading screen
+</td></tr>
+<tr>
+<td style="text-align:right;">6912</td>
+<td>*</td>
+<td>classic ULA loading screen
+</td></tr>
+<tr>
+<td style="text-align:right;">12288</td>
+<td>*</td>
+<td>LoRes loading screen
+</td></tr>
+<tr>
+<td style="text-align:right;">12288</td>
+<td>*</td>
+<td>Timex HiRes (512x192) loading screen
+</td></tr>
+<tr>
+<td style="text-align:right;">12288</td>
+<td>*</td>
+<td>Timex HiCol (8x1) loading screen
+</td></tr>
+<tr>
+<td style="text-align:right;">n * 16384</td>
+<td>*</td>
+<td>16kiB raw memory bank data in predefined order: 5,2,0,1,3,4,6,7,8,9,10,...,111 (particular bank may be omitted completely)
+</td></tr></tbody></table>
+<p>Structure of the header block:
+</p>
+<table class="wikitable">
+
+<tbody><tr>
+<th>offset</th>
+<th>size</th>
+<th>description
+</th></tr>
+<tr>
+<td>0</td>
+<td>4</td>
+<td>"Next" string
+</td></tr>
+<tr>
+<td>4</td>
+<td>4</td>
+<td>string with NEX file version, currently "V1.0", "V1.1" or "V1.2"
+</td></tr>
+<tr>
+<td>8</td>
+<td>1</td>
+<td>RAM required: 0 = 768k, 1 = 1792k
+</td></tr>
+<tr>
+<td>9</td>
+<td>1</td>
+<td>Number of 16k Banks to Load: 0-112 (see also the byte array at offset 18, which must yield this count)
+</td></tr>
+<tr>
+<td>10</td>
+<td>1</td>
+<td>Loading-screen blocks in file (bit-flags):
+<p>128 = no palette block, 16 = Hi-Colour, 8 = Hi-Res, 4 = Lo-Res, 2 = ULA, 1 = Layer2
+The loader does use common banks to load the graphics into, and show it from, i.e. bank5 for all ULA related modes and banks 9,10 and 11 for Layer2 graphics (loading these banks afterwards as regular bank will thus replace the shown data on screen). Only Layer2 and Lo-Res screens expect the palette block (unless +128 flag set). While one can include multiple screen data in single file (setting up all relevant bits), the recommended/expected usage is to have only one type of screen in NEX file.
+</p>
+</td></tr>
+<tr>
+<td>11</td>
+<td>1</td>
+<td>Border Colour: 0-7
+</td></tr>
+<tr>
+<td>12</td>
+<td>2</td>
+<td>Stack pointer
+</td></tr>
+<tr>
+<td>14</td>
+<td>2</td>
+<td>Program counter (0 = don't run, just load)
+</td></tr>
+<tr>
+<td>16</td>
+<td>2</td>
+<td>"Number of extra files" (currently not used by anything/anyone?)
+</td></tr>
+<tr>
+<td>18</td>
+<td>112</td>
+<td>byte flag (0/1) of 16k banks included in the file - this array is in regular order 0..111, i.e. bank5 in file will set 1 to header byte at offset 18+5 = 23, but the 16kiB of data for bank 5 are first in the file (order of bank data in file is: 5,2,0,1,3,4,6,7,8,9,10,...,111)
+</td></tr>
+<tr>
+<td>130</td>
+<td>1</td>
+<td>Layer2 "loading bar" 0 = OFF, 1 = ON (works only in combination with Layer2 screen data)
+</td></tr>
+<tr>
+<td>131</td>
+<td>1</td>
+<td>"Loading bar" colour (0..255)
+</td></tr>
+<tr>
+<td>132</td>
+<td>1</td>
+<td>Loading delay per bank (0..255 amount of frames), 0 = no delay
+</td></tr>
+<tr>
+<td>133</td>
+<td>1</td>
+<td>Start delay (0..255 amount of frames), 0 = no delay
+</td></tr>
+<tr>
+<td>134</td>
+<td>1</td>
+<td>Preserve current Next-Registers values (0 = reset, 1 = preserve)
+</td></tr>
+<tr>
+<td>135</td>
+<td>3</td>
+<td>Required core version, three bytes 0..15 "major", 0..15 "minor", 0..255 "subminor" version numbers. (core version is checked only when reported machine-ID is 10 = "Next", on other machine or emulator=8 the latest loaders will skip the check)
+</td></tr>
+<tr>
+<td>138</td>
+<td>1</td>
+<td>Timex HiRes 512x192 mode colour, encoded as for port 255 = bits 5-3. I.e. values 0, 8, 16, .., 56 (0..7 * 8)
+</td></tr>
+<tr>
+<td>139</td>
+<td>1</td>
+<td>Entry bank = bank to be mapped into slot 3 (0xC000..0xFFFF address space), the "Program Counter" (header offset +14) and "File handle address" (header offset +140) are used by NEX loader after the mapping is set (The default ZX128 has bank 0 mapped after reset, which makes zero value nice default).
+</td></tr>
+<tr>
+<td>140</td>
+<td>2</td>
+<td>File handle address: 0 = NEX file is closed by the loader, 1..0x3FFF values (1 recommended) = NEX loader keeps NEX file open and does pass the file handle in BC register, 0x4000..0xFFFF values (for 0xC000..0xFFFF see also "Entry bank") = NEX loader keeps NEX file open and the file handle is written into memory at the desired address.
+</td></tr>
+<tr>
+<td>142</td>
+<td>370</td>
+<td>reserved for future extensions, set to zero in V1.1 and V1.2 file format.
+</td></tr></tbody></table>
+<hr />
+<p>Possible roadmap/ideas for future (this is just collection of ideas, no timeframe or guarantee that they will ever happen, feel free to comment on them):
+</p>
+<ul><li>probably compatible with current V1.2 file format
+<ul><li>checking machine memory and use the RAMREQ to report low memory</li>
+<li>having entry bank dynamically allocated by NextZXOS (entrybank = 255?)</li>
+<li>changing working directory if path with directories was provided (adjust that also when passing command line in V1.3 to make file-only like)</li></ul></li>
+<li>V1.3+
+<ul><li>passing cmd line args to the loaded code - after discussion with Allen A. =&gt; BC = file handle (or 255), DE = command line (is equal to the field buffer value in header), zero terminated string (if the zero terminator is missing, the line is probably truncated to buffer size) = two new words into V1.3 header [cliBuffer, cliSize].</li>
+<li>preserving original NextZXOS stack SP value (stack pointer = 2?) (0 is valid SP starting from very "top" of RAM) (preserving is risky, as there is always possibility of ramtop being set in such unfortunate manner, that preserved sp will cause destruction of the loaded code, so the SP should be set up by the header every time, but maybe there can be extra flag to put old value into the new stack by loader, so the code can eventually get to the content of old stack - if the NEX file doesn't overwrite the banks 5/2/0)</li>
+<li>checksums incorporated into the NEX file (maybe into header?) - mostly for file archival/transfers, not loader itself</li>
+<li>custom palettes also for ULA/HiRes/HiCol screens (maybe +64 flag?) (or invert the +128 in V1.3 for those three modes, i.e. 0 = no pal / 128 = has pal)</li>
+<li>tilemap screen</li>
+<li>return multiple open file handles to the .nex file. Specify how many handles and an address in the header.</li>
+<li>With a flag (bit 7 of number of handles?) to force close all existing open handles first.</li></ul></li></ul>
+
+<!-- 
+NewPP limit report
+Cached time: 20190710053341
+Cache expiry: 86400
+Dynamic content: false
+[SMW] In‐text annotation parser time: 0 seconds
+CPU time usage: 0.010 seconds
+Real time usage: 0.011 seconds
+Preprocessor visited node count: 1/1000000
+Preprocessor generated node count: 4/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Highest expansion depth: 1/40
+Expensive parser function count: 0/100
+Unstrip recursion depth: 0/20
+Unstrip post‐expand size: 0/5000000 bytes
+-->
+<!--
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 -total
+-->
+</div>
+<!-- Saved in parser cache with key specnext_wiki:pcache:idhash:72-0!canonical and timestamp 20190710053341 and revision id 1336
+ -->
+</div>								<div class="printfooter">
+				Retrieved from ‘<a dir="ltr" href="https://specnext.dev/w/index.php?title=NEX_file_format&amp;oldid=1336">https://specnext.dev/w/index.php?title=NEX_file_format&amp;oldid=1336</a>’				</div>
+												<div id="catlinks" class="catlinks catlinks-allhidden" data-mw="interface"></div>												<div class="visualClear"></div>
+							</div>
+			<!-- /bodyContent -->
+		</div>
+					</div>
+			</div>
+		</div>
+		<!-- /content -->
+
+			<!-- sidebar-right -->
+			<div class="sidebar-wrapper sidebar-right-wrapper">
+				<div class="sidebar-container container-fluid">
+					<div class="row">
+						<div id="sidebar-right" class="col-md-3 col-md-offset-9">
+							<div class="btn-group btn-block"><a href="/w/index.php?title=NEX_file_format&amp;action=edit" id="ca-edit" class="btn btn-primary btn-block" title="Edit this page [e]" accesskey="e"><span class="glyphicon glyphicon-pencil"></span> Edit </a></div><div id="tweekiTOC"></div>						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /sidebar-right -->
+					<!-- footer -->
+			<div id="footer" role="contentinfo" class="footer container-fluid footer-sticky">
+			<ul id="footer-places"><li id="footer-places-privacy"><a href="/wiki/Wiki:Privacy_policy" title="Wiki:Privacy policy">Privacy policy</a></li><li id="footer-places-about"><a href="/wiki/Wiki:About" title="Wiki:About">About SpecNext official Wiki</a></li><li id="footer-places-disclaimer"><a href="/wiki/Wiki:General_disclaimer" title="Wiki:General disclaimer">Disclaimers</a></li></ul><ul id="footer-custom"><li class="dropup"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=NEX+file+format" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o">Login / Create Account</a></li></ul><ul id="footer-icons"><li id="footer-poweredbyico"><span><a href="//www.mediawiki.org/">Powered by MediaWiki</a></span><span><a href="https://www.semantic-mediawiki.org/wiki/Semantic_MediaWiki">Powered by Semantic MediaWiki</a></span></li></ul><div style="clear:both"></div>			</div>
+			<!-- /footer -->
+		<script>(window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgPageParseReport":{"smw":{"limitreport-intext-parsertime":0},"limitreport":{"cputime":"0.010","walltime":"0.011","ppvisitednodes":{"value":1,"limit":1000000},"ppgeneratednodes":{"value":4,"limit":1000000},"postexpandincludesize":{"value":0,"limit":2097152},"templateargumentsize":{"value":0,"limit":2097152},"expansiondepth":{"value":1,"limit":40},"expensivefunctioncount":{"value":0,"limit":100},"unstrip-depth":{"value":0,"limit":20},"unstrip-size":{"value":0,"limit":5000000},"timingprofile":["100.00%    0.000      1 -total"]},"cachereport":{"timestamp":"20190710053341","ttl":86400,"transientcontent":false}}});});</script><script>(window.RLQ=window.RLQ||[]).push(function(){mw.config.set({"wgBackendResponseTime":61});});</script>	</body>
+</html>

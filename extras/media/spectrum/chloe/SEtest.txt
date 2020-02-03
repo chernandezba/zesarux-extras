@@ -1,0 +1,23 @@
+Chloe 280SE test program
+========================
+
+This program tests the Chloe 280SE's video modes and sideways RAM.
+
+Three blocks of 32K are loaded into the top half of the DOCK, EX and HOME banks.
+
+These blocks contain 2 hi-res, 2 hi-col, and 4 lo-res screens at 8K offsets.
+
+The lo-res screens are copied to the lower 16K of the DOCK and EX banks.
+
+When a key is pressed, the program then cycles through the display modes,
+copying data from the DOCK or EX banks to either page 5 or page 7 of the HOME
+bank in the following order:
+
+1. lo-res 1, bank 5
+2. lo-res 2, bank 5, offset 8K
+3. lo-res 3, bank 7
+4. lo-res 4, bank 7, offset 8K
+5. hi-res 1, bank 5
+6. hi-res 2, bank 7
+7. hi-col 3, bank 5
+8. hi-col 4, bank 7

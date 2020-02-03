@@ -1,0 +1,53 @@
+
+           _________  ___       _________  ___  _____     .   ___
+   _____ _/  ._  _ /_/ _ \__ __/  ._    /_/ _ \_\    \----|__/ _ \__ _____
+  .\    Y    |/   Y    _    Y     |/   Y    _    Y    \   |    _    Y    /.
+  |     |    ____/|    Y    .    _____/|    Y    .\__     .    Y    |     |
+  |  H7 |    |    |____|    |    |     |____|    |   |    |____|    | dS! |
+  |     `----'         `----^----'          `----'   `----'    `----'     |
+  |        /(________  ____    ______      __     ____    ________        |
+  |  .__ __\___     /_/  _/__ _\_   /  _ _/  \_ _/  _/____\    _  \_ __.  |
+  |  |  Y    |/    /    _/   Y     /----Y \__/ Y    \_    Y    Y    Y  |  |
+  |  |  |    /    /.    |    .    /|    .      .     |    .    |    |  |  |
+  |  :  |_____     |____|    |_____     |      |_____|    |____|    |  |  |
+  :_____ ____`-----'    `----'    `-----^------'     `----'    `----'  :  |
+  /     \ /  \ ____ ___________________________________________________:  :
+ /     _ \\__/ _/  \\                                                  |\_.
+ \     //_/  \ _\__/      Papaya Dezign proudly presents ...           |  |
+  \____\\_\__/                                                         |  |
+  |  .                              esxDOS v0.8.5                      |  |
+  |  :                                                                 |  |
+  |  |               We're back again, and this time we bring          |  |
+  |  |               you the eagerly-awaited TR-DOS emulator!          |  |
+  |  |                                                                 |  |
+  |  |               There's also fully-featured support for           |  |
+  |  |               the DivMMC interface and for the ZX-One           |  |
+  |  |               FPGA core (with extra RAM usage on both           |  |
+  |  |               and 7Mhz SD I/O on the ZX-One).                   |  |
+  |  |                                                                 |  |
+  |  |               Unfortunately MapRAM mode users will not          |  |
+  |  |               be able to enjoy the TR-DOS emulator, we          |  |
+  |  |               are sorry about that :-(                          |  |
+  |  |                                                                 |  |
+  |  |               In the next version the API will be set           |  |
+  |  |               in stone and publicly released.                   |  |  
+  |  |                                                                 |  |
+  |  |               Credits:                                          |  |
+  |  |                                                                 |  |
+  |  |               Main Code: lordcoxis                              |  |
+  |  |               NMI Browser, Additional Code: ub880d              |  |
+  |  |               Boot Logo: bracket (original by K-0s)             |  |
+  |  |                                                                 |  |  
+  |  |               For full credits list check the readme.           |  |
+  |  |                                                                 |  |
+  |  |               Greetings fly out to all those who keep           |  |
+  |  |               the Speccy Scene alive!                           |  |
+  |  |                                                                 :  |
+  |  |               08.06.2013 / Papaya Dezign                  __  _____|
+  |  |               All rights perversed                   ___ /\_ /     \
+  |  |                                                     / \ \\/ /       \
+  |_ |                                                     \_/ ____\       /
+    \|_______________________________________________________ /  \ \\_____/
+     Y                                                        \__/_/       
+     :
+

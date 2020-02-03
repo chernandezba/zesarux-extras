@@ -1,0 +1,55 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+   <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Tin, read character from standard
+input, with timeout</font></b>
+<p><tt>RST 20H, DEFB $2D</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BC = timeout in 1/100 seconds</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; A = character read from standard input
+&nbsp;&nbsp;&nbsp;&nbsp; BC = time remaining in 1/100 seconds</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_SUSP ($69), suspension
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_DRAW ($66), application pre-empted and screen corrupted
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_QUIT ($67), KILL request
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ESC ($01), escape condition detected
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_TIME ($02), call has timed out</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ....DEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBC..../.... different</pre>
+Notes:
+<p>Bugs:
+<blockquote>Crashes OZ while in a popdown with safe workspace more than
+32 bytes, and the popdown gets pre-empted (RC_QUIT).<br>
+<BR></blockquote>
+Related calls:
+<blockquote><a href='gnsip.html'>GN_Sip</a>, system input line routine
+<br><a href='osin.html'>OS_In</a>, read (wait for) character from standard input
+<br><a href='ospur.html'>OS_Pur</a>, purge keyboard buffer
+<br><a href='osxin.html'>OS_Xin</a>, examine input</blockquote>
+
+</body>
+</html>

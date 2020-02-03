@@ -1,0 +1,120 @@
+DN Corrections, Modifications log
+
+DN 3.2.8 (TP, 15.12.02)
+- added notes about undocumented DC_ calls. Info from Jorma Oksanen.
+- dcin.htm, dcout.htm, dcprt.htm, dcxin.htm, dcicl.htm, dcrbd.htm, dcgen.htm updated
+- dc_bye.htm, dcent.htm, dcnam.htm, dcalt.htm, dcpol.htm  updated
+- oscli.htm, osnq.htm, ossp.htm updated
+- scrdrver.htm, scrdrv2.htm updated with printer redirection toggle
+- TBD hardware.htm, scrfiles.htm corrected
+- TBD : 10 ms INT, CLI .[ .], Dennis corrections
+
+DN 3.2.7 (DG, 12.12.99)
+- scrfiles.htm, UDG assignment order info from Dominic Morris.
+  Hires0 overlapping Lores0 on unexpanded Z88s.
+
+DN 3.2.6 (GS, 12.12.99)
+- z80instr.htm, <SMALL> tag added to allow for A4 printing of HTML.
+
+DN 3.2.5 (DG, 10.12.99)
+- scrdrver.htm, Horizontal and vertical scrolling clarified.
+- fppref.htm, Clarified fp_idv, fp_mod and fp_str.
+- index.htm, motherboard.htm, z80undoc.htm, scrdrver.htm, serintfc.htm,
+  release.htm, intro.htm, hardware.htm, manifest.htm, fppref.htm,
+  z80instr.htm, z80undoc.htm, scrfiles.htm, various minor layout changes.
+
+DN 3.2.4 (TP, 10.12.99)
+- scrfiles.htm added
+- hardware.htm, z80undoc.htm and index.htm updated
+- pushfram.htm removed from the Quick ref. and added to manif2.htm
+
+DN 3.2.3 (DG, 18.10.99)
+- scrdrver.htm, Noted NUL, 1,"2.[" and 1,"2.] possibly used for control
+  of screen restoring. PipeDream map window type. New command delete window.
+  Clarified window select and set margins. Corrected Output n copies of the
+  code m and Beep sequence. Corrected SD_DWN / SD_DWN value mixup.
+  Added quick ref to screen driver scrdrv2.htm and rearranged scrdrver.htm.
+- manifest.htm, Corrected SD_DWN / SD_DWN value mixup.
+- Renamed Z80inst*.htm to z80inst*.htm and updated references.
+- ossi.htm, corrected SI_HRD and SI_SFT details.
+- hardware.htm, added user defined character layout in LORES0.
+
+DN 3.2.2 (TP, 13.10.99)
+- index.htm, manually reorganised. PLEASE, update it manually NOW!
+- z80undoc.htm, added
+- index.htm, intro.htm, release.htm, version and authors updated
+- added Quick ref to Blink registers, OSPush frame
+- added a version file (begining with _) to the directory top
+- z80instr.htm, added mnemonics and flags rules
+- z80inst2.htm, added rules and cosmetic changes
+
+DN 3.2.1 (DG, 25.09.99)
+- scrdrver.htm, corrected clear from the cursor commands
+- scrdrver.htm, corrected corner example
+- scrdrver.htm, more description on box characters
+
+DN 3.2.0 (TP, 25.09.99)
+- z80instr.htm, added
+- z80inst2.htm, added quick reference
+- index.htm, fppref.htm, modified for the z80 refs.
+
+DN 3.1.9 (DG, 24.09.99)
+- stdiocli.htm, added enter key cli sequence
+- serintfc.htm, corrected baudrate 19200
+- serintfc.htm, corrected condition for de-asserting RTS
+- serintfc.htm, corrected pin 1 current
+- ossi.htm, changed SI_HRD and SI_SFT details
+- osnq.htm, added SI_SFT call for reading Panel settings
+- scrdrver.htm, added clear from the cursor commands
+- scrdrver.htm, clarified window relative/absolute placement
+- map.htm, spelling correction
+- hardware.htm, added example code for reading escape key
+- manif2.htm, added basic tokens and control char entries
+- manifest.htm, added basic tokens and control char sections
+- manifest.htm, top paragraph "most files from v2.0"
+
+DN 3.1.8 (TP, 23.09.99)
+- index.htm added quick jump to references
+- added sysref2.htm with OZ_ calls refrence
+- added ozei.htm, ozdi.htm, ozbuff.htm
+- added manif2.htm and modifications to manifest.htm
+- added fppref2.htm and modifications to fppref.htm
+
+DN 3.1.7 (GS, 24.08.99)
+- index.htm improved; better layout of the chapter contents using a <table> layout.
+
+DN 3.1.6 (GS, 08.08.99)
+- sysref.htm updated with low level OZ calls (still missing a few DC_ & OS_ calls
+  to be grouped in new sections)
+- dcgen.htm, Osbye.htm, Osexit.htm, dcent.htm, Osent.htm, Osuse.htm,
+  Osstk.htm, Dcbye.htm, Dcpol.htm, ospoll.htm, Dcnam.htm, dcscn.htm,
+  Osvth.htm, Osgth.htm updated.
+
+DN 3.1.5 (TP, 05.08.99)
+- Os_Gth, Vth, Fth update
+
+DN 3.1.4 (GS, 04.08.99)
+- minor spelling and grammar corrections in "motherbd.htm".
+  Integrated into "index.htm".
+- broken links for ossci.htm fixed in "manifest.htm" and "map.htm"
+
+DN 3.1.3 (TP, 01.08.99)
+
+- os_nq, updated, jump table added
+- hardware corrected, jump table (keyboard table corrected)
+- motherboard description added (new file)
+
+DN 3.1.2 (GS, 01.08.99)
+- dcnq.htm, dcsp.htm: problems with the table fixed
+- index.htm: OZ call section properly aligned.
+- changes to dc_pol, dc_bye, os_bye, os_use, os_exit, os_poll, os_stk, os_ent html files (cross reference links)
+
+DN 3.1.1 (TP, 01.08.99)
+
+- basicasm, some CR added
+- DOR, major types added, new entry for DR_RD2, Bill example changed to Paul
+- v0.93 added in the releases
+- os_sci updated, and link corrected in index
+- os_si updated
+- dc_nq, dc_sp updated, problems with the table
+- dc_bye, dc_pol, dc_ent, dc_gen, dc_scn, dc_ini updated

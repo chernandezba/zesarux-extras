@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tbody>
+
+ <tr>
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+
+  </tbody>
+</table>
+
+<hr width="100%">
+<p>
+
+<b><font size="+1">GN_Soe, write string at extended
+address to standard output</font></b>
+</p>
+
+<p><tt>RST 20H, DEFW $3C09</tt>
+</p>
+
+<p>IN:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BHL = pointer to null-terminated string at extended address<br>&nbsp;&nbsp;&nbsp;&nbsp; (B = 0, is interpreted as bank 0, not local...)</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp; BHL points to null terminator</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; AFBCDE../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; ......HL/.... different</pre>
+Notes:
+<blockquote>If B is zero on entry the address will not be treated as local.</blockquote>
+Bugs:
+<br>
+
+&nbsp;
+<p>Related calls:
+</p>
+
+<blockquote>
+  <a href="gnnln.html">GN_Nln</a>, send newline (CR/LF) to standard output <br>
+  <a href="gnsop.html">GN_Sop</a>, write string to standard output, local memory<br>
+  <a href="osbout.html">OS_Bout</a>, write null-terminated string block at (B)HL to standard output<br>
+  <a href="osout.html">OS_Out</a>, write character to standard output<br>
+  <a href="ospout.html">OS_Pout</a>, write embedded null-terminated string at caller (PC) to standard output
+</blockquote>
+
+</body>
+</html>

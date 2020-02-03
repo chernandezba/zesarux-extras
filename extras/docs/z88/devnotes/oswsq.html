@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+  <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tbody>
+ <tr>
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+<b><font size="+1">OS_Wsq, write to prefix sequence</font></b>
+</p>
+<p><tt>RST 20H, DEFW $CE06</tt>
+</p>
+<p>IN:&nbsp;&nbsp;&nbsp; A = character<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;HL = sequence buffer</p>
+<p>OUT: Fc=0 always<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; A=0 if sequence completed, -1 otherwise</p>
+<p>Registers affected after return: </p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDE../IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AF....HL/.... different</pre>
+<p>Notes:
+</p>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Internal operating system usage.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; write a char to the prefix sequence buffer.<br>
+<br>
+Bugs:<br>
+<br>
+Related calls:<br>
+<div style="margin-left: 40px;"><a href="osisq.html">OS_Isq</a>, initialise prefix sequence<br>
+</div>
+</body>
+</html>

@@ -1,0 +1,152 @@
+ ##############
+ ## RAM-DISK ##
+ ##############
+
+ Je subor utilitiek pre pracu s virtualnym drajvom - ramdiskom.
+ Sklada sa z tychto troch suborov:
+
+	ramdrive ... drajver pre ramdisk
+	ramdinit ... inteligentna inicializacia
+	ramdroff ... deinstalator ramdisku
+
+ Tieto tri programy umoznuju uzivatelovi pohodlne vytvorit,
+ ziniciazizovat (ak treba), alebo odinstalovat virtualnu mechaniku.
+
+ ****************
+ *** ramdrive ***
+ ****************
+
+ je malicky 621 bajtovy drajverik, ktory emulujte virtualny ramdisk,
+ konfigurovatelny pre rozne rom-banky predbezne do maximalnej kapacity 480 kB.
+
+ Instalaciou tohto drajvera ziska uzivatel pod cislom drajvu #09
+ plnohodnotnu virtualnu mechaniku s vlozenou virtualnou disketou s ktorou
+ mozete robit vsetko to, co aj s realnou disketou. Az na to, ze tuto
+ virtualnu disketu nemozete vybrat z virtualnej mechaniky. Teda, leda ze
+ by uzivatel vybral RAMku z obimky, ale to sa nejak zrovna moc neodporuca.
+
+ Vsetky data sejvnute do ramdisku su chranene kontrolnymi CRC sumami, takze
+ nejake poruchy v udajoch ulozenych v ramdisku su detekovane (chybou CRC).
+
+ Ako je to mozne, ze 621 bajtov dokaze emulovat disketovu jednotku s uplne
+ vsetkymi featuresami a moznostami ovladania (basicovymi prikazmi aj
+ strojakovymi sluzbami po RST #18 a RST #20) ako keby to bola obycajna
+ realna disketa ? To je velmi jednoduche. System MB-02 je otvorena
+ architektura s presne definovanymi rozhraniami medzi jednotlivymi
+ vrstvami systemu a bez problemov taketo cosi umoznuje. Vsetky rutinky na
+ ovladanie diskety uz v systeme existuju a 621 bajtovy drajver ich
+ jednoducho povedane pri svojej praci dokaze 'zneuzit'...a tym padom
+ poskytnut uzivatelovi taky isty komfort ako keby sa jednalo o klasicku
+ mechaniku. Dokonca aj vsetky oficialne vydane systemove utilitky (napr.
+ ff17, di, cdd, fi, lendir,...) plne spolupracuju s virtualnym ramdiskom
+ ako keby to bola proste dalsia realna mechanika. Hadam najzaujimavejsie
+ je prave ff17 - ramdisk je plne formatovatelny ako klasicka normalna disketa.
+
+ **************
+ * Instalacia *
+ **************
+
+ [1] Predpoklada sa samozrejme nabootovany system, verzia BS Dosu aspon 199.
+ S verziami nizsimi ako 199 nie je zarucena spolahliva funkcia.
+
+ [2] Konfiguracia ramdisku: Na zaciatku drajvera je mala oblast, kde je
+ ulozena adresa portu a cisla baniek, ktore urcuju kde bude ramdisk
+ instalovany a ktore banky bude vyuzivat. Vyzera to nejak takto:
+
+		org #8000
+		jr  install	skok na instalacnu rutinku
+	port	db  23		adresa portu na prepinanie baniek
+	dos_bnk	db  #61		banka v ktorej sa nachadza bios & dos
+	dat_bnk	db  #62,#63,#64	banky urcene pre data
+	dat_bnk	db  #65,#66,#67	banky urcene pre data
+		db  0,0,0,0...	nepouzite
+
+ Cisla baniek musia byt take, ze ked sa dane cislo posle na ten port,
+ banka sa musi naadresovat s povolenym zapisom. Cislo banky 0 znamena
+ neplatny udaj - ramdisk nebude tuto banku vyuzivat. Baniek moze byt
+ najviac specifikovanych 32 (zatial v tejto verzii). Teda ako vidno, je
+ to este robene uz pre novu verziu MB-02, pricom rom+dos su v bankach 0 a 1.
+ Pokial je treba inu konfiguraciu, mozu sa tieto konfiguracne udaje
+ o porte a cislach baniek samozrejme modifikovat. Napriklad pre stary
+ hardware MB-02 by to vyzeralo nejak takto:
+
+		org #8000
+		jr  install	skok na instalacnu rutinku
+	port	db  23		adresa portu na prepinanie baniek
+	dos_bnk	db  #0d		banka v ktorej sa nachadza bios & dos
+	dat_bnk	db  #0e,#0f	banky urcene pre data
+		db  0,0,0,0...	nepouzite
+ V buducnosti v ramci zvysovania konfortu mozno urobim aj daku utilitku,
+ ktora si od uzivatela vypyta cisla baniek a sama ich napokuje do
+ drajvera, alebo pripadne drajver bude spustatelny s parametrami - cislami
+ baniek.
+
+ [3] Ked mame system nabootovany, drajver nakonfigurovany, staci uz len
+ spustit drajver prikazom NEW "ramdrive" - drajver sa sam nainstaluje a
+ zmodifikuje DOS tak, aby poznal novu virtualnu mechaniku.
+ Prikaz NEW "ramdrive" je vhodne vlozit do suboru 'autoexe' aby sa drajver
+ hned sam nainstaloval po nabootovani systemu.
+
+ [4] Velmi dolezite: Instalacia drajvera je v podstate len 'napokovanie'
+ vsetkych obsluznych rutiniek a prislusne modifikacie na systeme. Data v
+ datovych bankach a ani kontrolne sumy dat sa nainstalovanim drajvera
+ neinicializuju. Preto je nutne po prvej instalacii drajvera cely ramdisk
+ najprv pred pouzitim sformatovat. Je to mozne urobit viacerymi sposobmi.
+ Najefektnejsi sposob je klasicke formatovanie klasickym formatovacom
+ diskiek FF17, do ktoreho v tom pripade treba vlozit taketo parametre:
+
+   Meno = RAMDRIVE
+    drv = 9
+    hdd = 0
+    trk = 16
+    sec = 15
+
+ Ramdisk teda v podstate emuluje obojstrannu disketu,
+ ktora ma 16 stop a 15 sektorov na kazdej stope.
+
+ Neinicializovanie dat v ramdisku pri jeho instalacii a tym padom aj
+ nutnost ho rucne formatovat je zvolena umyselne, umoznuje to totiz jednu
+ genialnu vec - ak si uzivatel sejvne nieco do ramdisku, vypne pocitac (a
+ ma banky zalohovanie baterkou), niekedy nabuduce zase zapne, nabootuje
+ system a nainstaluje ramdisk s takou istou konfiguraciou akou mal minule,
+ vsetky data sejvnute do ramdisku ostatnu zachovane a uzivatel s nimi moze
+ pokracovat v praci, kde minule prestal. Data su chranene kontrolnymi sumami,
+ takze keby sa nejak medzicasom porusili, system zahlasi CRC error.
+
+ ************
+ * ramdinit *
+ ************
+
+ Ak sa vam nechce namahat sa s formatovacom FF17, mozete pouzit aj tuto
+ utilitku. Spustite ju prikazom NEW "ramdinit" Je to vlastne taky
+ formatovaci program optimalizovany na formatovanie ramdiskov.
+
+ Po spusteni si tato utilitka osaha vsetkych 255 mechanik, a ked zisti,
+ ze niektora je ramdisk, skontroluje datovu konzistenciu na tomto
+ ramdisku. V pripade, ze ramdisk uz bol 'naformatovany' a data neboli
+ poskodene, utilitka neurobi nic (aby nezmazala data v ramdisku).
+ V pripade datovej nekonzistencie (CRC chyby, poskodeny boot sektor)
+ sa ramdisk naformatuje (otestuje sa jeho velkost, vytvoria sa systemove
+ struktury (boot, fat, adresare...).
+
+ Volanie tejto utilitky NEW "ramdinit" je vhodne umiestnit do suboru autoexe
+ hned za instalaciu hlavneho drajvera NEW "ramdrive" - tym sa zabezpeci, ze
+ ak sa drajver instaluje pry raz a este nie su vytvorene tie systemove
+ struktury na ramdisku, vytvoria sa.
+
+ ************
+ * ramdroff *
+ ************
+
+ Tato velmi jednoducha utilitka (vsimnite si jej dlzku) robi len jednu
+ jedinu malicku drobnu vecicku - odinstaluje drajver 'ramdrive'.
+ Tym padom virtualna mechanika alias ramdisk celkom prestava existovat
+ a BS-DOS je v stave, v akom bol pred instalaciou ramdiskoveho drajvera.
+
+ A co to vlastne robi ? Kym instalacia drajvera NEW "ramdrive" je len
+ 'napokovanie' vsetkych obsluznych rutiniek a prislusne modifikacie
+ na systeme, spustenie utilitky NEW "ramdroff" je len 'odpokovanie'
+ tychto obsluznych rutiniek a modifikacii zo systemu.
+
+ __________________________________________________________________________
+ Index 960729055246                                           Busy software

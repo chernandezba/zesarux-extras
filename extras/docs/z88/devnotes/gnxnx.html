@@ -1,0 +1,50 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Xnx, index next entry in linked list</font></b>
+<p><tt>RST 20H, DEFW $4409</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; CDE = pointer to previous entry
+&nbsp;&nbsp;&nbsp;&nbsp; BHL = pointer to current entry</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; CDE = pointer to old current entry (ie. BHL(in))
+&nbsp;&nbsp;&nbsp;&nbsp; BHL = pointer to next entry
+&nbsp;&nbsp;&nbsp;&nbsp; Fz = 1, if BHL(out) = 0.</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If BHL(in) = 0; BHL(in) and CDE(in) are then preserved.
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_EOF ($09), attempt to step beyond start or end of list</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......../IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/.... different</pre>
+Notes:
+<p>Bugs:
+<br>&nbsp;
+<p>Related calls:
+<blockquote><a href='gnxdl.html'>GN_Xdl</a>, delete an entry from a linked list
+<br><a href='gnxin.html'>GN_Xin</a>, insert an entry into a linked list</blockquote>
+
+</body>
+</html>

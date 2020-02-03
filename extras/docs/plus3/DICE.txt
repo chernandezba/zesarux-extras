@@ -1,0 +1,1762 @@
+Instructions for DICE disk tool for the Spectrum +3
+Transcribed by Damien Guard, 13 September 2004.
+-
+
+DICE
+Version 2.1
+
+By J Eyre
+
+A power Disk Utility for the ZX SPECTRUM +3
+thats as easy to operate as the numbers on the
+dice suggest.
+
+[picture of two dice, both with 1 face up]
+
+Copyright  KOBRAHSOFT  1990
+
+-
+
+
+
+
+
+
+                          DICE  VERSION 2.1
+
+                             by J Eyre
+
+                    (C) Copyright 1990 KOBRAHSOFT
+
+            All rights reserved.  No part of this program or
+            documentation may be reproduced in any form.
+            Unauthorised copying, modifying, hiring, lending
+            or sale prohibited.
+
+
+
+                 Contents:
+
+                 Introduction                 Part 1
+                 Disk Map                          2
+                 Directory Information             3
+                 File Information                  4
+                 File Contents                     5
+                 Disk Access                       6
+                 Log Blocks                        7
+                 Editor                            8
+                 Analyse                           9
+                 Block Diagram               Annex A
+                 Disk Details                      B
+                 DOS File Structure                C
+                 DOS Error Codes                   D
+                 SPECTRUM Character Set            E
+
+
+
+
+
+                                  1
+-
+PART 1
+
+ INTRODUCTION
+
+  DICE (Disk Information Copier Editor) is a powerful yet easy to operate
+utility tool for use with the ZX SPECTRUM +3 disk system.
+
+  Version 2.1 now includes many additional features. The full specification
+is shown below:
+
+    Read Disk Sectors -  Data displayed in Hex and ASCII with cursor
+                         readout in decimal of Byte and Word plus
+                         expanded +3 BASIC token.
+
+    Modify Disk Sectors - Input in decimal, alphanumeric or hexadecimal
+
+    Supports +3/PCW (Type 0), CP/M Plus, CPC System and Data formats
+
+    Examine and edit non standard sectors
+
+    Access any part of the Disk -  Selection by Block, Track and Sector
+                                   or Cursor Keys
+
+    Back-up Disk Files - Copies all or selected files, unfragments files
+                         (unless copying to a fragmented target disk)
+
+    Full Directory Listing - including erased ands special CP/M entries
+
+    Automatically locate the start of a selected file's data
+
+    Automatically follows fragmented file blocks
+
+    Automatically accesses whether an erased file can be recovered
+
+    Single key press to recover files (including multi entry files > 16K)
+
+    Recover lost data from part files or disks with defective directories
+
+    Erase single or multiple files by cursor selection
+
+    Rename files   (checks for duplicate filenames)
+
+    Set/cancel file attributes
+
+    Read file headers and displays file type and details
+
+    Reveals CP/M passwords and protection modes
+
+    Reads CP/M Time and Date stamps
+
+    Graphic and numeric display of file location and disk space used
+
+    Graphic and numeric display of overall disk space used
+
+    Print out of HEX/ASCII sector data
+
+    Fast disk search for a string of up to 8 bytes in length.
+
+    Format Disks - PLUS3DOS/CPM, System and Data formats
+
+
+                                      2
+-
+
+    Displays DOS error warnings with permanent reminder
+
+    Lock out defective sectors
+
+    Automatic checksum update when modifying header records
+
+    Decimal to Hexadecimal calculator (0-65535)
+
+    Confirmation checks before writing to Disk
+
+    Combines simple automatic operations for the novice with full
+    editor facilities for the more experienced user familiar with CP/M
+    file structure
+
+    Easy single key selections from menus
+
+     DICE has been designed principally for use with disks which conform
+   to the formats recognised by the ZX SPECTRUM +3.  Note most commercial
+   "games" disks are copy protected and use non standard formats to
+   prevent illegal copying.  The Analyse option allows many non standard
+   disk sectors to be read and modified.  However writing to commercial
+   disks should be treated with caution and only attempted when sure of
+   the consequences.
+
+     The program can be used within CP/M DOS file structure or by direct
+   access to any part of the disk.  In each case the Editor mode can be
+   initiated to modify data directly on the disk.  The program is
+   organised as follows:
+
+                                 DISK MAP
+           FILE STRUCTURE            |          DIRECT ACCESS
+                     ------------------------------
+                    |                |             |
+              DIRECTORY INFO         |             |
+                    |                |             |
+                FILE INFO        DISK ACCESS    ANALYSE
+                    |                |             |
+              FILE CONTENTS          |             |
+                    |                |             |
+                     --------------EDITOR----------
+
+          See Annex A for a more detailed block diagram
+
+     Full details on each of the functions can be found in Parts 2-9.
+
+     LOADING INSTRUCTIONS: DICE can be loaded directly from the loader
+   option on the Spectrum +3 menu or by typing LOAD "DICE" <ENTER> from
+   BASIC.  Once DICE has loaded with the DISC MAP screen displayed and the
+   disk drive stopped, replace the DICE disk with the disk to be examined
+   and press "N".
+
+     The program is compact using approx 13880 bytes of memory starting at
+   34000 and when running creates data buffers in the memory space up to
+   56382 which includes it's own machine stack.  Some 10K of low memory is
+   available to BASIC.  DICE can be restarted from BASIC by typing
+   RANDOMIZE USR 34000 <ENTER>.  It is therefore quite possible to keep
+   the program in memory when working in BASIC, entering and exiting DICE
+   as necessary to check the contents of disk files
+
+
+
+                                      3
+-
+
+  In general a flashing cursor following a prompt message requires
+either information to be typed in or any key to be pressed to resume
+operation.
+
+  Various confirmation prompts are displayed ie "Erase Y/N" to guard
+against accidental key selections.  Pressing "Y" accepts any other
+key rejects.
+
+  DOS error messages (see Annex D) are displayed at the prompt line.
+Since this is a busy part of the screen, the error message may be over
+written.  A permanent reminder that a DOS error has occurred is
+provided by a flashing "!" at the bottom right corner of the display.
+It is recommended that should a DOS error occur, DICE be reset by
+pressing "N" at the Disk Map screen.  A successful reset will remove
+the flashing "!" warning.
+
+  The data displays are organised as shown in the following diagram.
+The value of each byte in hexadecimal 00-FF (0-255 in decimal) is
+displayed on the left side of the screen and its corresponding ASCII
+character (SPECTRUM character set) is shown to the right.  Where the
+byte value is outside the printable character range a "." is
+displayed.
+
+           --------------------------------------
+          |      DISK LOCATION INFORMATION       |
+          |   ______________________   _______   |
+          |  |                      | |       |  |
+          |  |                      | |       |  |
+          |  |      128 Byte        | | 128   |  |
+          |  |   Quarter Sector     | | Byte  |  |
+          |  |      Display         | | ASCII |  |
+          |  |   in Hexadecimal     | |Display|  |
+          |  |      format          | |       |  |
+          |  |                      | |       |  |
+          |  |______________________| |_______|  |
+          |   ________________________________   |
+          |                                      |
+          |         KEY SELECTION MENUS          |
+          |                                      |
+          |   PROMPT LINE                        |
+           --------------------------------------
+
+  An alternative display is available at the Disk Access and File
+Contents screens.  All 512 bytes of the sector are displayed in
+ASCII, again "." replaces non-printable characters.  This display is
+most suited to Text files from Word Processors or Assembler source code
+but is useful for quick scanning as the arrow keys move a sector at
+a time in this display format.
+
+  DICE has been designed for both novice and the experienced user
+alike.  Many of the functions require no knowledge of how information
+is stored on the disk.  However to make full use of DICE a certain
+amount of knowledge is essential.  Annexs B and C provide some useful
+guidance.  Further information can be found in part 27 of the SPECTRUM
+manual.
+
+
+
+
+
+
+                                   4
+-
+                                PART 2
+
+DISK MAP
+
+
+                   ---------------------------------------
+                  |     c COPYRIGHT KOBRAHSOFT 1990       |
+                  |                                       |
+                  |     DICE V2.1           DISK MAP      |
+                  |    Author J Eyre         Drive A:     |
+                  |                                       |
+                  |    Standard Format Disk               |
+                  |    Disk space used 47K  126K free     |
+                  |    __________________                 |
+                  |   |-----DD***********|                |
+                  |   |******     *******| - Reserved     |
+                  |   |******************| D Directory    |
+                  |   |*****             | * Data Block   |
+                  |   |                  |   Not used     |
+                  |   |__________________|                |
+                  |                                       |
+                  |    NEW INIT DISK ANALYSE FILES QUIT   |
+                  |                                       |
+                  |     c 1990  All Rights Reserved       |
+                  |                                       |
+                   ---------------------------------------
+
+   This function displays the disk format, DICE recognises SPECTRUM+3
+ PCW(Type 0), CP/M Plus, CPC System and Data 3 inch disk formats.
+ Standard Format Disk refers to the format used by the first three.  See
+ Annex B for details of the various formats.
+
+  The amount of disk space allocate to current files and the space
+available for use is also identified together with a graphic indication
+of disk space usage.
+
+  Pressing "I" allows a disk to be initialised or formatted.  A new
+menu "PLUS3DOS/CPM SYSTEM DATA QUIT" and the prompt "Insert Disk &
+select Format" is displayed.  Pressing "Q" quits the formatter.
+Pressing "P","S" or "D" starts the format process.  See Annex B for
+details of the various Formats.  The track number being formatted is
+displayed and once track 39 has been formatted the prompt "Format
+Complete" is displayed.  Pressing any key effectively performs the
+"NEW" operation and the Disk Map for the newly formatted disk is
+displayed
+
+OPTIONS AVAILABLE:
+
+ N - NEW       Resets DICE to read the data from a new disk or
+               following a DOS error message (see Annex D).
+
+ Q - QUIT      Returns to +3 BASIC.  If the Copy facility has been
+               used, DICE checks whether it is safe to return to BASIC
+               and displays the message "NO STACK RESET COMPUTER TO
+               QUIT" if not.  In this case the reset button on the side
+               of the +3 should be pressed to exit DICE.
+
+ F - FILE      Select this to list the Directory and read or
+               modify file information/data.(See Parts 3,4,5 & 8)
+
+                                    5
+-
+
+ D - DISK      Select this option to directly access any disk sector
+               and read or modify data.  (See Parts 6 & 8)
+
+ A - ANALYSE   Select this option to read or modify non standard
+               sectors.  (See Part 9)
+
+ I - INIT      Initialise or Format disks.  PLUS3DOS/CPM, System or
+               Data Formats may be selected.
+
+
+
+                                    6
+-
+                                 PART 3
+
+DIRECTORY INFORMATION
+
+               ______________________________________
+              |   A:       DIRECTORY       PAGE 0    |
+              |   >?LONGFILE      |    -             |
+              |    ?+             |    -             |   KEY:
+              |     CLOCK.BAS     |    -             |   ? ERASED FILE
+              |     !             |    !             |   + CONTINUATION
+              |    *LABEL         |    -             |   - NEVER USED
+              |     FILENAME.1    |    -             |   * CPM INFO
+              |    *FILENAME.1    |    -             |   ! DATE AND TIME
+              |     !             |    !             |     MARKED ENTRY
+              |    #FILENAME.2    |    -             |
+              |    #FILENAME.3    |    -             |
+              |    #FILENAME.4    |    -             |
+              |     !             |    !             |
+              |     -             |    -             |
+              |     -             |    -             |
+              |     -             |    -             |
+              |     !             |    !             |
+              |   _______________________________    |
+              |                                      |
+              |   <  > SCAN   RENAME   ERASE  QUIT   |
+              |   COPY MARK   SELECT   BLANK  PAGE   |
+              |   ENTRY No 0                         |
+              |                                      |
+               --------------------------------------
+
+
+  This function displays a two page listing of all 64 directory
+entries showing both current and erased files.  The entry number at
+the position of the cursor is displayed at the bottom part of the
+screen.
+
+  Files over 16K in length require more than one entry to list their
+data blocks (see Annex C).  Continuation entries are indicated by a
+"+".  Erased files are indicated by a "?" preceding the filename.  CP/M
+Disk Volume Labels and File Protection entries are preceeded by an "*".
+Directories formatted for time and date stamps are shown by a "!" in
+every fourth entry slot.
+
+  The example directory list above shows the various combinations.  The
+directory has been initiated for CP/M Date and Time stamps.  FILENAME.1
+occupies two entries, the second, preceeded by the "*" contains
+password protection information.  LONGFILE is shown as an erased file
+with one continuation entry.  Note in practice continuation entries
+will not always occupy the next entry slot.
+
+  Files can be selected for susequent copy and erase actions.  In the
+example directory above, FILENAME.2, .3 AND .4 have all been marked.
+Single or selected files can be erased.  A file rename facility is also
+provided.
+
+COPY:
+
+  Pressing "C" initiates the disk copier.  If files have been marked
+for copying a confirmation prompt "Selected File copy Y/N" is
+
+
+                                   7
+-
+
+displayed otherwise "Copy all Files Y/N" is displayed.  The copy
+facility makes use of the extended memory of the +3, consequently any
+files on the RAM disk "M:" will be lost.  If BASICs machine stack is
+above 29000 then it will be over written.  DICE checks for this before
+exiting to prevent what would otherwise be an unpredictable result.
+
+  The facility effectively performs the DOS command COPY "A:*.*" TO
+"B:" and provides an unfragmented copy of all or the selected current
+files.   (ie the files are stored on contiguous sectors on the disk.
+See Annex C).  Note if files are being copied to a disk which already
+contains fragmented files then the data for the new files will be
+stored at the first available locations in the normal way.
+
+  This facility is especially useful on single drive computers since
+the maximum number of disk change overs is 3, for a full disk.  Whereas
+using the DOS command would require the disks to be swapped for every
+file.
+
+  Note for CP/M users, Password protection and Date and Time stamps
+are removed during the copy process.
+
+OPTIONS AVAILABLE:
+
+ ARROW KEYS    Move the cursor around the directory list.
+
+ S - SELECT    Selects the entry at the cursor and displays file
+               detais.  (See Part 4)
+
+
+ Q - QUIT      Returns to the DISK MAP.
+
+ P - PAGE      Toggles between page 0 and page 1.
+
+ M - MARK      Marks an entry for subsequent copy or erase actions.
+               Pressing "M" again deselects the entry.
+
+ B - BLANK     De-selects all marked entries.
+
+ C - COPY      Provides a back-up copy of all or selected current disk
+               files.  Prompts are displayed requesting disk change
+               overs.  The prompts refer to the disk to be copied as
+               the SOURCE disk and the copy as the TARGET disk.
+
+ E - ERASE     If one or more files have been marked the prompt
+               "Multiple Erase Y/N" is displayed otherwise only the
+               file at the cursor will be erased and the prompt "Erase
+               Y/N" is displayed.  Press Y to erase the file or files
+               selected any other key cancels the request.
+
+ R - RENAME    Change the name of the file at the cursor.  A prompt and
+               filename template "New Filename         .   " is
+               displayed.  Standard alphanumerics can be typed in.
+               Additionally DOS allows a limited range of special
+               characters ie _#$|@|"{}~ to be included in filenames.
+               These can be selected by repeated presses of the CAPS
+               SHIFT key which cyclically displays the characters.Once
+               the required character is displayed pressing another
+               Alphanumeric key enters both the special character and
+               the newly keyed character.  To enter another special
+               character first press CAPS LOCK then keep pressing CAPS
+
+
+                                   8
+-
+
+               SHIFT until the required character is displayed.  To
+               abort RENAME, Press ENTER then "N" at the "Save Y/N"
+               prompt.
+
+      Additional Key Functions for RENAME:
+
+          ENTER            Enter new filename
+          CAPS SHIFT       Cycle special characters
+          CAPS LOCK        Enter special characters
+          DELETE           Delete character to the left of the
+                           cursor
+          SPACE            Copy corresponding character from old
+                           filename
+          <                As delete
+          >                Move cursor to the start of the EXT field
+
+
+                                   9
+-
+
+                                PART 4
+
+FILE INFORMATION
+
+              ______________________________________
+             |            ENTRY No 0                |
+             |                                      |
+             |   File: CLOCK.BAS      ERASED        |
+             |   Starts Block 2    Trk 1   Sect 4   |
+             |   Occupies 3K of Disk space          |
+             |   PLUS3DOS  VERSION 1.0              |
+             |   BASIC Program Runs Line 10         |
+             |   __________________                 |
+             |  |-----DD***        |                |
+             |  |                  | - Reserved     |
+             |  |                  | D Directory    |
+             |  |                  | * Data block   |
+             |  |                  |   Not used     |
+             |  |__________________|                |
+             |                                      |
+             |   < > SCAN  EXAMINE  HEADER   QUIT   |
+             |             RECOVER  DISK     ATRB   |
+             |   File Recovery possible             |
+             |                                      |
+              --------------------------------------
+
+  This function displays the filename followed either by any file
+attributes or in the case of an erased file an erased indicator.  Both
+graphic and numeric details of the location of the file and the amount
+of disk space used are displayed.
+
+  The start of the file is identified by Block, Track and Sector
+number.  Erased files are identified and an assessment of the
+possibility of recovery is displayed.  Pressing "R" automatically
+recovers the file.  A check is made for an existing file with the
+same filename.  In the case of a duplicate the extension .| is added
+to the recovered file.
+
+  Initially the User Number, always 0 for +3 files but may be in the
+range 0-15 for CP/M, together with any password and protection mode
+information is displayed.  Pressing "H" replaces the User No with
+details of any header information found.  These are mutually exclusive
+since CP/M files don't have Headers and +3 files are always User 0 and
+don't use password protection.
+
+HEADER DETAILS:
+
+  BASIC PROGRAM      Autostart Line Number.
+  CODE               Load Address and length of code
+  ARRAYS             Array Name/Type and length of array
+
+  Ifthe disk contains CP/M files set up for Date and Time stamping
+these details may be found by noting the Entry number then pressing the
+right arrow key until the next Date and Time Information screen is
+displayed.  Date and Time details may be read for the previous 3
+Entries.
+
+OPTIONS AVAILABLE
+
+ < >             Move backward or forward one entry.
+
+
+                                   10
+-
+
+ Q - QUIT        Return to Directory Information. (See Part 3)
+
+ D - DISK        Shortcut to DISK ACCESS   (See Part 6)
+
+ H - HEADER      Displays any header information found.
+
+ A - ATRB        Change file attribute settings.  A series of prompts
+                 are displayed - "Protect Y/N", "System Y/N",
+                 "Archive Y/N", "Save to Disk Y/N" pressing "Y" sets
+                 the attribute, any other key cancels it.
+
+ E - EXAMINE     Displays Hex and ASCII details of the file starting at
+                 its first sector.  (See Part 5)
+
+ R - RECOVER     Recover an erased file.  This option is only available
+                 when there is a possibility of a successful file
+                 recovery.  Part data recovery can be made via DISK
+                 ACCESS mode.  (See Part 6)
+
+
+
+                                   11
+-
+
+                                 PART 5
+
+FILE CONTENTS
+
+              ______________________________________
+             |    A:  BLK 2    TRK  1   SECT 4.0    |
+             |   50 4C 55 53 33 44 4F 53 PLUS3DOS   |
+             |   1A 01 00 17 0A 00 00 00 ........   |
+             |   97 09 0A 00 20 07 00 00 .... ...   |
+             |   00 00 00 00 00 00 00 00 ........   |
+             =   00 00 00 00 00 00 00 00 ........   =
+             |   00 00 00 00 00 00 00 6A .......j   |
+             |   ________________________________   |
+             |                                      |
+             |   <  > SCAN  DISPLAY  EDIT  QUIT     |
+             |   FILE: CLOCK.BAS                    |
+              --------------------------------------
+
+     On entry the data at the start of the file is displayed.  This is
+   normally reserved for the file header information.  (See Annex C)
+
+     The Drive, Block, Track and Sector numbers are indicated on the
+   top line of the display.  128 bytes of data are displayed, in
+   Hexadecimal to the left and ASCII to the right.  Non printable
+   SPECTRUM character codes are replaced in the ASCII displayed by a ".".
+
+     Each disk sector holds 512 bytes of data, so four pages are needed to
+   cover a sector.  The quarter of the sector being displayed is indicated
+   by a number in the range 0-3 following the sector number and dot on the
+   top line.  An alternative display shows the full sector, 512 bytes, in
+   ASCII only.
+
+     When DOS saves a file to disk it finds the next available 1K block
+   (2 sectors) to store the data.  Therefore on a well used disk a file
+   exceeding 1K may not be stored on contiguous sectors but maybe split
+   up in 1K Blocks and spread around the disk.  The left and right
+   arrow keys scan through the file automatically locating the next
+   track and sector and displaying file data in the correct sequence.
+   Only the sectors occupied by the file are scanned.  Start of file
+   and end of file indications are displayed at the limits of the file.
+
+  OPTIONS AVAILABLE
+
+      < >        Scan backwards and forwards through the file either a
+                 quarter sector or full sector depending on display mode.
+
+                 Scan backwards or forwards to the start of the next
+                 block.
+
+   D - DISPLAY   Toggles between the 128 byte HEX/ASCII and 512 byte ASCII
+                 display formats.
+
+   Q - QUIT      Return to File Information.  (See Part 4)
+
+   E - EDIT      Enter the Editor mode. (See Part 8)
+
+
+                                      12
+-
+
+                                    PART 6
+
+DISK ACCESS
+
+            --------------------------------------
+           |    A:  BLK 0    TRK  1   SECT 0.0    |
+           |                                      |
+           |   00 43 4C 4F 43 4B 20 20 .CLOCK     |
+           |   20 42 41 53 00 00 00 15  BAS....   |
+           |   02 03 04 00 00 00 00 00 ........   |
+           |   00 00 00 00 00 00 00 00 ........   |
+           |   E5 4C 4F 4E 47 46 49 4C .LONGFIL   |
+           |   45 80 80 80 00 00 00 80 E          |
+           |   05 06 07 08 09 0A 0B 0C ........   |
+           |   0D 0E 0F 10 11 12 13 14 ........   |
+           |   E5 4C 4F 4E 47 46 49 4C .LONGFIL   |
+           |   45 80 80 80 01 00 00 77 E      w   |
+           |   15 16 17 18 19 1A 1B 1C ........   |
+           |   1D 1E 1F 20 21 22 00 00 ... !"..   |
+           |   00 46 49 4C 45 4E 41 4D .FILENAM   |
+           |   45 45 58 54 00 00 00 02 EEXT....   |
+           |   05 00 00 00 00 00 00 00 ........   |
+           |   00 00 00 00 00 00 00 00 ........   |
+           |   ________________________________   |
+           |                                      |
+           |   <  > SCAN  DISPLAY  EDIT   QUIT    |
+           |   LOG  SECT  TRACK    BLOCK  FIND    |
+           |                                      |
+            --------------------------------------
+
+   The Drive, Block, Track and Sector numbers are indicated on the
+ top line of the display.  128 bytes of data are displayed, in
+ Hexadecimal to the left and ASCII to the right.  Non printable
+ SPECTRUM character codes are replaced in the ASCII display by a ".".
+
+   Each disk sector holds 512 bytes of data, so four pages are needed to
+ cover a sector.  The quarter of the sector being displayed is indicated
+ by a number in the range 0-3 following the sector number and dot on the
+ top line.  An alternative display shows the full sector, 512 bytes, in
+ ASCII only
+
+   All sectors can be scanned using the left and right arrow keys.  all
+ tracks can be scanned using the up and down arrow keys.
+
+   Any part of the disk maybe accessed by selection of Block, Track
+ and Sector numbers.  Track and Sector numbers are entered in
+ decimal.  Block numbers can be entered in either decimal or
+ hexadecimal.
+
+FIND:
+
+   Pressing "F" enters the search mode to find a selected string of
+ up to 8 bytes on the disk.  On entry the Hex and ASCII displays are
+ cleared and a prompt "Input (0-255) is displayed at the bottom of
+ the screen.  Pressing CAPS SHIFT changes the prompt to
+ "Alpha/Numeric", pressing CAPS SHIFT again changes the prompt to
+ "Hexadecimal".  Further presses of CAPS SHIFT toggle through this
+ sequence.  Pressing CAPS LOCK in the Alphanumeric mode toggles
+ between upper and lowercase.
+
+                                    13
+-
+
+   Values should be input in the correct form for the select input
+ mode.  Pressing ENTER in either the decimal or hexadecimal mode enters
+ the value in the input line.  Alphanumerics are entered as they are
+ typed.  The value or character entered is displayed on the upper screen
+ in ASCII, Hex and Decimal and DICE waits for a further input.
+
+   DELETE removes the character to the left of the input cursor.  If
+ the input line is empty the left arrow key deletes the last entered
+ value displayed on the upper screen.
+
+   BREAK exists the search mode and returns to the previous Hex and ASCII
+ displays.
+
+   Pressing the right arrow key initiates the disk search.  The Track
+ number being searched is displayed at the bottom of the screen.
+ Pressing "Q" stops the search, note it may be necessary to hold the key
+ down for approx 1 second as a check for a stop request is only made at
+ the end of each track.
+
+   If the string is not located, the message "Not Found" is displayed
+ at the bottom of the screen.  Pressing any key returns to the
+ previous Hex and ASCII displays.
+
+   If the string is found, the Hex and ASCII displays are set to show
+ the data at the new disk location and the first character of the
+ string is highlighted.  The message "Found" is displayed at the
+ bottom of the screen followed by "ENTRY No" and a list of any
+ entries which use the data block containing the string.  Pressing
+ any key exits the search mode.
+
+   On entry to the search mode from DISK ACCESS the last used string
+ value is displayed on the upper screen which may then be edited or a
+ new search initiated.
+
+OPTIONS AVAILABLE
+
+   < >          Scan backward and forward one quarter sector or full
+                sector depending on display mode.
+
+                Scan backward and forward one track.
+
+   Q - QUIT     Return to Disk Map (See Part 2) or File Information (See
+                Part 4) depending on entry to Disk Access.
+
+   E - EDIT     Enter the Editor mode.  (See Part 8)
+
+   T - TRACK    Change Track number.  A prompt "Track (0-39)" is
+                displayed.  The required Track number should be typed
+                in followed by <ENTER>.  DELETE removes the character
+                to the left of the input cursor.  BREAK aborts the
+                request.
+
+   S - SECTOR   Change Sector number.  A prompt "Sector (0-8) is
+                displayed and the sector accessed when an appropriate
+                number key is pressed.
+
+   B - BLOCK    Change Block number.  A prompt "Block No" is
+                displayed.  Pressing CAPS SHIFT changes the prompt to
+                "Hexadecimal".  Further presses of CAPS SHIFT toggles
+                between the two input modes.  The required Block
+
+
+                                    14
+-
+
+                number should be typed in the form of the selected
+                input mode followed by <ENTER>.  DELETE removes the
+                character to the left of the input cursor.  BREAK
+                aborts the request.
+
+   L - LOG      Log block numbers to reclaim lost data on a disk (See
+                part 7)
+
+   F - FIND     Search the disk for a string of up to 8 bytes which can
+                be input in any combination of Decimal, Alphanumeric or
+                Hexadecimal.
+
+Additional Key functions for FIND:
+
+    <           Removes the last value/character entered from the
+                string.
+
+    >           Initiates a disk search for the string displayed on the
+                upper screen
+
+  ENTER         Enters the value in the input line.
+
+  DELETE        Removes the character to the left of the input cursor.
+
+  BREAK         Exits the search mode.
+
+  CAPS SHIFT    Changes input mode through Decimal - Alphanumeric -
+                Hexadecimal.
+
+  CAPS LOCK     Toggles upper or lowercase in Alphanumeric input
+                mode only.
+
+    Q           Abandons the disk search.
+
+
+                                    15
+-
+
+                                 PART 7
+
+LOG
+
+             ------------------------------------
+            |      LOG OF BLOCKS TO RECLAIM      |
+            |                                    |
+            |   01  02  03  04  05  06  07  08   |
+            |   1   2   3   4   5   6   7   8    |
+            |   09  0A  0B  0C  0D  0E  0F  10   |
+            |   9   10  11  12  13  14  15  16   |
+            =                                    =
+            |   39  3A  3B  3C  3D  3E  3F  40   |
+            |   57  58  59  60  61  62  63  64   |
+            |   _______________________________  |
+            |                                    |
+            |   Block  1   Selected Blocks 64    |
+            |   COPY  ADD  DELETE  BLANK  QUIT   |
+            |                                    |
+             ------------------------------------
+
+   This function allows file data to be retrieved from a disk when the
+ directory entry has been overwritten or the sectors containing the
+ directory damaged.  Up to 64 block numbers can be logged which are
+ displayed in decimal and hex.  The current block number and the number
+ of blocks logged are displayed in the lower part of the screen.
+
+   The procedure is to scan through the disk sequentially locating the
+ required blocks at the Disk Access screen.  As each block is located
+ press "L" which results in the prompt "Press: A - Add R - Review".
+ Pressing "A" will add the block number to the list and remain at the
+ Disk Access screen.  Pressing "R" displays the Log screen.
+
+   When all required blocks have been logged, press "C" - COPY.  A
+ prompt "New Filename         .    " is displayed.   Type in a filename
+ using the same procedure as the RENAME facility (See Part 3).  The
+ logged data blocks will then be copied to a file, with the requested
+ filename, created on a new disk.
+
+OPTIONS AVAILABLE
+
+Q - QUIT     Return to the Disk Access (See Part 6)
+
+D - DELETE   Remove the last block number in the Log
+
+B - BLANK    Remove all block numbers from the Log
+
+A - ADD      Add the current block number to the Log
+
+C - COPY     Create a file containing all logged blocks on a new disk
+
+
+                                    16
+-
+
+                                 PART 8
+
+EDITOR
+
+           --------------------------------------
+          |    A:  BLK 2    TRK  1   SECT 4.0    |
+          |                                      |
+          |   50 4C 55 53 33 44 4F 53 PLUS3DOS   |
+          |   1A 01 00 17 0A 00 00 00 ........   |
+          |   97 09 0A 00 20 07 00 00 .... ...   |
+          =   00 00 00 00 00 00 00 00 ........   =
+          |   00 00 00 00 00 00 00 00 ........   |
+          |   00 00 00 00 00 00 00 6A .......j   |
+          |   ________________________________   |
+          |                                      |
+          |   <  > SCAN  CHANGE  SAVE   QUIT     |
+          |   Byte:80 Word:19536 PRINT  HEX      |
+          |   BASIC:P                            |
+           --------------------------------------
+  
+
+  This function allows disk data to be modified and the Hex/ASCII part
+of the display to be output to a printer.  The cursor (Inverse Video)
+can be moved around the Hex and ASCII displays using the arrow keys.
+
+  Readouts at the bottom of the screen display the value, in
+decimal, of the byte and word (LSB first) at the cursor position.  If
+the value of the byte corresponds to a BASIC token then it is also
+displayed.  This is a very useful feature when examining a +3 BASIC
+file.
+
+  Data can be changed by pressing "C".  A prompt "Input (0-255)" is
+displayed at the bottom of the screen.  Pressing CAPS SHIFT changes
+the prompt to "Alpha/Numeric", pressing CAPS SHIFT again changes the
+prompt to "Hexadecimal".  Further presses of the CAPS SHIFT toggle
+through this sequence.  Pressing CAPS LOCK in the Alphanumeric mode
+toggles upper and lowercase.  The appropriate prompt for the chosen
+method of input should be selected.
+
+  DELETE removes the character to the left of the input cursor.  ENTER
+inputs new data.  In the decimal and hexadecimal input modes the
+right and left arrow keys input the new value and move the display
+cursor forwards or backwards one position.  In the alphanumeric mode
+characters are input as they are typed and the cursor moved one
+position forward.  BREAK exits the Change mode any data in the input
+line is ignored.
+
+  Changed data is displayed in Red and White.
+
+  Pressing "S" saves the changes made to disk.  A confirmation
+prompt "Save Y/N" is displayed.  Pressing "Y" saves the changes, any
+other key cancels the request.
+
+  If changes are being made at the first quarter of a Sector DICE
+checks to see if the original was a valid header record (See Annex C)
+and if so displays a prompt "Update Checksum (U)".  Press "U" ONLY when
+modifying a Header block at the start of a file.  If "U" is pressed the
+checksum at the bottom right of the Hex and ASCII displays will be
+automatically calculated and changed before saving to disk.  Pressing
+any other key just saves the changes requested.
+
+
+                                    17
+-
+
+   Pressing "Q" exits the Change mode.  On return to Disk Access or File
+ Contents screens any changes not previously saved to disk are lost.  On
+ return to the Analyse screen the edited data is displayed and the
+ sector must be re-read to retrieve the original data ie current the
+ data on the disk.
+
+   Pressing "P" causes the displayed Track and Sector numbers and
+ Hex/ASCII data to be output to a printer.  The printer should be
+ connected to the parallel (Centronics) port of the Plus3.  if the
+ printer is disabled or not connected an error message will be
+ displayed after a timeout period.
+
+   Pressing "H" initiates the decimal to hexadecimal calculator.  At the
+ prompt "Decimal" a number in the range 0-65535 may be typed in.
+ Pressing ENTER displays the corresponding hexadecimal number.  DELETE
+ removes the character to the left of the input cursor.  BREAK exits the
+ calculator.  Note the hex number is displayed Most Significant Byte
+ first ie 512 = 0200.  However 16 bit (2 byte) numbers are normally
+ stored Least Significant Byte first ie 512 = 00 20.
+
+OPTIONS AVAILABLE
+
+ ARROW KEYS      Move cursor around the Hex and ASCII displays.
+
+ Q - QUIT        Return to FILE CONTENTS (See Part 4) or DISK ACCESS
+                 (See Part 6) or ANALYSE (See Part 9) depending on entry
+                 to the EDITOR.
+
+ P - PRINT       Print out Hex/ASCII part of the display.
+
+ H - HEX         Decimal to Hexadecimal calculator ( 0 - 65535)
+
+ S - SAVE        Save changes to disk
+
+ C - CHANGE      Enters Change mode to modify data
+
+Additional Key functions for CHANGE:
+
+ DELETE          Delete the character to the left of the input
+                 cursor.
+
+ CAPS SHIFT      Change input mode through Decimal - Alphanumeric -
+                 Hexadecimal.
+
+ CAPS LOCK       Toggles upper or lowercase in Alphanumeric input
+                 mode only.
+
+ BREAK           Exit Change mode any data in the input line is ignored
+
+ ENTER           Input new data.
+
+   <             Inputs new data, in the decimal and hexadecimal
+                 modes, and moves the cursor backwards one position
+                 on the Hex and ASCII displays.
+
+   >             As above but moves the cursor forward one position.
+
+
+                                     18
+-
+
+                                   PART 9
+
+ANALYSE
+
+            ---------------------------------------
+           |    TRACK 1   SECTORS AVAILABLE 9      |
+           |                                       |
+           |      NO  BYTES   DATA   RESULTS       |
+           |                                       |
+           |    > 1    512     *     40 80 00      |
+           |      2    512     *     40 80 00      |
+           |      3    512     *     40 80 00      | 
+           |      4    512     *     40 80 00      | 
+           |      5    512     *     40 80 00      | 
+           |      6    512     *     40 80 00      | 
+           |      7    512     ?     00 00 40      | 
+           |      8    512     ?     00 00 40      | 
+           |      9    512     ?     00 00 40      |
+           |                                       |
+           |   _______________________________     |
+           |                                       |
+           |   <  > SCAN   BINARY   READ   QUIT    |
+           |                                       |
+            ---------------------------------------
+
+  This function allows many non standard formatted disk sectors to be
+read.  All other parts of this document have referred to LOGICAL SECTOR
+NUMBERS (ie 0-8).  However the actual sector numbers recorded in the
+sector identifier on the disk may be any number in the range 0-255.
+Sector numbers for the formats recognised by DOs are numbered 1-9 plus
+an offset which is held in the extended disk parameter block (XDPB) see
+part 27 of the Spectrum Manual.  Sector numbers for the various formats
+are shown below:
+
+   FORMAT           OFFSET          SECTOR NUMBERS
+
+  Spectrum             0                 1-9
+  CPC System          64                65-73
+  CPC Data           192               193-201
+
+  All the above formats use a sector size of 512 bytes, also specified
+in the XDPB. However the Floppy Disk Controller can be programmed to
+handle different sector sizes.  Even if the sector numbers and size
+conform to one of the above formats, information can be written to the
+disk as "deleted data" and will be hidden to DOS unless the XDPB is
+patched.  The operation of the uPD765A floppy disk controller is too
+complex to describe here and it should be noted that there are other
+parameters which may be changed so that data is not readable by DOS.
+
+  This option allows sectors of various sizes and numbers to be read
+where the data may have been recorded normally or as deleted data.
+
+  On entry the display shows the track number and the number of sectors
+found on the track.  The display then lists the identifier number for
+each sector, it's size in bytes, whether data has been recorded
+normally (indicated by "*") or as deleted data (indicated by "?").  The
+values in Hex of Command Status Registers 0-2 after reading each sector
+is also displayed.
+
+  The meaning of each bit in the registers is shown in the table below.
+
+
+                                 19
+-
+
+ To convert from the hex value to binary press "B" and type in the hex
+ value followed by ENTER.  The corresponding value in binary (most
+ significant bit first) ie D7 D6 D5 D4 D3 D2 D1 D0 is then displayed and
+ can be checked against the table.
+
+   The cursor can be moved through the sector numbers using up and down
+ arrow keys.  Pressing "R" reads the selected sector and displays the
+ usual 128 byte Hex/ASCII display.  Note that the sector number in the
+ top line is the physical sector number not he logical number as in
+ Disk Access and File Contents displays.
+
+   Options from the 128 byte display allow other tracks and sectors to
+ be accessed or the Editor to be selected (See Part 8).  The Quit option
+ returns to the Disk Map screen (See Part 2).
+
+OPTIONS AVAILABLE   Sector Selection Screen:
+
+            Move the cursor to select a sector
+
+R - READ    Read the selected sector
+
+B - BINARY  Hex to Binary converter
+
+Q - QUIT    Return to 128 byte Hex/ASCII data display
+
+
+OPTIONS AVAILABLE   Sector Data Display
+
+  <  >      Move backward or forward through the sectors data
+
+T - TRACK   Select a track
+
+S - SECTOR  Displays Sector Selection Screen
+
+E - EDIT    Edit sector information (See Part 8)
+
+Q - QUIT    Return to Disk Map (See Part 2)
+
+B - BINARY  Hex to Binary converter
+
+Command Status Registers
+
+ The Command Status Registers are displayed as follows:
+
+                   RESULTS
+
+               ST0   ST1   ST2
+
+
+ST0
+
+   BIT     DESCRIPTION
+
+   D7      D7=0 D6=0 Successful
+           D7=0 D6=1 Abnormal termination
+   D6      D7=1 D6=0 Invalid command issued
+           D7=1 D6=1 Abnormal termination.  Drive changed to not
+                     ready during command execution
+
+   D5      Set to 1 when FDC completes the seek command
+
+
+                                    20
+-
+
+   D4      Set to 1 when fault signal received from FDC
+
+   D3      Set to 1 if FDC not ready
+
+   D2      Head number 0 or 1
+
+   D1
+           Drive number 0 to 3
+   D0
+
+ST1
+
+   D7      Set to 1 when FDC tries to access a sector beyond the
+           final sector on the track
+
+   D6      Not used always set to 0
+
+   D5      Set to 1 when CRC error detected in ID or Data
+
+   D4      Set to 1 if FDC not serviced by system within time
+           limit
+
+   D3      Not used always set to 0
+
+   D2      Set to 1 if sector info not found
+
+   D1      Set to 1 if write protected
+
+   D0      Set to 1 if ID address mark not found
+
+ST2
+
+   D7      Not used always set to 0
+
+   D6      Set to 1 if deleted data
+
+   D5      Set to 1 if CRC error detected in data
+
+   D4      Set to 1 if track number in ID doesn't match
+
+   D3      Set to 1 if contents of memory and sector data match
+           (scan command)
+
+   D2      Set to 1 if the test issued by scan command not met
+
+   D1      Set to 1 if track different to ID and contents = 255
+
+   D0      Set to 1 if Data Address mark missing
+
+  Note 1: DICE sets the sector being read as the last sector on the track.
+The normal result from the PLUS3 driver is 40 80 00 ie Abnormal termination
+due to trying to access a sector beyond the final sector.  The required
+sector is read but the FDC tries to access the next sector.  The normal
+result for Deleted Data is 00 00 40.  The 40 indicates that Deleted Data
+has been read and in this case the FDC does not try to access the next
+sector.
+
+  Note 2: The description of the Command Status Registers has been kept
+very brief.  If more information is required a technical data sheet for
+the uPD765A should be obtained.
+
+
+                                      21
+-
+
+                                           ANNEX A
+
+                              _______                         ____________
+                             |       |                       |            |
+                             |     ------------------------------         |
+This diagram shows the       |    |          DISK MAP            |        |
+main features of DICE        |    |------------------------------|        |
+and the Keys which are    FORMAT  |Graphic and Numeric display   |    RESET FOR
+used to move around the    DISK   |of disk space used and free.  |    NEW DISK
+program.                     |    |Indicates Disk Format         |        |
+                             |    |------------------------------|        |
+                             |    | |I|  |F| |D|    |A|      |N| |        |
+                             |     ------------------------------         |
+                             |_______|    |   |      |        |___________|
+                              ____________|   |      |__________
+                             |                |_____            |
+            ______         FILES       ________     |           |            _________
+           |      |          |        |        |    |           |           |         |
+           |     -------------------------     |    |   -------------------------     |
+           |    |  DIRECTORY INFORMATION  |    |    |  |        ANALYSE          |    |
+           |    |-------------------------|    |    |  |-------------------------| SELECT
+           |    |Full Directory Listing   |  COPY   |  |Read non standard sectors| TRACK
+        TOGGLE  |Cursor selection of Entry|  ERASE  |  |Examine Status Registers | SECTOR
+       PAGE 0/1 |Copy all/selected files  | RENAME  |  |-------------------------|    |
+           |    |Rename/erase files       |  FILES  |  |       |E|       |T| |S| |    |
+           |    |-------------------------|    |    |  |-------------------------|    |
+           |    | |P|   |S|   |C| |E| |R| |    |    |           |         |___|_______|
+           |     -------------------------     |    |           -->EDIT
+           |_______|     |     |___|___|_______|    |
+                       SELECT                       |
+                       ENTRY                        |_____________
+            ________     |             _____      _________       |         _________
+           |        |    |            |     |    |         |      |        |         |
+           |    -------------------------   |    |     -------------------------     |
+           |   |     FILE INFORMATION    |  |    |    |      DISK ACCESS        |    |
+           |   |-------------------------|  |   FIND  |-------------------------|    |
+         SET/  |File details including   |  |  STRING |128 Byte Hex/ASCII       |  SELECT
+        CANCEL |Header information.      |  |   LOG   |512 Byte ASCII Displays  |  BLOCK
+         FILE  |Graphic indication of    |  |  BLOCKS |Selection of Block, Track|  TRACK
+     ATTRIBUTES|Disk space occupied.     |  |    |    |Sector. Scans all Sectors|  SECTOR
+           |   |File recovery assessment |RECOVER|    |Search disk for a string.|    |
+           |   |-------------------------|ERASED |    |-------------------------|    |
+           |   | |A|       |E|       |R| |FILE   |    | |L| |F| |E| |B| |T| |S| |    |
+           |    -------------------------   |    |     -------------------------     |
+           |______|         |         |_____|    |_______|___|   |   |___|___|_______|
+                        EXAMINE                                 EDIT
+                        A  FILE               _____________      |           _______
+                            |                |             |     |          |       |
+                -------------------------    |         -------------------------    |
+               |      FILE CONTENTS      |   |        |        EDIT MODE        |   |
+               |-------------------------|   |        |-------------------------|   |
+               |128 Byte Hex/ASCII       |   |        |Cursor can be moved over |   |
+               |512 Byte ASCII Displays  |  EDIT      |displays. Data printout. | CHANGE
+               |Automatically follows    |   |        |Readouts of Byte/Word in |  SAVE
+               |File Blocks.             |   |        |decimal plus BASIC Token.| TO DISK
+               |-------------------------|   |        |Change data on disk.     |   |
+               |                     |E| |   |        |-------------------------|   |
+                -------------------------    |        |     |P|      |C|    |S| |   |
+                                      |______|         -------------------------    |
+                                                                      |______|______|
+
+
+                                               A1
+-
+
+ANNEX B
+
+     A Disk Formatted by PLUS3DOS will have the characteristics shown
+   in the diagram below:
+
+   [image of disk]
+
+     On each side of the Disk there are 40 (0-39) Tracks which are each
+   divided into 9 (0-8) sectors.  The formatting process places an
+   identification mark at the start of each sector.  When data is to be
+   read or written, the disk is revolved and the Disk Drive read/write
+   head positioned above the required track.  DOS then checks for the
+   sector identifier to read or write the data.
+
+     DICE has Disk Maps which show where data is stored on the whole
+   Disk or where data for a particular file is stored.  These maps show
+   the Tracks sequentially as shown in the following diagram.
+
+                   -------------------------------
+                  |Track 0|Track 1|Track 2|Track 3|
+                  |Track 4|Track 5|Track 6|Track 7|
+                  :          Tracks 8-35          :
+                  |Track36|Track37|Track38|Track39|
+                   -------------------------------
+
+     Each Track is made up of 9 Sectors and each Sector can store 512
+   bytes of data.  DOS reserves various parts of the Disk space
+   depending on the format used.  If Track 0 is reserved, the first
+   Sector of this Track can be used as a Bootstrap (see the SPECTRUM
+   Manual Part 26 for an example).  Reserved disk space for the various
+   formats is shown below:
+
+                TRACK 0          TRACK 1             TRACK 2
+
+SPECTRUM +3    Reserved          Directory             -
+                               (sectors 0-3)
+
+CPC SYSTEM     Reserved          Reserved          Directory
+                                                 (sectors 0-3)
+
+CPC DATA       Directory            -                   -
+             (sectors 0-3)
+
+
+                                      B1
+
+-
+
+                                  ANNEX C
+
+DIRECTORY
+
+      The key to the data stored on a disk in the Directory.  In the
+   Spectrum (PCW Type 0) format, DOS reserves Sectors 0-3 (2048 bytes) of
+   Track 1 for this purpose.  Space is provided for 64 Entries (numbered
+   0-63) each entry comprising 32 bytes of information.  DOS manages disk
+   storage in Blocks of 1024 bytes (2 Sectors).  The Directory occupies
+   Block 0-1 and the remainder of the disk Blocks 2-175, situated on
+   Tracks 1-39, are available for data storage.
+
+      |----------TRACK 1---------|--------TRACK 2-----------|
+      |BLK 0|BLK 1|BLK 2|BLK 3|BLK 4|BLK 5|BLK 6|BLK 7|BLK 8|
+      |S0|S1|S2|S3|S4|S5|S6|S7|S8|S0|S1|S2|S3|S4|S5|S6|S7|S8|
+      |-DIRECTORY-|
+
+     The DICE Hex/ASCII display shows 128 bytes of data on the screen so
+   four 32 byte entries can be viewed as shown below:
+
+
+                    _______________________
+                   |    HEXADECIMAL  |ASCII|
+                   |     ENTRY 0     |     |
+                   |_________________|_____|
+                   |                 |     |
+                   |     ENTRY 1     |     |
+                   |_________________|_____|
+                   |                 |     |
+                   |     ENTRY 2     |     |
+                   |_________________|_____|
+                   |                 |     |
+                   |     ENTRY 3     |     |
+                   |_________________|_____|
+
+   The Directory provides DOS with a list of all the files on the disk,
+  from which it can identify against a particular file description
+  (filename and extension) if the file is available, ie not erased,
+  whether it is a protected or system file, its length and where to
+  retrieve the data from the disk to reconstruct the file in the correct
+  order.  The information provided in bytes 0-31 of each entry is shown
+  below.  Unused entries are filled with the value E5 (229).  The
+  following applies to PLUS3DOS files, CP/M Disks may use special
+  entries to record Disk Volume Labels, Password Protection and Date and
+  Time Stamps.
+
+Byte 0
+    _______________
+   |*| | | | | | | |
+   | | | | | | | | |          File status byte: 00 = current file
+   | | | | | | | | |                            E5 = erased file
+   |_|_|_|_|_|_|_|_|            (CP/M  00-0F - User 0 - 15)
+
+
+Bytes 1-8
+    _______________
+   | |*|*|*|*|*|*|*|          Filename in ASCII.  The spaces unused by
+   |*| | | | | | | |          filenames less than 8 characters long are
+   | | | | | | | | |          filled with 20 (32)
+   |_|_|_|_|_|_|_|_|
+
+
+
+                                    C1
+-
+
+Bytes 9-11                    Extension and Attributes.  These three
+                              spaces hold the ASCII value of any                              
+    _______________           extension (the 3 characters after the
+   | | | | | | | | |          filename and full stop ie .BAS).  The file
+   | |*|*|*| | | | |          attributes are also identified by these 3
+   | | | | | | | | |          bytes. If an attribute is set then 80(128)
+   |_|_|_|_|_|_|_|_|          is added to the byte value.  So that
+                              the byte for a blank extension normally
+   20 (32) would become A0 (160) if the relevant attribute was set.
+
+   The bytes correspond to the following attributes:
+
+       Byte 9       Protected file
+       Byte 10      System file
+       Byte 11      Archive file
+
+Byte 12
+    _______________            Continuation marker.  Each directory entry
+   | | | | | | | | |           provides space for 16 data blocks
+   | | | |*| | | | |           identifying where data is stored on the
+   | | | | | | | | |           disk.  Files exceeding 16K use additional
+   |_|_|_|_|_|_|_|_|           entries to record data blocks.  For
+                               files up to 16K and for the initial entry
+   of a longer file this byte value is 00.  For the fist continuation
+   it is 01 for the second 02 and so on.
+
+Bytes 13-14
+
+   _______________
+  | | | | | | | | |
+  | | | | | |*|*| |            Not Used
+  | | | | | | | | |
+  |_|_|_|_|_|_|_|_|
+
+
+Byte 15
+   _______________             File Length.  This byte holds a value
+  | | | | | | | | |            equivalent to the length of the file
+  | | | | | | | |*|            recorded by the entry in units of 128
+  | | | | | | | | |            bytes ie 8x the number of data blocks used
+  |_|_|_|_|_|_|_|_|            less any 128 byte units not used in
+                               the last data block.
+
+
+Bytes 16-31                    Data Blocks used.  When saved to disk, the
+  _______________              file data is divided into 1024 byte
+ | | | | | | | | |             (1 Block) sections. The location at which
+ | | | | | | | | |             it is stored on the disk is identified by
+ |*|*|*|*|*|*|*|*|             its Block number and recorded in this part
+ |*|*|*|*|*|*|*|*|             of the entry. Up to 16 Blocks can be
+                               accommodated. Unused portions are
+ filled with 00.  For files over 16k long additional entries are used
+ to list the required number of data blocks.  File status, Filename and
+ Extension/Attributes (ie bytes 0-11) will be the same for both the
+ original entry and any continuation entries.  The remaining used
+ positions (ie bytes 12 and 15-31) will vary depending on the
+ continuation number and the numbers of the data blocks used.
+
+
+
+                                  C2
+-
+
+  When DOS saves a file it locates the first available entry in the
+Directory.This may hold information on a previously erased file or
+if there are no erased files will be the next unused entry.  The
+same procedure is used for the file's data.  The first available data
+block which may have been previously allocated to an erased file is
+used and the procedure repeated until all the file's data has been
+stored.
+
+  Thus on a well used disk which has had many files of varying
+length saved and erased any one file may have data stored in various
+parts of the disk.  The disk map at the File Information display
+gives an indication where a files data is stored.
+
+
+        ______________________________________
+       |             ENTRY NO 5               |
+       |  FILE: EXAMPLE.BAK   PROT SYS ARCH   |
+       |  STARTS BLOCK 2    TRK 1   SECT 4    |
+       |  OCCUPIES 10K OF DISK SPACE          |
+       |  PLUS3DOS VERSION 1.0                |
+       |  BASIC PROGRAM RUNS LINE 10          |
+       |   ___________________                |
+       |  |-----DD**          |               |
+       |  |  ****      **     | - RESERVED    |
+       |  |*        *         | D DIRECTORY   |
+       |  |                   | * DATA BLOCK  |
+       |  |                   |   NOT USED    |
+       |  |___________________|               |
+       |                                      |
+       |  <  > SCAN  EXAMINE  HEADER  QUIT    |
+       |                      DISK    SET     |
+       |______________________________________|
+
+Example Directory Entries:
+
+         --------------------------------
+        |E5 43 4C 4F 4E 4B 20 20 .CLOCK  |
+        |20 42 41 53 00 00 00 17  BAS....|
+        |02 03 04 00 00 00 00 00  .......|
+        |00 00 00 00 00 00 00 00  .......|
+         --------------------------------
+  The example above shows an erased file with the file description
+CLOCK.BAS with no attributes set.  It is a single entry which uses
+data blocks 02-04 of disk space for storage although 128 bytes of
+block 04 are not used.
+
+         --------------------------------
+        |00 4C 4F 4E 47 46 49 4C .LONGFIL|
+        |45 A0 A0 20 01 00 00 80 E.. ....|
+        |15 16 17 18 19 1A 1B 1C ........|
+        |1D 1E 1F 20 21 22 23 24 ... !"#$|
+         --------------------------------
+  The example above shows a first continuation of LONGILFE which is
+a Protected System file.  All 16 positions list data blocks and the
+file length byte shows they are all fully used, so there may be a
+further continuation entry for this file.
+
+
+
+
+                                   C3
+-
+
+HEADER RECORD
+
+     Files created by +3DOS have a header record in the first 128
+    (0-127) bytes of the file.  DICE displays the header on one screen.
+    The layout of the header is as shown below.
+                                              _______________________
+   BYTES                                     | 0| 1| 2| 3| 4| 5| 6| 7|
+   1 - 7    PLUS3DOS signature               | 8| 9|10|11|12|13|14|15|
+       8    1A (26) soft EOF (End Of File)   |16|17|18|19|20|21|22|23|
+       9    Issue number                     :     Reserved bytes    :
+      10    Version number                   :       set to 00       :
+   11-14    File length  (32 bit LSB first)  :                       :
+   15-22    BASIC Header                     |__|__|__|_|__|__|126|CS|
+   23-126   Reserved set to 0
+      127   Checksum (sum of bytes 0-126 modulo 256)
+
+BASIC HEADER:
+
+    Byte 15 of the header record is the start of the BASIC header.  The
+    byte value determines the type of file:
+
+            Byte 15 = 0 - BASIC Program file
+                    = 1 - Numeric array
+                    = 2 - Character array
+                    = 3 - Code file
+
+    The information in the remaining bytes 16-22 varies depending on the
+    type of file.  Byte 22 is not currently used.
+
+ --------------------------------------------------------------------
+| Byte            | 15 |   16   17   |   18    19   |  20   21 |  22 |
+|--------------------------------------------------------------------|
+| BASIC Program   | 00 | File length | 8000h or LINE|  Offset  |  00 |
+| Numeric Array   | 01 | File length |  xx   Name   |  xx   xx |  00 |
+| Character Array | 02 | File length |  xx   Name   |  xx   xx |  00 |
+| Code            | 03 | File length | Load address |  xx   xx |  00 |
+ --------------------------------------------------------------------
+            xx = doesn't matter
+
+RECOVERING PART DATA:
+
+      The following may be a little difficult to understand to anyone
+    new to the subject but it does show how with a little effort a file
+    can be salvaged, reducing the amount of rework necessary to retype
+    the file
+
+      To reclaim a file which has been partly overwritten or contains
+    damaged sectors requires a bit of work on the part of the user.  The
+    approach to reclaiming part data will depend on the type of
+    information within the file ie BASIC, Text, Code, Array etc and some
+    time should be spent checking its format.
+
+      Various methods may be used for instance removing the "bad" block
+    number from the files directory entry or replacing the "bad" block
+    with a new block number.  Both these methods rely on the directory
+    being intact.  If the directory cannot be accessed the Logging
+    facility at Disk Access should be used (See Part 7).
+
+      REMOVING A BLOCK - This method depends on the tolerance of the
+    application program in accepting incomplete data.  The directory entry
+
+
+                                       C4
+-
+
+    containg the "bad" block should be located and the block removed by
+    using the Editor to move all subsequent block numbers back one
+    position.  The file length byte 15 of the entry should be reduced by
+    8. The header record at the start of the file also requires
+    modifying.  Start of file can be located either by entering the
+    block number at Disk Access or by selecting the file from the
+    Directory Information page and pressing "E" - Examine at the File
+    Information page.  The file length is recorded in 2 positions, Bytes
+    11-14 and 16-17, see Header Record above.  The Editor should be used
+    to reduce both numbers by 1024 (1 Block).
+
+      REPLACING A BLOCK - creating a new block is more likely to be
+    successful, however this will require some knowledge of the format
+    of the stored data.
+
+      For example a line of BASIC is made up of a Line Number comprising
+    2 bytes, most significant byte first (ie Line 1 is 00 01), then 2
+    bytes, least significant byte first (ie 1 is 01 00), which defines
+    the number of bytes which make up the remainder of the line,
+    followed by the BASIC tokens, numbers and characters of the line and
+    terminated by the [ENTER] token 0D.
+
+                              |-----Line Length-----|
+          |Line No|Line Length| BASIC Statements |0D|
+
+      To reclaim a BASIC file with a missing section, the aim would be to
+    create a new "bridging" block which is acceptable to the BASIC Editor.
+    The information in the "bridging block must make good the last line of
+    the first part of the file and the first line of the last part of the
+    file in terms of syntax, line number and line length.  The remaining
+    space in the "bridging" block can be padded out using a REM statement.
+    A simple example is shown below:
+
+      This examine assumes the following part of a BASIC Program:
+      100 LET X=-------Lost Data---------THEN LET ptr=x
+
+      A new block will be incorporated in lieu of the lost data which
+    will make the file acceptable to BASIC.  The program will become:
+
+     100 LET x=PI
+     101 REM --any characters---
+     102 If x THEN LET ptr=x
+
+     Locate the Directory entry containing the "bad" block number and
+   using the Editor replace it with the selected new block number.
+   Then using either File Contents or Disk Access locate the end of the
+   first part of the file.
+                                               --------------
+         0D   00   64   xx   xx   F1   78   3D| End of first |
+             Line 100   Length   LET    x   = | section      |
+                                               --------------
+
+     Use DICE Editor to change the line length xx xx to the correct
+   number for the modified line, in this example 05 00.  Then use Disk
+   Access to locate the start of the new block and use the Editor to
+   insert:
+       ----------
+      | Start of | A7   0D   00   65   F4   03   EA
+      | new block| PI ENTER  Line 101  LENGTH   REM
+       ----------
+
+
+                                    C5
+-
+
+     The length equals the number of bytes in line 101, in this example
+   1024 (1 block) less the number of bytes needed to make good lines
+   100 (2) and 102 (6) and the line number and length for line 101 (4).
+   Thus 1024-12=1012 or in hex (LSB first) F4 03.
+
+     Locate the last page of the new block and use the Editor to insert:
+                                             -----------
+           0D   00   66   0A   00   FA   78 | End of    |
+         ENTER  Line 102  Length    IF   x  | new block |
+                                             -----------
+   To match the start of the last section which for this example is:
+     --------------
+    |    Start of  |   CB   F1   70   74   72   3D   78   0D
+    | last section |  THEN  LET  p    t    r    =    x  ENTER
+     --------------
+     The byte values after REM do not matter.  In this example it is not
+   necessary to change the file length bytes in either the Directory or
+   the Header Record since one block has been replace by another.
+   However if the "bridging" block is used to replace a number of missing
+   or defective sectors, the file length values would need to be amended
+   accordingly.
+
+     The file can now be loaded into BASIC, Line 101 deleted and the
+   listing edited as required.
+
+ LOCKING OUT DEFECTIVE SECTORS:
+
+    Having replace the "bad" block with a new "bridging" block it now
+  becomes available for DOS to reuse.  A simple method of avoiding this
+  is to create a new directory entry which uses the "bad" block.  The
+  Editor can be used at the first available entry slot to create a
+  ficticious protected, system file which ties up the "bad" block and
+  which DOS will not erase or display at the CAT request.  To lock out a
+  single block say 0F (15), the required Directory entry would be as
+  follows:
+
+                   00 42 41 44 42 4C 4F 43 .BADBLOC
+                   4B A0 A0 20 00 00 00 08 K.. ....
+                   0F 00 00 00 00 00 00 00 ........
+                   00 00 00 00 00 00 00 00 ........
+
+
+                                  C6
+-
+
+                                ANNEX D
+
+DOS ERRORS
+
+      The PLUS3DOS system is very reliable but from time to time errors
+    do occur, usually due to human error such as no Disk or an
+    unformatted Disk in the Drive but also due to damaged disks.  DICE
+    displays an error message indicating the fault detected and the
+    track and sector at which it occurrred
+
+                  "ERROR MESSAGE  TRK 1  SECT 1   !"
+
+      DICE reads disk information a Track at a time.  In the case of an
+    unformatted or nonstandard format disk the program will make several
+    attempts to read each sector on the Track reporting an error before
+    moving on to read the next sector.  To abort this process press and
+    hold down the BREAK or SPACE key.
+
+      It is recommended that DICE be reset when an error has occurred by
+    returning to the DISK MAP display and pressing "N"-NEW.  If the
+    error is ignored and the message overwritten by other messages in
+    the prompt line, a flashing "!" remains as a warning at the bottom
+    right corner of all displays.  A successful reset clears the "!"
+    warning indicator.
+
+  DOS ERROR MESSAGES:
+
+    0   NO DISK         No disk in Drive
+    1   PROTECTED       Disk is Write Protected
+    2   SEEK FAIL       Unable to locate Track
+    3   CRC ERROR       CRC Data error
+    4   NO DATA         No data
+    5   MISSING ID      Missing address mark
+    6   BAD FORMAT      Unrecognised Disk format
+    7   DISK ERROR      Unknown Disk error
+    8   WRONG DISK      Disk changed
+    9   BAD MEDIA       Unsuitable media for the Drive
+
+
+                                   D1
+-
+
+              ANNEX E
+
+SPECTRUM CHARACTER SET
+
+DEC HEX  CHARACTER    | DEC HEX CHR | DEC HEX CHARACTER| DEC HEX CHR      |
+----------------------|-------------|------------------|------------------|
+ 0  00   _            | 64  40  @   | 128 80  _        | 192 C0  USR      |
+ 1  01    |           | 65  41  A   | 129 81   |       | 193 C1  STR$     |
+ 2  02    |           | 66  42  B   | 130 82   |       | 194 C2  CHR$     |
+ 3  03    |- not used | 67  43  C   | 131 83   |       | 195 C3  NOT      |
+ 4  04    |           | 68  44  D   | 132 84   |       | 196 C4  BIN      |
+ 5  05   -|           | 69  45  E   | 133 85   |       | 197 C5  OR       |
+ 6  06   PRINT comma  | 70  46  F   | 134 86   |       | 198 C6  AND      |
+ 7  07   [EDIT]       | 71  47  G   | 135 87   |       | 199 C7  <=       |
+ 8  08   cursor left  | 72  48  H   | 136 88   |       | 200 C8  >=       |
+ 9  09   cursor right | 73  49  I   | 137 89   |       | 201 C9  <>       |
+10  0A   cursor down  | 74  4A  J   | 138 8A   |       | 202 CA  LINE     |
+11  0B   cursor up    | 75  4B  K   | 139 8B   |       | 203 CB  THEN     |
+12  0C   [DELETE]     | 76  4C  L   | 140 8C   |       | 204 CC  TO       |
+13  0D   [ENTER]      | 77  4D  M   | 141 8D   |       | 205 CD  STEP     |
+14  0E   number       | 78  4E  N   | 142 8E   |       | 206 CE  DEF FN   |
+15  0F   not used     | 79  4F  O   | 143 8F   |       | 207 CF  CAT      |
+16  10   INK ctrl     | 80  50  P   | 144 90   |       | 208 D0  FORMAT   |
+17  11   PAPER ctrl   | 81  51  Q   | 145 91   |  user | 209 D1  MOVE     |
+18  12   FLASH ctrl   | 82  52  R   | 146 92   |- def. | 210 D2  ERASE    |
+19  13   BRIGHT ctrl  | 83  53  S   | 147 93   |  gfx  | 211 D3  OPEN#    |
+20  14   INVERSE ctrl | 84  54  T   | 148 94   |       | 212 D4  CLOSE#   |
+21  15   OVER ctrl    | 85  55  U   | 149 95   |       | 213 D5  MERGE    |
+22  16   AT ctrl      | 86  56  V   | 150 96   |       | 214 D6  VERIFY   |
+23  17   TAB ctrl     | 87  57  W   | 151 97   |       | 215 D7  BEEP     |
+24  18   _            | 88  58  X   | 152 98   |       | 216 D8  CIRCLE   |
+25  19    |           | 89  59  Y   | 153 99   |       | 217 D9  INK      |
+26  1A    |           | 90  5A  Z   | 154 9A   |       | 218 DA  PAPER    |
+27  1B    |           | 91  5B  [   | 155 9B   |       | 219 DB  FLASH    |
+28  1C    |- not used | 92  5C  \   | 156 9C   |       | 220 DC  BRIGHT   |
+29  1D    |           | 93  5D  ]   | 157 9D   |       | 221 DD  INVERSE  |
+30  1E    |           | 94  5E  ^   | 158 9E   |       | 222 DE  OVER     |
+31  1F   _|           | 95  5F  _   | 159 9F   |       | 223 DF  OUT      |
+32  20   space        | 96  60  £   | 160 A0   |       | 224 E0  LPRINT   |
+33  21   !            | 97  61  a   | 161 A1   |       | 225 E1  LLIST    |
+34  22   "            | 98  62  b   | 162 A2  _|       | 226 E2  STOP     |
+35  23   #            | 99  63  c   | 163 A3  SPECTRUM | 227 E3  READ     |
+36  24   $            | 100 64  d   | 164 A4  PLAY     | 228 E4  DATA     |
+37  25   %            | 101 65  e   | 165 A5  RND      | 229 E5  RESTORE  |
+38  26   &            | 102 66  f   | 166 A6  INKEY$   | 230 E6  NEW      |
+39  27   '            | 103 67  g   | 167 A7  PI       | 231 E7  BORDER   |
+40  28   (            | 104 68  h   | 168 A8  FN       | 232 E8  CONTINUE |
+41  29   )            | 105 69  i   | 169 A9  POINT    | 233 E9  DIM      |
+42  2A   *            | 106 6A  j   | 170 AA  SCREEN$  | 234 EA  REM      |
+43  2B   +            | 107 6B  k   | 171 AB  ATTR     | 235 EB  FOR      |
+44  2C   ,            | 108 6C  l   | 172 AC  AT       | 236 EC  GO TO    |
+45  2D   -            | 109 6D  m   | 173 AD  TAB      | 237 ED  GO SUB   |
+46  2E   .            | 110 6E  n   | 174 AE  VAL$     | 238 EE  INPUT    |
+47  2F   /            | 111 6F  o   | 175 AF  CODE     | 239 EF  LOAD     |
+48  30   0            | 112 70  p   | 176 B0  VAL      | 240 F0  LIST     |
+49  31   1            | 113 71  q   | 177 B1  LEN      | 241 F1  LET      |
+50  32   2            | 114 72  r   | 178 B2  SIN      | 242 F2  PAUSE    |
+51  33   3            | 115 73  s   | 179 B3  COS      | 243 F3  NEXT     |
+52  34   4            | 116 74  t   | 180 B4  TAN      | 244 F4  POKE     |
+53  35   5            | 117 75  u   | 181 B5  ASN      | 245 F5  PRINT    |
+54  36   6            | 118 76  v   | 182 B6  ACS      | 246 F6  PLOT     |
+55  37   7            | 119 77  w   | 183 B7  ATN      | 247 F7  RUN      |
+56  38   8            | 120 78  x   | 184 B8  LN       | 248 F8  SAVE     |
+57  39   9            | 121 79  y   | 185 B9  EXP      | 249 F9  RANDOMIZE|
+58  3A   :            | 122 7A  z   | 186 BA  INT      | 250 FA  IF       |
+59  3B   ;            | 123 7B  {   | 187 BB  SQR      | 251 FB  CLS      |
+60  3C   <            | 124 7C  |   | 188 BC  SGN      | 252 FC  DRAW     |
+61  3D   =            | 125 7D  }   | 189 BD  ANS      | 253 FD  CLEAR    |
+62  3E   >            | 126 7E  ~   | 190 BE  PEEK     | 254 FE  RETURN   |
+63  3F   ?            | 127 7F  ©   | 191 BF  IN       | 255 FF  COPY     |
+
+
+                                      E1

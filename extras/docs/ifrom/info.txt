@@ -1,0 +1,10 @@
+interface by antonio villena
+
+byte paginacion: al escribir en rom (a14=a15=0), con mreq=0 y wr=0
+5 bits bajos: es la pagina de los 512 kb de eeprom
+bit 7: bit de bloqueo (a 1), impide futuras escrituras en este byte de paginacion
+
+botones: reset, nmi. nmi solo salta a la 66h
+en un reset (y al arrancar) byte de paginacion=0
+
+

@@ -1,0 +1,35 @@
+http://velesoft.speccy.cz/data-gear.htm
+
+lo poco que he encontrado inteligible como una feature request para Fuse:
+
+And now, the peripheral address layout of MB02:
+
+A15-A8   A7-A0
+xxxxAAAA 0xx00011 = RTC (16 registers, addresable by A8-A11)
+xxxxxxxx 0xx00111 = not used
+xxxxxxxx 0xx01011 = Z80-DMA (software should use 0x0B)
+xxxxxxxx 0AA01111 = WD2797 (4 registers addresble by A5-A6)
+xxxxxxxx 00A10011 = drive control (described later)
+xxxxxxxx 00010111 = memory control (described later)
+xxxxxxxx 0AA11011 = 8255-2 (4 registers addresble by A5-A6)
+xxxxxxxx 0AA11111 = 8255-1 (4 registers addresble by A5-A6)
+
+Drive control:
+Address=0x13 Dir=OUT ... motors and disk select control for 4 disk drives
+Address=0x13 Dir=IN .... read status of disk drives
+Address=0x33 Dir=OUT ... bit0 = select density: 0=DD, 1=HD
+Detailed meaning of bits is described in attachment.
+
+Memory control:
+Address=0x17 Dir=OUT only (not defined for IN)
+Bit 0-4 ... RAM memory bank select (32 banks, 16kB each, together 512kB
+RAM)
+Bit 5 ..... Write enable for 512kB ram (0=write protect, 1=write enable)
+Bit 6 ..... RAM enable (0=rom/eeprom, 1=512kB ram)
+Bit 7 ..... ROM/EEPROM (0=original ZX rom, 1=boot eeprom)
+
+
+
+ver 
+http://cs.wikipedia.org/wiki/Wikipedista:Standazx/Sinclair_ZX_Spectrum_a_kompatibiln%C3%AD_po%C4%8D%C3%ADta%C4%8De
+

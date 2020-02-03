@@ -1,0 +1,76 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Fcm, compress a filename</font></b>
+<p><tt>RST 20H, DEFW $4E09</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BHL = source pointer
+&nbsp;&nbsp;&nbsp;&nbsp; HL = 0, not allowed
+&nbsp;&nbsp;&nbsp;&nbsp; HL = 1, not allowed
+&nbsp;&nbsp;&nbsp;&nbsp; HL = 2, not allowed
+&nbsp;&nbsp;&nbsp;&nbsp; String should be terminated by a control character
+&nbsp;&nbsp;&nbsp;&nbsp; (HL > 255, B = 0 means local pointer)
+
+&nbsp;&nbsp;&nbsp;&nbsp; DE = destination (local) pointer
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0: result to stream IX handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1: result to filter IX handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; > 255: place string at (DE)
+&nbsp;&nbsp;&nbsp;&nbsp; C = limit of space to use
+</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; DE = points to the character after the last one written
+&nbsp;&nbsp;&nbsp;&nbsp; (if DE(in) > 255)
+
+&nbsp;&nbsp;&nbsp;&nbsp; B = number of filename segments returned
+&nbsp;&nbsp;&nbsp;&nbsp; C = number of characters in compressed space
+</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad parameters, fatal error
+</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......HL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBCDE../.... different
+</pre>
+Notes:
+<blockquote>If the filename cannot be reproduced in the space available,
+ie. C(in), then on exit C =1, B = 0 and the expansion buffer (stream or
+filter) will be given a NULL. Setting C(in) = 18 will guarantee the return
+of a filename and extension.</blockquote>
+Bugs:
+<blockquote>If the source is in segment 2 then problems may occur.<br>
+<BR></blockquote>
+Related calls:
+<blockquote><a href='gnesa.html'>GN_Esa</a>, read &amp; write to filename segments
+<br><a href='gnfex.html'>GN_Fex</a>, expand a filename
+<br><a href='gnopw.html'>GN_Opw</a>, Open wildcard handler
+<br><a href='gnpfs.html'>GN_Pfs</a>, parse filename segment
+<br><a href='gnprs.html'>GN_Prs</a>, parse filename
+<br><a href='gnwcl.html'>GN_Wcl</a>, close wildcard handle
+<br><a href='gnwfn.html'>GN_Wfn</a>, fetch next match for wildcard string (handle)
+<br><a href='gnwsm.html'>GN_Wsm</a>, match filename segment to wildcard string</blockquote>
+
+</body>
+</html>

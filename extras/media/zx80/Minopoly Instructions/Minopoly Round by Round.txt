@@ -1,0 +1,43 @@
+Minopoly Round by Round
+
+Round 1:
+1. Whitechapel Road Z1
+2. The Angel, Islington Z2
+3. Mayfair Z3
+
+Round 2:
+1. Coventry Street T1
+2. Bond Street T2
+3. Park Lane T3
+
+Round 3:
+1. Pall Mall N1
+2. Bow Street N2
+3. Strand N3
+
+Round 4:
+1. Old Kent Road ZZZ1
+2. Pentonville Road ZZZ2
+3. Marlborough Street ZZZ3
+
+Round 5: 
+1. Whitehall TTT1
+2. Trafalgar Square TTT2
+3. Regent Street TTT3
+
+Round 6:
+1. Euston Road NNN1
+2. Northumberland Avenue NNN2
+3. Piccadilly NNN3
+
+Round 7:
+1. Fleet Street ZZZZ1
+2. Oxford Street ZZZZ2
+
+Round 8:
+1. Leicester Square TTTT1
+2. Vine Street TTTT2
+
+Round 9
+1. Electric Company NNNN1
+2. Water Works NNNN2

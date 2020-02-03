@@ -1,0 +1,137 @@
+
+
+12/6/17 18:53:00: Miguel Angel Rodriguez: no, el scroll ya lo puedo hacer en el modo radastaniano
+12/6/17 18:53:06: Miguel Angel Rodriguez: hay registros para scroll por hardware
+12/6/17 18:53:13: Miguel Angel Rodriguez: lo que pasa es que aún no te lo había detallado
+12/6/17 18:53:18: Miguel Angel Rodriguez: pero puedo hacerlo ahora, si quieres
+12/6/17 18:53:44: Cesar: Si. Algo había leído sobre desplazamiento de pantalla
+12/6/17 18:53:55: Cesar: Como quieras... 😉
+12/6/17 18:53:59: Miguel Angel Rodriguez: en realidad es muy muy sencillo. Verás
+12/6/17 18:54:06: Cesar: Aunque justo ahora estoy generando build beta
+12/6/17 18:54:22: Cesar: Ya eso entrará en la siguiente beta 😉
+12/6/17 18:54:27: Miguel Angel Rodriguez: hay dos registros nuevos, luego te paso nombres y numero de registro
+12/6/17 18:55:09: Miguel Angel Rodriguez: uno de ellos es de 14 o 16 bits, no recuerdo bien. Guarda el OFFSET en bytes desde el comienzo de la memoria de video actual, al comienzo real de la pantalla
+12/6/17 18:55:43: Miguel Angel Rodriguez: es decir, ahora la memoria de video no comienza en 4000h, 6000h, C000h o E000h (como hasta ahora)
+12/6/17 18:55:57: Miguel Angel Rodriguez: sino que comienza en alguna de esas direcciones + OFFSET
+12/6/17 18:56:07: Cesar: Ah ok
+12/6/17 18:56:23: Miguel Angel Rodriguez: supongo que sabes por qué son esas 4 direcciones posibles, verdad?
+12/6/17 18:57:36: Cesar: Bueno la shadow vram del 128 es para c000 mapeando RAM 7
+12/6/17 18:57:50: Cesar: Las otras dos es para la timex shadow
+12/6/17 18:58:09: Miguel Angel Rodriguez: eeeexacto
+12/6/17 18:59:29: Miguel Angel Rodriguez: <‎imagen omitida>
+12/6/17 18:59:39: Miguel Angel Rodriguez: Bien
+12/6/17 18:59:45: Miguel Angel Rodriguez: pues llama BASE a esa dirección, ok?
+12/6/17 18:59:59: Miguel Angel Rodriguez: la dirección de comienzo es ahora BASE+OFFSET
+12/6/17 19:00:14: Miguel Angel Rodriguez: pero de forma que al llegar al límite de 16K, vuelve al principio
+12/6/17 19:00:36: Miguel Angel Rodriguez: o sea, en realidad, la dirección inicial es (BASE + OFFSET) mod 16384
+12/6/17 19:00:50: Cesar: Ok
+12/6/17 19:00:54: Miguel Angel Rodriguez: de hecho, lo de MOD 16384 se aplica a cualquier dirección de memoria de pantalla
+12/6/17 19:00:58: Cesar: Idea del cpc, a que si? 😉
+12/6/17 19:01:08: Miguel Angel Rodriguez: mmmmm, no te diré que no :P
+12/6/17 19:01:15: Cesar: Jajaja
+12/6/17 19:01:24: Miguel Angel Rodriguez: bien. El segundo registro es de 8 bits
+12/6/17 19:02:42: Miguel Angel Rodriguez: se llama RADASPADDING
+12/6/17 19:02:47: Miguel Angel Rodriguez: ah, mira estos dos son:
+12/6/17 19:02:48: Miguel Angel Rodriguez: RADASOFFSET    equ 41h
+RADASPADDING   equ 42h
+12/6/17 19:04:47: Miguel Angel Rodriguez: con RADASPADDING la dirección total a la que se accede es:
+12/6/17 19:05:28: Miguel Angel Rodriguez: BASE + RADASOFFSET + scanline*RADASPADDING
+12/6/17 19:05:46: Miguel Angel Rodriguez: donde scanline es el número de scan (de 0 a 95) que se está pintando en pantalla
+12/6/17 19:06:47: Cesar: Mm
+12/6/17 19:06:51: Cesar: No entiendo lo del scan
+12/6/17 19:06:59: Miguel Angel Rodriguez: te lo explico
+12/6/17 19:07:03: Miguel Angel Rodriguez: otra forma de verlo es:
+12/6/17 19:07:05: Cesar: Quiero decir... no se puede hacer lo mismo con el offset solo?
+12/6/17 19:07:10: Miguel Angel Rodriguez: (lo de RADASPADDING)
+12/6/17 19:07:33: Miguel Angel Rodriguez: que si tienes un contador inicializado a BASE+OFFSET y a partir de ahí estás leyendo bytes para la pantalla radastaniana
+12/6/17 19:07:38: Miguel Angel Rodriguez: al llegar a 64 bytes
+12/6/17 19:07:47: Miguel Angel Rodriguez: en lugar de sumar 1 para irte al siguiente pixel
+12/6/17 19:07:54: Miguel Angel Rodriguez: sumas el valor que haya en RADASPADDING
+12/6/17 19:08:10: Cesar: Ah
+12/6/17 19:08:11: Cesar: Mm
+12/6/17 19:08:17: Cesar: Y eso de que sirve? 😅
+12/6/17 19:08:32: Miguel Angel Rodriguez: para hacer scroll horizontal y vertical
+12/6/17 19:08:47: Miguel Angel Rodriguez: si quiero hacer scroll vertical, modifico RADASOFFSET
+12/6/17 19:08:53: Miguel Angel Rodriguez: de 64 en 64
+12/6/17 19:09:13: Miguel Angel Rodriguez: si quiero hacer scroll horizontal, modifico RADASPADDING
+12/6/17 19:09:20: Miguel Angel Rodriguez: dicho de otra forma
+12/6/17 19:10:01: Miguel Angel Rodriguez: estos dos registros permiten que tú puedas tener toda la memoria de pantalla dedicada a gráficos, y con esos dos registros defines qué parte de esa memoria se verá en la "
+"ventana gráfica"
+12/6/17 19:10:47: Cesar: Pero modificando el padding digamos que "rompes" la estructura lineal del modo radastan, no?
+12/6/17 19:11:13: Miguel Angel Rodriguez: si y no
+12/6/17 19:11:51: Miguel Angel Rodriguez: modificando el padding lo que logro es que entre un scan y el siguiente no haya 0 bytes, sino un número determinado de bytes. Eso en principio rompe la linealidad del modo radastaniano, pero es que...
+12/6/17 19:12:19: Cesar: Ah ok
+12/6/17 19:12:29: Miguel Angel Rodriguez: ....el scroll por hardware se consigue definiendo una pantalla más grande de la que se pretende visualizar, y luego definiendo qué cacho de esa pantalla se va a ver realmente en el monitor
+12/6/17 19:12:32: Miguel Angel Rodriguez: un ejemplo
+12/6/17 19:12:54: Miguel Angel Rodriguez: tenemos 16KB. 16384 bytes. En el modo radastaniano eso son 32768 pixeles, ok?
+12/6/17 19:13:15: Cesar: Si
+12/6/17 19:13:29: Miguel Angel Rodriguez: con 32768 puedo definir una pantalla de 256x128, vale?
+12/6/17 19:13:34: Miguel Angel Rodriguez: y me ocuparía los 16KB
+12/6/17 19:13:50: Cesar: Mm si
+12/6/17 19:14:02: Miguel Angel Rodriguez: bien. Pues ponte que lleno 16KB con una pantalla de esas características
+12/6/17 19:14:10: Miguel Angel Rodriguez: y ahora quiero mostrar un cacho de ella
+12/6/17 19:14:15: Miguel Angel Rodriguez: el cacho debe ser de 128x96
+12/6/17 19:14:23: Miguel Angel Rodriguez: porque eso es lo que se verá en pantalla
+12/6/17 19:14:43: Miguel Angel Rodriguez: pongamos que el cacho que quiero mostrar es la esquina superior izquierda de esa gran pantalla de 256x128
+12/6/17 19:14:58: Cesar: Si
+12/6/17 19:14:58: Miguel Angel Rodriguez: en ese caso, RADASOFFSET valdría 0
+12/6/17 19:15:05: Miguel Angel Rodriguez: y RADASPADDING valdría......
+12/6/17 19:15:12: Cesar: 64
+12/6/17 19:15:16: Miguel Angel Rodriguez: ....... 128-64
+12/6/17 19:15:20: Miguel Angel Rodriguez: eeeexacto
+12/6/17 19:15:25: Cesar: Vale lo entiendo
+12/6/17 19:15:38: Cesar: Realmente hasta ahora no sabía bien como se hacía los scroll por hardware
+12/6/17 19:15:39: Cesar: Jeje
+12/6/17 19:15:41: Cesar: Gracias
+12/6/17 19:15:43: Cesar: Lo pillo
+12/6/17 19:16:45: Miguel Angel Rodriguez: si incremento RADASOFFSET y lo pongo a 1, estoy haciendo scroll horizontal
+12/6/17 19:17:20: Miguel Angel Rodriguez: si voy incrementando RADASOFFSET de 128 en 128 (la longitud en bytes de una linea de la pantalla total) hago scroll vertical
+12/6/17 19:17:37: Miguel Angel Rodriguez: así, tocando unicamente RADASOFFSET consigo scroll en las 4 direcciones
+12/6/17 19:18:45: Cesar: Guay
+12/6/17 19:18:49: Cesar: Hay demos de esto!
+12/6/17 19:18:50: Cesar: ?
+12/6/17 19:18:56: Miguel Angel Rodriguez: por supuesto
+12/6/17 19:18:59: Miguel Angel Rodriguez: con su codigo fuente y todo
+12/6/17 19:19:08: Miguel Angel Rodriguez: están en el repo, en
+12/6/17 19:19:18: Miguel Angel Rodriguez: /software/modo_radastaniano/hwscroll
+12/6/17 19:19:57: Cesar: Ok guay
+12/6/17 19:20:03: Cesar: Pues cuando tenga un rato lo miro
+12/6/17 19:20:03: Miguel Angel Rodriguez: perdon, en /software/modo_radastan/hwscroll
+12/6/17 19:20:14: Miguel Angel Rodriguez: creo que es muy fácil de implementar
+12/6/17 19:20:19: Cesar: La semana que viene estoy offline y esta semana tengo poco ratito
+12/6/17 19:20:21: Miguel Angel Rodriguez: ah, RADASOFFSET es de 14 bits
+12/6/17 19:20:30: Cesar: Pero a ver si puedo. Y sino de aquí a dos semanas
+12/6/17 19:20:32: Cesar: Ok
+12/6/17 19:21:55: Miguel Angel Rodriguez: cuando escribes en ese registro, lo primero que se escribe son los 8 bits menos significativos
+12/6/17 19:22:13: Miguel Angel Rodriguez: y luego, los 6 más significativos (en la segunda escritura, los dos bits más significativos se descartan)
+12/6/17 19:23:50: Miguel Angel Rodriguez: este cacho de código, por ejemplo, hace un scroll vertical de arriba a abajo a un gráfico de 128x205 pixeles
+12/6/17 19:24:02: Miguel Angel Rodriguez: en este ejemplo, RADASPADDING vale 0
+12/6/17 19:24:04: Miguel Angel Rodriguez: ld c,ZXIBASEADDR
+Forever        ld a,0   ;line
+               ld hl,0  ;offset
+Baja           halt
+               ld b,ZXUNOADDR
+               ld d,RADASOFFSET
+               out (c),d
+               inc b
+               out (c),l
+               out (c),h
+               ld de,64
+               add hl,de
+               inc a
+               cp 205-96
+               jr nz,Baja
+12/6/17 19:24:55: Miguel Angel Rodriguez: el offset está en HL, y va incrementandose de 64 en 64. A contiene el número de línea y se usa como contador para ir desde 0 hasta el tope que sería 205-96
+12/6/17 19:28:06: Cesar: Guay
+12/6/17 19:28:30: Cesar: Ya tengo  material. Jeje
+12/6/17 19:28:42: Miguel Angel Rodriguez: un scroll en diagonal, por ejemplo, en lugar de ir de 64 en 64 podría ir de 65 en 65
+12/6/17 19:29:07: Miguel Angel Rodriguez: para hacer scroll hacia abajo-derecha
+12/6/17 19:29:19: Miguel Angel Rodriguez: o de 63 en 63, para un scroll abajo-izquierda
+12/6/17 19:29:34: Miguel Angel Rodriguez: hay que tener en cuenta que, como lo que se mueven con estos registros son bytes
+12/6/17 19:29:43: Miguel Angel Rodriguez: el scroll vertical puede ser pixel a pixel
+12/6/17 19:29:52: Miguel Angel Rodriguez: pero el horizontal será de 2 en 2 pixeles como mucho
+12/6/17 19:33:15: Cesar: Claro. Porque en 1 byte hay dos pixeles
+12/6/17 19:33:23: Miguel Angel Rodriguez: xacto
+12/6/17 19:33:55: Miguel Angel Rodriguez: une esto de los offsets y tal a la interrupción raster
+12/6/17 19:34:03: Miguel Angel Rodriguez: y se pueden hacer cosas muy muy chulas
+12/6/17 20:00:18: Cesar: Guay. Me apunto todo esto 😀

@@ -1,0 +1,57 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Poll, poll for an application</font></b>
+<p><tt>RST 20H, DEFW $FC06</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = 0, fetch first application in the machine
+&nbsp;&nbsp;&nbsp;&nbsp; IX &lt;> 0 (current application handle), fetch next application</pre>
+OUT, if call successfull:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = new application handle</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_EOF, no more applications available (IX now invalid)</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../IX.. different</pre>
+Notes:
+<blockquote>Internal operating system usage.
+<br>An invalid input application handle also results in RC_EOF.</blockquote>
+Bugs:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -
+</pre>
+Related system calls:
+<blockquote>
+<a href='osent.html'>OS_Ent</a>, enter an application
+<br><a href="dcnam.html">DC_Nam</a>, Name current application
+<br><a href="dcent.html">DC_Ent</a>, enter new application
+<br><a href="dcpol.html">DC_Pol</a>, poll for card usage
+<br><a href='osstk.html'>OS_Stk</a>, stack the current process (application)
+<br><a href='osexit.html'>OS_Exit</a>, exit an application
+<br><a href="dcbye.html">DC_Bye</a>, exiting current application
+<br><a href="osbye.html">OS_Bye</a>, exit application
+<br><a href='osuse.html'>OS_Use</a>, process card usage</blockquote>
+
+</body>
+</html>

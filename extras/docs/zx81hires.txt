@@ -1,0 +1,26 @@
+http://foro.speccy.org/viewtopic.php?f=6&t=3071
+http://k1.dyndns.org/Vintage/Sinclair/80/Sinclair%20ZX80/Tech%20specs/Wilf%20Rigter%27s%20ZX81%20Video%20Display%20Info.htm#14
+http://www.pictureviewerpro.com/hosting/zx81/fredn.htm
+
+
+Como se deberia rehacer el core para que funcione mejor la hi-res en zx81:
+
+Hsync lanza una nmi. Siempre que el generador nmi este activo
+Hsync se genera cuando contador de hsync llega a 207. Y se resetea. Realmente restamos 207
+Contador hsync también se resetea cuando hay un int ack de Maskable interrupt.
+Después de interrupción maskable se debe desactivar interrupción
+Mínima longitud de vsync bajar de defecto 800
+Al inicializar lnctr hacerlo a 7 en vez de 0?
+Probar zx80, 81 fast y slow
+Ajuste horizontal estabilización no debería ser necesario
+Al reset de hsync cuando genera interrupción, resetear también contador de posición x? Posiblemente
+http://searle.hostei.com/grant/zx80/zx80nmi.html
+Dibujo caracteres debe ir con hsync counter?
+what is important is that the hsync starts exactly 16 clock cycles after the int-ack end
+Quizá hacer que hsync se establezca a -16 cuando se lance int ack?
+after an EI or DI instruction, interrupts aren’t accepted. They’re accepted again after the instruction after the EI (RET in the following example). So for example, look at this MSX2 routine that reads a scanline from the keyboard:
+Quizá si con todo esto no va bien, igualmente se puede dejar el contador de hsync aunque no haga ninguna función (pero que vaya contando y se resetee cuando convenga)
+
+
+Tambien revisar parametro ZX8081_LINEAS_SUP_NO_USABLES, esto casi parece puesto arbitrariamente
+Tambien comparar ejecución de codigo en vram con mostrar posicion electron en pantalla. No coinciden

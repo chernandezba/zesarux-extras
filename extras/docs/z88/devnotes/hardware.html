@@ -1,0 +1,530 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<title>Manipulating the Blink Registers</title><link href="stylesheet.css" type="text/css" rel="stylesheet"></head>
+<body>
+<table style="font-size: 12px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tbody><tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="basicasm.html">Previous</a></td>
+  <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+  <td align="right" valign="bottom" width="10%"><a href="motherbd.html">Next</a></td>
+ </tr>
+</tbody></table>
+
+<hr>
+
+<p><font size="4"><b>25. Manipulating the Blink Registers</b></font>
+</p>
+
+<p>It is generally programming practice to use the operating
+system calls provided rather than manipulating the hardware
+directly; it avoids compatibility problems with future releases,
+and treading on the toes of the operating system. We are
+therefore NOT going to encourage the reader to poke to the screen
+or disable the operating system! However we shall attempt to give
+as full a description of the hardware that exists. <br>
+&nbsp; </p>
+
+<p><b>Overview of the BLINK registers</b> </p>
+
+<p>The following table lists all the registers in the BLINK chip,
+which are accessed through the Z80 I/O ports. Not all of the
+registers are useful to programmers, but they are all included
+for completeness. Some are described in more detail later in this
+section. Note that because registers can only be written to or
+read from, but not both, it would be possible to lose track of
+register contents. Therefore the operating system use addresses
+$0400 to $04FF to store 'soft copies' of the values in the BLINK
+registers, with the low byte of the address being taken from the
+address of the I/O port. You can read these soft copies, to check
+out the contents of the registers, but most importantly you
+should always write to the soft copy for a register before
+writing to a register itself, for reasons explained below. <br>
+&nbsp; </p>
+
+<pre><i>I/O port</i>&nbsp;&nbsp;&nbsp; <i>WRITE</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>READ<br></i>$70&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#Screen">PB0</a>, pixel base reg.0&nbsp;&nbsp; -<br>$71&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#Screen">PB1</a>, pixel base reg.1&nbsp;&nbsp; -<br>$72&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#Screen">PB2</a>, pixel base reg.2&nbsp;&nbsp; -<br>$73&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#Screen">PB3</a>, pixel base reg.3&nbsp;&nbsp; -<br>$74&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#Screen">SBR</a>, screen base reg.&nbsp;&nbsp; -<br><br>$B0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#COM">COM</a>, command register&nbsp;&nbsp; -<br>$B1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#INT">INT</a>, mask &amp; control&nbsp;&nbsp;&nbsp;&nbsp; <a href="#STA">STA</a>, interrupt status<br>$B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#KBD">KBD</a>, keyboard<br>$B3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#EPR">EPR</a>, EPROM programming&nbsp; -<br>$B4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#TACK">TACK</a>, RTC ack.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>$B5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#TMK">TMK</a>, RTC int. mask&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#TSTA">TSTA</a>, RTC int. status<br>$B6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#ACK">ACK</a>, main int. mask&nbsp;&nbsp;&nbsp;&nbsp; -<br><br>$D0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#SR0">SR0</a>, segment reg. 0&nbsp;&nbsp;&nbsp;&nbsp; <a href="#TIM">TIM0</a>, RTC 5ms counter<br>$D1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#SR0">SR1</a>, segment reg. 1&nbsp;&nbsp;&nbsp;&nbsp; <a href="#TIM">TIM1</a>, RTC seconds counter (6 bits)<br>$D2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#SR0">SR2</a>, segment reg. 2&nbsp;&nbsp;&nbsp;&nbsp; <a href="#TIM">TIM2</a>, RTC minutes counter<br>$D3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#SR0">SR3</a>, segment reg. 3&nbsp;&nbsp;&nbsp;&nbsp; <a href="#TIM">TIM3</a>, RTC minutes/256 counter<br>$D4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#TIM">TIM4</a>, RTC minutes/64K counter (5 bits)<br><br>$E0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#RXD">RXD</a>, UART receive data register<br>$E1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#RXE">RXE</a>, extended receiver data<br>$E2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#RXC">RXC</a>, receiver control&nbsp;&nbsp; -<br>$E3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#TXD">TXD</a>, transmit data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>$E4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#TXC">TXC</a>, transmit control&nbsp;&nbsp; -<br>$E5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#UMK">UMK</a>, UART int. mask&nbsp;&nbsp;&nbsp;&nbsp; <a href="#UIT">UIT</a>, UART int. status<br>$E6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="#UAK">UAK</a>, UART int. mask&nbsp;&nbsp;&nbsp;&nbsp; -<br><br></pre>
+
+<p>NOTE: RTC stands for "Real Time Clock", int. stands
+for "Interrupt", and ack. stands for
+"acknowledge". <br>
+&nbsp; </p>
+
+<p><b>The&nbsp;</b><a name="COM"></a><b>COM register</b> ( COM,
+$B0) </p>
+
+<p>This register is detailed first because it controls various
+diverse aspects of BLINK operations: </p>
+
+<pre><i>Bit</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Name</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SRUN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Speaker source (0=SBIT, 1=TxD or 3200Khz)<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SBIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SRUN=0: 0=low, 1=high; SRUN=1: 0=3200 Khz, 1=TxD<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OVERP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to overprogram EPROMs<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RESTIM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to reset the RTC, clear to continue<br>3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PROGRAM&nbsp;&nbsp;&nbsp;&nbsp; Set to enable EPROM programming<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RAMS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Binding of lower 8K of segment 0: 0=bank 0, 1=bank 20<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VPPON&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to turn programming voltage ON<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LCDON&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to turn LCD ON, clear to turn LCD OFF</pre>
+
+<p>The two speaker control bits operate in the following fashion:
+</p>
+
+<pre><i>SRUN</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>SBIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Effect<br></i>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Speaker line low<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Speaker line high<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Speaker line oscillates at 3200 Khz<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Speaker line attached to Tx data (Tx data still output<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; to comms. port)</pre>
+
+<p>RAMS is cleared on reset thus paging in ROM at logical
+addresses $0000 to $1FFF. This is necessary since the Z80 program
+counter is loaded with zero on reset. In normal operation RAMS is
+set and the lower 8K is the system RAM, which is also used for
+application static workspace and stack. <br>
+&nbsp; </p>
+
+<p><b>Bank Switching</b> (<a name="SR0"></a> SR0-3, $D0-3 ) </p>
+
+<p>System calls inevitably require a significant time overhead
+while they decode their input parameters and perform general
+housekeeping. This could have an effect on some programs which
+need to switch banks around a great deal, so we present here the
+method for binding banks via hardware. It should not be necessary
+to use this code because of the existence of the fast code
+interface described in "Miscellaneous useful routines".
+This section is included to provide some explanations as how
+things work. If you want your code to be compatible with future
+versions of the machine you should only use the fast code
+interface. </p>
+
+<p>To rebind one of the segments 0 to 3, the program writes the
+bank number into the relevant "segment register"; there
+are four segment registers, one for each segment. These are held
+in the BLINK chip and adressed via the Z80 I/O ports $D0 to $D3.
+Thus: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a,20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; do not use this code...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out&nbsp; ($D3),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; under any circumstances</pre>
+
+<p>will bind bank 20 (internal RAM) to segment 3. </p>
+
+<p>Because the segment registers are write-only, the operating
+system needs 'soft copies' of the current bindings so it can
+restore the old bindings correctly after it has rebound banks at
+the start of OS calls or interrupt service routines. These soft
+copies are stored at machine locations $04D0 to $04D3. It is
+VITAL that the desired bindings are stored here BEFORE actually
+binding the bank; if the bank were bound first, then in the event
+of an interrupt occurring immediatly after the output
+instruction, the interrupt service routine would rebind the bank
+to the contents of the soft copy (assuming it does rebind the
+relevant segment), and the desired change would be lost. The
+equivalent of an <a href="osmpb.html">OS_Mpb</a> would be: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; bc, $04D0 + segment&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; address of soft copy<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, bank&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; bank number<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; (bc),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; update the soft copy<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out&nbsp; (c),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; bind in the bank</pre>
+
+<p>Similarly, the equivalent of the <a href="osmgb.html">OS_Mgb</a>
+would be simply to read the soft copy: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a,($04D0 + segment)<br><br></pre>
+
+<p><b>EPROMs</b> (&nbsp;<a name="EPR"></a>EPR, $B3 ) </p>
+
+<p>No convenient system call is provided for blowing individual
+bytes to EPROM. Hence we detail a method for doing so by directly
+manipulating the gate array registers. </p>
+
+<p>To write a byte to EPROM, the relevant physical address must
+be in slot 3, ie. banks $C0 to $FF. The user first sets up the
+correct programming signals for the type of EPROM concerned. This
+is done by writing to the BLINK register EPR, addressed by I/O
+port $B3. </p>
+
+<p>EPR, EPROM programming register: </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>FUNCTION<br></i>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PD1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Two bits representing the length of delay period<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PD0<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PGMD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; State of program pulse during delay period<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EOED&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; State of EOE during delay period<br>3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SE3D&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; State of slot 3 select during delay period<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PGMP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; State of program pulse during porch period<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EOEP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; State of EOE during porch period<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SE3P&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; State of slot 3 select during porch period</pre>
+
+<p>NOTE: For 32K EPROMs write $48 (@01001000) to EPR and for
+128K, 256K EPROMs use $69 (@01101001). </p>
+
+<p>The delay periods are as follows, but note that during
+overprogramming (when OVERP is set in COM) the period is tripled.
+The porch period is not exact but is never less than 2.4us. </p>
+
+<pre><i>PD1</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>PD0</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Period<br></i>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.88us<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 312.5us<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.5ms<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 10ms</pre>
+
+<p>To enter EPROM-programming mode, the user must set VPPON and
+PROGRAM in the COM register, addressed by I/O port $B0, and also
+switch off the LCD by clearing the LCDON bit. When this is done,
+programming can be achieved by writing to the relevant address
+(which obviously needs to be a physical address in slot 3 ie.
+banks $C0 to $FF) as though it were RAM. However, writing to slot
+3 addresses in program mode causes BLINK to take over. BLINK will
+hold the data and address busses with the appropriate data and
+then do a porch cycle, followed by a delay cycle and then another
+porch cycle before returning control to the processor. Once a
+byte has been programmed, it needs to be verified. This is done
+by exiting programming mode - clear VPPON and PROGRAM - and
+reading the byte back to see if it has been successfully blown.
+No more than 75 attempts should be made to blow any byte, and if
+it has not been blown by that stage, something is clearly wrong.
+Note that a byte will usually be successfully blown in one
+attempt. Once a byte has been successfully programmed, OVERP (in
+COM) should be set and the byte overprogrammed. Each byte should
+be overprogrammed the same number of times as it first took to
+program. </p>
+
+<p>A code fragment to blow a byte in register C to logical
+address (HL) - assumed to be bound to an EPROM address - is
+reproduced below. Note that when the Filer writes to the EPROM it
+does so by blowing blocks of bytes, rather than writing one byte
+at a time, and so operates a little faster than blowing each byte
+individually. </p>
+
+<pre>.start&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; b, 75&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Max. number of attempts<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, $48&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; for 32K EPROMs<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out&nbsp; ($B3),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Set EPROM programming signals<br><br>.proloop&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, $0E<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out&nbsp; ($B0),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Set VPP and PROGRAM bits<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; (hl),c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; write byte to EPROM (address)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, $04<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out&nbsp; ($B0),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Reset VPP and PROGRAM bits<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a,(hl)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cp&nbsp;&nbsp; c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; verify byte<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; z, byteok<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; djnz proloop</pre>
+
+<pre>; handle failure to write byte here...</pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret<br><br>.byte&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, 76&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; one more than maximum number of attempts<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sub&nbsp; b&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; same number of times it took to program<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a,b<br><br>.ovploop&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, $2E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; Reset VPP, PROGRAM<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out&nbsp; ($B0),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; and OVERPROGRAM<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; (hl),c&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; write byte<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, $04<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out&nbsp; ($B0),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; reset VPP, PROGRAM and OVERPROGRAM<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; djnz ovploop<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, $05&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; set COM register to<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out&nbsp; ($B0),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; turn screen back on<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret</pre>
+
+<p>The Z88 Assembler Workbench application <b>Zprom</b> uses the
+above algorithm in principle, but blows to EPROM in blocks of
+max. 16K in one go (depending of the user defined range) by using
+the standard Z80 instruction LDIR. </p>
+
+<p><b>UART Receive registers</b> </p>
+
+<p><a name="RXD"></a>RXD ($E0), receive data register </p>
+
+<p><tt>7&nbsp; 6&nbsp; 5&nbsp; 4&nbsp; 3&nbsp; 2&nbsp; 1&nbsp; 0</tt>
+<br>
+<tt>-----------------------</tt> <br>
+<tt>D7 D6 D5 D4 D3 D2 D1 D0</tt> <br>
+<tt>-----------------------</tt> </p>
+
+<p><a name="RXE"></a>RXE ($E1), extended receive data register </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Always clear<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Always clear<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Frame error, set if error<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RXDB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Value of RXD pin on BLINK<br>3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TCLK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Internal transmit clock<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RCLK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Internal receive clock<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PAR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parity or first stop bit<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; START&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Start bit (should be zero)</pre>
+
+<p><a name="RXC"></a>RXC ($E2), receive control register </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SHTW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to select short word mode<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LOOP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to connect transmit to receive (used for testing)<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UART&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to hold UART in RESET<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ARTS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Auto RTS mode<br>3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IRTS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Invert RTS<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BAUD 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These three bits define receiver baud rate<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BAUD 1<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BAUD 0</pre>
+
+<p>SHTW is used to align RXC register with the incoming data such
+that the byte you want ends up in RXC and you do not get stuck
+with parity or stop bits. We can see the effect of SHTW by
+showing how an incoming data stream is mapped onto RXC and RXE.
+Suppose the incoming data is </p>
+
+<p><tt>--&gt; S2 S1 D7 D6 D5 D4 D3 D2 D1 D0 ST --&gt; Z88</tt> <br>
+&nbsp; </p>
+
+<pre><i>BITS</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>If SHTW=0</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>If SHTW=1<br></i>S2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FE (inverted)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Not clocked in<br>S1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PAR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FE (inverted)<br>D7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PAR<br>D7-D0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D7-D0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D7-D0<br>ST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; START&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; START</pre>
+
+<p>When ARTS is set then RTS will be asserted every time a new
+character is received and cleared when the receive register has
+been read. Manual control of RTS can be achieved by using IRTS to
+change the current state of the line. </p>
+
+<p>The baud rates set by BAUD 2 to BAUD 0 are as follows: </p>
+
+<pre><i>Value</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>(Baud2-0)</i>&nbsp;&nbsp; Baud rate<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 75<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 001&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 300<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 010&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 600<br>3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 011&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1200<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 100&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2400<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 101&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9600<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 110&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 19200<br>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 111&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 38400<br><br></pre>
+
+<p><b>UART Transmit registers</b> </p>
+
+<p>The transmit data registers is 11 bits wide with the upper 3
+bits being written by the address lines A8-A10 during the OUT
+instruction. The register looks like this: </p>
+
+<p><a name="TXD"></a>TXD ($E3), Transmit data register </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 7-0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --------------------------------------------<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; STOP2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; STOP1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; START&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D7 - D0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --------------------------------------------</pre>
+
+<p>If SHTW (in RXC) is set then STOP2 will not be sent out and
+only 10 bits will be sent in all. To load the register you must
+use a code sequence like: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, data&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; 8 bits to send<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; b, @00000110&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; 2 stops, 1 start<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; c, TXD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; I/O port $B3<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out&nbsp; (c),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; transmit data</pre>
+
+<p><a name="TXC"></a>TXC ($E4), Transmit control register </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UTEST&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set fast baud rate for receive and transmit<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IDCD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, DCD interrupts when low (else when high)<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ICTS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, CTS interrupts when low (else when high)<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ATX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Auto transmit mode<br>3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ITX&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Invert Tx data output pin<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BAUD2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; These three bits define transmit baud reate<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BAUD1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (See above table for baud rates)<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BAUD0</pre>
+
+<p>When ATX is set the data in TXD will not be sent until CTS is
+asserted. Manual control of the TxD pin can be achieved by using
+ITX to change the current state of the line. <br>
+&nbsp; </p>
+
+<p><b>UART interrupts and status</b> </p>
+
+<p><a name="UIT"></a>UIT ($E5), UART interrupt status register </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RSRD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Receive shift register full (cleared when read)<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DCDI&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DCD interrupt<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CTSI&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CTS interrupt<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TDRE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Transmit data register empty<br>3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RDRF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Receive data register full<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DCD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; State of DCD line<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CTS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; State of CTS line</pre>
+
+<p>The registers UMK and UAK control the enabling and
+acknowledging of the UART interrupts. CTS and DCD can both be
+enabled to cause interrupts and the interrupts can be set to
+occur on either state of the line (IDCD and ICTS in the TXC
+register). To clear a DCD interrupt the state of IDCD needs to be
+changed (since the interrupt is level and not edge triggered) and
+then the DCD bit should be set in the interrupt acknowledge
+register UAK. CTS works in exactly the same way as DCD. </p>
+
+<p><a name="UMK"></a>UMK ($E5), UART interrupt mask register </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DCD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, DCD interrupts are enabled<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CTS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, CTS interrupts are enabled<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TDRE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, transmit data register empty interrupt enabled<br>3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RDRF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, receive data register empty interrupt enabled<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+
+<p><a name="UAK"></a>UAK ($E6), UART interrupt acknowledge
+register </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DCD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to acknowledge DCD interrupt<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CTS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to acknowledge CTS interrupt<br>4 - 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+
+<p>To clear TDRE and RDRF interrupts you write to the transmit
+data register or read from the receive data register
+respectively. <br>
+&nbsp; </p>
+
+<p><b>UART examples</b> </p>
+
+<p>It is sometimes desirable to explicitly manipulate the RTS
+line of the serial interface for example when auto-dialing
+modems. This may be done by manipulating the IRTS bit in the RXC
+register. In programming terms this is bit 3 of I/O port $E2. It
+is important that the soft copy is updated first. </p>
+
+<p>Bit 3 is XOR'ed with the normal state of the RTS line, as
+defined by RDRF in UIT (receive data register full) and ARTS
+(auto RTS) in RXC. </p>
+
+<p>The logic is RTS=[[RDRF AND ARTS] XOR IRTS]. This bit
+therefore toggles the RTS line. A code fragment to achieve this
+might be: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; bc, $04E2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; address of soft copy<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a,(bc)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; fetch old value<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; or&nbsp;&nbsp; 8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; or AND 247 to reset<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; (bc),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; update soft copy<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; out&nbsp; (c),a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; update hardware</pre>
+
+<p>The TxD (transmit data) line can be inverted by changing the
+state of ITX in TXC (the transmit control register) using bit 3
+of I/O port $E4 (soft copy address $04E4) in a similar way to the
+RTS line. The value of the RxD line (receive data) can be found
+by reading RXDB in RXE (extended receive data register, using bit
+4 of I/O port $E1 (soft copy $04E1 - the soft copy will not
+necessarily be up to date). <br>
+&nbsp; </p>
+
+<p><b>The Keyboard</b> (&nbsp;<a name="KBD"></a>KBD, $B2 ) </p>
+
+<p>The keyboard is read by outputting a row on the address line
+A8 to A15 and reading the KBD register in BLINK. The keyboard
+matrix looks like this: </p>
+
+<p><tt>-------------------------------------------------------------------------</tt>
+<br>
+<tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+D7&nbsp;&nbsp;&nbsp;&nbsp; D6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+D5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+D3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+D1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D0</tt> <br>
+<tt>-------------------------------------------------------------------------</tt>
+<br>
+<tt>A15 (#7) | RSH&nbsp;&nbsp;&nbsp; SQR&nbsp;&nbsp;&nbsp;&nbsp;
+ESC&nbsp;&nbsp;&nbsp;&nbsp; INDEX&nbsp;&nbsp;
+CAPS&nbsp;&nbsp;&nbsp; .&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; £</tt> <br>
+<tt>A14 (#6) | HELP&nbsp;&nbsp; LSH&nbsp;&nbsp;&nbsp;&nbsp;
+TAB&nbsp;&nbsp;&nbsp;&nbsp; DIA&nbsp;&nbsp;&nbsp;&nbsp;
+MENU&nbsp;&nbsp;&nbsp; ,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '</tt> <br>
+<tt>A13 (#5) | [&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SPACE&nbsp;&nbsp;
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Q&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Z&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+L&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0</tt> <br>
+<tt>A12 (#4) | ]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+LFT&nbsp;&nbsp;&nbsp;&nbsp; 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+W&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+S&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+M&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; P</tt> <br>
+<tt>A11 (#3) | -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+RGT&nbsp;&nbsp;&nbsp;&nbsp; 3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+E&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+D&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+K&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9</tt> <br>
+<tt>A10 (#2) | =&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DWN&nbsp;&nbsp;&nbsp;&nbsp; 4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+R&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+F&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+V&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+J&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; O</tt> <br>
+<tt>A9&nbsp; (#1) | \&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+UP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+T&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+G&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+B&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+U&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; I</tt> <br>
+<tt>A8&nbsp; (#0) | DEL&nbsp;&nbsp;&nbsp; ENTER&nbsp;&nbsp;
+6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+H&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+N&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8</tt> <br>
+<tt>-------------------------------------------------------------------------</tt>
+<br>
+&nbsp; </p>
+
+<pre>DIA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;DIAMOND&gt; key<br>SQR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;SQUARE&gt; key<br>LSH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Left &lt;SHIFT&gt; key<br>RSH&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Right &lt;SHIFT&gt; key<br>LFT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;LEFT&gt; arrow key<br>RGT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;RIGHT&gt; arrow key<br>DWN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;DOWN&gt; arrow key<br>UP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;UP&gt; arror key</pre>
+
+<p>The keyboard can be read directly using a piece of code like
+below, although note that while reading the keyboard, BLINK will
+stop the processor for up to 40us: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; c, $B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; I/O port $B2<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; b, row&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; one row of A15-8<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; in&nbsp;&nbsp; a, (c)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; get column data in A</pre>
+
+<p>To check for the escape key being pressed. </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; c, $B2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; b, @01111111&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;Detect keys in matrix top row.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; in&nbsp;&nbsp; a, (c)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cp&nbsp;&nbsp; @11011111&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ;Bit pattern returned if only the escape key is pressed.</pre>
+
+<p>If KWAIT (in INT) is set then performing a key read read will
+send the machine into Snooze state. When a key press is made the
+machine will wake up and if KEY (in INT) is set then a keyboard
+interrupt will occur. <br>
+&nbsp; </p>
+
+<p><b>Interrupts</b> </p>
+
+<p>The Z80 CPU is driven by two external interrupt. INT/NMI/HLT.
+10 ms TBD</p>
+
+<p>The&nbsp;<a name="INT"></a>INT ($B1) register controls which
+interrupts are enabled: </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; KWAIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, reading the keyboard will Snooze<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, an active high on A19 will exit Coma<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FLAP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, flap interrupts are enabled<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UART&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, UART interrupts are enabled<br>3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BTL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, battery low interrupts are enabled<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; KEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, keyboard interrupts (Snooze or Coma) are enabl.<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TIME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, RTC interrupts are enabled<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GINT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If clear, no interrupts get out of blink</pre>
+
+<p>The&nbsp;<a name="ACK"></a>ACK ($B6) register is used to
+acknowledge and thus clear an interrupt: </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Acknowledge A19 interrupt<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FLAP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Acknowledge FLAP interrupt<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BTL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Acknowledge battery low interrupt<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; KEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Acknowledge keyboard interrupt<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+
+<p>The&nbsp;<a name="STA"></a>STA ($B1) register provides
+information about which interrupt has actually occurred: </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FLAPOPEN&nbsp;&nbsp;&nbsp; If set, flap open else flap closed<br>6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, high level on A19 occurred during coma<br>5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FLAP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, positive edge has occurred on FLAPOPEN<br>4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UART&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, an enabled UART interrupt is active<br>3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BTL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, battery low pin is active<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; KEY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, a column has gone low in snooze (or coma)<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TIME&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If set, an enabled TIME interrupt is active<br><br></pre>
+
+<p><b>Coma and Snooze</b> </p>
+
+<p>The COMA state is entered via a HALT instruction. Any
+interrupt can cause a wake up, providing there is enough power to
+run the machine and the interrupt is enabled. If all interrupts
+are disabled withing BLINK (regardless of whether they are
+enabled in Z80 - the interrupt line to the Z80 comes from BLINK)
+before a HALT instruction, then the machine will never be able to
+wake up again. One special way of waking the machine is by
+ensuring KEY and KWAIT (in INT) are set before executing HALT.
+During HALT the upper 8 address bits hold the contents of the Z80
+I (Interrupt) register. If this is set appropriately, a special
+key sequence can cause an interrupt to occur, waking the machine.
+This is how the pressing the two &lt;SHIFT&gt; keys wakes up the
+machine. The I register is loaded with @00111111 before HALT is
+executed. The two &lt;SHIFT&gt; keys occur in the two left hand
+columns of the keyboard matrix, so they can be sensed with the
+address lines in this state. Note that the minimum time between
+entering COMA and waking up again is 5ms, so the COMA state would
+not be suitable for waiting for regular interrupts. Finally note
+that the UART will not work in COMA because all the UART clocks
+are shut down. </p>
+
+<p>During snooze the Z80 clock is stopped, but all the other
+system clocks continue to run. Therefore it is possible to use
+the UART from snooze. Any keyboard column going low will cause a
+wakeup from snooze, even if the keyboard interrupts are disabled.
+Note that the keyboard data returned after wakeup will not
+necessarily be valid, so the keyboard should definitely be read
+again. <br>
+&nbsp; </p>
+
+<p><b>Real Time Clock</b> (<a name="TIM"></a>TIM0-4, $D0-4) </p>
+
+<pre><i>Register</i>&nbsp;&nbsp;&nbsp; <i>Period</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Counts to</i>&nbsp;&nbsp; <i>Width in bits<br></i>TIM0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5ms&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 199&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8<br>TIM1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 second&nbsp;&nbsp;&nbsp; 59&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6<br>TIM2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 minute&nbsp;&nbsp;&nbsp; 255&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8<br>TIM3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 256 minutes 255&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 8<br>TIM4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 64K minutes 31&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5</pre>
+
+<p>The clock is reset to zero by settings RESTIM in the COM
+register. The clock will be held in reset, ie. it won't count
+until RESTIM is cleared again. In order to guarantee a valid
+result from any of these registers, software needs to read until
+two equal values are returned. This should always occur within
+three read cycles. </p>
+
+<p>There are three interrupts that the real time clock can
+generate and these are TICK (100 times a second), SEC (once a
+second) and MIN (once a minute). Three registers are associated
+with these interrupts: </p>
+
+<p><a name="TSTA"></a>TSTA ($B5), Timer interrupt status </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7 - 3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MIN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set if minute interrupt has occurred<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SEC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set if second interrupt has occurred<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TICK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set if tick interrupt has occurred</pre>
+
+<p>TMK ($B5), Timer interrupt mask </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7 - 3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MIN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to enable minute interrupt<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SEC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to enable second interrupt<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TICK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to enable tick interrupt</pre>
+
+<p>TACK ($B4), Timer interrupt acknowledge </p>
+
+<pre><i>BIT</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>NAME</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Function<br></i>7 - 3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -<br>2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MIN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to acknowledge minute interrupt<br>1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SEC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to acknowledge second interrupt<br>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TICK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set to acknowledge tick interrupt</pre>
+
+<p><b>Unused I/O ports</b> </p>
+
+<p>The I/O ports $F0 to $FF are not used by the system and so are
+available to hardware developers. The soft copy page $0400 is
+entirely reserve for I/O port use. You must
+not use this memory for any other purpose. Remember that when
+updating a soft copy, it must always be done before updating the
+port because of the possibility of an interrupt occurring and
+receiving bogus information about the state of a port. <br>
+&nbsp; </p>
+
+<p><b>&nbsp;</b><a name="Screen"></a><b>Screen registers</b> </p>
+
+<p>The addresses of the screen files are held in BLINK registers
+PB0 to PB3 and SBR. Their width determine the file granularity in
+a bank. For example, the LORES1 can be stored at 0, 4, 8 or 12K.
+Their softcopies are stored at ($046x) for the most significant
+bits and ($047x) for the 8 right bits. The role of these
+registers is as follows: </p>
+
+<pre><strong><i>Register   Name    Role    Length      Granularity  Width   Softcopies ($046x)       ($047x)<br></i></strong><i>PB0 ($70)  SC_LR0  LORES0  512 bytes   512 bytes    13 bits            5 bits right  8 bits right<br>PB1 ($71)  SC_LR1  LORES1  3.5K bytes  4K bytes     10 bits            2 bits right  8 bits right<br>PB2 ($72)  SC_HR0  HIRES0  6K bytes    8K bytes     9 bits             1 bit right   8 bits right<br>PB3 ($73)  SC_HR1  HIRES1  2K bytes    2K bytes     11 bits            3 bits right  8 bits right<br>SBR ($74)  SC_SBR  SBF     2K bytes    2K bytes     11 bits            3 bits right  8 bits right</i></pre>
+
+<p>These registers are write-only. They are set by <a href="ossci.html">OS_Sci</a> with OUT (C),A instructions are used.
+B always contains the left bits of data (more than 8), A the
+data, C the port. So, A is ($047x) and B is ($046x). Please,
+refer to the <a href="scrfiles.html">Screen Files</a> chapter for
+more about their structure.</p>
+
+<p><em>How to generate address from blink screen register
+softcopies</em> (iner of the OS_SCI call)<br>
+</p>
+
+<blockquote>
+ <blockquote>
+  <pre>h : bit from $046x<br>l : bit from $047x</pre>
+ </blockquote>
+</blockquote>
+
+<blockquote>
+ <pre>        Add 00 here<br>        ||<br>        vv<br>PB0 : 13 bits : hhhh hlll 00ll lll0<br>PB1 : 10 bits : hhll llll 00ll 0000<br>PB2 :  9 bits : hlll llll 00l0 0000<br>PB3 : 11 bits : hhhl llll 00ll l000<br>SBR : 11 bits : hhhl llll 00ll l000</pre>
+</blockquote>
+
+<p>Example, on an Expanded machine :</p>
+
+<blockquote>
+ <pre>Register : ($046x) ($047x) -&gt; Offset<br>  PB0      $04     $31     -&gt; $212200<br>  PB1      $00     $1C     -&gt; $070000<br>  PB2      $00     $43     -&gt; $212000<br>  PB3      $00     $39     -&gt; $070400<br>  SBR      $01     $0F     -&gt; $213800</pre>
+</blockquote>
+
+<hr>
+
+<table style="font-size: 12px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tbody><tr>
+  <td valign="top" width="33%"><a href="basicasm.html">Previous</a></td>
+  <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+  <td align="right" valign="top" width="33%"><a href="motherbd.html">Next</a></td>
+ </tr>
+ <tr>
+  <td valign="top" width="33%">BBC BASIC &amp; in-line
+  assembler</td>
+  <td align="center" valign="top" width="34%">Manipulating
+  the Blink Registers</td>
+  <td align="right" valign="top" width="33%">Z88
+  Motherboard Hardware</td>
+ </tr>
+</tbody></table>
+</body></html>

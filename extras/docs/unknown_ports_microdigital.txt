@@ -1,0 +1,37 @@
+-puertos en tk9xxx:
+-al arranque de maquina:  Out Port df unknown written with value 0, PC after=16
+-al ejecutar cualquier comando: In Port 38bf unknown asked, PC after=4ba-> quiza un puerto COM1 ruso
+
+
+0x16=22 decimal
+
+
+16(decimal): jp 5618
+
+zona no usada en rom original pero aqui si:
+19: xor a
+20: out(223),a
+22: ret
+
+
+zona no usada en rom original pero aqui si:
+15095: jp 6464
+15098: call 19
+15101: jr 15105
+15103: rst 56
+15104: rst 56
+15105: jp 5427
+
+
+
+
+
+4ba=1210
+
+zona no usada, pero en rom original contiene rutina de la vieja rom del zx81:
+1202: ld de,5009
+1205: ld hl,9436
+1208: in a,(191)
+1210: rla
+1211: ret
+

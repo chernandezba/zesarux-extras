@@ -1,0 +1,266 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Introduction</title>
+  <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tbody>
+
+ <tr>
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+ </tr>
+
+ <tr>
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Previous</a></td>
+
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="bottom" width="10%"><a href="overview.html">Next</a></td>
+ </tr>
+
+  </tbody>
+</table>
+
+<hr width="100%">
+<br>
+
+<b><font size="+1">Introduction</font></b>
+<br>
+
+&nbsp;
+<p><b>Preamble</b>
+</p>
+
+<p>The aim of these notes is to provide a comprehensive description of
+the hardware and software of the Z88 portable. The machine has a powerful
+operating system which provides facilities for software to be added on
+external cards, and integrated into the same environment which cares for
+the built-in programs. External software can take full advantage of the
+Z88's facility to switch between tasks, can use automatically generated
+command menus with optional help pages, and is provided with a large number
+of useful operating system calls, to access the screen, serial port, internal
+filing system, printer driver, etc.
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Who these notes are for</b>
+</p>
+
+<p>These notes are primarily targeted at the software author interested
+in writing applications for the Z88 using Z80 assembler, although it will also be useful to
+anyone developing hardware. The emphasis is placed on authors whose programs
+are destined for application cards, but a programmer using BASIC and needing
+to exploit the facilities of the operating system will find what he or
+she needs here.
+</p>
+
+<p>The notes assumes the reader is reasonably familiar with the Z88, and
+that the User Guide supplied with it has been read and is available for
+reference. Further, some basic knowledge of Z80 assembly language programming
+has to be assumed, for while it would be perfectly possible to develop
+software for the Z88 using a high level language compiler such as the <a href="http://www.z88dk.org/">z88dk</a> compiler. The information here,
+therefore, is from the point of view of an application writer developing
+in assembly language. Of course, this means that there is more than enough
+information for customising a compiler if this is the preferred route.
+</p>
+
+<p>We would anticipate that most developers would use a Z80 assembler running
+on a different machine, and would blow EPROM's from that machine to test
+in the Z88. Alternatively EPROM's can be blown from the Z88 itself. There
+is a simple development environment, which is the BASIC language which
+comes with the machine and includes an in-line Z80 assembler. How to use
+BASIC as a development environment is detailed in the "BBC BASIC and the
+Assembler" section of these notes.
+</p>
+
+<p>Apart from development software you can download lots of nice applications from the "Z88 Forever" Web Homepage,&nbsp;&nbsp;<a href="http://www.worldofspectrum.org/z88forever/">http://www.worldofspectrum.org/z88forever/</a> (site is maintained by Garry Lancaster).
+Here you can find everything about the Z88 portable computer that is worth knowing.
+</p>
+
+<p>The Z88 Development Project supplies a complete developers package that has
+all the necessary facilities for programming applications on the Z88 (native), and
+contains a modular Z80 assembler, debugger, EPROM programming software
+and on-line help, all as resident applications on a 128K ROM. In addition,
+a Z80 Cross Assembler that can be compiled on most C compilers on various operating systems to
+compile Z80 Assembler source files on ordinary workstation computers, supplied
+with a Z88 emulator that can run the compiled applications.
+</p>
+
+<p>All the assembler examples in these notes have been written in the format
+used by the Z80 Cross Assembler <span style="font-weight: bold;">Mpm</span>, which is used as the standard tool for OZ development.
+</p>
+
+<p>The latest addition to Z88 software development is the project at
+<a href="http://z88.linux.dk">http://z88.linux.dk</a>, which takes the Z88 to another level;
+the development team are developing new tools (cross assembler &amp; Z88 emulator / debugger),
+better system documentation and are working on a new, much improved OZ operating system.
+The good part is that all source code is publicly available in a <a href="https://z88.linux.dk/svn/">Subversion repository</a>
+(including OZ ROM), and under GPL license. You can browse the repository online clicking on
+<a href="http://z88.linux.dk/fisheye/browse/Z88Svn/">this link</a> (using FishEye).
+</p>
+<p>Dominic Morris has over the years worked on a Z88 Development Kit which consists
+of Small C+ pre-processor, compiler, optimizer, libraries, examples and more.
+This package is regularly updated with new features, including the capability of
+producing full-blown Z88 applications. This C development system now runs on
+several Z80 based systems, including Sinclair Spectrum clones.
+</p>
+
+<p>For the latest release, point your browser to <a href="http://www.z88dk.org/">http://www.z88dk.org/</a>
+</p>
+
+<p>An alternative high-level development environment is Z88 CamelForth
+by Garry Lancaster. This also allows
+for full application development. You can find the latest version at&nbsp;&nbsp;<a href="http://www.worldofspectrum.org/z88forever/camelforth/rom-camel.htmll">http://www.worldofspectrum.org/z88forever/camelforth/rom-camel.htmll</a>
+.
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Structure of these notes</b>
+</p>
+
+<p>The notes begins with a general overview of the Z88. It is important
+to study this carefully as many important concepts are dealt with, and
+a good understanding of this section will make the rest of the notes much
+easier to follow. Applications are talked about and guidelines for their
+construction are given. Application construction is then covered in detail,
+with the necessary static structure needed in the ROM card to let the system
+know the size of the card, what applications it contains etc. In this section
+the data structure for generating menus, command sequences and help pages
+is also discussed. Before moving on to discussing the main body of system
+calls, and how they are useful to the application writer, two important
+subjects are tackled. Firstly the way in which errors are handled; some
+errors include a request for an application to close itself down, and require
+serious immediate action, whereas others might simply inform the application
+that it may have been interrupted - perhaps the Z88 was switched off for
+a while. Secondly the memory architecture of the Z88 and the system memory
+management routines are explained.
+</p>
+
+<p>Understanding the memory organisation is the key to successful application
+writing, so this section needs to be studied with care.
+</p>
+
+<p>Following from this material individual calls can be discussed in some
+detail, starting with the most basic and commonly used and gravitating
+towards the more esoteric. Before the extensive calls reference part of
+the notes, Z88 hardware is discussed. The appendices include details of
+internal application file formats (ie. PipeDream and Diary), hardware connections
+and other general information. A glossary and index is provided.
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Important notice</b>
+</p>
+
+<p>lf you write an application which contains bugs or tries to circumnavigate
+the operating system, then it is likely that all the other applications
+in the Z88 will be affected. The effect may not be immediate, some indiscretions
+take weeks or even months to become apparent, but will usually be in the
+form of a system crash. You must always remember that the resources of
+the Z88 are not devoted exclusively to your application and therefore only
+use legal interfaces. Please note that all the internal applications follow
+all the rules and use no 'back door' techniques.
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Disclaimer</b>
+</p>
+
+<p>The authors will not in any event be liable for any loss, including
+consequential loss, caused by any error, defect or inaccuracy in this information,
+including but not limited to loss of profit or loss of contracts.
+<br>
+
+&nbsp;
+</p>
+
+<p><b>Release information, September 2007</b>
+</p>
+
+<p>This is the third major release of these notes and follow the latest OZ V4.2 release, identified with the same release number.
+</p>
+
+<p><b>Release information, October 1999</b>
+</p>
+
+<p>This is the second edition of the third release of the Developers Notes,
+identified as V3.2 . Many things have been changed and added since version
+2, especially the conversion from PipeDream format to HTML.
+</p>
+
+<p>The new V4 of the operating system was released long after the V2 notes.
+Unfortunately, this documentation does not reflect the bug fixes of V4,
+nor any improvements in V4. We hope to aquire information to be updated
+in these notes as soon as it gets into our hands. All reported bugs in
+the system calls reference refer to the V2.2/3.xx releases of the operating
+system.
+</p>
+
+<p>If you find any inaccuracies or inconsistencies, or if you have any
+comments on the style and presentation of these documents, then please
+pass these on in writing to:
+</p>
+
+<p><i>Gunther Strube, Denmark, email <a href="mailto:gbs@users.sf.net">gbs@users.sf.net</a></i>
+<br>
+
+<i>Thierry Peycru, France, email <a href="mailto:pek@users.sf.net">pek@users.sf.net</a></i>
+<br>
+
+<i>Dennis Gr&ouml;ning, Sweden, homepage <a href="http://www.algonet.se/%7Edennisgr/z88.html">www.algonet.se/~dennisgr/z88.html</a></i>
+</p>
+
+<p>Finally, many thanks to Vic Gerhardi, <a href="http://www.rakewell.com/">Rakewell
+Ltd</a>, for his early support of these notes. Many details have come to
+light because of those VERY old system printouts he had received from the
+birth of the OZ operating system in the early days.
+</p>
+
+<p>Z88 forever!
+</p>
+
+<p>The Authors..
+<br>
+
+&nbsp;
+</p>
+
+<p>
+</p>
+
+<hr width="100%">
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tbody>
+
+ <tr>
+   <td align="left" valign="top" width="33%"><a href="index.html">Previous</a></td>
+
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="top" width="33%"><a href="overview.html">Next</a></td>
+ </tr>
+
+ <tr>
+   <td align="left" valign="top" width="33%">Contents</td>
+
+   <td align="center" valign="top" width="34%">Introduction</td>
+
+   <td align="right" valign="top" width="33%">Z88 Overview</td>
+ </tr>
+
+  </tbody>
+</table>
+
+</body>
+</html>

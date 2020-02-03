@@ -1,0 +1,92 @@
+Attached is a text file showing how SPECTRA+128 supports the dual screen
+mechanism of the Spectrum 128.
+
+The only way I could add support for the 128 dual screen mechanism was to
+overlay it on SPECTRA's dual screen mechanism.
+
+SPECTRA has 6 DIL switches. Switch 2 was used on SPECTRA to select an
+onboard EPROM but is now used by SPECTRA+128 to select between 48K mode and
+128K mode (an onboard EPROM can still be used but an external switch must be
+soldered to the board). In 128K mode, the Spectrum 128 I/O port $7FFD is
+monitored.
+
+Writes to $4000-$7FFF are mirrored to the active SPECTRA screen bank, just
+as you have implemented.
+
+If 128 RAM bank 7 is paged in then writes to $C000-$FFFF are mirrored to the
+'other' SPECTRA screen bank.
+
+Writing to I/O port $7FFD to select 128 screen 0 or 1 will affect how
+SPECTRA's two screens are used. It effectively forms an XOR with SPECTRA's
+I/O port. Hopefully the attached table will explain this better than my
+description here!
+
+
++----------------------------++--------------------------++----------------- --------++--------------------------+
+|     Options Selected       ||    Mem Writes SPECTRA    ||  Mem Writes Spectrum 128 ||     Screen Displayed     |
++--------+---------+---------++--------+--------+--------++--------+-------- +-------++---------+-------+--------+
+|  128   | SPECTRA | SPECTRA || $4000  | $C000  | $C000  || $4000  | $C000  | $C000  || SPECTRA |  128  |  128   |
+| Screen | Shadow  |  Show   ||        | Bank 5 | Bank 7 ||        | Bank 5 | Bank 7 ||  SCART  |Monitor| Shadow |
++========+=========+=========++========+========+========++========+========+========++=========+=======+========+
+|   0    |   SP0   |   SP0   ||  SP0   |  SP0   |  SP1   ||   0    |   0    |   1    ||    0    |   0   |   0    |
+|   1    |   SP0   |   SP0   ||  SP0   |  SP0   |  SP1   ||   0    |   0    |   1    ||    1    |   1   |   0    |
++--------+---------+---------++--------+--------+--------++--------+--------+--------++---------+------+---------+
+|   0    |   SP0   |   SP1   ||  SP0   |  SP0   |  SP1   ||   0    |   0    |   1    ||    1    |   0   |   0    |
+|   1    |   SP0   |   SP1   ||  SP0   |  SP0   |  SP1   ||   0    |   0    |   1    ||    0    |   1   |   0    |
++--------+---------+---------++--------+--------+--------++--------+--------+--------++---------+------+---------+
+|   0    |   SP1   |   SP0   ||  SP1   |  SP1   |  SP0   ||   0    |   0    |   1    ||    0    |   0   |   1    |
+|   1    |   SP1   |   SP0   ||  SP1   |  SP1   |  SP0   ||   0    |   0    |   1    ||    1    |   1   |   1    |
++--------+---------+---------++--------+--------+--------++--------+--------+--------++---------+------+---------+
+|   0    |   SP1   |   SP1   ||  SP1   |  SP1   |  SP0   ||   0    |   0    |   1    ||    1    |   0   |   1    |
+|   1    |   SP1   |   SP1   ||  SP1   |  SP1   |  SP0   ||   0    |   0    |   1    ||    0    |   1   |   1    |
++--------+---------+---------++--------+--------+--------++--------+--------+--------++---------+------+---------+
+
+SP0 = SPECTRA screen 0
+SP1 = SPECTRA screen 1
+
+
+
+
+When reading from SPECTRA RAM to generate the TV picture:
+ 
+if $7FFD Bit 3 == 0 then
+   if $7FDF Bit 5 == 0 then
+      read from SPECTRA bank 0
+   else
+      read from SPECTRA bank 1
+   end if
+else
+   if $7FDF Bit 5 == 0 then
+      read from SPECTRA bank 1
+   else
+      read from SPECTRA bank 0
+   end if
+end if
+
+
+
+
+I think this can be simplified to:
+  read from SPECTRA bank ($7FFD Bit 3) xor ($7FDF Bit 5)
+ 
+ 
+ 
+Mirror to SPECTRA RAM when writing to address:
+* $4000-$7FFF
+* $C000-$FFFF and port $7FFD Bits 0-2 == 5
+* $C000-$FFFF and port $7FFD Bits 0-2 == 7
+ 
+if writing to $C000-$FFFF and $7FFD Bits 0-2 == 7 then
+   if $7FDF Bit 6 == 0 then
+      write to SPECTRA bank 1
+   else
+      write to SPECTRA bank 0
+   end if
+else if (writing to $4000-$7FFF) or (writing to $C000-$FFFF and $7FFD Bits 0-2 == 5) then
+   if $7FDF Bit 6 == 0 then
+      write to SPECTRA bank 0
+   else
+      write to SPECTRA bank 1
+   end if
+end if
+ 

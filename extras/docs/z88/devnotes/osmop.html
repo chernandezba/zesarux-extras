@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+
+<b><font size="+1">OS_Mop, open memory (allocate memory
+pool)</font></b>
+</p>
+<p><tt>RST 20H, DEFB $4E</tt>
+</p>
+<p>IN:
+</p>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = memory mask arguments (several arguments OR'ed together):<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Destination segment (allocated memory addressed for segment):<br></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MM_S0 ($00), segment 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MM_S1 ($40), segment 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MM_S2 ($80), segment 2<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MM_S3 ($C0), segment 3<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Source of memory (to be allocated):<br></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MM_FIX ($02), fixed workspace (not subject to swapping)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>or<br></i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MM_SLT ($04), explicit slot usage, mask also following:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MC_CI ($10), internal memory<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MC_C1 ($01), card 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MC_C2 ($02), card 2<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MC_C3 ($03), card 3<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Allocation variations</i>:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MM_EXC ($10), exclusive use of bank<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MM_MUL ($20), use multiple banks<br><br>&nbsp;&nbsp;&nbsp;&nbsp; BC = 0, always</pre>
+
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0<br>&nbsp;&nbsp;&nbsp;&nbsp; IX = memory pool handle</pre>
+
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp; A = error code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_NA ($06), handle not available<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ROOM ($07), no room</pre>
+
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.FBCDEHL/..IY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F......./IX.. different</pre>
+
+Notes:
+<blockquote>MM_EXC and MC_CI use the same argument bit. We don't know why,
+but believe its the same function (Internal &amp; Explicit slot usage).
+  <p>If only the memory segment mask are specified, it is probably default'ed
+to MM_MUL - for the rest of the arguments, we don't know.
+  </p>
+  <p>MM_FIX is probably an internal usage.
+  <br>
+&nbsp;</p>
+</blockquote>
+
+Bugs:
+<br>
+&nbsp;
+<p>Related calls:
+</p>
+<blockquote><a href="osbix.html">OS_Bix</a>, Bind in extended address
+  <br>
+
+  <a href="osbox.html">OS_Box</a>, restore bindings after <a href="osbix.html">OS_Bix</a>
+  <br>
+
+  <a href="osfc.html">OS_Fc</a>, select fast code (fast bank switching)
+  <br>
+
+  <a href="osmal.html">OS_Mal</a>, allocate memory
+  <br>
+
+  <a href="osmcl.html">OS_Mcl</a>, close memory (free memory pool)
+  <br>
+
+  <a href="osmfr.html">OS_Mfr</a>, free (previously allocated block) memory
+  <br>
+
+  <a href="osmgb.html">OS_Mgb</a>, get current bank binding in segment
+  <br>
+
+  <a href="file:///H:/SVN/documentation/devnotes/osmop.html"></a><a href="osmpb.html">OS_Mpb</a>, set new bank binding in segment<br>
+
+  <a href="ozmgb.html">OZ_Mgb</a>, get current bank binding in segment<br>
+
+  <a href="ozmpb.html">OZ_Mpb</a>, set new bank binding in segment</blockquote>
+</body>
+</html>

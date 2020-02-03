@@ -1,0 +1,26 @@
+**STOCKS AND SHARES 3 v.2.0**
+
+This is a simple trading game of skill and luck.
+The aim is to make as much money as possible.
+
+In each **BUYING ROUND** you must buy a 
+minimum of 5 and a maximum of 50 shares in
+each company **ONCE ONLY AND IN ANY ORDER**, 
+so try and maximize your portfolio.
+
+In each **SELLING ROUND** you must sell
+a minimum of 5 and a maximum of 50 shares
+depending on how many shares you have in
+a given company. You must trade with each
+of the companies **ONCE ONLY AND IN ANY ORDER**, 
+so try to maximize your portfolio.
+
+But don't get to gung-ho, the market can
+sting you at any time and wipe out your
+portfolio in a single stroke. Would it be best
+to work quickly and cash in or play the long
+game and hope for a bigger return? **IT'S
+UP TO YOU**
+
+I hope you enjoy my game especially written for the mighty ZX80.
+

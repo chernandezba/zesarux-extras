@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+
+<b><font size="+1">OS_Box, restore bindings after <a href="osbix.html">OS_Bix</a></font></b>
+</p>
+<p><tt>RST 20H, DEFB $63</tt>
+<br>
+&nbsp;
+</p>
+<pre>IN:&nbsp; E = bank to be bound into segment 1<br>&nbsp;&nbsp;&nbsp;&nbsp; D = bank to be bound into segment 2<br>&nbsp;&nbsp;&nbsp;&nbsp; IY = OSPUSH frame</pre>
+
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0</pre>
+
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different<br></pre>
+
+Notes:
+<blockquote>Internal operating system usage.<br>
+
+  <br>
+
+OS_Box are called from GN_ and OS_ 2 byte calls. Please refer to OS_Box
+for further information. May be used by applications.</blockquote>
+
+Bugs:
+<br>
+&nbsp;
+<p>Related calls:
+</p>
+<blockquote><a href="osbix.html">OS_Bix</a>, Bind in extended address
+  <br>
+
+  <a href="file:///H:/SVN/documentation/devnotes/osbox.html"></a><a href="osfc.html">OS_Fc</a>, select fast code (fast bank switching)
+  <br>
+
+  <a href="osmal.html">OS_Mal</a>, allocate memory
+  <br>
+
+  <a href="osmcl.html">OS_Mcl</a>, close memory (free memory pool)
+  <br>
+
+  <a href="osmfr.html">OS_Mfr</a>, free (previously allocated block) memory
+  <br>
+
+  <a href="osmgb.html">OS_Mgb</a>, get current bank binding in segment
+  <br>
+
+  <a href="osmop.html">OS_Mop</a>, open memory (allocate memory pool)
+  <br>
+
+  <a href="osmpb.html">OS_Mpb</a>, set new bank binding in segment<br>
+
+  <a href="ozmgb.html">OZ_Mgb</a>, get current bank binding in segment<br>
+
+  <a href="ozmpb.html">OZ_Mpb</a>, set new bank binding in segment</blockquote>
+</body>
+</html>

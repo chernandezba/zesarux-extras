@@ -1,0 +1,63 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"content="text/html; charset=iso-8859-1">
+<title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+  <td align="center" valign="bottom" width="80%">&nbsp;</td>
+  <td align="right" valign="bottom" width="10%"><a
+  href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+</table>
+
+<hr>
+
+<p><font size="4"><b>OS_Sci, alter screen information</b></font> </p>
+
+<p><tt>RST 20H, DEFW $D406</tt> </p>
+
+<p>IN: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = reason code
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SC_LR0 ($01)&nbsp;&nbsp; LORES0 (512 bytes granularity, 13 bits width)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SC_LR1 ($02)&nbsp;&nbsp; LORES1 (4K granularity, 10 bits width)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SC_HR0 ($03)&nbsp;&nbsp; HIRES0 (8K granularity, 9 bits width)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SC_HR1 ($04)&nbsp;&nbsp; HIRES1 (2K granularity, 11 bits width)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SC_SBR ($05)&nbsp;&nbsp; screen base (2K granularity, 11 bits width)
+
+  B = 0, get pointer address (address is not set)
+&nbsp;&nbsp;&nbsp;&nbsp; B &lt;&gt; 0, set pointer address with BHL = new pointer address (L always = 0)
+  and HL is truncated according to screen granularity</pre>
+
+<pre>OUT: </pre>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; BHL = old pointer address</pre>
+
+<p>Registers changed after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A..CDE../IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; .FB...HL/.... different</pre>
+
+<p>Notes: </p>
+
+<blockquote>
+ <p>These hardware registers should not be altered unless the
+ programmer knows what he is doing. Please refer to the
+ &quot;Hardware section&quot;. <br>
+ &nbsp;</p>
+</blockquote>
+
+<p>Bugs: </p>
+</body>
+</html>

@@ -1,0 +1,52 @@
+ -Para paginar se hace con acceso a 4 direcciones de ROM (da igual que
+sean lecturas o escrituras y da igual el contenido que envíes.
+   -Las 4 direcciones son $3FFC,  $3FFD,  $3FFE y $3FFF
+   -Esto hace que las 32 páginas a las que puedes acceder no son de
+16384 bytes, sino de 16380 bytes cada una.
+   -Hazte una idea que es la parte más alta de la ROM y se usan los dos
+bits de menor peso del bus de direcciones (ojo, direcciones, no datos)
+para paginar.
+   -Como se envía un bit por acceso (se escribe en un registro
+desplazamiento), son necesarios 5 accesos consecutivos para enviar el
+número de página
+   -El bit de menor peso, A0, se mete en un registro desplazamiento de 5
+bits (el cual pagina entre las 32 posibles ROMs), mientras que el A1
+sirve para bloquear paginación.
+   -En tu juego nunca vas a bloquear paginación. Esto se hace para
+evitar que se produzcan paginaciones accidentales una vez has
+seleccionado un juego del kartusho. La única forma de desbloquear una
+vez bloqueado es apagar y encender (un reset no vale) o bien darle al
+botón del pulsador.
+
+   Te pongo un ejemplo. Si quieres seleccionar la página 13, en binario
+sería 01101 (pongo 5 bits). Si queremos bloquear paginación al final
+enviaríamos las siguientes direciones:
+1111111111111100
+1111111111111101
+1111111111111101
+1111111111111100
+1111111111111111
+
+   Por tanto habría que usar estas instrucciones:
+ld ($3ffc), a
+ld ($3ffd), a
+ld ($3ffd), a
+ld ($3ffc), a
+ld ($3fff), a
+
+   Da igual lo que valga a, y también valen lecturas ld a, ($3ffc)
+
+   Espero haberme explicado bien. Si tienes alguna duda, pregunta.
+
+El github con los fuentes (y binarios de los kartushos) está aquí:
+
+https://github.com/antoniovillena/zxuno/tree/master/hardware/kartusho
+
+Hay 2 carpetas. La ROMs tiene un menú para seleccionar 32 juegos de
+cartucho (cada uno de 16K)
+
+La snapshots es para generar 10 juegos de snapshots (48k), también con menú
+
+El archivo binario (de 512k) con el que hacer las pruebas es éste:
+
+https://github.com/antoniovillena/zxuno/blob/master/hardware/kartusho/roms/kartusho4.rom

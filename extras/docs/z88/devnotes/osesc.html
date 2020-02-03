@@ -1,0 +1,78 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Esc, examine special condition</font></b>
+<p><tt>RST 20H, DEFB $6F</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = reason code
+
+&nbsp;&nbsp;&nbsp;&nbsp; Reason codes are as follows:
+
+&nbsp;&nbsp;&nbsp;&nbsp; SC_BIT ($00)&nbsp;&nbsp; Test for Escape. Returns Fc = 1 if escape has been
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pressed, else Fc = 0.
+
+&nbsp;&nbsp;&nbsp;&nbsp; SC_ACK ($01)&nbsp;&nbsp; Acknowledge escape and also flush input buffer.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fz = 1 if there was no escape to acknowledge, else
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fz = 0. Note that RC_ESC = SC_ACK so you can acknowledge
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; escape with this call without reloading the accumulator.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This also resets the machine timeout.
+
+&nbsp;&nbsp;&nbsp;&nbsp; SC_SET ($02)&nbsp;&nbsp; Set escape, ie. simulate an escape condition
+
+&nbsp;&nbsp;&nbsp;&nbsp; SC_RES ($03)&nbsp;&nbsp; Reset escape without flushing the input buffer.
+
+&nbsp;&nbsp;&nbsp;&nbsp; SC_TST ($04)&nbsp;&nbsp; Test if escape detection is enabled or disabled. Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; always, and A = SC_ENA if it is enabled, A = SC_DIS if
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; it is disabled.
+
+&nbsp;&nbsp;&nbsp;&nbsp; SC_ENA ($05)&nbsp;&nbsp; Enable escape detection
+&nbsp;&nbsp;&nbsp;&nbsp; SC_DIS ($06)&nbsp;&nbsp; Disable escape detection.</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; if A(in) = SC_BIT then
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0, no escape
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1, escape detected
+&nbsp;&nbsp;&nbsp;&nbsp; if A(in) = SC_ACK then
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0,
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fz = 1, no escape
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fz = 0, escape acknowledged, machine timeout reset
+&nbsp;&nbsp;&nbsp;&nbsp; if A(in) = SC_TST then
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = SC_ENA, escape detection enabled
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = SC_DIS, escape detection disabled
+&nbsp;&nbsp;&nbsp;&nbsp; other A(in) values
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different
+
+</pre>
+Related calls:
+<blockquote><a href="gnerr.html">GN_Err</a>, display an interactive error
+box
+<br><a href="gnesp.html">GN_Esp</a>, return an extended pointer to a system
+error message
+<br><a href="oserc.html">OS_Erc</a>, get error context
+<br><a href="oserh.html">OS_Erh</a>, set error handler</blockquote>
+
+</body>
+</html>

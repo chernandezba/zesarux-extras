@@ -1,0 +1,9 @@
+bmpload bumble.bmp
+CLS to clear
+(dot)CLS
+.CLS
+Ok
+￼
+not CLS from basic
+backoFF do hide layer2
+backon to show again

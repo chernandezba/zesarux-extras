@@ -1,0 +1,268 @@
+WhatNow?
+========
+
+by Garry Lancaster
+v1.11 - 17th July 2001
+
+WhatNow? is an application that can load and play many freely-available 
+text-only and text/graphic adventures on your Z88. It is a complete 
+emulation of Incentive's Graphic Adventure Creator (or GAC) runtime 
+system.
+
+Using this application you can play many adventure games that were 
+released in the eighties for the Sinclair ZX Spectrum; titles such as 
+Book Of The Dead, Frankenstein, Karyssia - Queen Of Diamonds and more.
+
+Additionally, if you feel so inclined, you can use your own Speccy (or 
+one of the many emulators) to create your own adventures with GAC so 
+that they can be enjoyed by Z88 users. If there is any interest in 
+doing this, I might even consider adding an adventure compilation 
+feature to WhatNow?, so get writing!
+
+New in the latest release (v1.11) is full support for all GAC adventures
+produced for the Amstrad CPC range of computers, the ability to continue
+typing and playing the adventure while pictures are still being drawn, and
+a bugfix.
+
+
+Loading GACed adventures
+========================
+The standard Z88 menu system is used throughout WhatNow?. When you 
+first enter the system, or when you close an adventure file, you will 
+arrive at the title screen. From here, you can use commands on the File 
+menu. If you choose a command but change your mind, you can cancel by 
+pressing ESCape in the dialog box that appears.
+
+Load file
+---------
+This command allows you to select a GAC datafile (either by selecting 
+from the Filer or simply typing the name) to load and play. Some 
+datafiles can be obtained from the Z88 forever! website. If you write 
+your own adventure on the Spectrum, using the "save datafile" option 
+will produce a file suitable for WhatNow?
+
+The system will take a few moments to load the file and ensure that it 
+is a valid GAC datafile. After that, you will enter the game.
+
+Close file
+----------
+When used from within a game, this command returns you to the main 
+title screen, where you can choose to load another adventure. 
+
+Quit
+----
+Terminates the application.
+
+Extract file
+------------
+If you obtain Spectrum snapshots or tape images from the internet or a 
+CD-ROM, you can use this option to attempt to extract any GAC datafiles 
+within them. This works with most snapshot and tape images, the most 
+common being TAP, TZX and SNA. If in doubt, try using the option 
+anyway; the worst that can happen is that no game will be found!
+
+During the extraction process, only a cursory inspection of the data is 
+made, so it's possible that datafiles that don't work will be produced 
+(the load file option makes a thorough check of the data and will 
+refuse to run an invalid game).
+
+Some GAC games were saved on tape as a number of separate blocks rather 
+than as a single chunk, and these will not in general be extracted 
+properly (for example, Frankenstein). If you run into this problem, you 
+will have to load the game into a Spectrum emulator and take a 
+snapshot; datafiles can then be extracted from the snapshots.
+
+The extract command continues searching a file even after successfully 
+extracting a datafile, so if you give it a TAP or TZX file containing a 
+multi-part adventure, all parts will be extracted. The first part is 
+always given the .gac extension, with other parts being called .ga2, 
+.ga3 and so on.
+
+At the moment, there is no way to extract files from the popular Z80 
+snapshot format. To get around this, you will have to convert these 
+snapshots to the SNA format (or similar) using an emulator or other 
+conversion utility.
+
+Version 1.11 now includes full support for Amstrad CPC games. The 
+extract option is capable of producing datafiles from snapshots or 
+uncompressed tape images of these games, but disk files (.dsk) are not 
+supported.
+
+
+The Parser
+==========
+WhatNow? provides a complex parser which can understand a variety of 
+sentences. Rather than entering single commands, you can enter many in 
+one go, separating them with "and", "then" or punctuation. The system 
+also understands the use of the word "it" to refer to the last object 
+mentioned. For example, you could enter:
+
+Get the lamp, light it and go east. Go south then get the rat.
+
+Finally, you can abbrieviate words as much as you like, and the parser 
+will do its best to understand what you mean.
+
+
+Graphics
+========
+Within the limits of the Z88 display, pictures are displayed as 
+accurately as possible. However, since the height of the display is 
+only half that used on the Spectrum, some distortion is unavoidable.
+
+Spectrum colours are given different shading patterns when used to fill 
+areas. However, due to the Spectrum's unusual display arrangement, 
+which is effectively a two-colour display overlaid with colour 
+information, some pictures may look slightly odd if the designer has 
+tried to be clever in the use of ink and paper colours. This is 
+particularly noticeable in the example adventure, Ransom.
+
+Graphics from Amstrad CPC games can look even more peculiar, due to the 
+four-colour system used which cannot be easily reproduced on the Z88.
+
+
+User-defined graphics (UDGs)
+============================
+Although GAC did not provide any way of using the Spectrum's 
+user-defined graphics facility, many games included an alternate 
+character set (for a more pleasing typeface), and some of these used a 
+few of the symbol characters as user-defined graphics.
+
+Due to differences between Z88 and Spectrum character definitions, it 
+is not possible to automatically extract any of these UDGs from 
+snapshot files. However, special .udg files are now available for some 
+games, and these add the graphic characters found in the Spectrum 
+versions to the Z88.
+
+To allow UDGs to be displayed, you must keep the .udg files together 
+with the adventure datafile, and they must have the same name. For 
+example, if you have botd1.gac and botd1.udg in the same location the 
+UDGs will be automatically installed when you load the adventure.
+
+
+Game commands
+=============
+During gameplay, there are a few commands on the Game menu that you can 
+use.
+
+Load position
+-------------
+Allows you to load a previously saved position. Most adventures also 
+allow you to type "load" to perform the same function.
+
+Save position
+-------------
+Similarly, lets you save your current position to a file. You can 
+usually type "save" to do this as well.
+
+Restart
+-------
+Restarts the adventure. Well, what did you expect? ;-)
+
+
+Options
+=======
+A number of options are available to affect the way the system behaves. 
+These can be selected at any time, whether playing a game or not.
+
+Graphics on
+-----------
+Splits the display into a text window at the left, and a graphics 
+window at the right. In most adventures, you can also type "pictures" 
+for the same effect. You can select this even if the adventure is 
+text-only, if you prefer a narrow text window.
+
+Text only
+---------
+Devotes the entire width of the display to text. This can also usually 
+be selected from within an adventure with the "text" command.
+
+Pause mode
+----------
+If a large amount of text is being displayed, having this option on (it 
+is on by default) means that the system will pause to let you read the 
+text before scrolling it off the screen.
+
+Scroll mode
+-----------
+If you prefer, you can select scroll mode which lets text scroll 
+through the screen without any pauses.
+
+Trap errors
+-----------
+This option, set by default, means that WhatNow? will stop the game 
+with a report if an error in the GAC game file is encountered.
+
+Ignore errors
+-------------
+If you find a particular game has errors in it (eg Matt Lucas often 
+causes a "stack imbalance" error), you can use this option to simply 
+ignore them and allow you to continue playing.
+
+
+Errors and bug reports
+======================
+Please contact me via the Z88 Forever website if you should encounter a 
+bug in the system, or find any Spectrum or Amstrad GAC adventure that
+can't be extracted or played. I'd also like to hear if you discover a
+particular game with errors in it. If possible, please include a saved game 
+position just before the error occurs, and let me know full details of 
+what you did when the problem appeared.
+
+
+Credits
+=======
+Incentive for designing such an excellent utility
+All GAC adventure writers, especially the prolific Charles A Sharp
+Paul White for much valuable testing, and providing GAC downloads
+Dominic Morris for more testing, and the wonderful "Oh Sh@#!"
+Paul David Doherty for researching available GAC adventures
+
+
+History
+=======
+v1.11	Minor speed improvements
+
+v1.10	Fixed punctuation bug in parser
+
+v1.09	Added full support for all Amstrad CPC games
+
+v1.08	Graphics now drawn as separate task, allowing play
+	to continue at the same time
+
+v1.07	Allow extraction of games larger than can be played
+
+v1.06	Converted source to run with Z88 CamelForth v3.04
+
+v1.05	Added limited support for Amstrad CPC games
+
+v1.04	Added user-defined graphics capability
+	Fixed the deliberate mistake in v1.03 ;-)
+
+v1.03	Added error trapping/ignore options
+	Pictures no longer redrawn if unnecessary
+	Bugfix: if local conditions were satisfied, "I don't 
+	understand" errors could still be displayed (Matt Lucas)
+	Fixed a nasty bug introduced in v1.02 (oops!) 
+	which caused WhatNow? to hang if a game error was 
+	encountered
+
+v1.02	All possible memory now given back to the system on 
+	pre-emption
+	Bugfix: end of conditions not always properly detected 
+	(Book Of The Dead)
+	Bugfix: extra "Okay" messages after a GET/DROP/BRIN/FIND 
+	action failed (Oh Sh@#!)
+
+v1.01	Bugfix: ellipses of zero height hung the system 
+	(Deadenders, Spacestation Beta 1)
+	Bugfix: turn count should be incremented after high 
+	priority conditions and not as in GAC manual (Oh Sh@#!)
+	Bugfix in output buffering routines (Wiz-Biz)
+	Minor optimization in output buffering routines
+	Bugfix: after pre-emption pictures were redrawn even if it 
+	was "dark" (Ransom)
+	Bugfix: effects of BRIN and FIND actions corrected
+
+v1.00	Initial release
+
+Garry Lancaster, 17th July 2001

@@ -1,0 +1,1282 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>OS_Epr, File Eprom Interface</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<th colspan="3" align="center">Z88
+Developers' Notes</th>
+</tr>
+<tr>
+<td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+<td align="center" valign="bottom" width="80%">&nbsp;</td>
+<td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</tbody>
+</table>
+<hr width="100%">
+<p><b><font size="+1">OS_Epr, File Eprom
+Interface</font></b>
+</p>
+<p><tt>RST 20H, DEFW $F006</tt>
+</p>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<div style="margin-left: 40px; font-family: monospace;">A
+= reason code:<br>
+<br>
+<a href="#EP_SAVE">
+EP_Save = $00</a> &nbsp; Blow RAM file to UV Eprom <br>
+<a href="#EP_LOAD">EP_Load = $03</a> &nbsp; Copy
+file from File Area, as RAM file <br>
+<a href="#EP_REQ">EP_Req = $06</a>
+&nbsp;&nbsp; Check for "oz" File Eprom or File
+Area in slot C &nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_Fetch">EP_Fetch = $09</a>
+&nbsp;Copy saved/deleted file from File Area to
+RAM&nbsp; &nbsp;&nbsp;&nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_Find">EP_Find = $0c</a> &nbsp; Find
+active File(name) in File Area in slot C
+&nbsp;&nbsp;&nbsp;&nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_DIR">EP_Dir = $0f</a> &nbsp;
+&nbsp;Return next filename (starting with
+first) <br>
+<a href="#EP_First">EP_First = $12</a>
+&nbsp;Return first file entry in File Area in slot C
+&nbsp; &nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_Prev">EP_Prev = $15</a> &nbsp;
+Return previous file entry in File Area
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (OZ 4.2 and
+newer)<br>
+<a href="#EP_Next">EP_Next = $18</a> &nbsp;
+Return next file entry in File Area &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (OZ
+4.2 and newer)<br>
+<a href="#EP_Last">EP_Last = $1b</a> &nbsp;
+Return last file entry in File Area in slot C
+&nbsp; &nbsp; (OZ 4.2 and newer)<br>
+<a href="#EP_TotSp">EP_TotSp = $1e</a>
+&nbsp;Return amount of used file space in slot C
+&nbsp; &nbsp; &nbsp; &nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_ActSp">EP_ActSp = $21</a>
+&nbsp;Return active file space in slot C &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_FreSp">EP_FreSp = $24</a>
+&nbsp;Return free file space in slot C &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_Count">EP_Count = $27</a>
+&nbsp;Return number of files in File Area slot C
+&nbsp; &nbsp; &nbsp; &nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_Stat">EP_Stat = $2a</a> &nbsp;
+Return file entry status (active or deleted)
+&nbsp; &nbsp; &nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_Size">EP_Size = $2d</a> &nbsp;
+Return file size of File Entry &nbsp;
+&nbsp; &nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (OZ
+4.2 and newer)<br>
+<a href="#EP_Name">EP_Name = $30</a> &nbsp; Copy
+File entry name to buffer at (CDE)
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (OZ 4.2 and
+newer)<br>
+<a href="#EP_Image">EP_Image = $33</a>
+&nbsp;Return pointer to start of file contents
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_New">EP_New = $36</a> &nbsp;
+&nbsp;Return pointer to future new entry in
+File Area &nbsp;&nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_SvFl">EP_SvFl = $39</a> &nbsp; Save
+RAM file to Flash or UV Eprom to slot C
+&nbsp; &nbsp; &nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_Delete">EP_Delete = $3c</a> Mark File
+Entry as deleted on Flash or UV Eprom
+&nbsp; (OZ 4.2 and newer)<br>
+<a href="#EP_Format">EP_Format = $3f</a> Create File
+Area in slot C (Eprom or Flash
+Card)&nbsp;&nbsp;(OZ 4.2 and newer)<br>
+<a href="osepr.html#EP_NewFile">EP_NewFile = $42</a>
+Write Blow RAM file to slot C &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp;(OZ 4.2 and newer)<br>
+<a href="#EP_WrBlk">EP_WrBlk = $45</a>
+&nbsp;Write a block of bytes to UV Eprom in slot 3
+&nbsp; &nbsp; &nbsp;(OZ 4.2 and newer)<br>
+<br>
+</div>
+<div style="margin-left: 40px;"><span style="font-family: monospace;">BC, DE, HL, IX arguments.
+<br>
+</span></div>
+<span style="font-family: monospace;">OUT:<br style="font-family: monospace;">
+</span>
+<div style="margin-left: 40px;"><span style="font-family: monospace;">Fc = 1, A = error
+code.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">Fc = 0, reason code
+action successfully ended.</span><br style="font-family: monospace;">
+</div>
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return depends on individual API call.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;"></span><span style="font-weight: bold;"><br>
+</span>All OS_Epr mnemonic defintion are found in the "eprom.def"
+file. All new API entries in OS_Epr of the OZ V4.2 release is a
+reflection of the implementations done in the standard library. All are
+used in FlashStore which were the original basis to create these
+routines to be shareable by other applications, and now availalable in
+OZ V4.2.<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<a name="EP_SAVE"></a><b>EP_SAVE ($00) - blow
+RAM file to Eprom in slot 3.</b>
+<pre>IN:&nbsp; BHL = pointer to filename, (B=0 means local pointer)<br><br>OUT: Fc = 0, file successfully blown on File EPROM.<br>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_FAIL ($16), file couldn't be blown on EPROM.<br><br><span style="font-family: monospace;">Registers changed after return:</span><br style="font-family: monospace;"><span style="font-family: monospace;"> &nbsp;..BCDEHL/IXIY same</span><span style="font-family: monospace;">&nbsp;<br>  AF....../.... different</span></pre>
+
+Write RAM file to UV
+Eprom card hardware in slot 3 (or available Flash hardware). If a file
+area does
+not exist on the card in slot 3, it will be created on the card (if
+possible). If a file already exists in the file area with the same
+path/filename, it will automatically marked as deleted.<br>
+<hr style="width: 100%; height: 2px;"><br>
+<a name="EP_LOAD"></a><b>EP_LOAD ($03) - read
+file from Eprom in slot 3 into RAM file.</b>
+<pre>IN:&nbsp; BHL = pointer to filename (to be found on EPROM)<br>&nbsp;&nbsp;&nbsp;&nbsp; IX = output file handle (to store contents of file on EPROM)<br><br><br>OUT: Fc = 0, file successfully moved to RAM filing system.<br>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_FAIL ($16), file EPROM not available.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_ROOM ($07), no room in filing system for data from EPROM.<br><br><span style="font-family: monospace;">Registers changed after return:</span><br style="font-family: monospace;"><span style="font-family: monospace;"> &nbsp;..BCDEHL/IXIY same</span><span style="font-family: monospace;">&nbsp;<br>  AF....../.... different</span></pre>
+Notes:<br>
+<div style="margin-left: 40px;">Before calling OS_Epr and
+EP_LOAD you should create a
+new file
+with an appropriate file name, using <a href="gnopf.html">GN_Opf</a>,
+A = OP_OUT. The filename to
+be searched on EPROM must not contain wildcards (the File EPROM is not
+organised as the RAM filing system). This call is equivalent to the
+&lt;&gt;EF
+command in the FILER. You must close the output file after the data has
+been copied from EPROM. This call also works with sub file areas (a
+file area available on an application card in slot 3 - implemented in
+OZ V4.2 and newer).<br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<a name="EP_REQ"></a><b>EP_REQ ($06)
+-&nbsp;</b><span style="font-weight: bold;">Check
+for "oz" File Eprom or File
+Area in slot C&nbsp; (OZ 4.2 and newer)</span><br>
+<b><br>
+</b>Check for "oz" File Eprom (on a conventional Eprom or on a
+Flash Memory)<br>
+<ol>
+<li>Check for a standard "oz" File Eprom, if that fails -<br>
+</li>
+<li>Check if that slot contains an Application ROM, then check
+for
+the Header Identifier below the application bank area. For Flash Cards,
+the File Header might be on first top bank of a free 64K sector. For UV
+Eproms, the File Header might be on the first top bank below the
+application bank area.<br>
+</li>
+<li>If a Rom Front Dor is located in a RAM Card, then this slot
+is regarded as a non-valid card as a File Eprom, ie. not present.<br>
+</li>
+<li>Check for embedded 'oz' watermark inside an 'OZ'
+application header. If found, then this indicates that a file area is
+located at the top of a card above an application area or at the top of
+an OZ ROM.<br>
+</li>
+<ol>
+<li>A standard 'oz' header is recognized by the top two
+watermark bytes in the top bank of the file area (either typically at
+the top of the card, in modulus 64K sectors in Flash Cards or&nbsp;
+modulus 16K banks on traditional EPROM's. The complete header has the
+following format:<br>
+<br>
+<div style="margin-left: 40px;"><span style="font-family: monospace;">&nbsp;&nbsp;
+------------------------------------------------------------------------------</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FC0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $00's
+until</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FF7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; $01</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FF8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4
+byte random id</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FFC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; size
+of card in banks (2=32K, 8=128K, 16=256K, 64=1Mb)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FFD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+sub-type: $7E, $7C, $7A for
+UV 32K, 128K &amp; 256K cards. $77, $6F for Intel and Amd Flash</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FFE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'o'</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FFF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'z'
+(file eprom identifier, lower case 'oz')</span><br>
+<span style="font-family: monospace;">&nbsp;&nbsp;
+------------------------------------------------------------------------------</span><br>
+</div>
+<br>
+<div style="margin-left: 40px;">&nbsp;&nbsp;
+in hex dump (example):<br>
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+00003fc0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ;
+................</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+00003fd0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ;
+................</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+00003fe0h: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ;
+................</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+00003ff0h: 00 00 00 00 00 00 00 01 73 D1 4B 3C 02 7E 6F 7A ;
+.........s?&lt;.~oz</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+------------------------------------------------------------------------------<br>
+<br>
+</span></div>
+</li>
+<li>A sub-standard 'oz' header is recognized at offset $3FEE
+inside
+an application 'OZ' header that is always placed at the top of the
+card, with the following format:<br>
+</li>
+</ol>
+</ol>
+<div style="margin-left: 80px;">&nbsp;&nbsp;
+Application Front DOR:<br>
+<br>
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FC0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0 0
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Link to
+parent</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FC3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0 0
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Link to
+brother - this may point to the HELP front DOR</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FC6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+x x
+x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Link to
+son - this points to the first application DOR</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FC9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+$13&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DOR type, ROM Front DOR</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FCA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DOR length</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FCB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+'N'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Key for name field (DT_NAM)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FCC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Length of name and terminator</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FCD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+'APPL',
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+NULL-terminated name</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FD2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+$FF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DOR terminator</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Optional file area at top card, above application area:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FEC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Size of file area in banks, eg. $02 for a 32K size</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FED&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+$00&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+64K Reclaim Sector (0=not used)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FEE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+'oz'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Application/ROM Card holds file area</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FF8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+@0xxxxxxx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Low byte of card ID</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FF9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+@0xxxxxxx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+High byte of card ID</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FFA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+@0000xxxx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4
+bit country code</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FFB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+$80&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Marks external application</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FFC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Size of card in banks, eg. $02 for a 32K card</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FFD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+$00&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Subtype of card - future expansion</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+$3FFE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+'OZ'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Card holds applications</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+------------------------------------------------------------------------------</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+in hex dump (example):</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+00003fc0h: 00 00 00 00 00 00 48 25 08 13 08 4E 05 41 50 50 ;
+......H%...N.APP</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+00003fd0h: 4C 00 FF 00 00 00 00 00 00 00 00 00 00 00 00 00 ;
+L...............</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+00003fe0h: 00 00 00 00 00 00 00 00 00 00 00 00 14 00 6F 7A ;
+..............oz</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+00003ff0h: 00 00 00 00 00 00 00 00 54 43 4C 81 20 00 4F 5A ;
+.........TCL .OZ</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+------------------------------------------------------------------------------</span><br style="font-family: monospace;">
+<br>
+</div>
+On partial success, if a Header is not found, Fz = 0 and the returned
+BHL pointer indicates that the card might hold a file area, beginning
+at this location.<br>
+If the routine returns Fz = 1, it's an identified File Area Header
+(pointing to 64 byte header in the top of bank B).<br>
+<br>
+<span style="font-family: monospace;">Register parameters:</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">In:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = slot number (0, 1, 2 or 3)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Out:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Success, File Area (or potential) available:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to File Header for slot C (B = absolute bank of slot).</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(or pointer to free space in potential new File Area).</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = size of File Eprom Area in 16K banks</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 1, File Header found</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = "oz" File Eprom sub type</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+D = size of card in 16K banks (0 - 64)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 0, File Header not found</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A undefined</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+D undefined</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Failure:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = C(in)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_ONF (File Eprom Card/Area not available; possibly no card in
+slot)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_ROOM (No room for File Area; all banks used for applications)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+.....E../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFBCD.HL/.... different</span><br style="font-family: monospace;">
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<a name="EP_Fetch"></a><span style="font-weight: bold;">EP_Fetch ($09)
+-&nbsp;Copy saved/deleted file from File Area to
+RAM&nbsp;&nbsp;(OZ 4.2 and newer)<br>
+<br>
+</span>Fetch file (image) from File Eprom Card, identified by
+File
+Entry at BHL (B=00h-FFh embedded slot mask, HL=0000h-3FFFh bank offset)
+and store it into<br>
+an open file (enabled for writing) in the RAM file system (using the IX
+handle).<br>
+<br>
+The application is responsible for opening/creating a RAM file, then
+using this library routine to transfer the contents from the File Eprom
+to the RAM file system, and then finally close the new RAM file.<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+IX = handle of file stream (opened previously with GN_Opf, A=OP_OUT)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+BHL = pointer to Eprom File Entry (bits 7,6 of B is the slot mask)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Image transferred successfully to RAM file.</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_ONF, File Eprom or File Entry was not found in slot</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_xxx, I/O error during saving process.</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+..BCDEHL/IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AF....../.... different</span><br>
+<br>
+<hr style="width: 100%; height: 2px;"><span style="font-weight: bold;"><br>
+<a name="EP_Find"></a>EP_Find ($0C) -&nbsp;Find
+active File(name) in File Area in slot
+C&nbsp;&nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+C = slot number of File Eprom (Area)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+DE = pointer to null-terminated filename to be searched for.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+The filename is excl. device name and must begin with '/'.</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 1, File Entry found.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to File Entry in card at slot</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 0, No file were found on the File Eprom.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to free byte on File Eprom in slot</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Eprom was not found at slot C</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+A..CDE../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+.FB...HL/.... different</span><br style="font-family: monospace;">
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<a name="EP_DIR"></a><b>EP_DIR ($0F) - Fetch
+filename from Eprom in slot 3:</b>
+<pre>IN:&nbsp; BHL = pointer to store returned filename (B=0 means local pointer).<br><br>OUT: Fc = 0:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filename returned at (HL), null-terminated.<br>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_EOF ($09), no more filenames on File EPROM.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_FAIL ($16), File EPROM not available.<br><br><span style="font-family: monospace;">Registers changed after return:</span><br style="font-family: monospace;"><span style="font-family: monospace;"> &nbsp;..BCDEHL/IXIY same</span><span style="font-family: monospace;">&nbsp;<br>  AF....../.... different</span></pre>
+Notes:
+<br>
+<div style="margin-left: 40px;">The first EPR_DIR call
+will return the first file
+name, if
+available. Subsequent calls will return the next filenames in
+chronological
+order (as the files were stored on EPROM). It is necessary to read all
+file names to the end, if you want to re-read the filenames from start
+at a later time. The buffer to receive the filenames from EPR_DIR must
+be sufficiently large, e.g. 128 bytes. The FILER uses this
+to&nbsp;display
+all available filenames on EPROM. Filenames never contains RAM device
+references,
+but always reflect the complete path from the filing system (when blown
+to EPROM). Old 'deleted' files are not reflected in the list of
+filenames.&nbsp;This call also works with sub file areas (a file
+area available on an
+application card in slot 3 - implemented in OZ V4.2 and newer).</div>
+<hr style="width: 100%; height: 2px;">
+<br>
+<span style="font-weight: bold;">
+<a name="EP_First"></a>EP_First ($12)
+-&nbsp;Return first file entry in File Area in slot
+C&nbsp;&nbsp;(OZ 4.2 and newer)<br>
+<br>
+</span>If the NULL file is identified as the first file, it is
+skipped and the next file entry pointer is automatically returned.<br>
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+C = slot number containing File Eprom</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 1, File Entry marked as deleted</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 0, File Entry is active.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to first file entry in slot (B=00h-FFh, HL=0000h-3FFFh).</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(NULL file skipped if found on Intel Flash Card)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Eprom was not found in slot, or File Entry not available</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+...CDE../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFB...HL/.... different</span><br style="font-family: monospace;">
+<br>
+Notes:
+<br>
+<div style="margin-left: 40px;">Due to a strange side
+effect with Intel
+Flash Chips, a special "NULL" file is saved as the first file to the
+Card. These bytes occupies the first bytes that otherwise could be
+interpreted as a random boot command for the Intel chip - the behaviour
+is an Intel chip suddenly gone into command mode for no particular
+reason. The NULL file prevents this behaviour by saving a file that
+avoids any kind of boot commands which sends the chip into command mode
+when the card has been inserted into a Z88 slot.<br>
+<br>
+</div>
+<hr style="width: 100%; height: 2px;">
+<br>
+<span style="font-weight: bold;">
+<a name="EP_Prev"></a>EP_Prev ($15) - Return
+previous file entry in File Area&nbsp; (OZ
+4.2 and
+newer)</span><br>
+<br>
+To get the previous file entry, the current file entry pointer must be
+supplied as argument to this API. The B register defines the absolute
+bank number which contains the slot mask ($40 for slot 1, $80 for slot
+2 and $C0 for slot 3).<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+BHL = pointer to current file entry in slot (B=00h-FFh, HL=0000h-3FFFh).</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom Area available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 1, File Entry marked as deleted</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 0, File Entry is active.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to previous file entry in slot (B=00h-FFh,
+HL=0000h-3FFFh).</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Eprom was not found in slot, or current File entry was the first</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Entry (an attempt was made to go beyond the bottom of the file
+area)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+A..CDE../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+.FB...HL/.... different<br>
+</span>
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<a name="EP_Next"></a><span style="font-weight: bold;">EP_Next ($18)
+-&nbsp;Return next file entry in File Area &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; (OZ
+4.2 and newer)</span><br>
+<br>
+To get the next file entry, the current file entry pointer must be
+supplied as argument to this API. The B register defines the absolute
+bank number which contains the slot mask ($40 for slot 1, $80 for slot
+2 and $C0 for slot 3).<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+BHL = pointer to current File Entry</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+BHL = pointer to next file entry on File Eprom in slot, or first byte
+of empty space</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 1, File Entry marked as deleted</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 0, File Entry is active.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Eprom was not found in slot, or File Entry not available</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+...CDE../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFB...HL/.... different</span><br style="font-family: monospace;">
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<span style="font-weight: bold;">
+<a name="EP_Last"></a>EP_Last ($1B) - Return last
+file entry in File Area in slot C
+&nbsp; &nbsp; (OZ 4.2 and newer)<br>
+<span style="font-weight: bold;"><br>
+</span></span>Return pointer to last file entry on Standard
+File Eprom, inserted in slot C. The returned&nbsp;B register
+defines the absolute
+bank number which contains the slot mask ($40 for slot 1, $80 for slot
+2 and $C0 for slot 3).<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+C = slot number containing File Eprom</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 1, File Entry marked as deleted</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 0, File Entry is active.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to last file entry in slot (B=00h-FFh, HL=0000h-3FFFh).</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Eprom was not found in slot, or File Entry not available</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+...CDE../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFB...HL/.... different</span><br style="font-family: monospace;">
+<span style="font-weight: bold;"></span>
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<span style="font-weight: bold;">
+<a name="EP_TotSp"></a>EP_TotSp ($1E)
+-&nbsp;Return amount of used file space in slot C
+&nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+Return amount of active and deleted file space (in bytes) in File Eprom
+Area, inserted in slot C.<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+C = slot number containing File Eprom Area</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = Amount of active file space in bytes (24bit integer, B = MSB)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+CDE = Amount of deleted file space in bytes (24bit integer, C = MSB)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_ONF</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Eprom was not found in slot C.</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+......../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFBCDEHL/.... different</span><br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<span style="font-weight: bold;">
+<a name="EP_ActSp"></a>EP_ActSp ($21)
+-&nbsp;Return active file space in slot
+C&nbsp;&nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+Return amount of active (visible) file space in File Eprom Area,
+inserted in slot C&nbsp;(API wrapper of&nbsp;<span style="font-weight: bold;">
+EP_TotSp</span>).<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+C = slot number containing File Eprom Area</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DEBC = Active space (amount of visible files) in bytes</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(DE = high 16bit, BC = low 16bit)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_ONF</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Eprom was not found in slot C.</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after (succesful) return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+A.....HL/IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+.FBCDE../.... different</span><br style="font-family: monospace;">
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<span style="font-weight: bold;">
+<a name="EP_FreSp"></a>EP_FreSp ($24)
+-&nbsp;Return free file space in slot C
+&nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+Return free space in Standard File Eprom Area, inserted in slot C.<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+C = slot number containing File Eprom Area</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Area available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DEBC = Free space available<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp;</span><span style="font-family: monospace;">(DE = high 16bit, BC = low
+16bit)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1, File Area was not found in slot C</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_ONF</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after (successful) return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+......HL/IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFBCDE../.... different</span><br style="font-family: monospace;">
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<span style="font-weight: bold;">
+<a name="EP_Count"></a>EP_Count ($27)
+-&nbsp;Return number of files in File Area slot C
+&nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+Count total of active and deleted files on File Eprom in slot C (excl.
+NULL file on Intel Flash card).<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+C = slot number containing File Eprom Area</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HL = total of active (visible) files</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DE = total of (marked as) deleted files</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(HL + DE are total files in the file area)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1, File Eprom was not found at slot C</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+..BC..../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AF..DEHL/.... different</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+Notes:
+<br>
+<div style="margin-left: 40px;">Due to a strange side
+effect with Intel Flash Chips, a special "NULL"
+file is saved as the first file to the Card. These bytes occupies the
+first bytes that otherwise could be interpreted as a random boot
+command for the Intel chip - the behaviour is an Intel chip suddenly
+gone into command mode for no particular reason. The NULL file prevents
+this behaviour by saving a file that avoids any kind of boot commands
+which sends the chip into command mode when the card has been inserted
+into a Z88 slot.<br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<a name="EP_Stat"></a><span style="font-weight: bold;">EP_Stat ($2A)
+-&nbsp;Return file entry status (active or deleted)
+&nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+Read File Entry Status information, if available. This routine might be
+used by applications, but is primarily used internally by OS_Epr.<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+BHL = pointer to start of file entry</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+The Bank specifier contains the slot mask, ie. defines which slot</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+is being read. HL is the traditional bank offset.</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Entry available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 1, deleted file</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 0, active file</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1, File Entry not available ($FF or $00 was first byte of entry)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf (Object not found)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+..BCDEHL/IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AF....../.... different</span><br style="font-family: monospace;">
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<a name="EP_Size"></a><span style="font-weight: bold;">EP_Size ($2D)
+-&nbsp;Return file size of File Entry
+&nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+Return file size in CDE of File Entry at pointer BHL (B=00h-FFh
+embedded slot mask, HL=0000h-3FFFh bank offset).<br>
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+BHL = Pointer to File Entry in card at slot</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 1, File Entry marked as deleted</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 0, File Entry active</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+CDE = size of file (24bit integer, C = high byte)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_ONF</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Eprom was not found in slot, or File Entry not available</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+..B...HL/IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AF.CDE../.... different</span><br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<a name="EP_Name"></a><span style="font-weight: bold;">EP_Name ($30) - Copy File
+entry name to buffer at (CDE)
+&nbsp; (OZ 4.2 and
+newer)</span><br>
+<br>
+Return file name of File Entry at BHL (B=00h-FFh embedded slot mask,
+HL=0000h-3FFFh bank offset).<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+CDE = buffer to hold returned filename, (C = 0, local pointer)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+BHL = pointer to Eprom File Entry in card (B contains embedded slot
+mask)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 1, File Entry marked as deleted</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fz = 0, File Entry marked as active</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = length of filename</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(CDE) contains a copy of filename, null-terminated.</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Eprom was not found in slot, or File Entry not available</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+..BCDEHL/IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AF...../.... different</span><br style="font-family: monospace;">
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<a name="EP_Image"></a><span style="font-weight: bold;">EP_Image ($33)
+-&nbsp;Return pointer to start of file contents
+&nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+<span style="font-family: monospace;">Return pointer to
+start of file image of File Entry at BHL</span><span style="font-family: monospace;"> (B=00h-FFh embedded slot
+mask, HL=0000h-3FFFh bank offset)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+BHL = pointer to Eprom File Entry in card at slot </span><span style="font-family: monospace;">(B contains embedded slot
+mask)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom available, File Entry available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to start of file image</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Eprom was not found in slot, or File Entry not available</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+...CDE../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFB...HL/.... different</span><br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<span style="font-weight: bold;">
+<a name="EP_SvFl"></a>EP_SvFl ($39) -&nbsp;Save
+RAM file to Flash or UV Eprom to slot C
+&nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+Save RAM file to Flash Memory or UV Eprom file area in slot C (files to
+UV Eprom only in slot 3).<br>
+<br>
+The routine does NOT handle automatical "deletion" of existing files
+that matches the filename (excl. device). This must be used by a call
+to OS_Epr, A=EP_Delete.<br>
+<br>
+Should the actual process of blowing the file image fail, the new File
+Entry will be marked as deleted, if possible.<br>
+<br>
+The screen is turned off while saving a file to flash file area that is
+in the same slot as the OZ ROM. During saving, no interference should
+happen from Blink, because the Blink reads the font bitmaps each 1/100
+second:<br>
+<br>
+<div style="margin-left: 40px;">If the screen were enabled
+when a
+byte is written to an address space that is part of OZ ROM chip, the
+font bitmaps would suddenly be unavailable which would create violent
+screen flickering during chip command mode. Further, and most
+importantly, to avoid the Blink doing read-cycles while chip is in
+command mode.</div>
+<br>
+By switching off the screen, the Blink doesn't read the font bit maps
+in OZ ROM, and the Flash chip can be in command mode without being
+disturbed<br>
+by the Blink.<br>
+<br>
+<span style="font-style: italic;">Important:</span><br>
+INTEL I28Fxxxx series Flash chips require the 12V VPP pin in slot 3 to
+successfully blow data to the memory chip. If the Flash Eprom card is
+inserted in slot 1 or 2, this routine will report a programming
+failure. It is the responsibility of the application (before using this
+call) to evaluate the Flash Memory (using the OS_Fep, A=FEP_CDID call)
+and warn the user that an INTEL Flash Memory Card requires the Z88 slot
+3 hardware, so this type of unnecessary error can be avoided. Equally,
+the application should evaluate that saving to a file that is on an UV
+Eprom only can be performed in slot 3. This routine will report failure
+if saving a file to slots 0, 1 or 2.<br>
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = slot number (0, 1, 2 or 3)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IX = size of I/O buffer.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DE = pointer to I/O buffer, in segment 0/1.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+HL = pointer to filename string (null-terminated), in segment 0/1.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Filename may contain wildcards (to find first match)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0, File successfully saved to Flash File Eprom.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to created File Entry in slot C.</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File (Flash) Eprom not available in slot A:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_NFE (not a recognized Flash Memory Chip)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Not sufficient space to store file (and File Entry Header):</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Room</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Flash Eprom Write Errors:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+If possible, the new File Entry is marked as deleted.</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_VPL, RC_BWR (see "error.def" for details)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+RAM File was not found, or other filename related problems:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Ivf</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_use</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed on
+return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+...CDE../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFB...HL/.... different</span><br style="font-family: monospace;">
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<a name="EP_New"></a><span style="font-weight: bold;">EP_New ($36)
+-&nbsp;Return pointer to future new entry in
+File Area &nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+Return BHL pointer to new file entry (also first byte of free space in
+File Eprom Area, inserted in slot C).<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+C = slot number containing File Eprom Area</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 0, File Eprom available</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to first byte of free space (B = absolute bank of slot C)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+Fc = 1, File Area was not found in slot C</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+...CDE../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFB...HL/.... different</span><br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<a name="EP_Delete"></a><span style="font-weight: bold;">EP_Delete ($3C)
+-&nbsp;Mark File Entry as deleted on Flash or UV Eprom&nbsp;
+(OZ 4.2 and newer)</span><br>
+<br>
+Mark File Entry as deleted in file area located on Flash or UV Eprom
+Card, identified by BHL pointer, B=00h-FFh (bits 7,6 is the slot mask),
+HL=0000h-3FFFh is the bank offset.<br>
+<br>
+The screen is turned off while byte is being written when we're in the
+same slot as the OZ ROM. During writing, no interference should happen
+from Blink, because the Blink reads the font bitmaps each 1/100 second:<br>
+<br>
+<div style="margin-left: 40px;">If the screen were enabled
+when a byte is written to an address space that is part of OZ ROM chip,
+the font bitmaps would suddenly be unavailable which would create
+violent screen flickering during chip command mode. Further, and most
+importantly, to avoid the Blink doing read-cycles while chip is in
+command mode.<br>
+</div>
+<br>
+By switching off the screen, the Blink doesn't read the font bit maps
+in OZ ROM, and the Flash chip can be in command mode without being
+disturbed by the Blink.<br>
+<br>
+<span style="font-style: italic;">Important:</span><br>
+INTEL I28Fxxxx series Flash chips require the 12V VPP pin in slot 3 to
+successfully blow data to the memory chip. If the Flash Eprom card is
+inserted in slot 1 or 2, this routine will report a programming
+failure. It is the responsibility of the application (before using this
+call) to evaluate the Flash Memory (using the OS_Fep, A=FEP_CDID call)
+and warn the user that an INTEL Flash Memory Card requires the Z88 slot
+3 hardware, so this type of unnecessary error can be avoided. Equally,
+the application should evaluate that saving to a file that is on an UV
+Eprom only can be performed in slot 3. This routine will report failure
+if saving a file to slots 0, 1 or 2.<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = pointer to File Entry (B=00h-FFh, HL=0000h-3FFFh bank offset)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(bits 7,6 of B is the slot mask)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Marked as deleted.</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf, File (Flash) Eprom or File Entry not found in slot</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_VPL, RC_BWR, Flash/UV Eprom&nbsp; Write Error</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed on
+return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+A.BCDEHL/IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+.F....../.... different</span><br style="font-family: monospace;">
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<span style="font-weight: bold;"><a name="EP_Format"></a>EP_Format
+($3f) - Create
+File Area&nbsp;in slot C, on UV Eprom or Flash Card
+&nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+Create file area header in UV Eprom Card (or Flash card, if available)
+in slot C. On UV Eprom, only the 64 byte header is created - on Flash
+Card, the complete file area is formatted and a header created.<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = slot number</span><br style="font-family: monospace;">
+<span style="font-family: monospace;"></span><span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+File Area created in slot C.</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;"></span><span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_VPL, RC_BWR, Flash/UV Eprom&nbsp;Write Error</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed on
+return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+A.BCDEHL/IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+.F....../.... different</span><br style="font-family: monospace;">
+<br>
+<hr style="width: 100%; height: 2px;">
+<br>
+<a name="EP_NewFile"></a><b>EP_NewFile ($42) - Write
+RAM file to File Card&nbsp;in slot C </b><span style="font-weight: bold;">(OZ 4.2 and newer)</span>
+<pre>IN:&nbsp;   <br>       C = slot number<br>     BHL = pointer to filename, (B=0 means local pointer)<br><br>OUT: Fc = 0, file successfully written to File Card in slot C (Flash or UV Eprom Card).<br>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_ error code: file couldn't be written to Card in slot C, not found, in use, etc.<br><br><span style="font-family: monospace;">Registers changed after return:</span><br style="font-family: monospace;"><span style="font-family: monospace;"> &nbsp;..BCDEHL/IXIY same</span><span style="font-family: monospace;">&nbsp;<br>  AF....../.... different</span><br></pre>
+Write RAM file to recognized card hardware in specified slot C (UV
+Eprom or Flash). Files written to UV Eprom only works in slot 3. Files
+written to Intel Flash Cards also only works in slot 3. Files written
+to AMD Flash Cards can be performed in all slots. If a file area does
+not exist on the card in slot C, it will be created on the card (if
+possible). If a file already exists in the file area with the same
+path/filename, it will automatically marked as deleted.<br>
+<hr style="width: 100%; height: 2px;"><br>
+<span style="font-weight: bold;"><a name="EP_WrBlk"></a>EP_WrBlk
+($45) -&nbsp;Write a block of bytes to UV Eprom in slot 3
+&nbsp;(OZ 4.2 and newer)</span><br>
+<br>
+Blow block of data to UV Eprom in slot 3. Screen will be switched off
+during operation.<br>
+<br>
+<span style="font-family: monospace;">IN:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+C = Blowing algorithm context (also known as File Area sub type)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DE = source address (local address space pointer)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IX = length of block</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL = destination address in slot 3</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">OUT:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 0 (block blown successfully to UV Eprom)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+BHL updated</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Fc = 1,</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_BWR (write error)</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+A = RC_Onf (unknown blowing algorithm context)</span><br style="font-family: monospace;">
+<br style="font-family: monospace;">
+<span style="font-family: monospace;">Registers changed
+after return:</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+...CDE../IXIY same</span><br style="font-family: monospace;">
+<span style="font-family: monospace;">&nbsp;&nbsp;
+AFB...HL/.... different</span><br style="font-family: monospace;">
+<br>
+Notes:<br>
+<div style="margin-left: 40px;">The blowing algorithm
+context is found in the "card.def" definition file; <span style="font-family: monospace;">CB_EP1</span> (32K) or
+<span style="font-family: monospace;">CB_EP2</span>
+(128K or more). </div>
+</body></html>

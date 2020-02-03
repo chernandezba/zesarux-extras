@@ -1,0 +1,55 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Xin, insert an entry into a linked list</font></b><tt></tt>
+<p><tt>RST 20H, DEFW $4609</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; HL = pointer to a 9-byte parameter block (usually on the stack):
+&nbsp;&nbsp;&nbsp;&nbsp; (HL+0) ... (HL+2) = pointer of block to insert
+&nbsp;&nbsp;&nbsp;&nbsp; (HL+3) ... (HL+5) = pointer to previous block
+&nbsp;&nbsp;&nbsp;&nbsp; (HL+6) ... (HL+8) = pointer to next block
+</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), if pointer to block to insert = 0.</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different</pre>
+Notes:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Algorithm: Assuming inserting entry I between entries X and Y:
+&nbsp;&nbsp;&nbsp;&nbsp; *I = X XOR Y
+&nbsp;&nbsp;&nbsp;&nbsp; *X = *X XOR Y XOR I
+&nbsp;&nbsp;&nbsp;&nbsp; *Y = *Y XOR X XOR I
+
+&nbsp;&nbsp;&nbsp;&nbsp; If X and Y are zero then the link is cleared.
+</pre>
+Bugs:
+<p>Related calls:
+<blockquote><a href='gnxdl.html'>GN_Xdl</a>, delete an entry from a linked list
+<br><a href='gnxnx.html'>GN_Xnx</a>, index next entry in linked list</blockquote>
+
+</body>
+</html>

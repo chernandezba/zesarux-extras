@@ -1,0 +1,513 @@
+
+*************************
+*
+* BASIC_COMMANDS   basic_commands
+*
+*************************
+
+LBASIC
+L06E22 DC.W $0051 
+* $51 BEFEHLE
+        
+    DC.W LPRINT-*  * $0884 = ADRESSE
+    DC.B $05
+    DC.B 'PRINT'
+    DC.W LRUN-*  *$0F78 * = ADRESSE
+    DC.B $03
+    DC.B 'RUN'
+    DC.W LSTOP-*  *$0FD8 * = ADRESSE 
+    DC.B $04
+    DC.B 'STOP'
+    DC.W LINPUT-*  *$5000  
+    DC.B $05
+    DC.B 'INPUT'
+    DC.W LWINDOW-*  *$113C 
+    DC.B $06
+    DC.B 'WINDOW'
+    DC.B $00
+    DC.W LBORDER-*  *$1158 * = ADRESSE 
+    DC.B $06
+    DC.B 'BORDER'
+    DC.B $00
+    DC.W LINK-*  *$0774 
+    DC.B $03
+    DC.B 'INK'
+    DC.W LSTRIP-*  *$0772 
+    DC.B $05
+    DC.B 'STRIP'
+    DC.W LPAPER-*  *$076E 
+    DC.B $05
+    DC.B 'PAPER'
+    DC.W LBLOCK-*  *$1120 
+    DC.B $05
+    DC.B 'BLOCK'
+    DC.W LPAN-*  *$0780 
+    DC.B $03
+    DC.B 'PAN'
+    DC.W LSCROLL-*  *$077E 
+    DC.B $06
+    DC.B 'SCROLL'
+    DC.B $00
+    DC.W LCSIZE-*  * $F81E 
+    DC.B $05
+    DC.B 'CSIZE'
+    DC.W LFLASH-*  * $FD20 
+    DC.B $05
+    DC.B 'FLASH'
+    DC.W LUNDER-*  * $FD12 
+    DC.B $05
+    DC.B 'UNDER'
+    DC.W LOVER-*  *  $FD26 
+    DC.B $04
+    DC.B 'OVER'
+    DC.B $00
+    DC.W LCURSOR-*  *  $F822 
+    DC.B $06
+    DC.B 'CURSOR'
+    DC.B $00
+    DC.W LAT-*  *  $F826 
+    DC.B $02
+    DC.B 'AT'
+    DC.B $00
+    DC.W LSCALE-*  *  $FD42 
+    DC.B $05
+    DC.B 'SCALE'
+    DC.W LPOINT-*  *  $FD4C 
+    DC.B $05
+    DC.B 'POINT'
+    DC.W LLINE-*  *  $FD56 
+    DC.B $04
+    DC.B 'LINE'
+    DC.B $00 
+    DC.W LELLIPS-*  *  $FD66 
+    DC.B $07
+    DC.B 'ELLIPSE'
+    DC.W LCIRCLE-*  *  $FD5C 
+    DC.B $06
+    DC.B 'CIRCLE'
+    DC.B $00
+    DC.W LARC-*  *  $FDA2 
+    DC.B $03
+    DC.B 'ARC'
+    DC.W LPOINTR-*  *  $FD26 
+    DC.B $07
+    DC.B 'POINT_R'
+    DC.W LTURN-*  *  $0FA8 
+    DC.B $04
+    DC.B 'TURN'
+    DC.B $00 
+    DC.W LTURNTO-*  *  $0F98  
+    DC.B $06
+    DC.B 'TURNTO'
+    DC.B $00
+    DC.W LPENUP-*  *  $0FD0 
+    DC.B $05
+    DC.B 'PENUP'
+    DC.W LPENDOWN-*  *  $0FCC 
+    DC.B $07
+    DC.B 'PENDOWN'
+    DC.W LMOVE-*  *  $0FD0 
+    DC.B $04
+    DC.B 'MOVE'
+    DC.B $00 
+    DC.W LLIST-*  *  $0564 
+    DC.B $04
+    DC.B 'LIST'
+    DC.B $00
+    DC.W LOPEN-*  *  $FC24 
+    DC.B $04
+    DC.B 'OPEN'
+    DC.B $00 
+    DC.W LCLOSE-*  *  $FBFA 
+    DC.B $05
+    DC.B 'CLOSE'
+    DC.W LFORMAT-*  *  $FB40 
+    DC.B $06
+    DC.B 'FORMAT'
+    DC.B $00 
+    DC.W LCOPY-*  *  $FB50 
+    DC.B $04
+    DC.B 'COPY'
+    DC.B $00 
+    DC.W LCOPYN-*  *  $FB4C 
+    DC.B $06
+    DC.B 'COPY_N'
+    DC.B $00 
+    DC.W LDELETE-*  *  $FA96 
+    DC.B $06
+    DC.B 'DELETE'
+    DC.B $00
+    DC.W LDIR-*  *  $FA92
+    DC.B $03
+    DC.B 'DIR'
+    DC.W LEXEC-*  *  $F92C
+    DC.B $04
+    DC.B 'EXEC'
+    DC.B $00 
+    DC.W LEXECW-*  *  $F928  
+    DC.B $06
+    DC.B 'EXEC_W'
+    DC.B $00
+    DC.W LLBYTES-*  *  $F994 
+    DC.B $06
+    DC.B 'LBYTES'
+    DC.B $00 
+    DC.W LSEXEC-*  *  $F9C0 
+    DC.B $05
+    DC.B 'SEXEC'
+    DC.W LSBYTES-*  *  $F9BC 
+    DC.B $06
+    DC.B 'SBYTES'
+    DC.B $00 
+    DC.W LSAVE-*  *  $FBDE 
+    DC.B $04
+    DC.B 'SAVE'
+    DC.B $00 
+    DC.W LMERGE-*  *  $0E34 
+    DC.B $05
+    DC.B 'MERGE'
+    DC.W LMRUN-*  *  $0E36 
+    DC.B $04
+    DC.B 'MRUN'
+    DC.B $00 
+    DC.W LLOAD-*  *  $0E4E 
+    DC.B $04
+    DC.B 'LOAD'
+    DC.B $00 
+    DC.W LLRUN-*  *  $0E4C 
+    DC.B $04
+    DC.B 'LRUN'
+    DC.B $00 
+    DC.W LNEW-*  *  $0E50 
+    DC.B $03
+    DC.B 'NEW'
+    DC.W LCLEAR-*  *  $0DDC 
+    DC.B $05
+    DC.B 'CLEAR'
+    DC.W LOPENIN-*  *  $FB88 
+    DC.B $07
+    DC.B 'OPEN_IN'
+    DC.W LOPENNEW-*  *  $FB82 
+    DC.B $08
+    DC.B 'OPEN_NEW'
+    DC.B $00  
+    DC.W LCLS-*  *  $0616 
+    DC.B $03
+    DC.B 'CLS'
+    DC.W LCALL-*  *  $F5EA
+    DC.B $04
+    DC.B 'CALL'
+    DC.B $00 
+    DC.W LRECOL-*  *  $0AE4
+    DC.B $05
+    DC.B 'RECOL'
+    DC.W LRANDOMISE-*  *  $09A8
+    DC.B $09
+    DC.B 'RANDOMISE'
+    DC.W LPAUSE-*  *  $064C 
+    DC.B $05
+    DC.B 'PAUSE'
+    DC.W LPOKE-*  *  $0668
+    DC.B $04
+    DC.B 'POKE'
+    DC.B $00 
+    DC.W LPOKEW-*  *  $0668
+    DC.B $06
+    DC.B 'POKE_W'
+    DC.B $00 
+    DC.W LPOKEL-*  *  $0664 
+    DC.B $06
+    DC.B 'POKE_L'
+    DC.B $00 
+    DC.W LBAUD-*  *  $F4C2
+    DC.B $04
+    DC.B 'BAUD'
+    DC.B $00 
+    DC.W LBEEP-*  *  $F4F6
+    DC.B $04
+    DC.B 'BEEP'
+    DC.B $00
+    DC.W LCONTINUE-*  *  $0E20
+    DC.B $08
+    DC.B 'CONTINUE'
+    DC.B $00 
+    DC.W LRETRY-*  *  $0E0A 
+    DC.B $05
+    DC.B 'RETRY'
+    DC.W LREAD-*  *  $F81A 
+    DC.B $04
+    DC.B 'READ'
+    DC.B $00 
+    DC.W LNET-*  *  $0562 
+    DC.B $03
+    DC.B 'NET'
+    DC.W LMODE-*  *  $053E 
+    DC.B $04
+    DC.B 'MODE'
+    DC.B $00
+    DC.W LRENUM-*  *  $0ACA 
+    DC.B $05
+    DC.B 'RENUM'
+    DC.W LDLINE-*  *  $0400 
+    DC.B $05
+    DC.B 'DLINE'
+    DC.W LSDATE-*  *  $F732
+    DC.B $05
+    DC.B 'SDATE'
+    DC.W LADATE-*  *  $F716 
+    DC.B $05
+    DC.B 'ADATE'
+    DC.W LLINER-*  *  $FBA4
+    DC.B $06
+    DC.B 'LINE_R'
+    DC.B $00
+    DC.W LELLIPSR-*  *  $FBB2
+    DC.B $09
+    DC.B 'ELLIPSE_R'
+    DC.W LCIRCLER-*  *  $FBA6
+    DC.B $08
+    DC.B 'CIRCLE_R'
+    DC.B $00
+    DC.W LARCR-*  *  $FBEA 
+    DC.B $05
+    DC.B 'ARC_R'
+    DC.W LAUTO-*  *  $0A56
+    DC.B $04
+    DC.B 'AUTO'
+    DC.B $00 
+    DC.W LEDIT-*  *  $0A4A
+    DC.B $04
+    DC.B 'EDIT'
+    DC.B $00
+    DC.W LFILL-*  *  $FAD4 
+    DC.B $04
+    DC.B 'FILL'
+    DC.B $00
+    DC.W LWIDTH-*  *  $0EAC
+    DC.B $05
+    DC.B 'WIDTH'
+    DC.W LREPORT-*  *  $0CB4 
+    DC.B $06
+    DC.B 'REPORT'
+    DC.B $00
+    DC.W LTRA-*  *  $0D8A 
+    DC.B $03
+    DC.B 'TRA'
+    DC.W $0000  * END COMMANDS
+    DC.W $003A  * $3A FUNCTIONS
+    DC.W LACOS-*  *  $0F7C  
+    DC.B $04
+    DC.B 'ACOS'
+    DC.B $00 
+    DC.W LACOT-*  *  $0F7A
+    DC.B $04
+    DC.B 'ACOT'
+    DC.B $00
+    DC.W LASIN-*  *  $0F78
+    DC.B $04
+    DC.B 'ASIN'
+    DC.B $00
+    DC.W LATAN-*  *  $0F76
+    DC.B $04
+    DC.B 'ATAN'
+    DC.B $00
+    DC.W LCOS-*  *  $0F74
+    DC.B $03
+    DC.B 'COS'
+    DC.W LCOT-*  *  $0F74
+    DC.B $03
+    DC.B 'COT'
+    DC.W LEXP-*  *  $0F74
+    DC.B $03
+    DC.B 'EXP'
+    DC.W LLN-*  *  $0F74
+    DC.B $02
+    DC.B 'LN'
+    DC.B $00
+    DC.W LLOG10-*  *  $0F74
+    DC.B $05
+    DC.B 'LOG10'
+    DC.W LSIN-*  *  $0F72
+    DC.B $03
+    DC.B 'SIN'
+    DC.W LSQRT-*  *  $0F72
+    DC.B $04
+    DC.B 'SQRT'
+    DC.B $00
+    DC.W LTAN-*  *  $0F70 
+    DC.B $03
+    DC.B 'TAN'
+    DC.W LDEG-*  *  $0F70 
+    DC.B $03
+    DC.B 'DEG'
+    DC.W LRAD-*  *  $0F70 
+    DC.B $03
+    DC.B 'RAD'
+    DC.W LRND-*  *  $0FB2
+    DC.B $03
+    DC.B 'RND'
+    DC.W LINT-*  *  $1016 
+    DC.B $03
+    DC.B 'INT'
+    DC.W LABS-*  *  $0F7E
+    DC.B $03
+    DC.B 'ABS'
+    DC.W LPI-*  *  $0FF8
+    DC.B $02
+    DC.B 'PI'
+    DC.B $00
+    DC.W LPEEK-*  *  $101C
+    DC.B $04
+    DC.B 'PEEK'
+    DC.B $00
+    DC.W LPEEKW-*  *  $101C
+    DC.B $06
+    DC.B 'PEEK_W'
+    DC.B $00
+    DC.W LPEEKL-*  *  $101C 
+    DC.B $06
+    DC.B 'PEEK_L'
+    DC.B $00
+    DC.W LRESPR-*  *  $1036
+    DC.B $05
+    DC.B 'RESPR'
+    DC.W LEOF-*  *  $1054 
+    DC.B $03
+    DC.B 'EOF'
+    DC.W LINKEYS-*  *  $1094 
+    DC.B $06
+    DC.B 'INKEY$'
+    DC.B $00
+    DC.W LCHRS-*  *  $10E2
+    DC.B $04
+    DC.B 'CHR$'
+    DC.B $00
+    DC.W LCODE-*  *  $1152 
+    DC.B $04
+    DC.B 'CODE'
+    DC.B $00 
+    DC.W LKEYROW-*  *  $11DA 
+    DC.B $06
+    DC.B 'KEYROW'
+    DC.B $00 
+    DC.W LBEEPING-*  *  $101A 
+    DC.B $07
+    DC.B 'BEEPING'
+    DC.W LLEN-*  *  $1120
+    DC.B $03
+    DC.B 'LEN'
+    DC.W LDIMN-*  *  $1158 
+    DC.B $04
+    DC.B 'DIMN'
+    DC.B $00 
+    DC.W LDAYS-*  *  $1204 
+    DC.B $04
+    DC.B 'DAY$'
+    DC.B $00 
+    DC.W LDATE-*  *  $1198
+    DC.B $04
+    DC.B 'DATE'
+    DC.B $00 
+    DC.W LDATES-*  *  $11EE 
+    DC.B $05
+    DC.B 'DATE$'
+    DC.W LFILLS-*  *  $10AA 
+    DC.B $05
+    DC.B 'FILL$'
+    DC.W LVERS-*  *  $101C 
+    DC.B $04
+    DC.B 'VER$'
+    DC.B $00 
+    DC.W LERRNC-*  *  $1232 
+    DC.B $06
+    DC.B 'ERR_NC'
+    DC.B $00
+    DC.W LERRNJ-*  *  $1226
+    DC.B $06
+    DC.B 'ERR_NJ'
+    DC.B $00
+    DC.W LERROM-*  *  $121A
+    DC.B $06
+    DC.B 'ERR_OM'
+    DC.B $00
+    DC.W LERROR-*  *  $120E 
+    DC.B $06
+    DC.B 'ERR_OR'
+    DC.B $00
+    DC.W LERRBO-*  *  $1202
+    DC.B $06
+    DC.B 'ERR_BO'
+    DC.B $00 
+    DC.W LERRNO-*  *  $11F6
+    DC.B $06
+    DC.B 'ERR_NO'
+    DC.B $00
+    DC.W LERRNF-*  *  $11EA
+    DC.B $06
+    DC.B 'ERR_NF'
+    DC.B $00
+    DC.W LERREX-*  *  $11DE 
+    DC.B $06
+    DC.B 'ERR_EX'
+    DC.B $00
+    DC.W LERRIU-*  *  $11D2 
+    DC.B $06
+    DC.B 'ERR_IU'
+    DC.B $00
+    DC.W LERREF-*  *  $11C6
+    DC.B $06
+    DC.B 'ERR_EF'
+    DC.B $00
+    DC.W LERRDF-*  *  $11BA
+    DC.B $06
+    DC.B 'ERR_DF'
+    DC.B $00
+    DC.W LERRBN-*  *  $11AE
+    DC.B $06
+    DC.B 'ERR_BN'
+    DC.B $00
+    DC.W LERRTE-*  *  $11A2
+    DC.B $06
+    DC.B 'ERR_TE'
+    DC.B $00
+    DC.W LERRFF-*  *  $1196
+    DC.B $06
+    DC.B 'ERR_FF'
+    DC.B $00
+    DC.W LERRBP-*  *  $118A 
+    DC.B $06
+    DC.B 'ERR_BP'
+    DC.B $00
+    DC.W LERRFE-*  *  $117E 
+    DC.B $06
+    DC.B 'ERR_FE'
+    DC.B $00
+    DC.W LERRXP-*  *  $1172
+    DC.B $06
+    DC.B 'ERR_XP'
+    DC.B $00
+    DC.W LERROV-*  *  $1166
+    DC.B $06
+    DC.B 'ERR_OV'
+    DC.B $00
+    DC.W LERRNI-*  *  $115A 
+    DC.B $06
+    DC.B 'ERR_NI'
+    DC.B $00
+    DC.W LERRRO-*  *  $114E 
+    DC.B $06
+    DC.B 'ERR_RO'
+    DC.B $00 
+    DC.W LERRBL-*  *  $1142  * = ADRESSE
+    DC.B $06
+    DC.B 'ERR_BL'
+    DC.B $00
+    DC.W LERNUM-*  *  $11AA * = ADRESSE
+    DC.B $05
+    DC.B 'ERNUM'
+    DC.W LERLIN-*  *  $11B0 * = ADRESSE
+    DC.B $05
+    DC.B 'ERLIN'
+    DC.W $0000
+
+****** END BASIC_COMMANDS basic_commands

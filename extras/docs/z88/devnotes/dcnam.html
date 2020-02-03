@@ -1,0 +1,74 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+  <td align="center" valign="bottom" width="80%">&nbsp;</td>
+  <td align="right" valign="bottom" width="10%"><a
+  href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+</table>
+
+<hr>
+
+<p><font size="4"><b>DC_Nam, Name current application</b></font> </p>
+
+<p><tt>RST 20H, DEFW $0C0C</tt> <br>
+&nbsp; </p>
+
+<p>IN:</p>
+
+<blockquote>
+ <pre>HL = pointer to a null terminated name</pre>
+</blockquote>
+
+<p>OUT: -</p>
+
+<p>Registers affected after return: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different</pre>
+
+<p>Notes: </p>
+
+<blockquote>
+ <p>This provides text for the 'Your Ref.' column in the
+ Index. Up to 15 characters can be displayed. Screen driver
+ codes are ignored (Bold, underlined, etc.). <br>
+ Applications may use this call to define a
+ &quot;point-of-reference&quot; description for it self when
+ the Index popdown will be activated at a later time and the
+ various running applications are listed. <br>
+ Pointer can be terminated with any control char ($00-$1F).</p>
+</blockquote>
+
+<p>Related system calls: </p>
+
+<blockquote>
+ <p><a href="ospoll.html">OS_Poll</a>, poll for an application <br>
+ <a href="dcpol.html">DC_Pol</a>, poll for card usage <br>
+ <a href="osent.html">OS_Ent</a>, enter an application <br>
+ <a href="dcent.html">DC_Ent</a>, enter new application <br>
+ <a href="osexit.html">OS_Exit</a>, exit an application <br>
+ <a href="osbye.html">OS_Bye</a>, exit application <br>
+ <a href="dcbye.html">DC_Bye</a>, exiting current application <br>
+ <a href="osstk.html">OS_Stk</a>, stack current process
+ (application) <br>
+ <a href="osuse.html">OS_Use</a>, process card usage<br>
+ <a href="dcalt.html">DC_Alt</a>, pass an alternative character</p>
+</blockquote>
+</body>
+</html>

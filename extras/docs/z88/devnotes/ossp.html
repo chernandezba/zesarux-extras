@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tbody>
+
+ <tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+  <td align="center" valign="bottom" width="80%">&nbsp;</td>
+  <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+
+  </tbody>
+</table>
+
+<hr>
+
+<p><font size="4"><b>OS_Sp, specify</b></font> </p>
+
+<p><tt>RST 20H, DEFB $69</tt> </p>
+
+<p>IN: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; IX = argument<br>&nbsp;&nbsp;&nbsp;&nbsp; BC = reason code<br>&nbsp;&nbsp;&nbsp;&nbsp; HL = pointer to data<br>&nbsp;&nbsp;&nbsp;&nbsp; A = length (size) of data</pre>
+
+<p>OUT, if call succeeded: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0</pre>
+
+<p>OUT, if call failed: </p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp; A = return code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), incorrect reason code or parameter<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_UNK ($03), unknown request</pre>
+
+<p>Related calls: </p>
+
+<blockquote>
+  <p><a href="dcsp.html">DC_Sp</a>, DC specify<br>
+ <a href="dcnq.html">DC_Nq</a>, DC enquire<br>
+ <a href="osnq.html">OS_NQ</a>, enquire</p>
+</blockquote>
+
+<hr>
+
+<p>The following is the list of reason codes for manipulating the
+Panel and Printer Editor. Please refer to <a href="osnq.html">OS_Nq</a>
+for other system resources that may be only be read. <br>
+&nbsp; </p>
+
+<p><b>System Values</b> </p>
+
+<pre><i>Symbol (reason code)Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Gfi ($8000)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Install changed settings<br>PA_Mct ($8001)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Timeout in minutes<br>PA_Rep ($8002)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Repeat rate<br>PA_Kcl ($8003)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Keyclick 'Y' or 'N'<br>PA_Snd ($8004)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sound 'Y' or 'N'<br>PA_Bad ($8005)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Default bad process size in K<br>PA_Loc ($8006)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Keyboard localization (identified by country letter)<br><br> CL_US  'A'  United states<br> CL_FR  'F'  France<br> CL_DE  'G'  Germany<br> CL_UK  'U'  England<br> CL_DK  'D'  Denmark<br> CL_SE  'S'  Sweden<br> CL_IT  'I'  Italy<br> CL_SP  'P'  Spain<br> CL_JP  'J'  Japan<br> CL_IS  'C'  Iceland<br> CL_NO  'N'  Norway<br> CL_CH  'W'  Chweiss<br> CL_TR  'T'  Turkey<br> CL_FI  'L'  Finland<br><br></pre>
+
+<p><b>Application values</b> </p>
+
+<pre><i>Symbol (reason code)Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Iov ($8010)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Insert/Overtype 'I' or 'O'<br>PA_Dat ($8011)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date format 'E' or 'A' (European, American)<br>PA_Map ($8012)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PipeDream map 'Y' or 'N'<br>PA_Msz ($8013)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Map size in pixels<br>PA_Dir ($8014)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 12&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Default directory<br>PA_Dev ($8015)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 16&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Default device<br><br></pre>
+
+<p><b>Serial port values</b> </p>
+
+<pre><i>Symbol (reason code)Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Txb ($8016)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 (or 1)&nbsp; Transmit baud rate - binary<br>PA_Rxb ($8017)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 (or 1)&nbsp; Receive baud rate - binary<br>PA_Xon ($8018)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Xon/Xoff 'Y' or 'N'<br>PA_Par ($8019)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Parity 'O', 'E', 'M', 'S' or 'N'</pre>
+
+<p><b>Printer Editor values (highlights &amp; translation tables)</b>
+</p>
+
+<pre><i>Symbol (reason code)Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Ptr ($8020)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Printer name<br>PA_Alf ($8021)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Allow Linefeed, 'Y' or 'N'<br>PA_Pon ($8022)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp; Printer On sequence<br>PA_Pof ($8023)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp; Printer Off sequence<br>PA_Eop ($8024)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp; End of page sequence<br><br>PA_Mip ($8025)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp; HMI prefix sequence<br>PA_Mis ($8026)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp; HMI suffix sequence<br>PA_Mio ($8027)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 31 (max)&nbsp; HMI offset sequence<br><br><br></pre>
+
+<p><b>Highlight bases</b> </p>
+
+<pre>PA_On1 ($8028)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Underline<br>PA_On2 ($802C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Bold<br>PA_On3 ($8030)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Extended sequence<br>PA_On4 ($8034)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Italics<br>PA_On5 ($8038)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Subscript<br>PA_On6 ($803C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Superscript<br>PA_On7 ($8040)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Alternate font<br>PA_On8 ($8044)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; User Defined<br><br></pre>
+
+<p><b>Translations</b> </p>
+
+<pre><i>Symbol (reason code)Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Tr1 ($8048)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Row 1, Entry A<br>PA_Tr2 ($804A)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B<br>PA_Tr3 ($804C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C<br>PA_Tr4 ($804E)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Row 2, Entry A<br>PA_Tr5 ($8050)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B<br>PA_Tr6 ($8052)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C<br>PA_Tr7 ($8054)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Row 3, Entry A<br>PA_Tr8 ($8056)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B<br>PA_Tr9 ($8058)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C<br><br>ISO translations 1 - 28 (International Z88 versions):</pre>
+
+<pre><i>Symbol (reason code)Size</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i>Meaning<br></i>PA_Tr10 ($8080)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Row 1, Entry 1 (ISO 1)<br>PA_Tr11 ($8082)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 (ISO 2)<br>PA_Tr12 ($8084)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3 (ISO 3)<br>PA_Tr13 ($8086)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4<br>PA_Tr14 ($8088)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5<br>PA_Tr15 ($808A)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6<br>PA_Tr16 ($808C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 7<br>PA_Tr17 ($808E)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Row 2, Entry 1<br>PA_Tr18 ($8090)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2<br>PA_Tr19 ($8092)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3<br>PA_Tr20 ($8094)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4<br>PA_Tr21 ($8096)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5<br>PA_Tr22 ($8098)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6<br>PA_Tr23 ($809A)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 7<br>PA_Tr24 ($809C)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Row 3, Entry 1<br>PA_Tr25 ($809E)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2<br>PA_Tr26 ($80A0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3<br>PA_Tr27 ($80A2)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4<br>PA_Tr28 ($80A4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5<br>PA_Tr29 ($80A6)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6<br>PA_Tr30 ($80A8)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 7<br>PA_Tr31 ($80AA)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Row 4, Entry 1<br>PA_Tr32 ($80AC)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2<br>PA_Tr33 ($80AE)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3<br>PA_Tr34 ($80B0)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4<br>PA_Tr35 ($80B2)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5<br>PA_Tr36 ($80B4)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 6<br>PA_Tr37 ($80B6)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 7 (ISO 28)<br></pre>
+
+<p>PA_Fr&lt;n&gt; will normally be one character long. If there
+are more characters in this sequence then the first character is
+replaced by the translation string, but the others are printed as
+well. </p>
+
+<p>In addition to the Panel and Printer Editor, the following
+parameters can be set. They expect HL to point to a
+null-terminated string: </p>
+
+<pre>SP_Dev ($8C00)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set current device<br>SP_Dir ($8C03)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set current directory<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Note: Use always a '/' in front of the path name,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; otherwise <a href="osnq.html">OS_Nq</a> can crash when reading the<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; parameter.<br>SP_Fnm ($8C06)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set current name match<br></pre>
+</body>
+</html>

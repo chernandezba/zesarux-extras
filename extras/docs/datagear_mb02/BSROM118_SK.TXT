@@ -1,0 +1,168 @@
+
+
+                       ******************
+                       *** BS rom 118 ***
+                       ******************
+
+ Jedn  sa o klasick£ romku zo ZX Spectra 48k (+) na ktorej  boli
+sp chan‚ tieto £pravy:
+
+ - pribudlo zop r novìch pr¡kazov - preh–ad Ôalej
+ - rozç¡ren  syntax niektorìch pr¡kazov - preh–ad Ôalej
+ - asi çtvorn sobne rìchle chytanie £vodn‚ho t¢nu z kazeœ ku
+ - programovì kurzor zmenenì zo znaku ">" na znak "*"
+ - zvìçen  frekvencia chybov‚ho beepu
+ - spracovanie hexadecim lnych Ÿ¡sel v rozsahu 0-65535
+ - mo§nosœ p¡sania basicovìch riadkov v rozsahu 0-16383
+   (napr. edit cia nult‚ho riadku)
+ - rìchlejç¡ autorepeat na zaŸiatku po inicializ ci¡
+ - pri pokuse o odoslanie chybn‚ho pr¡kazu alebo riadku skoŸ¡
+   kurzor na miesto chyby (lepçie ako v IZO-ROM)
+ - mo§nosœ vypisovaœ listing programu bez riadiacich k¢dov
+   (nereaguje na farby, TAB a AT - vhodn‚ na zaçit‚ programy)
+ - oçetrenie NMI pomocou rozç¡rite–n‚ho menu - preh–ad Ôalej
+ - opraven‚ niektor‚ chyby - preh–ad Ôalej
+ - dva nov‚ znaky v znakovom s£bore - malì podŸiarnik a çtvorŸek
+ - programovì kurzor "*" sa vypisuje iba pri autoliste
+ - po editaŸnej z¢ne sa d  chodiœ hore a dolu
+ - reset a new ma§£ pameœ pomocou PUSH - je to super rìchle
+ - autolist mo§no v ka§dom okamihu zastaviœ kl vesou "Q"
+
+               Preh–ad chìb, ktor‚ boli opraven‚
+               ---------------------------------
+ - Chybn‚ oçetenie NMI rutiny - vyrieçilo to NMI menu. Ale
+   pr¡sluçnì bajt zostal nezmenenì - to keby ho n hodou
+   nejakì program moc usilovne zaŸal sk£maœ a testovaœ.
+ - PRINT AT 0,0;CHR$ 8; - posunulo kurzor na poz¡ciu AT -1,31 -
+   v tejto romke sa poloha kurzora nemen¡.
+ - Ak sa malo vyp¡saœ chybov‚ hl senie a je zak zan‚ preruçenie,
+   tak to zmrzlo. V tejto romke sa to nem“§e staœ.
+ - Norm lna romka sama seba na adres ch 0..4 prepisuje. T to
+   romka nie, preto m“§e be§aœ aj bez zak zan‚ho z pisu v ramke.
+ - Ak je poslednì riadok  v  programe  N,  vy  odoçlete  pr zdny
+riadok N+1 (ako§e ho zma§ete) a potom stlaŸ¡te EDIT,  editne  sa
+v m N-tì riadok aj s programovìm  kurzorom.  V  tejto  romke  sa
+programovì kurzor objavuje iba autolistingu  a  preto  sa  nikdy
+nem“§e objaviœ v editnutom riadku.
+
+ Po resete alebo NEWe sa romka  prihl si  vyp¡san¡m  inform cie,
+ko–ko je vo–n‚ho miesta (basic  a  premenn‚  basicu  maj£  vtedy
+samozrejme nulov£ d–§ku) a vyp¡çe sa norm lne hl senie OK.
+ 48k a 128k reset a ani NEW netestuj£ pam„œ - predpoklad  sa, §e
+cel  48kB alebo 128k pam„t je funkŸn .
+
+ Po NMI (skoku na adresu #66) zaŸne srçaœ border, Ÿo  je  znakom
+§e ste v NMI menu. Ak by bol z sobn¡k SP na adres ch  #00-#4000,
+zmen¡ sa na #5800. Ovl dacie kl vesy:
+
+ B - teplì çtart basicu. Inicializuj£ sa vçeky syst‚mov‚
+     premenn‚ okrem PROG, VARS a ELINE - teda basicovì
+     program a basico‚ premenn‚ zostan£ zachovan‚.
+ N - to ist‚ ako CLEAR #5fff: NEW - teda pam„œ nad #6000 ostane
+     neporuçen .
+ R - zma§e cel£ pam„œ 48kB - je to klasickì 48k reset.
+ E - zma§e cel£ pam„œ 128k - (extend reset 128k)
+ I - resetuje tieto perif‚rie: AY, FDC, DMA a mechaniku disku.
+ S - save "" screen$ na aktu lne zariadenie (MG alebo disk)
+ T - ako USR 15522 Ÿi§e aktu lne zariadenie bude p ska.
+ D - ako USR 15524 Ÿi§e aktu lne zariadenie bude disk.
+ Q - n vrat speœ do preruçen‚ho programu. Pozor: n vrat bude
+     korektnì iba vtedy, ak SP nebol zmenenì na #5800.
+     Pri n vrate s£ vçetky registre (okrem dolnìch 7 bitov
+     registra R) obnoven‚ na p“vodn‚ hodnoty.
+ M - skok do debuggera v MRS (mus¡ byœ v pam„ti!).
+     Vçetky registre sa nastavia ako boli v okamihu preruçenia
+     programu pomocou MNI - Ÿi§e mo§no preruçenì program Ôalej
+     krokovaœ (PC a SP sa korektne nastavia iba ak sa SP
+     nezmenilo na #5800!).
+ 0..9 - prepnutie ram-banky na 128k. Ak by sa SP nach dzal v
+        oblasti hornìch 16 kB, bude zmenenì na #5800.
+        Je to vlastne OUT (#7ffd),Ÿ¡slo - Ÿi§e pomocou 8 a 9 si
+        mo§no pozrieœ obsah druhej videostr nky.
+ U - u§¡vate–sk  funkcia - na adrese #3901 je  JP  XXX,  kde  si
+m“§e u§¡vate– napokovaœ adresu svojej aplik cie  a  po  stlaŸen¡
+kl vesy "U" sa t to aplik cia spust¡. N vrat je norm lne pomocou
+RET.
+ Z - u§¡vate–sk  funkcia - na adrese #3904 je DW  xxx,  a  Ôalej
+presne tak isto ako "U". Tieto  dve  funkcie  v  samotnej  romke
+nerobia niŸ, ale  s£  vyhraden‚  pre  Ôalçie  rozç¡renia  (napr.
+rezidentnì monitor).
+
+            Rozç¡renie syntaxe existuj£cich pr¡kazov
+            ----------------------------------------
+            (Polo§ky v z tvork ch < > s£ nepovinn‚.)
+
+ CONTINUE <vìraz> .. ak je vìraz nenulovì tak sa spust¡ stroj k
+   od tejto adresy. Pozor ! Pri n vrate mus¡ byœ na rozdiel od
+   USR register IY nastavenì na #5c3a, ale zato HL' nemus¡ maœ
+   hodnotu #2758.
+ CLS <vìraz> .. ak vìraz je nenulovì tak sa n¡m nastavia vçetky
+   farby (pr. CLS 7 = BORDER 0: PAPER 0:INK 7:BRIGHT 0:FLASH 0).
+ GOTO, GOSUB, PAUSE, BORDER .. Ÿ¡selnì parameter pri tìchto
+   pr¡kazoch je nepovinnì - nezadanì sa ch pe ako nula.
+ <PRINT> zoznam polo§iek .. Za predpokladu, §e zoznam polo§iek
+   nezaŸ¡na Ÿislicou, Ÿiarkou, bodkoŸiarku a apostrofom mo§ete
+   pokojne vynechaœ pr¡kaz PRINT. Toti§ ak sa pri behu programu
+   n jde nieŸo, Ÿo nie je §iadny pr¡kaz, skoŸ¡ sa do rutinky na
+   pr¡kaz PRINT.
+ POKE add,byte .. norm lne p“vodn‚ poke
+ POKE add;word .. dvojbajtov‚ poke (ni§ç¡ bajt sa uklada ni§çie)
+ POKE add,reœazec .. ulo§ene dan‚ho reœazca do pam„ti. Prvì znak
+   sa ulo§¡ na adresu add, druhì na  adresu  add+1  ...  atÔ.  V
+   princ¡pe nez le§¡ na tom, Ÿi pri  ukladan¡  reœazca  v  tomto
+   pr¡kaze  nap¡çete  Ÿarku  alebo  bodkoŸiarku,  ale  z  d“vodu
+   mo§n‚ho rozç¡renia v bud£cnosti sa odpor£Ÿa pou§¡vaœ vìhradne
+   iba Ÿiarku.
+
+ VAL$ <vìraz> .. ak je vìraz Ÿ¡seln‚ho typu, tak vìsledkom tejto
+   funkcie je çtvorznakovì reœazec hexadecim lnych Ÿ¡slic - in Ÿ
+   povedan‚ prevod DEC -> HEX (pr. VAL$ 33023 = "80ff").
+ VAL <vìraz> .. ak je vìraz Ÿ¡seln‚ho typu, tak vìsledkom tejto
+   funkcie je dvojbajtov‚ Ÿ¡slo uvo§en‚ na tejto adrese - in Ÿ
+   povedan‚ dvojbajtovì PEEK.
+ %,& .. prevod HEX -> DEC podobne ako je BIN prevod BIN -> DEC.
+   In Ÿ povedan‚ ak chcete ako Ÿ¡slo zap¡saœ hexadecim lnu
+   konçtantu, mus¡ zaŸ¡naœ znakom "%" alebo "&". Znak "#" nebol
+   pou§itì preto, lebo ten sa pou§¡va na nastavenie kan la v
+   pr¡kazoch PRINT A INPUT (pr. %80ff = 33023).
+
+                    Nov‚ pr¡kazy a ich syntax
+                    -------------------------
+ , <vìraz> .. (Ÿiarka) editne pr¡sluçnì basicovì riadok. Ak
+      vìraz nie je uvedenì alebo nadob£da nulov£ hodnotu,
+      edituje sa riadok s najni§ç¡m poradovìm Ÿ¡slom.
+ ' <vìraz> .. (apostrof) prep¡na ram-banky na 128k ako OUT
+      (#7ffd),vìraz. Vìraz mus¡ byœ v intervale 0 a§ 15. Pozor!
+      Pri prep¡nan¡ mus¡ byœ RAMTOP menç¡ ako #c000 (in Ÿ ako
+      0-9 v NMI menu).
+  .. obnov¡ vçetky syst‚mov‚ premenn‚ okrem PROG, VARS a ELINE.
+      (Ako "B" v NMI menu.) [C v kr£§ku]
+ ^ .. ve–kì 128k reset - ma§e cel£ pam„œ 128k.
+      (Ako "E" v NMI menu.) [ç¡pka hore]
+ ? .. vyp¡çe inform ciu o d’§ke programu, d’§ke premennìch a
+      ve–kosœ vo–nej pam„te pre basic.
+ * .. header - z p sky Ÿ¡ta hlaviŸky a vypisuje o nich toto:
+            typ s£boru : meno s£boru : adresa : d–§ka
+ _ .. to ist‚ ako USR 00102 - skok do NMI menu.
+ # .. to ist‚ ako USR 54885 - skok do MRS (mus¡ byœ v pam„ti!).
+
+                  Jedna nov  syst‚mov  premenn 
+                  -----------------------------
+ KeÔ§e NMI rutinka v§dy zavol  NMI menu, nepotrebuje  u§  vektor
+na adrese 23728. Preto tri bity na 23728 s£ takto vyu§it‚:
+
+ bit 0=0:Ÿ¡sla basicovìch riadkov sa vypisuj£ ako çtvormiestne
+ bit 0=1:Ÿ¡sla basicovìch riadkov sa vypisuj£ ako p„œmiestne
+ bit 1=0:pri autoliste sa vypisuj£ riadiace k¢dy norm lne
+ bit 1=1:pri autoliste sa vypisuj£ riadiace k¢dy pod–a bitu 2
+ bit 2=0:pri autoliste sa v¢bec nevypisuj£ riadiace k“dy
+ bit 2=1:pri autoliste sa vypisuj£ riadiace k¢dy ako "?"
+
+Po resete alebo newe sa tu zap¡çe nula. P„œmiestne Ÿ¡sla riadkov
+maj£ vìznam vtedy, ak pou§¡vate riadky v rozsahu 10000 a§ 16383.
+Tento bit nijako neovplyvåuje beh programu s takìmito  riadkami,
+len men¡ form t listingu. Pri editovan¡  riadku  sa  jeho  Ÿ¡slo
+vyp¡çe v§dy ako p„œmiestne.
+
+
+                 ******************************

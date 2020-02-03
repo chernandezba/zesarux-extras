@@ -1,0 +1,64 @@
+Comandos adicionales al PDF:
+
+El comando 34 -> es como el 33 pero bloquea futuros comandos.
+El comando 39 -> establece el slot actual como el slot al que hay que volver si se pulsa un reset—> Esto es, si recibes un comando 39 y estas en el slot 14 por ejemplo, cuando se pulse un reset en el spectrum, independientemente de en qué slot estés, se selecciona primero el slot 14 y se hace un reset.
+
+
+Para comandos de un byte:
+
+Primero se escribe un byte X en dirección 1, n veces. El comando es el valor X - Si X es entre 1 y 39, se ejecuta el comando simple
+
+Para comandos de tres bytes:
+
+Primero se escribe un byte X en dirección 1, n veces. El comando es el valor X 
+Segundo, el data1 se escribe byte Y en dirección 2, m veces. El data1 es el valor Y
+Tercero, el data2 se escribe byte Z en dirección 3, p veces. El data2 es el valor Z
+   Cuarto, la confirmación se escribe con un byte aleatorio en la dirección 0 una sola vez. Entonces hay que ejecutar el comando.
+
+Así por tanto mis valores importantes a emular son X, Y y Z. Tanto n,m,p para mi emulador no me sirven de nada.
+
+
+COMANDOS NORMALES: Se ejecutan unos 148us tras recibir el ÚLTIMO de los pulsos (como lo hacías ahora). El número de pulsos equivale al valor recibido en la dirección 1. Por tanto, hay que esperar 518 t-states en un 48k y 525 t-states en un 128k
+COMANDOS ESPECIALES: Se ejecutan 8,75us tras recibir el pulso de confirmación en la dirección 0 con cualquier valor. Por tanto hay que esperar 31 t-states en cualquier equipo.
+
+Los comandos siguen funcionado igual que antes: tres comandos normales consecutivos en las direcciones 1,2 y 3. La 1 es el comando (es especial si está entre 40 y 49). La 2 es data1 y la 3 es data 2. Al final un pulso de confirmación en la dirección 0 con cualquier valor de datos.
+
+
+
+Avanzado para cuando funcione todo: Los comandos especiales hacen “timeout” si no se reciben juntas las 4 etapas. Ese timeout es de 17000 t-states mas o menos y puedes implementarlo de la siguiente manera.
+Tras recibir el cmd en la dir 1 y determinar que es un comando especial, tomas el valor de los t-states. Si no recibes el PRIMER pulso de data1 en los siguientes 17000 t-states, descartas y vuelves a la espera normal de cualquier comando. Lo mismo para data2 respecto a data1 y para confirmación respecto a data2.
+
+
+---
+
+memoria:
+
+Son 512k de ROM y 256 bytes de eeprom escribible mediante comando
+
+--
+
+>Sigo sin entender como evitar el bug de la rom original del spectrum que se dedica a escribir en la rom:
+
+El HW del dandanator arranca sin hacer ni caso a los comandos. da igual lo que le digas que no hace caso. Sólo cuando se pagina el Slot 0 de la ROM externa (los primeros 16k de los 512k) se activa la interpretación de comandos. 
+Esa paginación inicial se hace o bien al arrancar si la eeprom tiene guardado que arranque en el slot 0 o bien al darle al botón del cacharro.
+aclarado:
+
+ Hay varias maneras de deshabilitar los comandos: 
+1) Con el nuevo comando 34
+2) con el comando 46, específico para bloquear comandos
+3) con el comando 40, atendiendo a los bits de los datos
+
+// Special Command 40   : Fast Change & Action
+//                      : Data 1 : Bank Number (1-33)   
+//                      : Data 2 : Action to perform
+//                               : bit 3 - Disable Commands
+//                               : bit 2 - Lock Commands   
+//                               : bit 1 - NMI
+//                               : bit 0 - Reset
+//                               : bits 4-7 - Reserved MUST be 0
+
+Una vez deshabilitados, los comandos sólo se vuelven a activar con un hard-reset o con una acción de botón.
+
+Luego está el tema de bloquear los comandos, que se hace o bien con el 46 o bien con el 40 en el bit 2. Para desbloquear los comandos, se puede hacer con una acción de botón o con otro comando 46.
+
+--

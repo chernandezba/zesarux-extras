@@ -1,0 +1,64 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Dei, convert zoned, external
+format date to internal format</font></b>
+<p><tt>RST 20H, DEFW $1609</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; B = month (1 = january, ..., 12 = december)
+&nbsp;&nbsp;&nbsp;&nbsp; C:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C7 to C5: day of the week (0 to 7, 0 = unspecified)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C4 to C0: day of the month (1 to 31)
+
+&nbsp;&nbsp;&nbsp;&nbsp; DE = signed year number (relative to 0 A.D.).
+&nbsp;&nbsp;&nbsp;&nbsp; B.C. years are negative.
+</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; ABC = internal format date
+</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1, invalid date given
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_SNTX, syntax error.
+</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ....DEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBC..../.... different
+</pre>
+Notes:
+<blockquote>For the "day of the week" parameter, 1 represents Monday, 2
+Tuesday, etc. If you supply zero the routine will work out the day name
+for you. An invalid date error does not return an error code, just Fc=1.
+A date is invalid if inconsistent, eg. you say it is Monday when it should
+be Tuesday, or if a parameter is out of range.</blockquote>
+Bugs:
+<br>&nbsp;
+<p>Related calls:
+<blockquote><a href='gndie.html'>GN_Die</a>, convert internal format date to zoned format
+<br><a href='gngdt.html'>GN_Gdt</a>, convert an ASCII string to an internal binary date
+<br><a href='gngmd.html'>GN_Gmd</a>, Get (read) machine date in internal format
+<br><a href='gnpdt.html'>GN_Pdt</a>, write internal date as ASCII string
+<br><a href='gnpmd.html'>GN_Pmd</a>, put (set) machine date</blockquote>
+
+</body>
+</html>

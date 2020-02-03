@@ -1,0 +1,138 @@
+ZX-Evolution, as you probably know, is an FPGA clone. It has certain peripheral hardware on its board, but majority of chipset logic is packed into FPGA.
+Currently there are two popular FPGA configurations for ZX-Evo: Baseconf and TS-Conf. I'm the author of the latter. So I will talk mostly about it.
+These configs are quite different and compatible on the level of ZX-128 only. Each has own set of extended features.
+
+There are bad news and good news.
+Bad #1 - there's no documentation for TS-Conf in English besides that Excel and less probable that I'll write it in a near future.
+Bad #2 - the emulation for TS-Conf will require 28MHz granularity for virtual system clock (i.e. emulator should be aware of DRAM timestamps with this accuracy to emulate the system properly). Generally, the complexity of emulation is more or less of Amiga level.
+Good #1 - there is accurate emulation available in Unreal Speccy. The code is written in C++ and is not quite easy, but it can give an idea and can be used for reference.
+
+I can answer questions related to TS-Conf. But do not ask me about Baseconf, I know less about its details. Emulation for Baseconf is much easier and is also available in Unreal Speccy.
+
+Feel free to ask.
+Best regards.
+
+
+-----
+
+Forzar entrar en menu bios: symbol shift cuando este arrancando esa rom
+
+rom mapping
+
+The following ports/signals are in play:
+- #7FFD bit4,
+- DOS signal,
+- #21AF (Memconfig),
+- #10AF (Page0).
+
+Memconfig:
+- bit0 is an alias of bit4 #7FFD,
+- bit2 selects mapping mode (0 - map, 1 - no map),
+- bit3 selects what is in #0000..#3FFF (0 - ROM, 1 - RAM).
+
+In "no map" the page in the win0 (#0000..#3FFF) is set in Page0 directly. 8 bits are used if RAM, 5 lower bits - if ROM (ROM has 32 pages i.e. 512kB).
+In "map" mode Page0 selects ROM page bits 4..2 (which are set to 0 at reset) and bits 1..0 are taken from other sources, selecting one of four ROM pages, see table.
+
+bit1/0
+00 - after reset, only in "no map" mode, System ROM,
+01 - when DOS signal active, TR-DOS,
+10 - when no DOS and #7FFD.4 = 0 (or Memconfig.0 = 0), Basic 128,
+11 - when no DOS and #7FFD.4 = 1 (or Memconfig.0 = 1), Basic 48.
+
+chernandezba wrote:
+Maybe it's handled like baseconf?
+
+No, absolutely different.
+
+-----
+
+PS/2:
+
+ZX-Evo has peripheral controller on its board which interfaces PS/2 keyboard. Keys are mapped to ZX keys either directly (0-9, A-Z etc.) or using key combinations like Caps Lock = CS+2. Some keys aren't mapped at all and used for special functions (F12 is system reset, it cannot be read from Z80 because it resets it =).
+KB is read from Z80 either via normal ZX ports or via dedicated PS/2 port where keys are represented in raw scan codes. TS-BIOS uses ZX KB ports only.
+
+The PS/2 functionality is shared with Baseconf.
+W #EFF7 - bit7 = 1 enables access
+W #DFF7 - register number
+RW #BFF7 - register read/write
+
+Registers.
+W #F0..FF = 2 - enables access to PS/2 FIFO
+R #F0..FF - read PS/2 FIFO.
+
+This is repository with ATmega128 firmware.
+User avatar
+TS-Labs
+ 
+Posts: 4638
+Joined: Thu, 26.07.2012 01:29:56
+
+
+
+----
+
+Other:
+
+chernandezba wrote:
+So I always enter to the bios menu, even if I do a reset.
+
+Normally not. You enter BIOS setup once it hasn't been configured, i.e. checksum is wrong. Then you can only enter by pressing SS + F12 (right shift on PS/2).
+chernandezba wrote:
+I don't still emulate cmos, so I suppose this is why it enters the bios
+
+Yes. Settings cannot be read properly so ROM thinks CMOS isn't configured and enters setup.
+chernandezba wrote:
+Are cmos ports on tsconf the same as baseconf?
+
+Yes, the same.
+
+
+-----
+
+NVRAM
+
+Port EFF7. Bit 7 a 1, permitir escritura en NVRAM. Bit 7 a 0, no permitir escritura en NVRAM
+Port DFF7. Elige celda nvram (0...EFH)
+Port BFF7. (r/w). Valor de la celda nvram
+
+------
+
+Modo texto. Charset sale de archivo 866_code.fnt (2kb). modo 80x30?
+es hasta 128x64. charset de 6x8?
+ver https://github.com/tslabs/zx-evo/blob/f3b8fa4fccc609b127ba317d65eecb304873fcfe/pentevo/rom/src/arrays.asm -> font8
+
+quiza se guarda en nvram??
+
+------
+
+Modos video:
+
+Yet another fact. The size of visible window is selected via VConfig register bits 6..7:
+00 - 256x192 (512x192 for text)
+01 - 320x200 (640x200 for text)
+10 - 320x240 (640x240 for text)
+11 - 360x288 (720x288 for text)
+
+Text mode uses so called 'Hi-Res' resolution which is twice as normal by X axis. One char despite being 8x8 pixels occupies screen area equal to 4x8 ZX pixels.
+So maximum characters in a line, on the bigger video mode, is 360/4=90
+
+So, you have a total window of 360x288 and you enlarge border size (and reducing pixel size) depending on the video mode, so:
+
+00 - 256x192: border size: 104x96
+01 - 320x200: border size: 40x88
+10 - 320x240: border size: 40x48
+11 - 360x288: border size: 0x0
+
+I think on emulation I will make a window size of 720x576 (to have a 4:3 aspect ratio window), drawing "central" pixels and border with a size of 2x2 and text mode pixels with a size of 1x2.
+
+
+
+Colour palette: 15 bit rgb palette. two conversion table from 15 bit to 24 bit: one multiplies the value *8 (normal vdac) and without vdac, where every 5-bit component are different from 0...23, but 24...31 are always 255
+That setting vdac/not vdac can be enabled per-user in every entry of the palette (setting bit 15), so every palette entry is:
+
+C RRRRR GGGGG BBBBB
+
+Where C enables vdac
+As this requires me to use two color palettes for that (two 32768 size palettes) and needed 65536, I can not do it now. My current palette is limited to exactly 65536 (as I'm using 16-bit indexes to it) . So, I will have a manual setting for the menu to enable/disable vdac. In the real tsconf, you can enable per-color vdac setting, but not on ZEsarUX yet
+I fact, it is not needed all the 65536 entries, as some of them are repeated in both palettes (those with any colour component is less than < 24). But it will be a bit difficult to have a lookup function, to have two 32768 entries palette, but using less than 2x32768
+

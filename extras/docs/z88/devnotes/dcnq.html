@@ -1,0 +1,85 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+  <td align="center" valign="bottom" width="80%">&nbsp;</td>
+  <td align="right" valign="bottom" width="10%" nowrap><a
+  href="sysref.html">Contents of System Calls</a></td>
+ </tr>
+</table>
+
+<hr>
+
+<p><font size="4"><b>DC_Nq, handle Director/CLI enquiries</b></font>
+</p>
+
+<p><tt>RST 20H, DEFW $160C</tt> </p>
+
+<dl>
+ <dt>IN:</dt>
+</dl>
+
+<blockquote>
+ <pre>B = 0, always
+C = reason code</pre>
+ <blockquote>
+  <pre>DQ_Dev ($00), get default device
+DQ_Dir ($03), get default directory
+DQ_Fnm ($06), get filename match string
+DQ_Dmh ($09), get the director memory handle
+DQ_Inp ($0C), get std. input handle
+DQ_Out ($1F), get std. output handle
+DQ_Prt ($12), get printer stream handle
+DQ_Tin ($15), <font size="3">get input-T handle
+DQ_Tot ($18), get output-T handle
+DQ_Tpr ($1B), get printer-T handle
+DQ_Chn ($1E), reset serial port and get NQ_Chn
+</font></pre>
+ </blockquote>
+</blockquote>
+
+<p>OUT:</p>
+
+<blockquote>
+ <pre>Fc = 0,&nbsp;&nbsp; success
+  result in IX for DQ_Dmh, DQ_Inp, DQ_Out, DQ_Prt, DQ_Tin, DQ_Tot, DQ_Tpr, DQ_Chn
+  result in BHL for DQ_Dev, DQ_Dir, DQ_Fnm
+Fc = 1,&nbsp;&nbsp; A = RC_UNK ($03)</pre>
+</blockquote>
+
+<p>Notes: </p>
+
+<blockquote>
+ <p>Internal operating system usage. <br>
+ DC_NQ is a subcall of OS_NQ, use <a href="osnq.html">OS_NQ</a>
+ instead.<br>
+ Dev, Dir, Fnm get the attribute from Filer if it is open,
+ otherwise from Index.</p>
+</blockquote>
+
+<p>Bugs: -</p>
+
+<p>Related calls: </p>
+
+<blockquote>
+ <p><a href="dcsp.html">DC_Sp</a>, DC specify<br>
+ <a href="ossp.html">OS_Sp</a>, specify<br>
+ <a href="osnq.html">OS_NQ</a>, enquire<br>
+ </p>
+</blockquote>
+</body>
+</html>

@@ -1,0 +1,9 @@
+10 REMark : breaker boot prog
+20 REMark : author :sinclair (which?)
+30 REMark : found on French PD disk/mdv qlcf28 (also on other disks).
+40 REMark : standard fare breakout prog
+50 REMark : use cursors to hit ball, space to serve
+60 REMark : alter dev$ to suit your system
+70 dev$ = "flp1_"
+80 MERGE dev$&"breakout_bas"
+90 REMark : that's all folks

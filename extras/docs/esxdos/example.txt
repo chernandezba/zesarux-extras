@@ -1,0 +1,47 @@
+asm
+   FA_READ      equ       $01
+   M_GETSETDRV   equ   $89
+   F_OPEN      equ   $9a
+   F_CLOSE      equ   $9b
+   F_READ      equ   $9d
+
+Main:      xor a
+      rst $08
+      defb M_GETSETDRV   ; A = unidad actual
+SDCard:      ld b, FA_READ      ; B = modo de apertura
+      ld hl, FileName    ; HL = Puntero al nombre del fichero (ASCIIZ)
+      rst $08
+      defb F_OPEN
+      ld (FHandle),a
+      jr nc, FileFound
+      call Print
+      defb "File FLASH not found"
+      defb 0
+      ret
+FileFound:   ld hl, 16384
+      ld bc, 6912
+      ld a,(FHandle)
+      rst $08
+      defb F_READ
+      jr nc, ReadOK
+      call Print
+                   defb "Read Error"
+      defb 0
+      ret
+ReadOK:      ld (FHandle),a
+      rst $08
+      defb F_CLOSE
+      ret
+Print:      pop hl
+      defb $3e
+Print1:      rst $10
+      ld a, (hl)
+      inc hl
+      or a
+      jr nz, Print1
+      jp (hl)
+FHandle:      defb 0
+FileName:      defb "gatito.scr"
+      defb 0
+
+end asm

@@ -1,0 +1,260 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>The screen files</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <th colspan="3">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+  <td valign="bottom" width="10%"><a href="z80undoc.html">Previous</a></td>
+  <td align="center" valign="bottom" width="80%"><a
+  href="index.html">Contents</a></td>
+  <td align="right" valign="bottom" width="10%">&nbsp;</td>
+ </tr>
+</table>
+
+<hr>
+
+<p><font size="4"><b>33. The Screen Files</b></font></p>
+
+<p><b>Preamble</b></p>
+
+<p>The screen is generated from the Screen Base File (SBF), a 2K
+file containing character codes, window and status information
+with four more files which contain font definitions of those
+characters. They are called LORES0, LORES1, HIRES0 and HIRES1
+where the LORES character sets consist in 6 by 8 pixels
+characters (used for characters) and the HIRES characters are 8
+by 8 pixels (used for the map area and the OZ window). </p>
+
+<p>The screen is refreshed every 10ms. It consists of 64 rows of
+640 bits (pixels). Each 156µs, the 640 bits shift-register is
+built by combining character set data according to the screen
+codes stored in the Screen Base File (SBF). When the Blink reads
+a line, it shifts 6 or 8 bits to the row register according the
+Hires (HRS) flag. Those bits are given by the corresponding
+character number in the definition file (LORESx or HIRESx). Some
+text effects are hardware driven (reverse, flashing, grey,
+underlining). The flags behaviour depends on the HRS state.</p>
+
+<p><b>The Definition Files</b></p>
+
+<p>The Lores fonts are addressed by 9 bits. It represents an
+amount of 512 characters ($000-$1FF).<br>
+- Lores1 ($000-$1BF) is the 6 * 8 fonts in ROM<br>
+- Lores0 ($1C0-$1FF) is the 6 * 8 user defined characters file in
+RAM. Assignment starts from top address with the character for
+code '@'. </p>
+
+<p>The Hires fonts are addressed by 10 bits. It represents an
+amount of 1024 characters ($000-$3FF).<br>
+- Hires0 ($000-$2FF) is the 8 * 8 map file in RAM (only 256 are
+used)<br>
+- Hires1 ($300-$3FF) is the 8 * 8 fonts in ROM for the OZ window
+(only 128 are used)</p>
+
+<p>Theyre structure is simply the 8 bytes of each character in
+the row order 1 to 8. For the Lores the 6 bits are stored in a
+byte but only uses bits 0-5 like UDG. You can use this C program
+(zdc.c) to view those files.</p>
+
+<p>The mapping of those files depends on OZ version but is
+generaly located at the bottom of bank $07. The 128K ROM was a
+bit short so conceptors mixed Lores1 and Hires1. Here is mapping
+for OZ v4.0 (UK), the same as v3.26 (FR) :</p>
+
+<pre>$0000-$07FF LORES1 (set at $070000)
+ $0000-$03FF Normal 6*8 font (128)
+ $0400-$07FF Bold 6*8 font (128)
+$0800-$0EFF HIRES1 (set at $070800)
+ $0800-$0BFF Tiny 6*8 font (128)
+ $0C00-$0EFF OZ 8*8 font (96 with some 6x8 inside)</pre>
+
+<p>The precise Res1 mappings in OZ versions: <a
+href="charset22.txt">2.2/3.0</a>, <a href="charset25.txt">2.5</a>,
+<a href="charset26.txt">2.6</a>, 3.12, <a href="charset313.txt">3.13</a>,
+<a href="charset317.txt">3.17</a>, <a href="charset318.txt">3.18</a>,
+<a href="charset319.txt">3.19</a>, <a href="charset321.txt">3.21</a>,
+<a href="charset323.txt">3.23</a>, <a href="charset326.txt">3.26/4.0</a>.
+<br>
+Actually, 58 characters are free in the Lores1, 134 in the
+Hires1.</p>
+
+<p>In order to spare the 32K RAM of the original z88, the Res0
+length and address vary if the machine is expanded or not.</p>
+
+<pre><em>Font  Unexpanded         Expanded</em>
+Lores0 $21-2200 (256 bytes, 32 chars)   $43-0800 (512 bytes, 64 chars)
+Hires0 $21-2000 (512 bytes, 64 pixels)   $43-0000 (2K bytes, 256 pixels)
+SBF  $21-3800 (8 rows of 256 bytes)   $21-3800 (8 rows of 256 bytes)</pre>
+
+<p>On an unexpanded Z88 Hires0 may actually overlap Lores0. If
+Map=Yes and Map size in Panel is set to more than 64 (up to 96),
+user defined characters may be overwritten by map information if
+PipeDream is run. </p>
+
+<p><b>The Screen Base File</b></p>
+
+<p>It is a 2K file consisting of 8 lines of 256 bytes. In a line,
+each character position is stored on 2 bytes with its attributes.
+When the Blink builts the 640 rows it only reads the 216 first
+bytes. So up to 108 characters are stored by line. The 40 bytes
+remaining are used to store windows status and information (see
+below). The format of these two bytes is like this: </p>
+
+<pre><em><tt>Attribute 2 (odd address):&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attribute 1 (even address):</tt></em><em>
+</em><tt>7&nbsp;&nbsp; 6&nbsp;&nbsp; 5&nbsp;&nbsp; 4&nbsp;&nbsp; 3&nbsp;&nbsp; 2&nbsp;&nbsp; 1&nbsp;&nbsp; 0&nbsp;&nbsp; 7&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp; 5&nbsp;&nbsp; 4&nbsp;&nbsp; 3&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp; 1&nbsp;&nbsp; 0&nbsp;</tt>
+<tt>---------------------------------------------------------------</tt>
+<tt>sw1 sw2 hrs rev fls gry und ch8</tt> <tt>ch7 ch6 ch5 ch4 ch3 ch2 ch1 ch0</tt>
+<tt>---------------------------------------------------------------</tt>
+
+sw1 : no hardware effect (used to store tiny flag)
+sw2 : no hardware effect (used to store bold flag)
+hrs : refer to Hires font (i.e. shift 8 bits in register), else Lores
+rev : reverse (i.e. XOR)
+fls : flash (1 second period)
+gry : grey (probably a faster flash period)
+und : underline (i.e. set the 8 bits when on 8th row), only valid for Lores
+   it becomes ch9 when hrs is set.</pre>
+
+<p>It will also define 4 modes : Lores, Hires, Lores cursor and
+Null character.</p>
+
+<pre><em><tt>    5&nbsp;&nbsp;&nbsp;&nbsp; 4&nbsp;&nbsp;&nbsp;&nbsp; 3&nbsp;&nbsp;&nbsp;&nbsp; 2&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp; 0,&nbsp; 7-0</tt></em>
+<em><tt>      hrs&nbsp;&nbsp; rev&nbsp;&nbsp; fls&nbsp;&nbsp; gry&nbsp;&nbsp; und&nbsp;&nbsp; ch8-ch0</tt></em>
+<tt>----------------------------------------------------</tt>
+<tt>LORES     0&nbsp;&nbsp;&nbsp;&nbsp; v&nbsp;&nbsp;&nbsp;&nbsp; v&nbsp;&nbsp;&nbsp;&nbsp; v&nbsp;&nbsp;&nbsp;&nbsp; v&nbsp;&nbsp;&nbsp;&nbsp; 000-1FF</tt>
+<tt>LORES CURSOR   1&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp; v&nbsp;&nbsp;&nbsp;&nbsp; v&nbsp;&nbsp;&nbsp;&nbsp; 000-1FF</tt>
+<tt>NULL CHARACTER 1&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp; xxx&nbsp;&nbsp;&nbsp; -&nbsp; xxx</tt>
+<tt>HIRES  &nbsp;&nbsp;&nbsp;&nbsp;    1  0&nbsp;&nbsp;&nbsp;&nbsp; v&nbsp;&nbsp;&nbsp;&nbsp; v&nbsp;&nbsp;&nbsp;&nbsp; 000&nbsp;&nbsp;&nbsp; -&nbsp; 3FF</tt>
+x = don't care, v = valid, (i.e. the attribute depends on the value of the bit)</pre>
+
+<p>The Null character ($34 or $35) is used when there is nothing
+to add to the shift-register. For example, when there is no map,
+the first line shifts 104 lores characters (6*104=624 pixels), 1
+null (0), 3 hires (O, Z, space, 16 bits the third is not
+displayed). It corresponds to 640 pixels. This null character is
+used many times when there is a map.</p>
+
+<p>Line terminator : </p>
+
+<p>Lores cursor : is just a reversed flashing character with hrs
+flag set.</p>
+
+<p><strong>Windows and Status informations</strong></p>
+
+<p>In the SBF, the 40 bytes free at the end of each line are used
+by OZ to store windows and cursor informations. As OZ uses
+absolute addresses, those data are defined according theyre
+address. Each line contains the relative window properties (1-8)
+and the main data are stored in the last line.</p>
+
+<pre>7800-78D7 Row 1, 108 chars. 78D8-78E6 Window 1 properties. 78E7-78FF Unused.
+7900-79D7 Row 2, 108 chars. 79D8-79E6 Window 2 properties. 79E7-79FF Unused.
+7A00-7AD7 Row 3, 108 chars. 7AD8-7AE6 Window 3 properties. 7AE7-7AFF Unused.
+7B00-7BD7 Row 4, 108 chars. 7BD8-7BE6 Window 4 properties. 7BE7-7BFF Unused.
+
+7C00-7CD7 Row 5, 108 chars. 7CD8-7CE6 Window 5 properties. 7CE7-7CFF Unused.
+7D00-7DD7 Row 6, 108 chars. 7DD8-7DE6 Window 6 properties. 7DE7-7DFF Unused.
+7E00-7ED7 Row 7, 108 chars. 7ED8-7EE6 Window 7 properties. 7EE7-7EFF Unused.
+7F00-7FD7 Row 8, 108 chars. 7FD8-7FE6 Window 8 properties. 7FE7-7FFF Main data.</pre>
+
+<pre><font size="3"><em><u>Main data</u></em>
+$7FE7 2 Active window frame
+$7FE9 1 SOH sequence length (0 if none)
+$7FEC x SOH buffer</font><font size="2" face="Courier New">
+</font>
+Example with a sequence defining a user lores character : 1,138,'=',..,...
+$7FE9 10 the length
+$7FEC '=' the command
+$7FED user defined character number
+$7FEE user defined character data (8 raws)</pre>
+
+<p>The window frame contains informations about the window
+appearance and the cursor (if selected). The 8 frames are :</p>
+
+<pre><em><u>IX frame</u></em>
+$78E6 window 1
+$79E6 window 2
+$7AE6 window 3
+$7BE6 window 4
+$7CE6 window 5
+$7DE6 window 6
+$7EE6 window 7
+$7FE6 window 8
+</pre>
+
+<p>When addressing a frame, its number is in IX. The data i/o are
+done with LD (IX-nn) instructions. nn defines the data described
+in the window frame structure. In that frame, the coordinates are
+absolutes. It is the address of the character attributes. Stored
+in HL, H refers to the row, L to the column. For example, (0,0)
+will be $00 $78 (HL=$7800). (105,7) will be $E2 $7F (HL=$7FE2).</p>
+
+<pre><em><u>Window frame structure
+</u></em>IX-01 Y up left
+IX-02 X up left
+IY-03 Y down right
+IY-04 X down right
+IY-05 Left margin
+IY-06 Right margin
+IY-07 Y cursor address
+IY-08 X cursor address
+IY-09 cursor attributes (?)
+IY-10 ?
+IY-11 ?
+IY-12 ?
+IY-13 Control
+   b0-b1 Jutification (0 normal, 1 right, 2 left, 3 centered)
+   b6 Set to update cursor
+   b7 Cursor mode (set=ON)
+IY-14 ?
+</pre>
+
+<p><b>Uses of the Screen Registers</b> </p>
+
+<p>Obviously, any routines which look directly at screen
+information are very hardware specific. Use of the <a
+href="ossci.html">OS_Sci</a> call means that in future such
+routines would not cause code to fail, in the way that writing
+directly to hardware registers might, but if the system hardware
+arrangement did change, any code which relies on the screen
+information, almost certainly would not work properly. Therefore
+it makes sense that code using the <a href="ossci.html">OS_Sci</a>
+call checks for error returns and can cope with the concept of
+the screen information being unavailable. </p>
+
+<p>Screen file address are read by <a href="ossci.html">OS_Sci</a>
+with A=file reason and B=0, result is in BHL. The Lores0 and
+Hires0 can be moved by the user (often used in the Ranger
+software). For more details about the Screen registers consult <a
+href="hardware.html#Screen">Blink registers manipulations</a>
+chapter.</p>
+
+<hr>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+  <td valign="top" width="33%"><a href="z80undoc.html">Previous</a></td>
+  <td align="center" valign="top" width="34%"><a
+  href="index.html">Contents</a></td>
+  <td align="right" valign="top" width="33%">&nbsp;</td>
+ </tr>
+ <tr>
+  <td valign="top" width="33%">The Z80 undocumented
+  instructions</td>
+  <td align="center" valign="top" width="34%">The Screen
+  Files</td>
+  <td align="right" valign="top" width="33%">&nbsp;</td>
+ </tr>
+</table>
+</body>
+</html>

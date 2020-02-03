@@ -1,0 +1,56 @@
+DivMMC es una amalgama de dos proyectos: ZXMMC (con los puertos
+renombrados) y DivIDE (para el control de la paginación automática y RAM).
+
+Para lo segundo, necesitas el DivIDE programming model, que está aquí.
+Sáltate todo lo que tiene que ver con los puertos IDE, o sea, el
+epigrafe "IDE command block registers" porque eso tú no lo vas a
+implementar. Tú vas a implementar de ahí dos cosas:
+- La paginación automática
+- El puerto de control de paginación
+
+El documento es éste: http://www.divide.cz/files/info/pgm_model.txt
+
+Ve directamente a "DivIDE control register". El comportamiento del
+puerto $E3 es lo que tendrás que implementar. Para DivMMC se usan los
+bits 0 a 5 para especificar el número de banco de RAM, en lugar de sólo
+los bits 0 y 1. Esto es porque DivMMC soporta hasta 64 bloques de 8K =
+1024KB de SRAM. ZX-Uno usa una implementación de 128K, es decir, usamos
+los bits 0 a 3 inclusive.
+
+Fïjate que en la autopaginación (les llaman "traps"), ésta se produce
+DESPUES de que se haya leido la instrucción en la dirección de memoria
+que origina el autopaginado. Los traps de TRDOS funcionan diferente: se
+pagina la ROM del DivMMC en el momento en que aparece en el bus la
+dirección del trap, antes de que se llegue a leer la memoria (que por
+tanto se leería ya de la ROM del DivMMC).
+
+Hay también "traps" de salida: es decir, direcciones tales que DESPUES
+de que se haya leído la instrucción en esa dirección, despaginan la ROM
+del DivMMC. Si el documento que te he enlazado no te aclara, tú
+pregúntame :)
+
+Para lo primero, el control de la tarjeta SD/MMC, se emplean dos
+puertos: uno es el registro SPI y otro el registro de chip select para
+indicar qué tarjeta (puede haber dos) es la activa.
+
+La documentación del ZXMMC la tienes aquí:
+http://www.probosci.de/zxbada/zxmmc/cpld.html
+
+Pero recuerda que en DivMMC los puertos son diferentes. Lo que en ZXMMC
+es el puerto $1F, en DivMMC es el puerto $E7, y el puerto $3F del ZXMMC
+en DivMMC es el puerto $EB. El comportamiento es el mismo en ambos
+periféricos.
+
+Dado que el DivMMC es un poco complejo, te recomiendo que hagas lo
+siguiente: emula primero el acceso a la tarjeta SD usando los puertos de
+ZXMMC (que puedes dejar activos, ya que no interfieren luego con
+DivMMC), y prueba la emulación con las ROM's del proyecto +3e en
+ZEsaurUX. Cuando consigas leer y escribir en la tarjeta, entonces añade
+los puertos DivMMC (que harían lo mismo que los del ZXMMC) e implementa
+la emulación del control de paginación de DivMMC.
+
+Para emular la tarjeta SD necesitarás conocer el protocolo SPI que
+implementan, el cual tiene varios comandos, parámetros, etc. Es un poco
+complejo, la verdad.
+
+Con esto creo que tienes para empezar ;)

@@ -1,0 +1,66 @@
+Esxdos command "GRAMON" v0.1 (green border)
+===========================================
+
+Original author MS-CID SOFTWARE 1990
+Small modifications and port to ESXDOS by VELESOFT 2013
+
+Info:
+=====
+Gramon is graphic monitor for finding graphic,sprites,character fonts and screens in ZX memory. It's easy version without 128kB paging support. Work with memory adress 0-65535. Gramon code is before start move to videoram to adress 16384 (length is 4096 bytes), don't need system variables. From ZX rom use only character font (#3D00-#3FFF), keyboard test (#028E-#02BE) and routines LOAD and SAVE (#4C2-#604). Gramon support the most widely used graphic modes (11 graphic modes).
+
+Description of info line on bottom line:
+----------------------------------------
+MEM: 15616  = memory adress of current graphic/sprite
+MODE: Z-    = type of graphic mode (Z,X,C,V,B,N), "-" show with step 1, "+" show with step 2(for sprite in format BYTE MASK,BYTE GFX,BYTE MASK,BYTE GFX...)
+32 x 8      = size of current window with sprite/graphic (32=height in pixels,8=width in bytes)
+BUF : 0     = buffer pointer for save up to 10 sprites
+
+Controll keys:
+--------------
+RAM BROWSING:
+1 = MEM-1
+2 = MEM+1
+5 = MEM-(8 x width)
+8 = MEM+(8 x width)
+6 = MEM-width
+7 = MEM+width
+9 = MEM-(height x width)
+0 = MEM+(height x width)
+
+DISPLAY MODES:
+Z = character mode
+X = sinclair mode
+C = "zigzag" mode
+V = columns mode
+B = linear mode
+N = screen mode (here is ignored -/+ mode, width=32 and height=128)
+
+WINDOW SIZE:
+O = width-1
+P = width+1
+Q = height-8
+A = height+8
+W = height-1
+S = height+1
+
+TAPE OPERATIONS:
+J = load block to MEM adress (any size) - this command work only with real tape
+H = save block from MEM adress with length WIDTHxHEIGHT (in mode N is fixed size 6912 bytes)
+Y = save screen as "GRAMON.PIC" CODE 16384,6912
+
+BUFFER FOR GRAPHIC/SPRITES:
+K = BUF-1 (decrease number of buffer)
+L = BUF+1 (increase number of buffer)
+G = save sprite from window to current buffer
+F = show sprite from current buffer
+T = animation of sprites from buffers (show sprites from buffer 0 to current number of buffer)
+O = decrease speed of animation
+P = increase speed of animation
+SPACE = stop animation
+
+NEXT FUNCTIONS:
+E = show/hide info line
+M = swith between modes -/+ (- = step 1, + = step 2)
+R = return to BASIC (show black screen - key Y=YES/N=NO)
+ENTER = shift to next window/sprite
+U = erase all sprites on screen and set window position to left upper row

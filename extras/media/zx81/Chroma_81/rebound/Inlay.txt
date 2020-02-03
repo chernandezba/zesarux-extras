@@ -1,0 +1,61 @@
+REBOUND
+
+
+HOW TO PLAY
+
+Knock all the blocks out of the court by using your bat to deflect the ball toward them.
+
+Sometimes a bonus token will fall from a block, granting a power-up if collected:
+
++1	Extra Life	Player is granted an extra life (up to a maximum of 9)
+>>	Next Level	Player is immediately moved to the next level.
+££	Extra Score	Player's score is increased.
+FB	Fire Bullets	Use FIRE to launch bullets from the player's bat to help remove blocks.
+GB	Grab Ball	Player's bat will 'catch' the ball - use FIRE to launch it again.
+SB	Smash Ball	Ball won't rebound when a block is hit, but will instead continue onwards regardless.
+X3	Multi-Ball	Ball will be split into three.
+ZZ	Slow Ball	Ball will move much slower, making it easier to catch.
+
+Collecting a bonus token will remove any currently active benefit.
+
+
+HINTS
+
+Some blocks will require more than a single hit to remove them.
+Crossed blocks ('XX') cannot be removed.
+The direction the ball will rebound from the player's bat is different depending on where it hits the bat - Use this to help control the ball to remove the last remaining blocks.
+
+
+CONTROLS
+
+Z - Move left.
+X - Move right.
+L - Fire.
+P - Pause the game.
+
+All keys can be redefined by pressing R on the main menu.
+
+The ZXpand joystick interface is also supported, and automatically detected, replacing the direction and fire keys.
+
+The game will be in colour if the Chroma 81 interface is detected, and set to show colour.
+
+
+CREDITS
+
+Game programming & graphics by Bob Smith.
+Uses the ZX7 codec, by Einar Saukas.
+
+
+http://www.bobs-stuff.co.uk/
+http://www.facebook.com/bobs.stuff
+https://twitter.com/bobsstuffgames
+
+
+Bob Smith - 2014.
+
+This game is provided for non-commercial use only.
+
+
+RELEASE NOTES
+
+23/12/2004 - v1.0 - First full release.

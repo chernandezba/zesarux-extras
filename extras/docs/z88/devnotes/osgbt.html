@@ -1,0 +1,69 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>OS_Gbt, get byte from file (or device)
+with timeout</font></b>
+<p><tt>RST 20H, DEFB $3F</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; BC = timeout in 1/100 second ticks
+&nbsp;&nbsp;&nbsp;&nbsp; IX = handle of file (or device)</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0, if byte read OK
+&nbsp;&nbsp;&nbsp;&nbsp; A = byte read
+&nbsp;&nbsp;&nbsp;&nbsp; BC = remaining time in 1/100 seconds</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_EOF ($09), end of file reached
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad handle supplied in IX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_RP ($13), device is read-protected
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_TIME ($02), if timeout.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ESC ($01), escape, if device :COM.0, :PRT.0, or :INP.0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_SUSP ($69), if device is :COM.0, :PRT.0 or :INP.0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_DRAW ($66), if device is :INP.0
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_QUIT ($67), if device is :INP.0</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ....DEHL/IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBC..../.... different
+</pre>
+Notes:
+<p>Bugs:
+<br>&nbsp;
+<p>Related calls:
+<blockquote><a href='gncl.html'>GN_Cl</a>, close file
+<br><a href='gndel.html'>GN_Del</a>, delete a file from memory
+<br><a href='gnopf.html'>GN_Opf</a>, open file/resource (wildcard search)
+<br><a href='gnren.html'>GN_Ren</a>, rename file
+<br><a href='oscl.html'>OS_Cl</a>, internal close (OZ usage)
+<br><a href='osdel.html'>OS_Del</a>, file delete (internal OZ usage)
+<br><a href='osfrm.html'>OS_Frm</a>, file read miscellaneous
+<br><a href='osfwm.html'>OS_Fwm</a>, file write miscellaneous
+<br><a href='osgb.html'>OS_Gb</a>, get byte from file (or device)
+<br><a href='osmv.html'>OS_Mv</a>, move bytes between stream and memory
+<br><a href='osop.html'>OS_Op</a>, internal open (OZ usage)
+<br><a href='ospb.html'>OS_Pb</a>, write byte to file, device
+<br><a href='ospbt.html'>OS_Pbt</a>, write byte to file, device with timeout
+<br><a href='osren.html'>OS_Ren</a>, file rename (internal OZ usage)</blockquote>
+
+</body>
+</html>

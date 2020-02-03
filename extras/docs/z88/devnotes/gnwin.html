@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+
+<body>
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tbody>
+ <tr>
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+  </tbody>
+</table>
+
+
+<hr width="100%">
+<p>
+<b><font size="+1">GN_Win, Standard window create with banner and bottom line (OZ 4.2 and newer)</font></b>
+</p>
+<p><tt>RST 20H, DEFW $7A09</tt>
+</p>
+<pre>
+IN:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DE = (optional) "dynamic" pointer to banner (if banner pointer in definition block is 0)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BHL = pointer to 7 byte window definition block (if B=0, then local pointer)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Window Defintion Block offsets:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0:&nbsp; A = window ID (bits 0-3). The ID is in range 1-8
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bit 7=1, 6=1: Draw left &amp; right bars, shelf brackets, banner text, bottom line
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bit 7=1, 6=0: Draw left &amp; right bars, shelf brackets, banner text
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bit 7=0, 6=1: Draw left &amp; right bars
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bit 7=0, 6=0: Just create window space (no visible borders)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bit 5=1: 8 pixel inverted top banner (only evaluated with bit 7=1)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bit 5=0: 7 pixel inverted top banner (only evaluated with bit 7=1)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bit 4=1: For all windows: grey screen, then draw window to get a pop-up effect.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1:&nbsp; X coordinate (upper left corner) of Window
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2:&nbsp; Y coordinate (upper left corner) of Window
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3:&nbsp; WIDTH of Window (inclusive banner &amp; bottom line)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4:&nbsp; HEIGHT of Window (inclusive banner &amp; bottom line)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5:&nbsp; low byte, high byte address of window banner text
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Only specified if bit 7 of window ID is enabled.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set pointer to 0, if using a dynamic banner (window with different banner each time)
+<br>
+OUT, if call successful: (always)
+&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+
+Registers changed after return:
+&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different
+</pre>
+
+
+Notes:
+<blockquote>Example of window definition block with extended window "2" having 8 pixel banner and bottom line:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFB @11100000 | 2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFW $0000<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFW $0811<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DEFW bannerptr ; this points to a banner text.</blockquote>
+
+Bugs:
+<p>Related calls:
+</p>
+
+<blockquote>
+  <blockquote>
+    <blockquote><a href="file:///H:/SVN/documentation/devnotes/gnnln.html"></a><a href="gnsoe.html">GN_Soe</a>, write string at extended address to standard output
+  <br>
+  <a href="gnsop.html">GN_Sop</a>, write string to standard output, local memory<br>
+  <a href="osbout.html">OS_Bout</a>, <small><font size="+1"><small>write null-terminated string block at (B)HL to standard output<br>
+   </small></font></small><a href="osout.html">OS_Out</a>, <small>&nbsp;<font size="+1"><small>write character to standard
+output</small></font></small><br>
+  <a href="ospout.html">OS_Pout</a>,&nbsp;<small><font size="+1"><small>write embedded null-terminated string at caller (PC) to standard output</small></font></small></blockquote>
+ <small><font size="+1"><small></small></font></small></blockquote>
+</blockquote>
+</body>
+</html>

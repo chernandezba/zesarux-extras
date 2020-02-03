@@ -1,0 +1,215 @@
+- TBBlue uses the same timming as ZX Spectrum 128 “Toaster”
+ 
+- 512Kb RAM is divide as:
+-- 0x000000 a 0x03FFFF (256K) RAM  DivMMC        A18..16 = 000, 001, 010, 011
+-- 0x040000 a 0x05FFFF (128K) RAM  Spectrum    A18..16 = 100, 101
+ 
+-- 0x060000 a 0x06FFFF  (64K)  ESXDOS and M1            A18..16 = 110   
+-- 0x060000 - ESXDOS rom     - A18..14 = 11000
+-- 0x064000 - M1 rom            - A18..14 = 11001
+-- 0x068000 - M1 extra rom    - A18..14 = 11010
+-- 0x06c000 - M1 ram            - A18..14 = 11011
+ 
+-- 0x070000 a 0x07FFFF  (64K) ROM Spectrum    A18..16 = 111
+ 
+- ZX80, 81 and jupiter Ace are emulated using the Speccy 128 and proper roms from Paul Farrow.
+ 
+- Multifaces (one, 128 or 3) are selected according the machine selection (if Multiface is enabled at menu)
+ 
+- Kempston Mouse uses 0xfbdf, 0xffdf, 0xfadf (if mouse is enabled at menu)
+ 
+- ULAplus is supported (if enabled)
+ 
+- port 0x24D5: 1st read = return hardware number (below), 2nd read = return firmware version number (first nibble.second nibble) e.g. 0x12 = 1.02
+ 
+hardware numbers
+
+
+#define HWID_DE1A               1               /* DE-1 */
+#define HWID_DE2A               2               /* DE-2  */
+//#define HWID_DE2N             3               /* DE-2 (new) */
+//#define HWID_DE1N             4               /* DE-1 (new) */
+#define HWID_FBLABS             5               /* FBLabs */
+#define HWID_VTRUCCO    6               /* VTrucco */
+#define HWID_WXEDA              7               /* WXEDA */
+#define HWID_EMULATORS  8               /* Emulators */
+#define HWID_ZXNEXT             10              /* ZX Spectrum Next */
+#define HWID_MC                 11              /* Multicore */
+#define HWID_ZXNEXT_AB  250             /* ZX Spectrum Next Anti-brick */
+ 
+ 
+- port 0x24D9: write to bit 0 – soft reset, bit 1 hard reset
+ 
+ 
+- Write in port 0x24DB (config1)
+ 
+                case cpu_do(7 downto 6) is
+                    when "01"    => maquina <= s_speccy48;
+                    when "10"    => maquina <= s_speccy128;
+                    when "11"    => maquina <= s_speccy3e;
+                    when others    => maquina <= s_config;   ---config mode
+                end case;
+                romram_page <= cpu_do(4 downto 0);                -- rom or ram page
+ 
+ 
+ 
+ 
+Write in port 0x24DD (config2)
+                if cpu_do(7) = '0' then
+                   s_lp_enabled         <= cpu_do(6);                        -- Light Pen 1 = habilitada
+                    s_m1_enabled        <= cpu_do(5);
+                    s_ps2_mode            <= cpu_do(4);                        -- Modo PS2 (0 = keyboard, 1 = mouse)
+                    joy0_mode            <= cpu_do(3 downto 2);            -- Modo joystick1 (0=Sinclair, 1=Kempston, 2=cursor)
+                    joy1_mode            <= cpu_do(1 downto 0);            -- Modo joystick2 (0=Sinclair, 1=Kempston, 2=cursor)
+                else
+                    ula50_60hz            <= cpu_do(6);                        -- 1 = 60 Hz
+                    psg_mode                <= cpu_do(5 downto 4);            -- 1 = modo AY
+                    ulaplus_enable        <= cpu_do(3);                        -- 1 ativa ULA+
+                    s_divmmc_enabled    <= cpu_do(2);
+                    scandbl_sl             <= cpu_do(1);                        -- 1 habilita scanlines
+                    scandbl_en            <= cpu_do(0);                        -- 1 habilita o scandoubler
+                end if;
+    
+port 0x24DF bit 2 = 1 turbo mode (7Mhz)
+ 
+ 
+The files for boot are in
+http://www.victortrucco.com/TK/TBBlue/TBBlue_SD.rar
+ 
+TBBlue.FW is the boot rom and can be loaded at 0x0000. Config.ini is read and wrote by this rom using the SD card port (it use some raw commands to access the SD port).
+ 
+I believe you can start with these informations. Take a look in everything and let me know.
+
+
+----
+
+
+Example booting a rom:
+-loader at 0000h
+-loader loads firmware .FW (loaded in 0x6000):
+1 - The TK90X ROM is loaded in RAM (at 0x070000, counting from RAM start)
+2 – port 0x24DB (config1) receive “01” in bits 7 and 6, because is a speccy48-like
+3 -  port 0x24DB (config1) receive “11100” in bits 4 to 0. (This points to 0x70000, the ROM)
+4 - port 0x24D9: bit 0 receive “1” – soft reset
+ 
+And... TK90X is loaded.
+
+
+---------
+
+
+ ram_page <=
+        s128_ram_page              when cpu_a(15 downto 14) = "11" and maquina = s_speccy3e and plus3_special = '0'                                    else
+        "0" & cpu_a(15 downto 14)  when maquina = s_speccy3e and plus3_special = '1' and plus3_page = "00"    else
+        "1" & cpu_a(15 downto 14)  when maquina = s_speccy3e and plus3_special = '1' and plus3_page = "01"    else
+        (not(cpu_a(15) and cpu_a(14))) & cpu_a(15 downto 14) when maquina = s_speccy3e and plus3_special = '1' and plus3_page = "10"     else
+        (not(cpu_a(15) and cpu_a(14))) & (cpu_a(15) or cpu_a(14)) & cpu_a(14) when maquina = s_speccy3e and plus3_special = '1' and plus3_page = "11"  else
+        s128_ram_page  when cpu_a(15 downto 14) = "11" and maquina = s_speccy128  else        -- Selectable bank at 0xc000 somente se for speccy 128K
+        cpu_a(14) & cpu_a(15 downto 14); -- A=bank: 00=XXX, 01=101, 10=010, 11=XXX    -- Pagina 1 mapeia para banco 5 mesmo se for speccy 48K
+ 
+
+- Mapa da RAM
+    -- 0x000000 a 0x03FFFF (256K) para a RAM da DivMMC        A18..16 = 000, 001, 010, 011
+    -- 0x040000 a 0x05FFFF (128K) para a RAM do Spectrum    A18..16 = 100, 101
+   
+    -- 0x060000 a 0x06FFFF  (64K) para ESXDOS e M1            A18..16 = 110   
+    -- 0x060000 - ESXDOS rom     - A18..14 = 11000
+    -- 0x064000 - M1 rom            - A18..14 = 11001
+    -- 0x068000 - M1 extra rom    - A18..14 = 11010
+    -- 0x06c000 - M1 ram            - A18..14 = 11011
+   
+    -- 0x070000 a 0x07FFFF  (64K) para a ROM do Spectrum    A18..16 = 111
+   
+    process (maquina, romram_en, cpu_a, s128_rom_page, plus3_page, divmmc_bank,
+                divmmc_rom_en,
+                ram_page, romram_page, divmmc_ram_en, s_m1_rom_cs, s_m1_ram_cs)
+    begin
+        if maquina = s_config then
+            if cpu_a(15) = '1' then
+                ram_addr <= "10" & ram_page & cpu_a(13 downto 0);
+            else
+                ram_addr <= romram_page & cpu_a(13 downto 0);
+            end if;
+        elsif divmmc_ram_en = '1' then
+                ram_addr <= '0' & divmmc_bank(4 downto 0) & cpu_a(12 downto 0);
+        elsif s_m1_rom_cs = '0' then
+                ram_addr <= "11001" & cpu_a(13 downto 0);
+        elsif s_m1_ram_cs = '0' then
+                ram_addr <= "11011" & cpu_a(13 downto 0);
+        elsif romram_en = '1' then
+            if divmmc_rom_en = '1' then
+                ram_addr <= "11000" & cpu_a(13 downto 0);
+            elsif maquina = s_speccy48 then
+                ram_addr <= "11100" & cpu_a(13 downto 0);
+            elsif maquina = s_speccy128 then
+                ram_addr <= "1110" & s128_rom_page & cpu_a(13 downto 0);
+            else -- speccy3e
+                ram_addr <= "111" & plus3_page(1) & s128_rom_page & cpu_a(13 downto 0);
+            end if;
+        else    -- ram_en
+            ram_addr <= "10" & ram_page & cpu_a(13 downto 0);
+        end if;
+    end process;
+----
+
+
+Well, I suppose the piece of code that maps addresses 0-16383 is :
+ 
+    process (maquina, romram_en, cpu_a, s128_rom_page, plus3_page, divmmc_bank,
+                divmmc_rom_en,
+                ram_page, romram_page, divmmc_ram_en, s_m1_rom_cs, s_m1_ram_cs)
+    begin
+        if maquina = s_config then
+            if cpu_a(15) = '1' then
+                ram_addr <= "10" & ram_page & cpu_a(13 downto 0); //8000-FFFF points to IC RAM 0x040000
+            else
+                ram_addr <= romram_page & cpu_a(13 downto 0); //0000 – 7fff points to IC RAM 0x070000
+            end if;
+ 
+yes, but in this case, only if in config mode. Any address from 0x8000 (line cpu A15 = 1) is pointed to 128 RAM
+ 
+So, you said that writing 11100 to port 0x24DB you map 0x070000 to the Z80 space address 0-16383.
+The romram_page bits are these 5 bits set to 111000.... So my theory is that, the address mapped to 0-16383 comes from the 512KB space address codified as:
+ 
+XXX XX00000000000000    (14 zeros)
+ 
+XXX XX are the 5 lower bits at port 24DBH.
+ 
+yes
+ 
+So if XXXXX=11100 the address is:
+ 
+111 0000000000000000  which is 70000H
+ 
+yes
+
+ 
+If, for example, XXXXX is 11001, the resulting address is:
+ 
+ 
+110 0100000000000000 which points to 0x064000 - M1 rom
+ 
+yes
+ 
+Right?
+ 
+Then I suppose where maquina = s_config, you can map any ram page from the total 512 KB to 0-16383. Right?
+ 
+yes. I load all the roms this way, just changing the page and writing to 0-16383
+ 
+Can you map other pages to the other different 3 segment pages?
+16384-32767
+32768-49151
+49152-65535
+?
+Or only the normal 128k/+2A paging system?
+ 
+No, other pages follows the regular 128k modes (ram_page variable)
+ 
+ 
+Maybe I need a more complete documentation... But I'll try to understand it all ;)
+ 
+ 
+ 
+Thanks
+Cesar 

@@ -1,0 +1,3 @@
+DMA DEMO LEVEL 3
+
+Original version contain error in DMA sequency and work only with German Z80 DMA clone (UA858D). New fixed version contain correct DMA sequency and work with all DMA chips. This ZIP archive contain too source code of patch (in .SNA file).

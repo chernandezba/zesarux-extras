@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tbody>
+
+ <tr>
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+
+  </tbody>
+</table>
+
+<hr width="100%">
+<p>
+
+<b><font size="+1">GN_Nln, Send newline (CR/LF) to
+standard output</font></b>
+</p>
+
+<p><tt>RST 20H, DEFW $2E09</tt>
+</p>
+
+<p>IN:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1<br>&nbsp;&nbsp;&nbsp;&nbsp; A = error code:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), bad handle (during re-direction)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_WP ($14), write protected (during re-direction)</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; AF....../.... different</pre>
+Notes:
+<blockquote>Error will only occur if rebinding has occurred.</blockquote>
+Bugs:
+<p>Related calls:
+</p>
+
+<blockquote>
+ <a href="gnsoe.html">GN_Soe</a>, write string at extended address to standard output <br>
+  <a href="gnsop.html">GN_Sop</a>, write string to standard output, local memory<br>
+  <a href="osbout.html">OS_Bout</a>, write null-terminated string block at (B)HL to standard output<br>
+  <a href="osout.html">OS_Out</a>, write character to standard output<br>
+  <a href="ospout.html">OS_Pout</a>, write embedded null-terminated string at caller (PC) to standard output
+</blockquote>
+
+</body>
+</html>

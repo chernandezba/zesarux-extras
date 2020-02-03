@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tbody>
+
+ <tr>
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+ </tr>
+ <tr>
+   <td align="left" valign="bottom" width="10%"><a href="index.html">Contents</a></td>
+   <td align="center" valign="bottom" width="80%">&nbsp;</td>
+   <td align="right" valign="bottom" width="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+ </tr>
+
+  </tbody>
+</table>
+
+<hr width="100%">
+<p>
+
+<b><font size="+1">OS_Out, write character to standard
+output</font></b>
+</p>
+
+<p><tt>RST 20H, DEFB $27</tt>
+</p>
+
+<p>IN:
+</p>
+
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = character to be written</pre>
+OUT:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0 always (error handler is never provoked)</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A.BCDEHL/IXIY same<br>&nbsp;&nbsp;&nbsp;&nbsp; .F....../.... different<br></pre>
+Notes:
+<blockquote>OS_Out may also be used to write screen driver codes by writing
+them in a series of OS_Out sequences, eg. 1, '2', '+', 'B' to switch on
+bold typeface.</blockquote>
+Bugs:
+<br>
+
+&nbsp;
+<p>Related calls:
+</p>
+
+<blockquote>
+ <a href="gnnln.html">GN_Nln</a>, send newline (CR/LF) to standard output <br>
+  <a href="gnsoe.html">GN_Soe</a>, write string at extended address to standard output <br>
+  <a href="gnsop.html">GN_Sop</a>, write string to standard output, local memory<br>
+  <a href="osbout.html">OS_Bout</a>, write null-terminated string block at (B)HL to standard output<br>
+  <a href="ospout.html">OS_Pout</a>, write embedded null-terminated string at caller (PC) to standard output
+</blockquote>
+
+</body>
+</html>

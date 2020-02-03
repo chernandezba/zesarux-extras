@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <title>Memory Management</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <th colspan="3" align="center">Z88 Developers' Notes</th>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="bottom" width="10%"><a href="errhandl.html">Previous</a></td>
+
+   <td align="center" valign="bottom" width="80%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="bottom" width="10%"><a href="scrdrver.html">Next</a></td>
+
+ </tr>
+
+  </tbody>
+</table>
+<hr width="100%">
+<p>
+
+<b><font size="+1">6. Memory Management</font></b>
+</p>
+<p>Most operating systems provide calls to allocate chunks of memory and
+free them after use. The Z88 is no exception; however, the largest chunk
+of memory which can be allocated at any one time, and thus the largest
+chunk which can be guaranteed continuous, is 256 bytes. The only way of
+ensuring a larger continuous chunk is to set up the application as a so-called
+'bad application'. This is wasteful of space and time as the OZ is forced
+to reshuffle memory, hence the pejorative term attached. A well-written
+application should only use the small chunks of memory, which for most
+programs should not be difficult, and indeed should provide a useful discipline
+as it tends to lead to little wasted memory in comparison with, say, reserving
+a 100K chunk and probably leaving much of it unused.
+<br>
+&nbsp;
+</p>
+<p><b>Allocation</b>
+</p>
+<p>Reserved chunks of memory are allocated from larger 'pools'. To reserve
+memory, the application must first allocate a memory pool, which is done
+by the call <a href="osmop.html">OS_Mop</a>. This allocates a memory pool, set initially to 256
+bytes in size, and a handle to refer to it. The only parameter for this
+call is the memory mask. The value of the mask effects the segment to which
+the logical address of allocated memory will refer. The allocation routine
+will find a free page within a bank and place its 14 bit address in register
+HL. The upper two bits are provided by the upper two bits of the memory
+mask. The memory mask must be one of MM_S0 to MM_S3 which correspond to
+segment 0, 1, 2 and 3 respectively.
+</p>
+<p>Each memory pool is associated with a particular bank of RAM and so
+all allocations from that pool are guaranteed to be in the same bank. This
+is usefull to know as it can reduce the amount of bank switching that has
+to be done. When a pool is exhausted a 'No room' error is returned - this
+does not mean that the Z88 has run out of memory, but that there is no
+more room in the bank associated with the pool to give to the application.
+The application should now attempt to open another memory pool, which will
+be associated with another bank, and allocate from there. If this attempt
+is thwarted by a 'No room' error then the Z88 has no more memory it can
+allocate to the application.
+</p>
+<p>Once a pool is openeded actual allocation can begin using the <a href="osmal.html">OS_Mal</a>
+system call. It is called with a pool handle, returned by the previous
+<a href="osmop.html">OS_Mop</a> system call, and memory is allocated from the stock allocated to
+the pool. If future calls of <a href="osmal.html">OS_Mal</a> exhaust the 256 byte initially allocated
+to the pool, the pool will expand to include more pages, one at a time.
+A 'No room' indicates that the memory pool is exhausted, ie. it can find
+no more free pages in its bank. If more memory is required, a new pool
+will need to be opened, although it may be that there is no memory left.
+</p>
+<p><a href="osmal.html">OS_Mal</a> returns a bank number, the segment number implied by the pool's
+memory mask and a logical address. The logical address consists of a 14
+bit offset within a bank with the upper two bits defined by the memory
+mask. Note that the allocated memory is not automatically paged in, so
+before it can be used, the application must ensure that the relevant bank
+is bound to the segment in which it is to be used. This will usually be
+the same segment as specified in the memory mask, if not then the address
+returned by <a href="osmal.html">OS_Mal</a> will have to be altered (the upper two bits). The binding
+calls are detailed below.
+</p>
+<p>The complement of <a href="osmal.html">OS_Mal</a> is <a href="osmfr.html">OS_Mfr</a>, which will free a chunk of memory.
+This may be a subset of a previously allocated chunk, although since a
+partially allocated page cannot be used by other applications, it is only
+really effective to free whole pages at a time. Finally, the complement
+to <a href="osmop.html">OS_Mop</a> is <a href="osmcl.html">OS_Mcl</a>. This call will de-allocate all the memory associated
+with the pool, meaning that each chunk does no have to be separately de-allocated,
+and close the pool down. Pools must be closed off, even if all the memory
+has been freed, otherwise the system will loose a handle and some memory.
+<br>
+&nbsp;
+</p>
+<p><b>Bindings</b>
+</p>
+<p>Now we have seen how memory is allocated we must show how allocated
+memory can be paged into the logical address space. This involves binding
+banks to specific segments. Two calls are provided for this purpose: the
+first, <a href="osmgb.html">OS_Mgb</a>, return the current binding for a particular segment ie.
+which bank is associated with the specific segment, but also returns the
+old binding. The calls are not particularly slow, but if a lot of bank
+switching is likely to occur then a faster mechanism can be used which
+makes use of the Z88's 'fast code' facility detailed in "Miscellaneous
+useful routines".
+</p>
+<p>The registers used for the memory management routines are carefully
+chosen for programmer convenience. Once a pool is opened, register IX holds
+the pool handle which <a href="osmal.html">OS_Mal</a>, <a href="osmfr.html">OS_Mfr</a> and <a href="osmcl.html">OS_Mcl</a> require. The binding calls
+expect a segment specifier (MS_S0 to MS_S3) in register C and a bank number
+in register B, so <a href="osmal.html">OS_Mal</a> exits with these three registers appropriately
+set. It establishes the segment number by reference to the memory mask
+associated with the pool. <a href="osmpb.html">OS_Mpb</a> returns the old binding of the same segment
+in register B, so providing BC is preserved the old binding, can be restored
+simply by calling <a href="osmpb.html">OS_Mpb</a> again.
+<br>
+&nbsp;
+</p>
+<p><b>Example</b>
+</p>
+<p>This routine demonstrates how 256 bytes can be allocated and paged in
+ready for use. Note the attention to errors, which is vital in the Z88
+system because each application has to share with others.
+</p>
+<p>
+</p>
+<hr width="100%">
+<pre>include "memory.def"&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; memory allocation definitions<br>include "director.def"&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; director call definitions<br>include "errors.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; error code definitions<br>include "stdio.def"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; standard input/output definition calls<br><br>.example&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; a, MM_S1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; use segment 1 for memory allocations<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; bc, 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; as per call spec<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osmop.html">OS_Mop</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; open a memory pool for segment 1<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; c, open_err&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; check for error...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; IX = pool handle<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; bc, 256&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; 256 bytes = full page<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xor&nbsp; a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; A = 0<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osmal.html">OS_Mal</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; allocate page<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp; c, alloc_err&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; check for error<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osmpb.html">OS_Mpb</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; effect new binding<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; application specific code goes here<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; HL points to a page of memory that<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; we are free to use...<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osmcl.html">OS_Mcl</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; assume IX is still intact<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; xor&nbsp; a&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; no error message on exit<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osbye.html">OS_Bye</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; exit the application</pre>
+
+<tt>; routine to handle "No room" when attempting to open a memory pool</tt>
+<pre>.open_err&nbsp;&nbsp; ld&nbsp;&nbsp; a, RC_ROOM&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; error code...<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="osbye.html">OS_Bye</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; exit with error message</pre>
+
+<tt>; this routine called when <a href="osmal.html">OS_Mal</a> fails. A = error code.</tt>
+<br>
+<tt>; NOTE: in this example this should not occur because only one
+page is</tt>
+<br>
+<tt>; requested and the pool already has this much. Subsequent <a href="osmal.html">OS_Mal</a>'s</tt>
+<br>
+<tt>; may fail</tt>
+<pre>.alloc_err&nbsp; call_oz(<a href="gnesp.html">GN_Esp</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; ext. address of error message<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnsoe.html">GN_Soe</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; write message to standard output<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; call_oz(<a href="gnnln.html">GN_Nln</a>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; followed by &lt;CR&gt;&lt;LF&gt;<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; application specific code to handle memory goes here.<br></pre>
+<p>
+</p>
+<hr width="100%">
+<table style="font-size: 12px" border="0" cellpadding="0" cellspacing="0" width="100%">
+
+  <tbody>
+ <tr>
+
+   <td align="left" valign="top" width="33%"><a href="errhandl.html">Previous</a></td>
+
+   <td align="center" valign="top" width="34%"><a href="index.html">Contents</a></td>
+
+   <td align="right" valign="top" width="33%"><a href="scrdrver.html">Next</a></td>
+
+ </tr>
+
+ <tr>
+
+   <td align="left" valign="top" width="33%">Error handling and related issues</td>
+
+   <td align="center" valign="top" width="34%">Memory Management</td>
+
+   <td align="right" valign="top" width="33%">Output and the screen driver</td>
+
+ </tr>
+
+  </tbody>
+</table>
+</body>
+</html>

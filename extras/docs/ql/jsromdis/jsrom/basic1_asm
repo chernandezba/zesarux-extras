@@ -1,0 +1,579 @@
+
+
+*******************************
+*
+*  BASIC1_ASM basic1_asm
+*
+*******************************
+
+* initialise basic, search for ROMS, display F1/F2 menu
+L04A74 BRA.S   L04AAA 
+XL04A74 EQU L04A74
+L04A76 CMPI.L  #$4AFB0001,(A3)
+       BNE.S   L04A9E
+       LEA     $0008(A3),A1  * number of commands
+       JSR     L039B2(PC)    * link in name table
+       MOVE.W  $0004(A3),D0  * number of functions
+       BEQ.S   L04A94
+       LEA     $00(A3,D0.W),A1  * list of functions
+       JSR     L06DA6(PC)
+L04A94 MOVE.W  $0006(A3),D0     * initialisation routine
+       BEQ.S   L04A9E           * no routine supplied
+       JSR     $00(A3,D0.W)     * init routine
+L04A9E RTS
+
+L04AA0 JSR     L039F6(PC)       * install window
+       MOVE.L  D4,D1            * D1 = #
+       JMP     L06646(PC)
+
+* basic init
+L04AAA JSR     L0566E(PC)
+       JSR     L06DA2(PC)
+       LEA     L04BBA(PC),A1    * window def
+       MOVEQ   #$00,D4
+       BSR.S   L04AA0           * init window 0
+       LEA     $0C000,A3        * ROM EXTENSION
+       BSR.S   L04A76           * try to initialise extension
+       MOVEA.L #$C0000,A3        * EXTENSIONS at C0000 ff 
+L04AC8 BSR.S   L04A76           * SAME AS BEFORE
+       ADDA.W  #$4000,A3        * add 16 K
+       CMPA.L  #$CC000,A3       * till end of RAM
+
+*
+* !!! to avoid software - problems caused by bad decoding of ROM-port
+* hardware: - modification of ROM-Port 
+*           - or make sure to have no expansion at CC000
+* software: - omit the first test for C000 (is done when testing CC000)
+*           - or set top to $CC000 instead of $100000
+*         !!!! (t h a t ' s     w h a t    I  d i d   h e r e !)
+
+       BLT.S   L04AC8
+       LEA     L04BC6(PC),A1    * WINDOW 1
+       MOVEQ   #$01,D4
+       BSR.S   L04AA0
+       MOVEQ   #-$19,D0         * START-MESSAGE
+       JSR     L03968(PC)
+L04AE4 LEA     L04BD2(PC),A1    * WINDOW 2
+       MOVEQ   #$02,D4
+       BSR.S   L04AA0
+       MOVEQ   #-$18,D0         * F1-MONI ETC
+       JSR     L03968(PC)       * open START window
+GETMOD MOVEQ   #$01,D0          * TRAP NR
+       MOVEQ   #-$01,D3         * TIMEOUT
+       TRAP    #$03             * NOW INKEY$
+       MOVEQ   #$00,D6          * INIT MODE 4
+       MOVEQ   #$00,D7
+       MOVEQ   #$20,D5
+       SUBI.B  #$E8,D1          * F1 ?
+       BEQ.S   INIMON
+       SUBQ.B  #$4,D1           * F2 ?
+       BNE.S   GETMOD
+       MOVEQ   #$00,D6
+       MOVEQ   #$01,D7
+       MOVEQ   #$44,D5          * d5=displacement for windows
+INIMON MOVE.B  D6,D1
+       MOVE.B  D7,D2
+       MOVEQ   #$10,D0
+       TRAP    #$01                     * SCREEN-INIT
+       LEA     XL04B72-$08(PC,D5.W),A1       * #2 DEFI
+       BSR.S   L04B6E
+       MOVEA.L #$00010001,A0
+       LEA     XL04B72-$14(PC,D5.W),A1       * #1 DEFI
+       BSR.S   L04B6E
+       SUBA.L  A0,A0
+       LEA     XL04B72-$20(PC,D5.W),A1       * #0 DEFI
+       BSR.S   L04B6E
+       LEA     L04BDE(PC),A0            * boot-definiton
+       BSR.S   L04B46                   * try to boot from any device
+       BEQ.S   L04B40                   * success
+       LEA     L04BE4(PC),A0            * try mdv1_boot
+       BSR.S   L04B46
+       BNE.S   L04B52                   * nothing
+L04B40 CLR.W   $0088(A6)                * clear line-number
+       BRA.S   L04B54
+
+L04B46 MOVEQ   #$01,D0          * try to open boot
+       MOVEQ   #-$01,D1
+       MOVEQ   #$00,D3
+       TRAP    #$02
+       TST.L   D0
+       RTS
+
+L04B52 SUBA.L  A0,A0                * A0=0: no boot actioned
+L04B54 MOVE.L  (A6),$0004(A6)
+       MOVEQ   #$00,D7
+       MOVEQ   #$7E,D1
+       JSR     L04E6A(PC)
+       MOVE.L  A0,$0084(A6)
+       LEA     L04BF0(PC),A5
+       MOVE.L  A5,-(A7)
+L04B6A JMP     L04C04(PC)       * try to execute line or prog
+
+L04B6E JMP     L03A02(PC)
+L04B72
+XL04B72 EQU L04B72
+* Moni#0
+       DC.B    $00,$00,$00,$04  * size border/size colour/paper/ink
+       DC.B    $02,$00,$00,'2'  * width hight
+       DC.B    $00,$00,$00,$CE  * origin horiz and verti
+* Moni#1       
+       DC.B    $FF,$01,$02,$07
+       DC.B    $01,$00,$00,$CA
+       DC.B    $01,$00,$00,$00
+* Moni#2
+       DC.B    $FF,$01,$02,$07
+       DC.B    $01,$00,$00,$CA
+       DC.B    $00,$00,$00,$00
+* TV#0
+       DC.B    $00,$00,$00,$07
+       DC.B    $01,$C0,$00,'('
+       DC.B    $00,' ',$00,$D8
+*TV#1
+       DC.B    $00,$00,$02,$07
+       DC.B    $01,$C0,$00,$C8
+       DC.B    $00,' ',$00,$10
+* TV#2     
+       DC.B    $00,$00,$01,$07
+       DC.B    $01,$C0,$00,$C8
+       DC.B    $00,' ',$00,$10
+* init window
+L04BBA DC.B    $00,$00,$00,$04
+       DC.B    $01,$C0,$00,$AA
+       DC.B    $00,' ',$00,' '
+       
+* copyright window
+L04BC6 DC.B    $07,$02,$02,$07
+       DC.B    $01,'p',$00,$0E
+       DC.B    $00,'H',$00,$EE
+
+* window for extensions message
+L04BD2 DC.B    $04,$04,$07,$02
+       DC.B    $00,$A8,$00,$1C
+       DC.B    $00,$AE,$00,$CE
+
+L04BDE DC.W    $0004
+       DC.B    'BOOT'
+L04BE4 DC.W    $0009
+       DC.B    'MDV1_BOOT'
+       DC.B    $00
+       
+L04BF0 JSR     L0A9BA(PC)       * SYSTEM COMMAND
+       LEA     L04BF0(PC),A5    * 4BF0 - adrr fo errors
+       MOVE.L  A5,-(A7)
+L04BFA CLR.L   $0084(A6)
+       MOVEQ   #$00,D1
+       JSR     L0661E(PC)
+L04C04 CLR.L   $0076(A6)
+       MOVE.L  (A6),$0004(A6)
+       TST.B   $00AA(A6)
+       BEQ.S   L04C2C
+       MOVE.W  $00AC(A6),D4
+       MOVE.W  D4,D6
+       SF      $00AB(A6)
+       JSR     L07518(PC)
+       MOVE.W  $00AE(A6),D0
+       SNE     $00AA(A6)
+       ADD.W   D0,$00AC(A6)
+L04C2C MOVE.L  A0,D0
+       JSR     L079C4(PC)
+       BEQ.S   L04C64
+       BGT.S   L04C3C
+       CMPI.B  #$F6,D0
+       BEQ.S   L04C50
+L04C3C SF      $00AA(A6)
+       JSR     L09B9C(PC)       * error-report
+L04C44 BSR     L04CFA
+       BEQ.S   L04C4E
+       MOVEQ   #$02,D0
+       TRAP    #$02
+L04C4E BRA.S   L04BFA
+
+L04C50 MOVEQ   #$02,D0  * CLOSE MDV1_BOOT
+       TRAP    #$02
+       CLR.L   $0084(A6)    * command channel=0
+       TST.W   $0088(A6)    * LINE TO EXECUTE ?
+       BLT     L04D6A       * NO
+       BRA     L04D9E       * YES
+
+L04C64 TAS     $008F(A6)    * initialise BREAK
+       MOVE.L  A1,D1
+       SUB.L   (A6),D1
+       SF      $00B9(A6)    * BV.ARROW
+       MOVE.B  -$01(A6,A1.L),D0
+       SUBI.B  #$D0,D0
+       BCS.S   L04C86
+       ST      $00B9(A6)    * BV.ARROW
+       BEQ.S   L04C86
+       MOVE.B  #$01,$00B9(A6)
+L04C86 SUBQ.W  #1,D1
+       BLE     L04C04
+       CMPI.B  #$20,-$02(A6,A1.L)
+       BNE.S   L04C98
+       SUBQ.W  #1,A1
+       BRA.S   L04C86
+
+L04C98 MOVE.B  #$0A,-$01(A6,A1.L)
+       MOVE.L  A1,$0004(A6)
+L04CA2 JSR     L0890C(PC)
+       LEA     L08B5A(PC),A2
+       JSR     L087D4(PC)
+       BEQ.S   L04CD0
+       BLT.S   L04CB8
+       JSR     L097DC(PC)
+       BRA.S   L04CA2
+
+* error handling of direct commands
+
+L04CB8 TST.L   $0084(A6)   * was it # 0
+       BNE.S   L04CCC
+       MOVEQ   #-$15,D0    * report bad line
+       JSR     L09B9C(PC)
+       SUBQ.L  #1,$0004(A6)
+       BRA     L04C2C      * edit offending line
+
+* error handling of direct input from other # than 0
+L04CCC JSR     L08A4E(PC)
+L04CD0 JSR     L08AB4(PC)
+       JSR     L08E88(PC)
+       BRA.S   L04D02     * ERROR
+       SF      $006F(A6)
+       ST      $008E(A6)
+       MOVE.L  D0,D5
+       BSR.S   L04CFA
+       BNE     L04C04
+       MOVEQ   #$02,D1
+       JSR     L0661E(PC)
+       BLT.S   L04CF6
+       JSR     L08FE6(PC)
+L04CF6 BRA     L04BFA
+
+* get input #
+
+L04CFA MOVEA.L $0084(A6),A0
+       MOVE.L  A0,D0
+       RTS
+
+* supervisor for direct commands
+* enter command mode
+L04D02 MOVEA.L $0008(A6),A4         * BV.TKBAS
+       MOVE.B  #$01,$006C(A6)       * BV.STMNT
+       SF      $006E(A6)            * BV.INLIN
+       ST      $006D(A6)            * BV.CONT
+L04D14 ST      $006F(A6)            * BV.SING
+       CLR.L   $0068(A6)            * BV.LINUM
+       JSR     L0A4BA(PC)
+       JSR     L0A8B8(PC)
+       BNE     L04C44
+       TST.B   $008B(A6)            * BV.COMLN
+       BEQ.S   L04D5E
+       SUBQ.W  #4,$008C(A6)         * BV.STOPN
+       BEQ.S   L04CF6
+       BLT.S   L04D14
+       MOVEA.L $0008(A6),A0         * BV.TKBAS
+       MOVE.L  $000C(A6),D0         * BV.TKTOP
+       SUBA.L  A0,A4
+       SUB.L   A0,D0
+       MOVE.L  D0,D1
+       SUBA.L  D0,A7
+L04D46 MOVE.W  $00(A6,A0.L),(A7)+
+       ADDQ.W  #2,A0
+       SUBQ.W  #2,D1
+       BGT.S   L04D46
+       SUBA.L  D0,A7
+       MOVE.W  D0,-(A7)
+       MOVE.W  A4,-(A7)
+       MOVE.B  $006C(A6),-(A7)
+       MOVE.L  $006E(A6),-(A7)
+L04D5E TST.W   $0088(A6)
+       BGE.S   L04D98
+       BSR.S   L04CFA
+L04D66 BNE     L04C04
+L04D6A TST.B   $008B(A6)
+       BEQ.S   L04CF6
+       SF      $008B(A6)
+       MOVE.L  (A7)+,$006E(A6)
+       MOVE.B  (A7)+,$006C(A6)
+       MOVEA.L $0008(A6),A0
+       MOVEA.L A0,A4
+       ADDA.W  (A7)+,A4
+       MOVE.W  (A7)+,D0
+L04D86 MOVE.W  (A7)+,$00(A6,A0.L)
+       ADDQ.W  #2,A0
+       SUBQ.W  #2,D0
+       BGT.S   L04D86
+       MOVE.L  A0,$000C(A6)
+       BRA     L04D14
+
+* execution of Basic progs
+
+L04D98 BSR     L04CFA   * store channel ID
+       BNE.S   L04D66   * not #0
+L04D9E JSR     L0A4BA(PC)       * init variables and procs
+       MOVEA.L $0010(A6),A4     * BV.PFBAS
+       SF      $006F(A6)
+       CLR.L   $0068(A6)
+       MOVE.B  #$01,$006C(A6)
+       MOVE.W  $0088(A6),D4
+       BEQ.S   L04DD6
+       JSR     L09FBE(PC)
+       BNE     L04BFA
+       MOVE.B  $008A(A6),D4
+       BEQ.S   L04DD6
+       JSR     L0A96A(PC)       * first instruction in line
+       JSR     L0A00A(PC)
+L04DD0 JSR     L0A90C(PC)       * execute prog
+       BRA.S   L04DDA
+
+L04DD6 JSR     L0A8A8(PC)       * execute prog
+L04DDA BNE     L04BFA           * error or end
+       TST.W   $008C(A6)        * system command ?
+       BNE     L04D5E           * no
+       BRA.S   L04DD0           * continue
+      
+* !! only once needed ??? !!!
+
+L04DE8 JSR     L04E5E(PC)       * reserve memory for name table entry
+       MOVEA.L $001C(A6),A2
+       ADDQ.L  #8,$001C(A6)
+       RTS
+       
+L04DF6 MOVE.L  D1,-(A7)         * reserve memory for variables
+       ADDQ.L  #7,D1
+       ANDI.W  #$FFF8,D1
+L04DFE MOVEA.W #$0072,A0
+       MOVEQ   #$0C,D0
+       TRAP    #$01
+       TST.L   D0
+       BLT.S   L04E0C   * memory insufficient
+       BRA.S   L04E26
+
+L04E0C MOVE.L  D1,-(A7)
+       JSR     L04E76(PC)
+       MOVEA.L $002C(A6),A0
+       ADD.L   D1,$002C(A6)
+       MOVEA.W #$0072,A1
+       MOVEQ   #$0D,D0
+       TRAP    #$01
+       MOVE.L  (A7)+,D1
+       BRA.S   L04DFE
+
+L04E26 MOVE.L  (A7)+,D1
+       RTS
+
+L04E2A DC.W    $0100  * table for memory reservation
+       DC.W    $0100
+       DC.W    $0100
+       DC.W    $0100
+
+* !!! table above and command below are fuzzy - in all cases same amount
+* of memory is reserved so it can be shortened - instead of 
+* first four lines only move.l #$0100,d1 would be sufficient !!!
+ 
+L04E32 LEA     L04E2A(PC),A1
+       ADD.W   D0,D0
+       MOVEQ   #$00,D1
+       MOVE.W  $00(A1,D0.W),D1  * fuzzy
+       MOVEQ   #$60,D2
+       MOVE.L  A7,$0060(A6)
+       MOVE.L  A6,D0
+       SUB.L   D0,$0060(A6)
+       BRA.S   L04E90           * reserve 256 bytes
+
+L04E4C MOVEQ   #$20,D1          * reserve 32 bytes artihm stack
+L04E4E MOVEQ   #$58,D2
+       BRA.S   L04E90
+
+L04E52 MOVEQ   #$0C,D1          * 12 Bytes on stack
+L04E54 MOVEQ   #$48,D2
+       BRA.S   L04E90
+
+* !!! only once needed ??? !!! - YES! AVOID JSR
+
+L04E58 MOVEQ   #4,D1            * reserve 4 BYTES
+L04E5A MOVEQ   #$50,D2
+       BRA.S   L04E90
+
+L04E5E MOVEQ   #$08,D1         
+L04E60 MOVEQ   #$1C,D2
+       BRA.S   L04E84
+
+* !!! only once needed ??? !!! - YES! AVOID JSR
+
+L04E64 MOVEQ   #$16,D1
+       MOVEQ   #$3C,D2
+       BRA.S   L04E84
+
+L04E6A MOVEQ   #$04,D2
+       BRA.S   L04E84
+
+* !!! only once needed ??? !!! - YES! AVOID JSR
+
+L04E6E MOVEQ   #$0C,D2
+       BRA.S   L04E84
+
+L04E72 MOVEQ   #$24,D2
+       BRA.S   L04E84
+
+* !!! only once needed ??? !!! - YES! AVOID JSR
+
+L04E76 MOVEQ   #$2C,D2
+       BRA.S   L04E84
+
+* !!! only once needed ??? !!! - YES! AVOID JSR
+
+L04E7A MOVEQ   #$34,D2
+       BRA.S   L04E84
+       
+* !!! only once needed ??? !!! - YES! AVOID JSR
+L04E7E MOVEQ   #$44,D2
+       BRA.S   L04E84
+       
+L04E82 MOVEQ   #$14,D2
+L04E84 MOVEQ   #$00,D0
+       MOVE.L  $04(A6,D2.L),D3
+       SUB.L   $00(A6,D2.L),D3
+       BRA.S   L04E9A
+
+* RESERVE MEMORY ON BASE OF STACK
+
+L04E90 MOVEQ   #-$01,D0
+       MOVE.L  $00(A6,D2.L),D3
+       SUB.L   -$04(A6,D2.L),D3
+L04E9A CMP.L   D1,D3             * enough memory for reservation
+       BGE.S   L04EE2
+       MOVEM.L A0-A3,-(A7)
+       ADDI.L  #$F,D1
+       ANDI.W  #$FFF0,D1
+L04EAC MOVE.L  $0048(A6),D3
+       SUB.L   $0044(A6),D3
+       CMP.L   D1,D3
+       BGT.S   L04F14
+       MOVEM.L D0-D2,-(A7)
+       MOVEQ   #$16,D0
+       TRAP    #$01
+       TST.L   D0
+       BEQ.S   L04EE4
+       MOVE.W  #$0012,$008C(A6)
+       TRAP    #$00
+       MOVEA.L $0064(A6),A5
+       ADDA.L  A6,A5
+       SUBA.L  $0076(A6),A5
+       SUBQ.W  #4,A5
+       MOVE.L  A5,USP
+       MOVE.W  #$0004,SR
+       SF      $006D(A6)
+L04EE2 RTS
+
+L04EE4 MOVEA.L $0048(A6),A0
+       MOVEA.L $0064(A6),A1
+       LEA     $00(A1,D1.L),A2
+L04EF0 SUBQ.W  #4,A2
+       SUBQ.W  #4,A1
+       MOVE.L  $00(A6,A1.L),$00(A6,A2.L)
+       CMPA.L  A0,A1
+       BGT.S   L04EF0
+       MOVEQ   #$48,D0
+       MOVEQ   #$64,D2
+L04F02 ADD.L   D1,$00(A6,D0.L)
+       ADDQ.W  #4,D0
+       CMP.L   D2,D0
+       BLE.S   L04F02
+       ADDA.L  D1,A7
+       MOVEM.L (A7)+,D0-D2
+       BRA.S   L04EAC
+
+L04F14 TST.B   D0
+       BMI.S   L04F54
+       CMPI.L  #$44,D2
+       BEQ.S   L04F84
+       MOVEA.L $44(A6),A1
+       MOVEA.L $04(A6,D2.L),A0
+       LEA     $00(A1,D1.L),A2
+L04F2C SUBQ.W  #4,A1
+       SUBQ.W  #4,A2
+       MOVE.L  $00(A6,A1.L),$00(A6,A2.L)
+       CMPA.L  A0,A1
+       BGT.S   L04F2C
+       MOVEQ   #$04,D0
+       ADD.W   D2,D0
+       MOVEQ   #$48,D2
+       TST.L   $0072(A6)
+       BEQ.S   L04F7A
+       CMPI.L  #$28,D0
+       BGT.S   L04F7A
+       ADD.L   D1,$0072(A6)
+       BRA.S   L04F7A
+
+L04F54 CMPI.L  #$48,D2
+       BEQ.S   L04F84
+       MOVEA.L -$04(A6,D2.L),A1
+       MOVEA.L $0048(A6),A0
+       NEG.L   D1
+       LEA     $00(A0,D1.L),A2
+L04F6A MOVE.L  $00(A6,A0.L),$00(A6,A2.L)
+       ADDQ.W  #4,A0
+       ADDQ.W  #4,A2
+       CMPA.L  A1,A0
+       BLE.S   L04F6A
+       MOVEQ   #$48,D0
+L04F7A ADD.L   D1,$00(A6,D0.L)
+       ADDQ.W  #4,D0
+       CMP.L   D2,D0
+       BLT.S   L04F7A
+L04F84 MOVEM.L (A7)+,A0-A3
+       RTS
+
+L04F8A MOVEQ   #$14,D2
+       BRA.S   L04FA0
+
+L04F8E MOVEQ   #$24,D2
+       BRA.S   L04FA0
+
+L04F92 MOVEQ   #$1C,D2
+       BRA.S   L04FA0
+
+L04F96 MOVEQ   #$2C,D2
+       BRA.S   L04FA0
+
+L04F9A MOVEQ   #$34,D2
+       BRA.S   L04FA0
+
+L04F9E MOVEQ   #$3C,D2
+L04FA0 MOVEA.L $04(A6,D2.L),A1
+       MOVE.L  A1,D1
+       MOVE.L  $00(A6,D2.L),D0
+       ADDQ.W  #1,D0
+       BCLR    #$00,D0
+       MOVEA.L D0,A0
+       SUB.L   A0,D1
+       BEQ.S   L04FE6
+L04FB6 MOVE.L  $00(A6,A1.L),$00(A6,A0.L)
+       ADDQ.W  #4,A1
+       ADDQ.W  #4,A0
+       CMPA.L  $0044(A6),A1
+       BLT.S   L04FB6
+       MOVEQ   #$04,D0
+       ADD.B   D2,D0
+       TST.L   $0072(A6)
+       BEQ.S   L04FDA
+       CMPI.B  #$28,D2
+       BGE.S   L04FDA
+       SUB.L   D1,$0072(A6)
+L04FDA MOVEQ   #$48,D2
+L04FDC SUB.L   D1,$00(A6,D0.L)
+       ADDQ.B  #4,D0
+       CMP.B   D2,D0
+       BLT.S   L04FDC
+L04FE6 RTS
+
+L04FE8 ADDQ.L  #7,D1
+       ANDI.L  #$FFFFFFF8,D1
+       BEQ.S   L04FFA
+       MOVEA.W #$0072,A1
+       MOVEQ   #$0D,D0
+       TRAP    #$01
+L04FFA RTS
+
+L04FFC DC.W    $4E75
+       DC.W    $0000
+***End BASIC1_ASM  basic1_asm

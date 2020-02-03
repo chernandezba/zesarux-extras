@@ -1,0 +1,16 @@
+playwav - ESXDOS command for playing .wav audio files
+
+1. Copy the file 'playwav' to the /bin directory of your ESXDOS drive.
+2. Copy some .wav files there too - they need to be 44100Hz unsigned 8-bit mono.
+   If you have SoX <http://sox.sourceforge.net/> installed, you can convert
+   pretty much any audio file into the appropriate format with the command line:
+   sox input.wav -u -b 8 -c 1 -r 44100 --norm output.wav
+3. Boot up ESXDOS, and run:
+	.playwav foo.wav
+
+NB: The .wav files must be fully unfragmented on disk to work correctly...
+
+
+Matt Westcott
+gasman@raww.org
+2012-05-05

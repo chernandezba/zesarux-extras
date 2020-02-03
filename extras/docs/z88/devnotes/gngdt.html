@@ -1,0 +1,86 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p>
+
+<b><font size=+1>GN_Gdt, convert an ASCII string
+to an internal binary date</font></b>
+<p><tt>RST 20H, DEFW $0609</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; HL = source pointer
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 = read from stream whose handle is IX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 = read from filter whose handle is IX
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 = not allowed
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; > 255 = string pointed to by HL
+&nbsp;&nbsp;&nbsp;&nbsp; DE = destination pointer
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0 = not allowed
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1 = not allowed
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2 = result returned in ABC
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; >255 = store result at address pointed to by DE
+&nbsp;&nbsp;&nbsp;&nbsp; A = date format
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A0 = 1, undefined
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A1 = 1, undefined
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A2 = 1, undefined
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A3 = 1, force American format (MM/DD/YY)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A4 = 1, force European format (DD/MM/YY)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A5 = 1, force C to be the delimiter
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A6 = 1, undefined
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A7 = 1, undefined
+
+&nbsp;&nbsp;&nbsp;&nbsp; IX = source handle (if HL = 0,1)
+&nbsp;&nbsp;&nbsp;&nbsp; B = maximum number of characters to be read
+&nbsp;&nbsp;&nbsp;&nbsp; C = optional forced delimiter (default is ".")</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; HL, if HL(in) = 0, index to last character read
+&nbsp;&nbsp;&nbsp;&nbsp; HL, if HL(in) > 255, pointer to last/terminating character
+&nbsp;&nbsp;&nbsp;&nbsp; ABC, if DE(in) = 2, date in internal format
+&nbsp;&nbsp;&nbsp;&nbsp; ABC, if DE(in) > 255, ABC(in)
+&nbsp;&nbsp;&nbsp;&nbsp; DE, if DE(in) > 255, DE(in)+3</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp; A = error code:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_ROOM ($07), insufficient memory to make conversion.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_HAND ($08), handles not available for conversion
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_BAD ($04), bad parameters
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RC_SNTX ($0C), Bad syntax
+</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ......../IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFBCDEHL/.... different
+</pre>
+Notes:
+<blockquote>Setting A3=0 and A4=0 will mean that the PANEL settings for
+the date format will be used. A3=A4=1 will use European format. The routine
+will return a syntax error (RC_SNTX) if A5=1 and the character passed in
+C(in) is not the terminator of the string to be converted. Please note
+that returned internal format is in high byte low byte register sequense
+(A = high byte, C = low byte).</blockquote>
+Bugs:
+<p>Related calls:
+<blockquote><a href='gndei.html'>GN_Dei</a>, convert zoned format date to internal format
+<br><a href='gndie.html'>GN_Die</a>, convert internal format date to zoned format
+<br><a href='gngmd.html'>GN_Gmd</a>, Get (read) machine date in internal format
+<br><a href='gnpdt.html'>GN_Pdt</a>, write internal date as ASCII string
+<br><a href='gnpmd.html'>GN_Pmd</a>, put (set) machine date</blockquote>
+
+</body>
+</html>

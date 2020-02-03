@@ -1,0 +1,54 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+<link href="stylesheet.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+
+<tr>
+<td VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;&nbsp;&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr>
+<p><b><font size=+1>OS_Gth, allocate tri-handle</font></b>
+<p><tt>RST 20H, DEFW $E206</tt>
+<p>IN:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; A = tri-handle subtype
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TH_FILT ($F0), allocate filter handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TH_WMG ($F1), allocate wildcard manager handle
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TH_ALM ($F2), allocate alarm handle
+&nbsp;&nbsp;&nbsp;&nbsp; B = Bank where code is to be called
+&nbsp;&nbsp;&nbsp;&nbsp; H = High byte of adress (Low byte is given by the reason code after RST 30h)
+&nbsp;&nbsp;&nbsp;&nbsp; L = Segment where to bind bank</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; IX = tri-handle</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_ROOM, failed to allocate tri-handle</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ..BCDEHL/..IY same
+&nbsp;&nbsp;&nbsp;&nbsp; AF....../IX.. different</pre>
+Notes:
+<blockquote>Internal operating system usage.
+<br>This call specifies a code area to be called by the RST $30 followed
+by a reason code (the low byte address). When using this call, IX is the
+handle. Those values are remembered by calling OS_Vth with the correct
+handle (IX) and the correct subtype (A).</blockquote>
+Bugs:
+<p>Related system calls:
+<blockquote><a href="osvth.html">OS_Vth</a>, verify tri-handle
+<br><a href="osfth.html">OS_Fth</a>, free tri-handle</blockquote>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+http://www.zxdesign.info/vidparam.shtml
+
+Video Parameters
+Mar 01, 2007
+
+A single ZX Spectrum display row takes 224 T-States, including the horizontal flyback. For every T-State 2 pixels are written to the display, so 128 T-States pass for the 256 pixels in a display row. The ZX Spectrum is clocked at 3.5 MHz, so if 2 pixels are written in a single CPU clock cycle, the pixel clock of our display must be 7 MHz. A single line thus takes 448 pixel clock cycles.
+
+The left and right border areas can be shown to be 48 pixels wide, which gives a visible row of 352 pixels (and the border equivalent) in total. That would take 352 / 2 = 176 T-States to display, and we know that a display row takes 224 T-States, so the lost 96 T-States must be used during the horizontal flyback of the electron beam to the start of the new row.
+
+It would be interesting to calculate the horizontal frequency at this point so see how it compares to the usual scanline frequency of 15625 Hz (or a period of 64us).
+
+At a pixel clock of 7 MHz, 1 cycle takes 142.9ns. Our scanline takes 448 clock cycles, so a complete scanline takes 142.9ns X 448 = 64us (1 / 64us = 15625 Hz). Hurrah!
+
+There is some detail as to the screen timings in the 16/48K ZX Spectrum Reference.
+Video Memory to Screen
+
+During the 128 T-States of video display, screen bytes and attributes need to be transferred from the video memory and shifted a bit at a time to the video display. Both the screen byte and the attribute byte need to have been fetched before the the first bit of that screen byte needs to be shifted into the display circuit.
+
+The comp.sys.sinclair FAQ 16/48K ZX Spectrum Reference gives details of the video memory contention when the ULA is drawing the screen. I keep looking at this table and wondering why it takes the ULA 6 T-States to read the video memory. My hunch is that the ULA reads the attribute byte in the T-state before it's due to write the video byte, and reads the screen byte in bits over the next 5 T-states, just before it needs them, and I guess this is related to the way the ULA addresses the dynamic memory chips.
+
+We can probably do a lot better than this if we fetch the screen byte into a latch followed by the attribute byte. This could be done in a 2 T-States instead of 6, but this would change the amount video contention, so even if we can do the memory fetch in less than 6 T-States we will still need to hold the CPU for the full 6.
+< Previous Next >
+
+
+-----
+
+The ZX Spectrum 128K / +2:
+The 128K machine is similar to the 48K machine, but with extra memory accessed by paging it into the top 16K of RAM. There are also some timing differences:
+
+
+The main processor runs at 3.54690 MHz, as opposed to 3.50000 MHz.
+There are 228 T-states per scanline, as opposed to 224.
+There are 311 scanlines per frame, as opposed to 312.
+There are 63 scanlines before the television picture, as opposed to 64.
+To modify the border at the position of the first byte of the screen (see the 48K ZX Spectrum section for details), the OUT must finish after 14365, 14366, 14367 or 14368 T states have passed since interrupt. As with the 48K machine, on some machines all timings (including contended memory timings) are one T state later.
+Note that this means that there are 70908 T states per frame, and the '50 Hz' interrupt occurs at 50.01 Hz, as compared with 50.08 Hz on the 48K machine. The ULA bug which causes snow when I is set to point to contended memory still occurs, and also appears to crash the machine shortly after I is set to point to contended memory.
+

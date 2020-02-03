@@ -1,0 +1,68 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <title>System Calls Reference</title>
+   <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+<table style="font-size: 12px" border=0 CELLSPACING=0 CELLPADDING=0 WIDTH="100%" >
+<tr>
+<th ALIGN=CENTER COLSPAN="3">Z88 Developers' Notes</th>
+</tr>
+<tr>
+<td ALIGN=LEFT VALIGN=BOTTOM WIDTH="10%"><a href="index.html">Contents</a></td>
+<td ALIGN=CENTER VALIGN=BOTTOM WIDTH="80%">&nbsp;</td>
+<td ALIGN=RIGHT VALIGN=BOTTOM WIDTH="10%"><a href="sysref.html">Contents&nbsp;of&nbsp;System&nbsp;Calls</a></td>
+</tr>
+</table>
+
+<hr WIDTH="100%">
+<p><b><font size=+1>OS_Stk, stack file current process</font></b>
+<p><tt>RST 20H, DEFW $F806</tt>
+<br>&nbsp;
+<pre>IN:&nbsp; -</pre>
+OUT, if call successful:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 0
+&nbsp;&nbsp;&nbsp;&nbsp; BHL = pointer to stacked process</pre>
+OUT, if call failed:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Fc = 1
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A = RC_ROOM, no room to stack process information</pre>
+Registers changed after return:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; ...CDE../IXIY same
+&nbsp;&nbsp;&nbsp;&nbsp; AFB...HL/.... different</pre>
+Notes:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; Internal operating system usage.
+&nbsp;&nbsp;&nbsp;&nbsp; A stacked process environment consists of:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stack pointer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SP
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stack frame&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; at [SP;ST.END]
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; registers&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; part of stack
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; static workspace&nbsp;&nbsp;&nbsp; part of stack
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; handles&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; part of stack
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; segment registers&nbsp;&nbsp; described by USRSG0/1/2
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; windows
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; map(s)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return PC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RESUME (in <a href="osin.html">OS_In</a>)
+
+&nbsp;&nbsp;&nbsp;&nbsp; Z88 Team: We believe that ST.END is the top address before
+&nbsp;&nbsp;&nbsp;&nbsp; the safe workspace of the application. However, we have not verified
+&nbsp;&nbsp;&nbsp;&nbsp; this.
+
+</pre>
+Bugs:
+<pre>&nbsp;&nbsp;&nbsp;&nbsp; -
+
+</pre>
+Related system calls:
+<blockquote><a href="ospoll.html">OS_Poll</a>, poll for an application
+<br><a href="dcpol.html">DC_Pol</a>, poll for card usage
+<br><a href="osent.html">OS_Ent</a>, enter an application
+<br><a href="dcent.html">DC_Ent</a>, enter new application
+<br><a href="dcnam.html">DC_Nam</a>, name current application
+<br><a href="osexit.html">OS_Exit</a>, exit an application
+<br><a href="osbye.html">OS_Bye</a>, exit application
+<br><a href="dcbye.html">DC_Bye</a>, exiting current application
+<br><a href="osuse.html">OS_Use</a>, process card usage</blockquote>
+
+</body>
+</html>
