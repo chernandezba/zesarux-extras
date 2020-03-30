@@ -1,0 +1,131 @@
+-----ALTROM TBBLUE-----
+
+* esto es valido para ZEsarUX 8.2, tbblue core version 3.1.1. Firmware 1.22
+
+-Tbblue: al cargar juegos .tap de 48k por ejemplo, cuando pide en que modo cargar, usa un nuevo registro en que cambia la rom:
+
+
+-There was a major change in the hardware to support better compatibility with the 48k and 128k.
+ Now when you load 48k or 128k programs, the original roms are put in place as well. 
+ This is done using a new hardware feature the alternate rom:
+0x8C (140) => Alternate ROM 
+(R/W) (hard reset = 0)
+IMMEDIATE
+bit 7 = 1 to enable alt rom
+bit 6 = 1 to make alt rom visible only during writes, otherwise replaces rom during reads
+bit 5 = 1 to lock ROM1 (48K rom)
+bit 4 = 1 to lock ROM0 (128K rom)
+AFTER SOFT RESET (copied into bits 7-4)
+bit 3 = 1 to enable alt rom
+bit 2 = 1 to make alt rom visible only during writes, otherwise replaces rom during reads
+bit 1 = 1 to lock ROM1 (48K rom)
+bit 0 = 1 to lock ROM0 (128K rom)
+The locking mechanism also applies if the alt rom is not enabled. For the +3 and zx next, if the two lock bits are not
+zero, then the corresponding rom page is locked in place. Other models use the bits to preferentially lock the corresponding
+48K rom or the 128K rom.
+
+
+
+Registro nuevo bloqueo rom
+
+nr_8c_altrom_lock
+
+
+//8c: 
+		/*
+		Registro nuevo bloqueo rom
+
+nr_8c_altrom_lock
+
+
+There are two 16k blocks of memory set aside to hold alternate roms.  
+These exist at the same level as the usual roms and can substitute for them.
+
+Only bits 7:4 of nextreg 0x8c apply to the current state of the machine.  
+bits 3:0 are copied into bits 7:4 on a soft reset.
+
+The altrom replaces the rom in the bottom 16k if nextreg 0x8c bit 7 is set (altrom_en) 
+and either the cpu is writing with nextreg 0x8c bit 6 is 1 or the cpu is reading and nextreg 0x8c bit 6 is 0.  
+The intention here is the altrom can be put in write-only mode so that the regular rom is still present for 
+reading but the altroms can be written.  Remember mmu can still cover it because the altrom is at the same level as normal rom.
+
+Which of the two altroms is seen?  This depends on the machine type but for a zx next the type is +3.  For a +3 machine:
+
+ if nr_8c_altrom_lock_rom1 = '1' or nr_8c_altrom_lock_rom0 = '1' then
+    sram_active_rom <= nr_8c_altrom_lock_rom1 & nr_8c_altrom_lock_rom0;
+    sram_alt_128 <= not nr_8c_altrom_lock_rom1;
+ else
+    sram_active_rom <= port_1ffd_rom;
+    sram_alt_128 <= not port_1ffd_rom(0);
+ end if;
+
+sram_alt_128 is either 0 or 1 choosing one of the altroms.
+
+sram_active_rom is the rom selection 0-3 used when the altrom is not active.  
+port_1ffd_rom is two bits with the usual port_1ffd rom bit as most significant bit and 
+the port_7ffd rom bit as the least significant.
+
+I think that covers the details.
+
+
+0x8C (140) => Alternate ROM
+(R/W) (hard reset = 0)
+IMMEDIATE
+  bit 7 = 1 to enable alt rom
+  bit 6 = 1 to make alt rom visible only during writes, otherwise replaces rom during reads
+  bit 5 = 1 to lock ROM1 (48K rom)
+  bit 4 = 1 to lock ROM0 (128K rom)
+AFTER SOFT RESET (copied into bits 7-4)
+  bit 3 = 1 to enable alt rom
+  bit 2 = 1 to make alt rom visible only during writes, otherwise replaces rom during reads
+  bit 1 = 1 to lock ROM1 (48K rom)
+  bit 0 = 1 to lock ROM0 (128K rom)
+The locking mechanism also applies if the alt rom is not enabled. For the +3 and zx next, if the two lock bits are not
+zero, then the corresponding rom page is locked in place. Other models use the bits to preferentially lock the corresponding
+48K rom or the 128K rom.
+
+
+Allen Albright I see on the vhdl sources the new memory map with the alt roms
+
+-- 0x000000 - 0x00FFFF (64K)  => ZX Spectrum ROM         A20:A16 = 00000
+   -- 0x010000 - 0x011FFF ( 8K)  => divMMC ROM              A20:A16 = 00001,000
+   -- 0x012000 - 0x013FFF ( 8K)  => unused                  A20:A16 = 00001,001
+   -- 0x014000 - 0x017FFF (16K)  => Multiface ROM,RAM       A20:A16 = 00001,01
+   -- 0x018000 - 0x01BFFF (16K)  => Alt ROM0 128k           A20:A16 = 00001,10
+   -- 0x01c000 - 0x01FFFF (16K)  => Alt ROM1 48k            A20:A16 = 00001,11
+   -- 0x020000 - 0x03FFFF (128K) => divMMC RAM              A20:A16 = 00010
+   -- 0x040000 - 0x05FFFF (128K) => ZX Spectrum RAM         A20:A16 = 00100
+   -- 0x060000 - 0x07FFFF (128K) => Extra RAM
+   -- 0x080000 - 0x0FFFFF (512K) => 1st Extra IC RAM (if present)
+   -- 0x100000 - 0x17FFFF (512K) => 2nd Extra IC RAM (if present)
+   -- 0x180000 - 0x1FFFFF (512K) => 3rd Extra IC RAM (if present)
+
+	-> Soft reset can be the button or via nextreg 2
+
+-> Ver patch_tbblue_add_alt_rom.diff
+
+When altrom is off (bit 7), the locking mechanism applies to the normal roms.  
+A few posts up I gave you an excerpt from the vhdl where you can see the lock bits are checked to 
+determine which normal rom (sram_active_rom) and which altrom (sram_alt_128) will be selected in 
+the bottom 16k (later on the choice between normal and alt rom is made depending on whether the alt 
+rom is enabled and whether it's a read or write).
+
+That applies to the +3 machine type (the next).  I'm not sure how far you are going with the emulation.  
+If you are doing the machine types (you boot into the 48k personality with a machine type of 48k instead of +3) 
+then normal rom selection has more cases.  
+See https://gitlab.com/SpectrumNext/ZX_Spectrum_Next_FPGA/-/blob/master/cores/zxnext/src/zxnext.vhd#L2299 .  
+The machine type is coming from nextreg 3 
+ https://gitlab.com/SpectrumNext/ZX_Spectrum_Next_FPGA/-/blob/master/cores/zxnext/src/zxnext.vhd#L4586
+
+The machine type does affect a few things like which ports are used for the multiface (multiface 1, multiface 128, multiface +3), whether certain configuration bits in the nextreg can be changed and some port decoding on ports 7ffd, eg, (although that is going to be changed to depend on video timing instead soon).
+
+"but this locking always need bit 7 set, right?":
+A: No it applies all the time if the two locking bits are not 00.  
+The difference is the locking is applied to the alt rom if bit 7 is set and to the regular roms if bit 7 is reset.
+-Quizá falte alguna instrucción de z80n para lo del altrom?
+
+-Soft reset can be the button or via nextreg 2: que cuando haga ese reset, copie bits bajos a altos de registro 8c
+
+-Quizá modos 48 y 128 de next fallan porque intentan cambiar tipo máquina (y eso solo se permite en el boot)
+
+-----FIN ALTROM TBBLUE-----
