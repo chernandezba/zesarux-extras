@@ -1,0 +1,69 @@
+Instalar freebsd base, usando iso FreeBSD-12.1-RELEASE-amd64-bootonly.iso
+
+
+Para entorno de escritorio:
+https://www.2daygeek.com/install-xfce-mate-kde-gnome-cinnamon-desktop-environment-on-freebsd/
+
+
+Lista de pasos:
+
+
+
+1) Install X Window Systems on FreeBSD
+
+We need to install Xorg before proceeding desktop installation, which provides the open source X Window System used to provide a graphical environment.
+
+[Keep your system upto date]
+# freebsd-update fetch
+# freebsd-update install
+
+[Install X Window System]
+# pkg install xorg
+2) Install Display Manager on FreeBSD
+
+we need to install/enable Display Manager based on the desktop environment such as gdm, lightdm, slim, lxdm, etc,.. so that we can feel the difference or we can use the same Display Manager to all the desktop environment. Finally enable the Display Manager on /etc/rc.conf file, so that it will popup the login screen, otherwise you wont get login screen. Some of the desktop environment have own display manager such as Gnome (GDM) & KDE (KDM), so we can enable it after installation. Few of the desktop environment don’t have the Display manager such as Xfce, Cinnamon, etc.,. So we can install slim, its common display manager which will work without any tweak with all the desktop environment.
+
+[Install/Enable Display Manager]
+# pkg install slim
+
+[Enable Display Manager]
+# nano /etc/rc.conf
+gdm_enable="YES"      [For GNOME, Cinnamon]
+kdm4_enable="YES"     [For KDE]
+slim_enable="YES"     [For XFCE, MATE]
+
+->en mi caso, gnome3
+
+3) Mount /proc file system
+
+All Desktop Environment requires /proc to be mounted automatically during system startup. So Add the below line to /etc/fstab.
+
+# nano /etc/fstab
+proc           /proc       procfs  rw  0   0
+4) Enable application on /etc/rc.conf file
+
+All Desktop Environment uses D-Bus and HAL for a message bus and hardware abstraction. These applications are automatically installed as dependencies of Desktop Environment. Add the below line to /etc/rc.conffile, so that it will automatically startup on system boot.
+
+# nano /etc/rc.conf
+dbus_enable="YES"
+hald_enable="YES"
+gnome_enable="YES"     [Only For GNOME]
+5) Install Desktop Environment on FreeBSD
+
+FreeBSD supports wide range of desktop environment such as Xfce, Kde, Gnome, Cinnamon & Mate. You can choose better one or more then one as per your requirement then install it.
+
+
+[Install xfce4 Desktop Environment]
+# pkg install xfce
+
+[Install MATE Desktop Environment]
+# pkg install mate
+
+[Install GNOME Desktop Environment]
+# pkg install gnome3
+
+[Install CINNAMON Desktop Environment]
+# pkg install cinnamon
+
+[Install KDE Desktop Environment]
+# pkg install kde
