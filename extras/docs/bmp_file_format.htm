@@ -1,0 +1,427 @@
+<html>
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>THE BMP FILE FORMAT</title>
+</head>
+
+<body>
+<div align="center"><img src="http://www.ee.ualberta.ca/~lramirez/Header.gif"> </div>
+<p align="left"><font size="5" face="Arial"><b>THE BMP FILE FORMAT</b></font></p>
+<p><font face="Arial">Compiled by Nathan Liesch of <b>Imperium Accelero 9000</b> </font></p>
+<hr>
+<p align="left"><font face="Arial">Increasingly the power of FPGAs is being 
+utilized for DSP applications and a common source for digital signals to process 
+is images. The first step in implementing any sort of image processing algorithm 
+is accessing the raw pixel data. </font></p>
+<p align="left"><font face="Arial">The MS-Windows standard format is BMP and was 
+developed as a device-independent bitmap (DIB) format that will allow Windows to 
+display the bitmap on any type of display device. The term &quot;device independent&quot; 
+means that the bitmap specifies pixel color in a form independent of the method 
+used by a display to represent color. This file format can be stored uncompressed, 
+so reading BMP files is fairly simple; most other graphics formats are 
+compressed, and some, like GIF, are difficult to decompress.</font></p>
+
+<font face="Arial">The file format consists of the following structures:<br>
+</font>
+<table border="1" cellpadding="1" cellspacing="1">
+  <tr>
+    <td><font face="Arial" size="4"><b>Structure</b></font></td>
+    <td><font face="Arial" size="4"><b>Corresponding Bytes</b></font></td>
+    <td><b><FONT FACE="Arial" size="4">Description</FONT></b></td>
+  </tr>
+  <tr>
+    <td ><FONT FACE="Arial">Header</FONT></td>
+    <td ><font face="Arial">0x00 - 0x0D</font></td>
+    <td ><font face="Arial">contains information about the type, size, and 
+    layout of a device-independent bitmap file</font></td>
+  </tr>
+  <tr>
+    <td ><FONT FACE="Arial">InfoHeader</FONT></td>
+    <td ><font face="Arial">0x0E - 0x35</font></td>
+    <td ><font face="Arial">specifies the dimensions, compression type, and color format for the 
+    bitmap</font></td>
+  </tr>
+  <tr>
+    <td ><FONT FACE="Arial">ColorTable</FONT></td>
+    <td ><font face="Arial">0x36 - variable</font></td>
+    <td ><font face="Arial">contains as many elements as there are colors in the bitmap, but is not 
+    present for bitmaps with 24 color bits because each pixel is represented by 
+    24-bit red-green-blue (RGB) values in the actual bitmap data area</font></td>
+  </tr>
+  <tr>
+    <td ><FONT FACE="Arial">Pixel Data</FONT></td>
+    <td ><font face="Arial">variable</font></td>
+    <td ><font face="Arial">an array of bytes that defines the bitmap bits. These are the actual 
+    image data, represented by consecutive rows, or &quot;scan lines,&quot; of the bitmap. 
+    Each scan line consists of consecutive bytes representing the pixels in the 
+    scan line, in left-to-right order. The system maps pixels beginning with the 
+    bottom scan line of the rectangular region and ending with the top scan 
+    line.</font></td>
+  </tr>
+</table>
+<p><font face="Arial">Below is a more detailed table of the contents of each of 
+these structures.</font></p>
+<TABLE border="1" cellpadding="2" cellspacing="1">
+<TR>
+<TH COLSPAN="3"><FONT FACE="Arial" size="4">Name</FONT></TH>
+
+<TH><FONT FACE="Arial" size="4">Size</FONT></TH>
+
+<TH><font face="Arial" size="4">Offset</font></TH>
+
+<TH><FONT FACE="Arial" size="4">Description</FONT></TH>
+</TR>
+
+<TR>
+<TD COLSPAN="3"><b><FONT FACE="Arial">Header</FONT></b></TD>
+
+<TD><FONT FACE="Arial">14 bytes</FONT></TD>
+
+<TD>&nbsp;</TD>
+
+<TD><FONT FACE="Arial">Windows Structure: BITMAPFILEHEADER</FONT></TD>
+</TR>
+
+<TR>
+<TD ROWSPAN="4" width="10"><FONT FACE="Arial">&nbsp;</FONT></TD>
+
+<TD COLSPAN="2"><FONT FACE="Arial">Signature</FONT></TD>
+
+<TD><FONT FACE="Arial">2 bytes</FONT></TD>
+
+<TD><font face="Arial">0000h</font></TD>
+
+<TD><FONT FACE="Arial">'BM'</FONT></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="2"><FONT FACE="Arial">FileSize</FONT></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><font face="Arial">0002h</font></TD>
+
+<TD><FONT FACE="Arial">File size in bytes</FONT></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="2"><FONT FACE="Arial">reserved</FONT></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">0006h</span></TD>
+
+<TD><FONT FACE="Arial">unused (=0)</FONT></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="2"><FONT FACE="Arial">DataOffset</FONT></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">000Ah</span></TD>
+
+<TD><font face="Arial">Offset from beginning of file to the beginning of the 
+bitmap data</font></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="3"><b><FONT FACE="Arial">InfoHeader</FONT></b></TD>
+
+<TD><FONT FACE="Arial">40 bytes</FONT></TD>
+
+<TD>&nbsp;</TD>
+
+<TD><FONT FACE="Arial">Windows Structure: BITMAPINFOHEADER</FONT></TD>
+</TR>
+
+<TR>
+<TD ROWSPAN="11" width="10"><FONT FACE="Arial">&nbsp;</FONT></TD>
+
+<TD COLSPAN="2"><FONT FACE="Arial">Size</FONT></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">000Eh</span></TD>
+
+<TD><FONT FACE="Arial">Size of InfoHeader =40&nbsp;</FONT></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="2"><FONT FACE="Arial">Width</FONT></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">0012h</span></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">Horizontal width of 
+bitmap in pixels</span></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="2"><FONT FACE="Arial">Height</FONT></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">0016h</span></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">Vertical height of 
+bitmap in pixels</span></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="2"><FONT FACE="Arial">Planes</FONT></TD>
+
+<TD><FONT FACE="Arial">2 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">001Ah</span></TD>
+
+<TD><FONT FACE="Arial">Number of Planes (=1)</FONT></TD>
+</TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN="2"><span style="font-size: 11.0pt; font-family: Arial">Bits Per 
+Pixel</span></TD>
+
+<TD><FONT FACE="Arial">2 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">001Ch</span></TD>
+
+<TD><FONT FACE="Arial">Bits per Pixel </FONT>
+<span style="font-size: 11.0pt; font-family: Arial">used to store palette entry 
+information. This also identifies in an indirect way the number of possible 
+colors. Possible values are:</span><FONT FACE="Arial"><BR>1 = monochrome palette. NumColors = 1&nbsp;&nbsp;
+<BR>4 = 4bit palletized. NumColors = 16&nbsp;&nbsp;
+<BR>8 = 8bit palletized. NumColors = 256&nbsp;
+<BR>16 = 16bit RGB. NumColors = 65536<BR>24 = 24bit RGB. NumColors = 16M</FONT></TD>
+</TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN="2"><FONT FACE="Arial">Compression</FONT></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">001Eh</span></TD>
+
+<TD><FONT FACE="Arial">Type of Compression&nbsp;&nbsp;
+<BR>0 = BI_RGB&nbsp;&nbsp; no
+compression&nbsp;&nbsp;
+<BR>1 = BI_RLE8 8bit
+RLE encoding&nbsp;&nbsp;
+<BR>2 = BI_RLE4 4bit
+RLE encoding</FONT></TD>
+</TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN="2"><FONT FACE="Arial">ImageSize</FONT></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">0022h</span></TD>
+
+<TD><FONT FACE="Arial">(compressed) Size of Image&nbsp;
+<BR>It is valid to set this =0 if Compression
+= 0</FONT></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="2"><FONT FACE="Arial">XpixelsPerM</FONT></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">0026h</span></TD>
+
+<TD><FONT FACE="Arial">horizontal resolution: Pixels/meter</FONT></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="2"><FONT FACE="Arial">YpixelsPerM</FONT></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">002Ah</span></TD>
+
+<TD><FONT FACE="Arial">vertical resolution: Pixels/meter</FONT></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="2"><FONT FACE="Arial">Colors Used</FONT></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">002Eh</span></TD>
+
+<TD><FONT FACE="Arial">Number of actually used colors. </FONT>
+<span style="font-size: 11.0pt; font-family: Arial">For a 8-bit / pixel bitmap 
+this will be 100h or 256.</span></TD>
+</TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN="2"><span style="font-size: 11.0pt; font-family: Arial">Important 
+Colors</span></TD>
+
+<TD><FONT FACE="Arial">4 bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">0032h</span></TD>
+
+<TD><FONT FACE="Arial">Number of important colors&nbsp;
+<BR>0 = all</FONT></TD>
+</TR>
+
+<TR VALIGN=TOP>
+<TD COLSPAN="3"><b><FONT FACE="Arial">ColorTable</FONT></b></TD>
+
+<TD><FONT FACE="Arial">4 * NumColors bytes</FONT></TD>
+
+<TD><span style="font-size: 11.0pt; font-family: Arial">0036h</span></TD>
+
+<TD><FONT FACE="Arial">present only if Info.BitsPerPixel less than
+8&nbsp;&nbsp;
+<BR>colors should be ordered by importance</FONT></TD>
+</TR>
+
+<TR>
+<TD ROWSPAN="5" width="10"><FONT FACE="Arial">&nbsp;</FONT></TD>
+
+<TD ROWSPAN="4"></TD>
+
+<TD><FONT FACE="Arial">Red</FONT></TD>
+
+<TD><FONT FACE="Arial">1 byte</FONT></TD>
+
+<TD>&nbsp;</TD>
+
+<TD><FONT FACE="Arial">Red intensity</FONT></TD>
+</TR>
+
+<TR>
+<TD><FONT FACE="Arial">Green</FONT></TD>
+
+<TD><FONT FACE="Arial">1 byte</FONT></TD>
+
+<TD>&nbsp;</TD>
+
+<TD><FONT FACE="Arial">Green intensity</FONT></TD>
+</TR>
+
+<TR>
+<TD><FONT FACE="Arial">Blue</FONT></TD>
+
+<TD><FONT FACE="Arial">1 byte</FONT></TD>
+
+<TD>&nbsp;</TD>
+
+<TD><FONT FACE="Arial">Blue intensity</FONT></TD>
+</TR>
+
+<TR>
+<TD><FONT FACE="Arial">reserved</FONT></TD>
+
+<TD><FONT FACE="Arial">1 byte</FONT></TD>
+
+<TD>&nbsp;</TD>
+
+<TD><FONT FACE="Arial">unused (=0)</FONT></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="4"><FONT FACE="Arial">repeated NumColors times</FONT></TD>
+</TR>
+
+<TR>
+<TD COLSPAN="3"><b><font face="Arial">Pixel Data</font></b></TD>
+
+<TD><FONT FACE="Arial">InfoHeader.ImageSize bytes</FONT></TD>
+
+<TD>&nbsp;</TD>
+
+<TD><FONT FACE="Arial">The image data</FONT></TD>
+</TR>
+</TABLE>
+<font face="Arial">&nbsp;</font>
+<BR>
+<font face="Arial" size="4">Bits Per Pixel 
+Field</font><font face="Arial"></TD>
+</TR>
+<font size="4">
+</TABLE>
+</font>
+</font>
+<table border="1" cellpadding="2" cellspacing="1">
+  <tr>
+    <td><font face="Arial">Value</font></td>
+    <td><font face="Arial">Description</font></td>
+  </tr>
+  <tr>
+    <td><font face="Arial">1</font></td>
+    <td><font face="Arial">The bitmap is 
+monochrome, and the palette contains two entries. Each bit in the bitmap array 
+represents a pixel. If the bit is clear, the pixel is displayed with the color 
+of the first entry in the palette; if the bit is set, the pixel has the color of 
+the second entry in the table.</font></td>
+  </tr>
+  <tr>
+    <td><font face="Arial">4</font></td>
+    <td><font face="Arial">The bitmap has 
+a maximum of 16 colors, and the palette contains up to 16 entries. Each pixel in 
+the bitmap is represented by a 4-bit index into the palette. For example, if the 
+first byte in the bitmap is 1Fh, the byte represents two pixels. The first pixel 
+contains the color in the second palette entry, and the second pixel contains 
+the color in the sixteenth palette entry.</font></td>
+  </tr>
+  <tr>
+    <td><font face="Arial">8</font></td>
+    <td><font face="Arial">The bitmap has 
+a maximum of 256 colors, and the palette contains up to 256 entries. In this 
+case, each byte in the array represents a single pixel.</font></td>
+  </tr>
+  <tr>
+    <td><font face="Arial">16</font></td>
+    <td><font face="Arial">The bitmap has 
+a maximum of 2^16 colors. If the <i>Compression</i> field of the bitmap file is 
+set to BI_RGB, the <i>Palette</i> field does not contain any entries. Each word 
+in the bitmap array represents a single pixel. The relative intensities of red, 
+green, and blue are represented with 5 bits for each color component. The value 
+for blue is in the least significant 5 bits, followed by 5 bits each for green 
+and red, respectively. The most significant bit is not used.
+<br>
+If the <i>
+Compression</i> field of the bitmap file is set to BI_BITFIELDS, the <i>Palette</i> 
+field contains three 4 byte color masks that specify the red, green, and blue 
+components, respectively, of each pixel.&nbsp; Each 2 bytes in the bitmap array 
+represents a single pixel.</font></td>
+  </tr>
+  <tr>
+    <td><font face="Arial">24</font></td>
+    <td><font face="Arial">The bitmap has 
+a maximum of 2^24 colors, and the <i>Palette</i> field does not contain any 
+entries. Each 3-byte triplet in the bitmap array represents the relative 
+intensities of blue, green, and red, respectively, for a pixel.</font></td>
+  </tr>
+  </table>
+<p><font face="Arial" size="4">Additional Info</font></p>
+<p><font face="Arial">Each scan line is zero padded to the nearest 4-byte 
+boundary. If the image 
+ 
+has a width that is not divisible by four, say, 21 bytes, there would be 3 
+bytes of padding at the end of every scan line.</font></p>
+<p><font face="Arial">Scan lines are stored bottom to top instead of top to 
+bottom.</font></p>
+<p><font face="Arial">RGB values are stored backwards i.e. BGR.</font></p>
+<p><font face="Arial">4 bit &amp; 8 bit BMPs can be compressed. BMPs use a very 
+simple form of compression called Run Length Encoded (RLE). Instead of storing a 
+value for each pixel RLE stores a number, N, followed by an index. This means 
+that the next N pixels are of the color for this index.</font></p>
+<p><font face="Arial">For additional information refer to:<br>
+<a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/gdi/bitmaps_4v1h.asp">
+MSDN Library: Bitmap Storage</a><br>
+<a href="http://www.dcs.ed.ac.uk/home/mxr/gfx/2d/BMP.txt">The Graphics File 
+Formats Page - BMP</a></font></p>
+<p><font face="Arial">Compiled by Nathan Liesch of <b>Imperium Accelero 9000</b> </font></p>
+<p><font face="Arial"><b>With guidance from:</b> </font></p>
+<img src="http://www.ee.ualberta.ca/~nliesch/images/strongbad.jpg">
+</body>
+
+</html>
