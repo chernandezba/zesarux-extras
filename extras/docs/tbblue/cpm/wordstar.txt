@@ -1,0 +1,87 @@
+Note: I don't remember the original author of this instructions, sorry! I found it somewhere in a Spectrum Next group:
+
+
+
+Hi folks, thanks to Claire, Phoebus & Robin’s help yesterday, I (finally) managed to install WordStar under CP/M and it’s working a treat! 
+
+It took me ages to get up and running (mostly to find a suitable copy of WordStar) so I’ve detailed the install steps below from (my) total novice perspective, in case it is of use to anyone else.
+
+This assumes you already have CP/M up and running as per the initial on-screen instructions.
+
+I learned tons in the process & the contents of chapter 20 now make total sense! 
+
+If I've missed anything, let me know and I'll edit the post.
+
+Fun Fact: Game of Thrones author George R.R Martin still uses a DOS version of WordStar 4.0 to write his novels!
+
+-------------------------
+
+So, firstly download & extract Version 4.00 of WordStar to a new folder at the root (first level) of your Next SD card.
+
+Call the folder ‘wordstar’ for the sake of simplicity.
+
+WordStar DL here:[http://www.retroarchive.org/cpm/text/wordstar-collection.html](http://www.retroarchive.org/cpm/text/wordstar-collection.html)
+
+Create a new B Drive in CP/M via the command line of the Next browser by typing mkdata “/nextzxos/cpm-b.p3d”
+
+This allows WordStar to sit on its own drive (not necessary) but it keeps everything tidy.
+
+Fire up CP/M via the next browser
+
+At the A> prompt, type B: to switch to your newly created B Drive 
+
+You should now see a B> prompt
+
+Import the contents of your wordstar folder from the Next’s C drive by typing- import c:/wordstar/*.* B:
+
+Using the wildcard *.* in place of a file name imports ALL files from the folder.
+
+You should now see the files importing.
+
+(Typing DIR will show the files in the current directory)
+
+Once imported type WINSTALL.COM
+
+This will launch the installer and you will be asked “What file would you like to install'
+
+At the prompt type WS
+
+You will then be asked “What file would you like to save setup too'
+
+At the prompt again type WS
+
+The main installation menu will appear
+
+Press A to enter Console
+
+Choose option W for Zenith 19/Heath 19 monitors
+
+X to exit the submenu
+
+Press C to enter Computer
+
+Select B as the main disk drive for your application (assuming you set up a B drive earlier)
+
+X to exit the submenu
+
+Select A for a single user system
+
+X to exit the submenu
+
+(I left the default printer as it was)
+
+WS.COM has now been installed
+
+Hit yes if you are finished making changes
+
+You will now be returned to the B> prompt
+
+Type WS to launch WordStar
+
+WordStar should now launch and you can now write your NEXT bestselling novel (see what I did there?)
+
+Remember that CP/M boots into the A drive so you will always need to switch to your B drive first (type B:) before launching your application (type WS)
+
+If CP/M can't find your program and returns your input with a question mark after it ie: WS?. Type DIR (directory) to show the files on the current drive and make sure your program files are there. If not switch to another drive, type DIR to make sure your files are present then run as normal.
+
+Laters on the Menjay! 
