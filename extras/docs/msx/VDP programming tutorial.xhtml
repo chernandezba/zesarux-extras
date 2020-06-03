@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="/css/map.css" type="text/css"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+  <title>VDP programming tutorial</title>
+  <link rel="stylesheet" href="/css/map.css" type="text/css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+<h1 id="head">MSX Assembly Page</h1>
+
+<div id="menu">
+<ul>
+<li><a href="/">Main</a></li>
+<li><a href="/articles/">Articles</a></li>
+<li><a href="/resources/">Resources</a></li>
+<li><a href="/sources/">Sources</a></li>
+<li><a href="/links/">Links</a></li>
+<li><a href="/contributing/">Contributing</a></li>
+</ul>
+</div>
+<div id="content">
+
+
+
+<h1>VDP programming tutorial</h1>
+
+<p>This article is meant to be a tutorial for beginning Assembly programmers who want to access the <abbr title="Machines with Software eXchangability">MSX</abbr> <abbr title="Video Display Processor">VDP</abbr>. Knownledge of Z80 assembly is expected. I’ll start out with explaining a little about the three main features of the VDP, then I will go into more detail on how to use them, giving some sample routines inbetween, then I will tell something about the palette, and finally I will give an small example using all addressing methods.</p>
+
+<p>Table of contents:</p>
+
+<ul>
+<li><a href="#basics">The VDP basics</a></li>
+<li><a href="#registers">Writing and reading VDP registers</a>
+<ul>
+  <li><a href="#direct">Direct register access</a></li>
+  <li><a href="#indirect">Indirect register access</a></li>
+  <li><a href="#status">Status register access</a></li>
+</ul>
+</li>
+<li><a href="#vram">Writing and reading the VRAM</a>
+<ul>
+  <li><a href="#vramtiming">VRAM access timing</a></li>
+</ul>
+</li>
+<li><a href="#commands">Executing VDP commands</a></li>
+<li><a href="#palette">Setting the palette</a></li>
+<li><a href="#example">Programming example</a></li>
+</ul>
+
+
+
+
+<h2 id="basics">The VDP basics</h2>
+
+<p>There are basically three VDPs for when it concerns MSX computers, the MSX1 its TMS9918A (by Texas Instruments), the MSX2 its v9938, and the MSX2+ and turboR’s v9958 (both by Yamaha). There is also the Graphics9000 (v9990, also by Yamaha), which is pretty cool aswell, but we won’t talk about that one. This document is a guide to programming the v9938, with some remarks about the v9958 inbetween. Although the v9958 definitely has some great additional features like high-color screen modes and horizontal scrolling, the basics are the same.</p>
+
+<p>The MSX v9938 VDP has three main features:</p>
+
+<ul>
+<li>It has <em><abbr title="Video RAM">VRAM</abbr></em>. This is a special 128kb <abbr title="Random Access Memory">RAM</abbr> area dedicated to the VDP, in which it stores its image data. The MSX <abbr title="Central Processing Unit">CPU</abbr> can only access it through the VDP.</li>
+
+<li>It has a set of <em>registers</em>. With these registers you can control the VDP’s behaviour, amongst others in which screenmode it operates, the refresh frequency, and much much more. Especially when used in combination with screensplits they enable you to achieve amazing things. In total there are 39 write-only registers, and 10 read-only (status) registers. On the v9958 VDP, used in amongst others all MSX 2+ and turboR computers, there are 3 additional write-only registers.</li>
+
+<li>It has a <em>command unit</em> which can perform VDP-based operations. These operations can vary from copying a specified area of an image in different speed modes to filling boxes and drawing lines. This is really one of the most useful features of the MSX VDP, because it can perform these operations independently of the Z80 CPU, and is also faster at it. Just give the VDP your 15-byte command and let it do the hard work.</li>
+</ul>
+
+<p>The VDP has got 4 I/O ports through which communication with the CPU is done. They are referred to as VDP ports #0 - #3. On MSX2 computers, one officially needs to read the VDP ‘base’ port address (being the address of the first port) from addresses 6 and 7 in the <abbr title="Basic Input Output System">BIOS</abbr>. However, from the MSX2+ computer on this address has been standardized to #98. The only devices which actually used this feature are MSX2 expansion sets for MSX1 computers, and those are very rare due to amongst others the lack of software support, and because buying a new MSX2 computer would probably have been cheaper. So in practice, you can just assume them to be present in the #98-#9B range, which is much faster to program for. I’ll usually refer to the I/O port number (#98 for example) instead of the VDP’s port number (being #0 in this case).</p>
+
+
+
+
+
+
+
+<h2 id="registers">Writing and reading VDP registers</h2>
+
+<p>The VDP registers are pretty much the most important for controlling the VDP’s behaviour. As mentioned before, you can make them set a screen mode and lots of other display properties, and particularly when used on screensplits they can enable you to pull amazing visual effects. They can only be written to, and not read from, so if you’re smart you mirror them in the RAM everytime you write to them, especially when it concerns the mode registers. The MSX BIOS also does this, I will tell you the specific addresses later on. The VDP registers are generally referred to as r#number, number being the register number (duh :)), e.g. r#23, which is the display offset (vertical scroll) register.</p>
+
+<p>If you have been a avid MSX-Basic programmer, you will probably notice something odd, because in Basic, VDP register 23 is referred to as <code>VDP(24)</code>! This is indeed true for Basic, and the reason for that is that on the MSX1, with the TMS9918A VDP, <code>VDP(8)</code> was used to read status register 0. However, on the MSX2 VDP suddenly an 8th register appeared. To fix this they decided to increase the register number with 1 (and use negative numbers for the new status registers). So <code>VDP(9)</code> in Basic is actually r#8 and <code>VDP(10)</code> is r#9.</p>
+
+<p>The actual VDP register 24 is not present on the v9938 nor on the v9958. It was used on the v9948 – apparantly a VDP dedicated to the Korean market, which added another text mode specifically for use with the Korean character set. The v9958 added new registers to the v9938 registerset aswell, those are registers 25-27, but it hasn’t got a register 24.</p>
+
+<p>Ah, I still need to list the promised MSX BIOS VDP register mirror addresses:</p>
+
+<p>
+#F3DF - #F3E6: registers 0-7<br />
+#FFE7 - #FFF6: registers 8-23<br />
+#FFFA - #FFFC: registers 25-27
+</p>
+
+<p>I myself often have the start addresses set as 3 labels, <var>VDP_0</var>, <var>VDP_8</var> (-8) and <var>VDP_25</var> (-25), and refer to for example register 23 with <code>VDP_8 + 23</code>. Another setup I use even more is my own <var>VDP</var> array of 28 bytes. At the start of my program I copy the values from the BIOS into my own array, and after that I simply load the value of a certain VDP register in <var>A</var> by using <code>LD A,(VDP+9)</code>.</p>
+
+
+<h3 id="direct">Direct register access</h3>
+
+<p>Anyways, let’s talk about how to actually write to them registers ;). The VDP registers can be addressed in two ways, direct and indirect. Usually the direct way is used, but the indirect method is also practical in some situations. For direct register access, what you have to do is write the value to port #99 first, and then write the register number with bit 8 set (in other words, +128). Here is the method definition from the v9938 application manual:</p>
+
+<pre>                     MSB  7   6   5   4   3   2   1   0  LSB
+                        +---+---+---+---+---+---+---+---+
+   Port #1 First byte   |D7 |D6 |D5 |D4 |D3 |D2 |D1 |D0 | DATA
+                        +===+===+===+===+===+===+===+===+
+           Second byte  | 1 | 0 |R5 |R4 |R3 |R2 |R1 |R0 | REGISTER #
+                        +---+---+---+---+---+---+---+---+
+</pre>
+
+<p>So the actual code with which you change a register’s value will look something like this:</p>
+
+<pre>    ld a,value
+    di
+    out (#99),a
+    ld a,regnr + 128
+    ei
+    out (#99),a
+</pre>
+
+<p>Note the <code>DI</code> and the <code>EI</code> instructions inbetween. It is <em>VERY</em> important that you disable the interrupts during the 2 <code>OUT</code>s. This is because the VDP registers are also changed on the interrupt, and if an interrupt were to occur right inbetween these two <code>OUT</code> instructions the results would be unpredictable. The <code>EI</code> is put before the <code>OUT</code> here since the <code>EI</code> has a delay of 1 instruction on the Z80 before it re-enables the interrupts, and if possible one should keep the interrupts disabled as shortly as possible (some interrupts like line interrupts for screensplits or RS232 interrupts need responses as fast as possible).</p>
+
+<p>There is no speed limit on reading and writing VDP registers. Well, there is
+one obviously, but existing MSX CPUs don’t reach it. So feel free to have just
+a <code>XOR A</code> between two <code>OUT</code> instructions, or even use
+consecutive <code>OUTI</code> or <code>OUT (C),r</code> instructions.</p>
+
+<p>Another thing, if you are going to make a macro for setting the VDP register, I strongly recommend you to not include the <code>DI</code> and <code>EI</code> instructions. If you do that the status of the interrupt is not clearly visible in the code anymore, which could result in puzzling bugs in situations where the interrupt must stay disabled (for example in case you want to select a status register - see below). The downside of this is that you can’t put the <code>EI</code> before the 2nd <code>OUT</code> anymore, only after the macro. But that’s not that bad either, while the bugs this could cause can be mind-sizzling.</p>
+
+<h3 id="indirect">Indirect register access</h3>
+
+<p>There is also the other method of addressing the registers, which is, as said before, the indirect method. This means that you can specify the register to write to once, and then repeatedly write values, which is about twice as fast. However the register needs to be the same for all values, or it has to be a successive range of registers (indirect register writing supports auto incrementing). Indirect register writing is done by writing the register number to r#17, also specifying whether to auto-increment, and then writing the desired values to port #9B:</p>
+
+<pre>                  MSB  7   6   5   4   3   2   1   0  LSB
+                     +---+---+---+---+---+---+---+---+
+  Register #17       |AII| 0 |R5 |R4 |R3 |R2 |R1 |R0 | REGISTER #
+                     +-+-+---+---+---+---+---+---+---+
+                       |-- 1:  Auto increment inhibit
+                       +-- 0:  Auto increment on
+
+                     +---+---+---+---+---+---+---+---+
+  Port #3            |D7 |D6 |D5 |D4 |D3 |D2 |D1 |D0 | DATA
+                     +---+---+---+---+---+---+---+---+
+</pre>
+
+<p>Code example:</p>
+
+<pre>    ld a,regnr      ; add +128 for no auto increment
+    di
+    out (#99),a
+    ld a,17 + 128
+    ei
+    out (#99),a
+
+    ld b,number_of_bytes
+    ld c,#9B        ; you can also write ld bc,#nn9B, which is faster
+    ld hl,address
+    otir
+</pre>
+
+<p>Note that since VDP programming can be very tight, especially on screensplits, you often need the fastest solution possible. In that case, consider unrolling the <code>OTIR</code> to <code>OUTI</code>s as discussed in the <a href="/articles/fast_loops.php">Fast Loops</a> article.</p>
+
+<h3 id="status">Status register access</h3>
+
+<p>Aside from the normal registers there are also the status registers. Those can only be read, although in some cases status bits get reset when they’re read. The status registers are usually referred to as s#number, for example s#0 (being the default status register), and they contain information about interrupts, sprite status, and also the VDP <abbr title="Identification">ID</abbr> number with which you can identify what type of VDP it is (the v9938 has ID 0, the v9958 has ID 2, and the mysterious v9948 probably had ID 1).</p>
+
+<p>In order to read a status register one needs to write the number of the status register in r#15, and after that the status register’s value can be read from port #99:</p>
+
+<pre>                  MSB  7   6   5   4   3   2   1   0  LSB
+                     +---+---+---+---+---+---+---+---+
+  Register #15       | 0 | 0 | 0 | 0 |S3 |S2 |S1 |S0 | Status register
+                     +===+===+===+===+===+===+===+===+
+  Port #1 Read data  |D7 |D6 |D5 |D4 |D3 |D2 |D1 |D0 | DATA
+                     +---+---+---+---+---+---+---+---+
+</pre>
+
+<p>An important thing to remember is that with the common BIOS interruptroutine enabled, s#0 must <em>always</em> be enabled. So if you select another status register, keep the interrupts disabled until after you’ve read it and selected back s#0. Also note that it is good practice to have the interrupts disabled for a time period as short as possible, in other words you shouldn’t poll for a certain status register while keeping the interrupts disabled. Switch back to s#0 and enable the ints regularly.</p>
+
+<p>Some example code to read out a status register:</p>
+
+<pre>    ld a,statusregnr
+    di
+    out (#99),a
+    ld a,15 + 128
+    out (#99),a
+    in a,(#99)
+    ex af,af'
+    xor a           ; ld a,0
+    out (#99),a
+    ld a,15 + 128
+    ei
+    out (#99),a
+    ex af,af'
+    ret
+</pre>
+
+
+
+
+
+
+<h2 id="vram">Writing and reading the VRAM</h2>
+
+<p>Now, for the VRAM... It is pretty obvious that the CPU needs a means to write data to it, otherwise it would be quite hard to load an image into the VRAM. Aside from that, the VRAM access is also used a lot to update tables within the VRAM, like for example the sprite tables, and in (tile-based) screen modes 1-4 the pattern and attribute tables aswell. Especially in those screen modes you can pull some really cool effects using this.</p>
+
+<p>Since the VRAM is not directly connected to the CPU, communication with it needs to be done through the VDP. On the MSX, the process of writing bytes to the VRAM consists of two steps, first one needs to set the VDP’s ‘address counter’ and the mode (read or write access), and then the program can output (or input) a number of bytes to the VDP, which is interfaced with the VRAM. The setting of the address counter has to be done like this:</p>
+
+<ol type="1">
+<li>set the address counter bits 14-16 in register 14</li>
+<li>set the address counter bits 0-7</li>
+<li>set the address counter bits 8-13 and specify whether to read or to write</li>
+</ol>
+
+<p>The setting of the upper three bits in register 14 was added in the v9938 VDP (as opposed to the MSX1 TMS9918A) because of the larger amount of VRAM, 128kb instead of 16kb, and hence the larger addressing space. Anyways, those bits need to be set first, and then the bits 0-13 have to be written using two consecutive <code>OUT</code>s to port #99. To clarify a bit more:</p>
+
+
+<pre>                   MSB  7   6   5   4   3   2   1   0  LSB
+                      +---+---+---+---+---+---+---+---+
+  Register #14        | 0 | 0 | 0 | 0 | 0 |A16|A15|A14| VRAM access base
+                      +---+---+---+---+---+---+---+---+ address register
+
+                   MSB  7   6   5   4   3   2   1   0  LSB
+                      +---+---+---+---+---+---+---+---+
+  Port #1 First byte  |A7 |A6 |A5 |A4 |A3 |A2 |A1 |A0 | VRAM access base
+                      +===+===+===+===+===+===+===+===+ address registers
+         Second byte  | X | X |A13|A12|A11|A10|A9 |A8 |
+                      +-+-+-+-+---+---+---+---+---+---+
+                        0   0:  Read
+                        0   1:  Write
+</pre>
+
+<p>After having done this, you can read or write the data from or to port #98.
+After each VRAM read/write access, the address counter is automatically
+increased, so if you use repeated reads/writes you don’t need to set the address
+counter again all the time. Note however that you can’t mix reads and writes –
+if you wish to change from reading to writing mode or vice versa you need to
+re-set the address with the read/write bit set appropriately.</p>
+
+<p>On the TMS9918 the VRAM address pointer gets modified when you write to a
+register. Therefore, on MSX1 you must keep the interrupts disabled while writing
+to or reading from VRAM. Fortunately the V9938’s VRAM address pointer is not
+affected by register writes, so this restriction does not apply to MSX2.</p>
+
+<h3 id="vramtiming">VRAM access timing</h3>
+
+<p>It is important to know that there is a speed limit when accessing the VRAM.
+How fast you can write exactly depends on the screen mode you’re in and whether
+you have sprites enabled, etc. The TMS9918 is the slowest, and in the worst case
+requires you to space your reads and writes 29 T-states apart. Notably, this is
+slower than the <code>OTIR</code> and <code>INIR</code> instructions (23
+cycles), so use the following code in stead (exactly 29 cycles):</p>
+
+<pre>OutiToVram:
+    outi
+    jp nz,OutiToVram
+</pre>
+
+<p>The V9938 is quite a bit faster, reads and writes only need to be 15 T-states
+apart. There is one exception: screen 0 requires a 20 T-states wait, both in
+width 40 and 80 modes. Note that the TMS9918 is actually faster in this screen
+mode, so make sure to test screen 0 programs on MSX2 hardware.</p>
+
+<p>What this means is that in MSX2 software you can safely use the
+<code>OTIR</code> and <code>INIR</code> instructions to output bulk data to the
+VRAM. If you’re not in screen 0, you can also safely use <code>OUTI</code>
+and <code>INI</code> instructions, refer to the
+<a href="/articles/fast_loops.php">Fast Loops</a> article for more details on
+how you can access the VRAM as quickly as possible by creating fast 16-bit loops
+and unrolling the <code>OTIR</code> / <code>INIR</code> instructions.</p>
+
+<p>Finally, during vertical blanking or when the screen is disabled, there is no
+speed limit. This applies to both the TMS9918 and the V9938. When you intend to
+exploit this fact, please be aware that at 60Hz, the vertical blanking period is
+shorter than at 50Hz. Test your code on both European and Japanese machines.</p>
+
+<p>For the exact details of TMS9918 VRAM access speeds, consult section 2.1.5 of
+the <a href="/resources/video/texasinstruments_tms9918.pdf">TMS9918 application
+manual</a>. For details about the V9938 timing consult Wouter Vermaelen’s
+<a href="/articles/vdp-vram-timing/vdp-timing.html">V9938 VRAM timings</a>
+(<a href="/articles/vdp-vram-timing/vdp-timing-2.html">part II</a>) articles.
+Finally, note that all V9938 timings also apply to the V9958.</p>
+
+<table>
+<caption>Minimum VRAM access timings in 3.58 MHz Z80 cycles</caption>
+<thead>
+	<tr><th>Screen mode</th><th>VDP mode</th><th>TMS9918</th><th>V9938 / V9958</th></tr>
+</thead>
+<tbody>
+	<tr><td>screen 0, width 40</td><td>TEXT 1</td><td>12</td><td>20</td></tr>
+	<tr><td>screen 0, width 80</td><td>TEXT 2</td><td></td><td>20</td></tr>
+	<tr><td>screen 1</td><td>GRAPHIC 1</td><td>29</td><td>15</td></tr>
+	<tr><td>screen 2</td><td>GRAPHIC 2</td><td>29</td><td>15</td></tr>
+	<tr><td>screen 3</td><td>MULTICOLOR</td><td>13</td><td>15</td></tr>
+	<tr><td>screen 4</td><td>GRAPHIC 3</td><td></td><td>15</td></tr>
+	<tr><td>screen 5</td><td>GRAPHIC 4</td><td></td><td>15</td></tr>
+	<tr><td>screen 6</td><td>GRAPHIC 5</td><td></td><td>15</td></tr>
+	<tr><td>screen 7</td><td>GRAPHIC 6</td><td></td><td>15</td></tr>
+	<tr><td>screen 8</td><td>GRAPHIC 7</td><td></td><td>15</td></tr>
+</tbody>
+</table>
+
+<p>Here are example routines to set the VDP for reading/writing the VRAM:</p>
+
+<pre>;
+; Set VDP address counter to write from address AHL (17-bit)
+; Enables the interrupts
+;
+SetVdp_Write:
+    rlc h
+    rla
+    rlc h
+    rla
+    srl h
+    srl h
+    di
+    out (#99),a
+    ld a,14 + 128
+    out (#99),a
+    ld a,l
+    nop
+    out (#99),a
+    ld a,h
+    or 64
+    ei
+    out (#99),a
+    ret
+
+;
+; Set VDP address counter to read from address AHL (17-bit)
+; Enables the interrupts
+;
+SetVdp_Read:
+    rlc h
+    rla
+    rlc h
+    rla
+    srl h
+    srl h
+    di
+    out (#99),a
+    ld a,14 + 128
+    out (#99),a
+    ld a,l
+    nop
+    out (#99),a
+    ld a,h
+    ei
+    out (#99),a
+    ret
+</pre>
+
+
+
+
+
+
+
+
+<h2 id="commands">Executing VDP commands</h2>
+
+<p>And finally, we arrived at the VDP commands. For screen modes 0-4 they are pretty useless, but for screen 5 and up they are definitely one of the coolest features of the VDP. They offer you the possibility to let the VDP perform a couple of actions ranging from copying an area of the screen to drawing a line. It also offers several variants of the same action, which offer more or less possibilities in exchange for speed. For example, the <abbr title="High-speed Move Memory to Memory">HMMM</abbr>, <abbr title="Logical Move Memory to Memory">LMMM</abbr> and <abbr title="High-speed Move Memory to Memory, Y only">YMMM</abbr> commands all copy an area of the screen, but HMMM is significantly faster than LMMM, and YMMM even more so, however the restrictions on YMMM make it only useful in a number of occasions. Refer to the article about <a href="/articles/vdp_commands_speed.php">VDP commands speed measurements</a> for more details on the command speeds. Take a look at the COMMANDS section on page 54 and onwards of the v9938 application manual for detailed descriptions of the several commands.</p>
+
+<p>The VDP expects its command parameters to be set in registers 32-45, and the final command code in register 46. The fastest and easiest way to do this is by using the indirect register access method. The parameter of a function which does that (<code>DoCopy</code>, given below) could then be a pointer to a 15-byte VDP command data block (illustrated in the programming example at the bottom). But before a new command is sent to r#32-r#46 the program should first check the <abbr title="Command Execute">CE</abbr> bit in s#2 (bit 0). This bit indicates whether the previously given command has finished or not. If it hasn’t, you should wait with giving the next command, or the previous one will be aborted. If abortion is what you want, there is a special STOP command for that.</p>
+
+<p>As you might already have guessed, the VDP executes the command independantly of the processor (on nowadays’ PC video cards this is called <i>hardware accelleration</i>... gah, we MSX-ers have had that for a long time already! ;)). In effect this means that the routine returns immediately after issueing the VDP command and in the meanwhile the CPU can do something else. Only if you immediately issue another command the CPU has to wait for the VDP to finish.</p>
+
+<p>Note about the v9958: if you set bit 6 of r#25, using VDP commands in screen modes 0-4 actually <i>is</i> supported. I it kind of hard to think of a real good use for it, but maybe you’ll find one someday :). Er, lemme think, it could for example be used to speed up vertical scrolling in screens 0 and 1. Or actually any tile-based scrolling I guess.</p>
+
+<p>Here is the <code>DoCopy</code> routine, read the small source code article <a href="/sources/docopy.php">about <code>DoCopy</code></a> on how to speed it up a little more.</p>
+
+<pre>;
+; Fast DoCopy, by Grauw
+; In:  HL = pointer to 15-byte VDP command data
+; Out: HL = updated
+;
+DoCopy:
+    ld a,32
+    di
+    out (#99),a
+    ld a,17 + 128
+    out (#99),a
+    ld c,#9B
+VDPready:
+    ld a,2
+    di
+    out (#99),a     ; select s#2
+    ld a,15 + 128
+    out (#99),a
+    in a,(#99)
+    rra
+    ld a,0          ; back to s#0, enable ints
+    out (#99),a
+    ld a,15 + 128
+    ei
+    out (#99),a     ; loop if vdp not ready (CE)
+    jp c,VDPready
+    outi            ; 15x OUTI
+    outi            ; (faster than OTIR)
+    outi
+    outi
+    outi
+    outi
+    outi
+    outi
+    outi
+    outi
+    outi
+    outi
+    outi
+    outi
+    outi
+    ret
+</pre>
+
+
+
+<h2 id="palette">Setting the palette</h2>
+
+<p>Setting a new VDP palette is a rather easy thing to do. First you have to set the palette pointer in r#16, usually it is set to 0, and then you can write your palette values to port #9A. The palette pointer automatically increments, and loops to 0 again when it reaches the last palette entry. By the way, please note that in screen 8 the palette can’t be used for sprites.</p>
+
+<p>Here is an example SetPalette routine. The <code>OTIR</code> could be unrolled to <code>OUTI</code>s if you really need the additional speed (for example on a screensplit).</p>
+
+<pre>;
+; Set the palette to the one HL points to...
+; Modifies: AF, BC, HL (=updated)
+; Enables the interrupts.
+;
+SetPalette:
+    xor a           ; set p#pointer to zero.
+    di
+    out (#99),a
+    ld a,16+128
+    ei
+    out (#99),a
+    ld bc,#209A     ; out 32x to port #9A
+    otir
+    ret
+</pre>
+
+
+
+<h2 id="example">Programming example</h2>
+
+<p>This is a small example of a short program which combines most techniques. Do with it whatever you want, look at it, try it out, ignore it... ^_^. It isn’t exactly the summum of speed and optimized code, but ahwell... It will do.</p>
+
+<pre>;
+; Is supposed to run in screen 5, so you should make a small BASIC loader,
+; or call the CHMOD BIOS routine.
+;
+DoExampleCopy:
+    xor a           ; set vram write base address
+    ld hl,#8000     ;  to 1st byte of page 1...
+    call SetVDP_Write
+
+    ld a,#88        ; use color 8 (red)
+FillL1:
+    ld c,8          ; fill 1st 8 lines of page 1
+FillL2:
+    ld b,128        ;
+    out (#98),a     ; could also have been done with
+    djnz FillL2     ; a vdp command (probably faster)
+    dec c           ; (and could also use a fast loop)
+    jp nz,FillL1
+
+    ld hl,COPYBLOCK ; execute the copy
+    call DoCopy
+
+    ret
+
+
+COPYBLOCK:
+    db 0,0,0,1
+    db 0,0,0,0
+    db 8,0,8,0
+    db 0,0,#D0        ; HMMM
+
+; As an alternate notation, you might actually prefer the following:
+;
+;   dw    #0000,#0100
+;   dw    #0000,#0000
+;   dw    #0008,#0008
+;   db    0,0,#D0
+</pre>
+
+
+
+
+</div>
+
+<div id="foot">© 2020 MSX Assembly Page. MSX is a trademark of MSX Licensing Corporation.</div>
+</body>
+</html>
