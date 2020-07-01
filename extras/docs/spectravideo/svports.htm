@@ -1,0 +1,137 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="no-bok">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="keywords" content="Spectravideo MSX SV-318 SV-328 SV-728 SV-738 SV-838">
+<meta name="description" content="Spectravideo Documents">
+<meta name="GENERATOR" content="Microsoft FrontPage 6.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Spectravideo Documents</title>
+</head>
+
+<body text="#C0C0C0" bgcolor="#666666" topmargin="18" link="#FFFFFF" vlink="#FFFFFF" alink="#FFFFFF" bgproperties="fixed" background="images/tile.gif">
+<div align="center">
+  <center>
+  &nbsp;
+  <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="665" id="AutoNumber1">
+    <tr>
+      <td width="100%" bgcolor="#333333">
+		<p align="left">
+		<map name="FPMap0">
+		<area target="_top" href="spectravideo.htm" shape="rect" coords="5, 122, 63, 142">
+		<area target="_top" href="svhistory.htm" shape="rect" coords="66, 123, 150, 142">
+		<area target="_top" href="sv318.htm" shape="rect" coords="155, 122, 261, 141">
+		<area target="_top" href="svsoftware.htm" shape="rect" coords="266, 123, 367, 141">
+		<area target="_top" href="svdocuments.htm" shape="rect" coords="371, 124, 482, 142">
+		<area target="_top" href="svmisc.htm" shape="rect" coords="487, 123, 540, 141">
+		<area target="_top" href="svlinks.htm" shape="rect" coords="543, 123, 601, 140">
+		</map>
+		<img border="0" src="images/svi/svheader3fl.jpg" width="949" height="168" usemap="#FPMap0"><font face="Arial">&nbsp; 
+		<br>
+		<br>
+		</font>
+		<strong><font face="Arial" size="4" color="#FFFFFF">Port Summary</font></strong></p>
+		<pre><font face="Arial">SVI	MSX	R/W	Description
+
+10	91      W	Centronics Printer Data (characters out ASCII)
+11	90      W	Centronics STROBE output (bit 0=0)
+12	90      R	Centronics BUSY state (bit 0=1)
+
+20	--	R	Modem UART 8250 Receive buffer register
+20	--	W	Modem UART 8250 Divisor latch (LSB)
+20	--	W	Modem UART 8250 Transmitter holding buffer register
+21	--	W	Modem UART 8250 Divisor latch (MSB)
+21	--	W	Modem UART 8250 Interrupt enable register
+22	--	W	Modem UART 8250 Interrupt identification register
+23	--	W	Modem UART 8250 Line control register
+24	--	W	Modem UART 8250 Modem control register
+25	--	R	Modem UART 8250 Line status register
+26	--	R	Modem UART 8250 Modem status register
+
+28	--	R	RS-232C UART 8250 Receive buffer register
+28	--	W	RS-232C UART 8250 Divisor latch (LSB)
+28	--	W	RS-232C UART 8250 Transmitter holding buffer register
+29	--	W	RS-232C UART 8250 Divisor latch (MSB)
+29	--	W	RS-232C UART 8250 Interrupt enable register
+2A	--	W	RS-232C UART 8250 Interrupt identification register
+2B	--	W	RS-232C UART 8250 Line control register
+2C	--	W	RS-232C UART 8250 Modem control register
+2D	--	R	RS-232C UART 8250 Line status register
+2E	--	R	RS-232C UART 8250 Modem status register
+
+--	80	R/W	RS-232C UART 8251 Data Port
+--	81	R/W	RS-232C UART 8251 Command/Status Port
+--	82	R	RS-232C Status Sense Port: CTS, CTC Channel-2, RI, &amp; CD.
+--	82	W	RS-232C Interrupt Mask Register
+--	83		RS-232C Reserved
+--	84	R/W	RS-232C CTC 8253 Counter 0
+--	85	R/W	RS-232C CTC 8253 Counter 1
+--	86	R/W	RS-232C CTC 8253 Counter 2
+--	87	W	RS-232C CTC 8253 Mode Register
+
+30	D0	R	FDC WD1793 Status register
+30	D1	W	FDC WD1793 Command register
+31	D2	R/W	FDC WD1793 Track register
+32	D3	R/W	FDC WD1793 Sector register
+33	D4	R/W	FDC WD1793 Data register
+34	D5	R	FDC Read INTRQ and DRQ from FD-1793
+34	D6	W	FDC Disk select register (bit 0 and 1)
+38	D7	W	FDC Density select register (bit 0)
+
+50	78	W	CRT 6845 Adress latch
+51	79	R	CRT 6845 Controller register R0-R17
+58	79	W	CRT 6845 Bank control on/off
+
+6C	--	R/W	PIO Interface highest 8 bits
+6D	--	R/W	PIO Interface lowest 8 bits
+
+80	98	W	VDP TMS9918A Writes a byte to VRAM, increases VRAM pointer
+81	99	W	VDP TMS9918A Adress latch
+84	98	R	VDP TMS9918A Reads a byte from VRAM, increases VRAM pointer
+85		R	VDP TMS9918A
+
+88	A0      W	PSG AY-3-8910 Adress latch
+8C	A1      W	PSG AY-3-8910 Data write
+90	A2      R	PSG AY-3-8910 Data read
+
+98	A8      R	PPI 8255 Port A
+98	A8      W	PPI 8255 Port A
+99	A9      R	PPI 8255 Port B
+99	A9      W	PPI 8255 Port B
+96	AA      R	PPI 8255 Port C
+96	AA      W	PPI 8255 Port C
+97	AB      W	PPI 8255 Mode select and I/O setup of A,B,C
+9A	AB	R	PPI Return Mode
+
+</font></pre>
+		<p align="left">
+		<font face="Arial" size="2">Source: Tomas Karlsson</font><font face="Arial"><br>
+		<br>
+&nbsp;</font></p></td>
+    </tr>
+    <tr>
+      <td width="100%" bgcolor="#333333">
+      &nbsp;</td>
+    </tr>
+    <tr>
+      <td width="100%" bgcolor="#333333">
+      <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%" id="AutoNumber2">
+        <tr>
+          <td width="50%"><font face="Tahoma" size="2">Webmaster:
+          <img border="0" src="images/roger.gif" width="117" height="14" align="middle"></font><img border="0" src="images/4x4.gif" width="4" height="4"></td>
+          <td width="50%">
+          <p align="right">&nbsp;</td>
+        </tr>
+      </table>
+      </td>
+    </tr>
+  </table>
+  </center>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>
