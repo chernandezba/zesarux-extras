@@ -1,0 +1,8 @@
+To load game use this command:
+
+0 0 bload rng
+
+
+More info:
+
+https://nihirash.itch.io/rocks-and-ghosts
