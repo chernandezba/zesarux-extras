@@ -1,0 +1,136 @@
+<!DOCTYPE 
+    HTML PUBLIC 
+    "-//W3C//DTD HTML 4.01 Transitional//EN" 
+    "http://www.w3.org/TR/html4/loose.dtd"
+    >
+<html>
+<head>
+<title>Memory Map - Development - SMS Power!</title>
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+<link rel='stylesheet' title='Styled' href='//www.smspower.org/pub/skins/smspower/smspower.css' type='text/css' />
+<style type='text/css'><!--
+  ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
+  code.escaped { white-space: nowrap; }
+  .vspace { margin-top:1.33em; }
+  .indent { margin-left:40px; }
+  .outdent { margin-left:40px; text-indent:-40px; }
+  a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
+  a.createlink { text-decoration:none; position:relative; top:-0.5em;
+    font-weight:bold; font-size:smaller; border-bottom:none; }
+  img { border:0px; }
+  .editconflict { color:green; 
+  font-style:italic; margin-top:1.33em; margin-bottom:1.33em; }
+
+  table.markup { border:2px dotted #ccf; width:90%; }
+  td.markup1, td.markup2 { padding-left:10px; padding-right:10px; }
+  table.vert td.markup1 { border-bottom:1px solid #ccf; }
+  table.horiz td.markup1 { width:23em; border-right:1px solid #ccf; }
+  table.markup caption { text-align:left; }
+  div.faq p, div.faq pre { margin-left:2em; }
+  div.faq p.question { margin:1em 0 0.75em 0; font-weight:bold; }
+  div.faqtoc div.faq * { display:none; }
+  div.faqtoc div.faq p.question 
+    { display:block; font-weight:normal; margin:0.5em 0 0.5em 20px; line-height:normal; }
+  div.faqtoc div.faq p.question * { display:inline; }
+   
+    .frame 
+      { border:1px solid #cccccc; padding:4px; background-color:#f9f9f9; }
+    .lfloat { float:left; margin-right:0.5em; }
+    .rfloat { float:right; margin-left:0.5em; }
+a.varlink { text-decoration:none; }
+
+--></style><meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+<link rel='stylesheet' type='text/css' href='//www.smspower.org/pub/attachtable/attachtable.css' /> <meta name='robots' content='index,follow' />
+</head>
+<body>
+<div id='wrap' class='clearfix'>
+
+<div id='header'>
+<table width='100%'><tr>
+<td align='left' valign='middle'>
+<h1><a href='//www.smspower.org'><img src='/uploads/Site/logo.png' alt='SMS Power!' title='SMS Power!' width='204' height='50' /></a></h1>
+</td><td align='center' valign='middle'>
+<div class='nowrap' style='text-align: center;'>
+<h2><a class='wikilink' href='//www.smspower.org/Development/Index'>Development</a></h2>
+<p><span style='font-size:83%'>Sega Master System / Mark III / Game Gear<br />SG-1000 / SC-3000 / SF-7000 / OMV</span>
+</p></div>
+</td><td align='right' valign='top'>
+<p><a name='top' id='top'></a>
+<a class='wikilink' href='//www.smspower.org/'>Home</a> - <a class='wikilink' href='/forums/'>Forums</a> - <a class='wikilink' href='//www.smspower.org/Games/Index'>Games</a> - <a class='wikilink' href='//www.smspower.org/Scans/Index'>Scans</a> - <a class='wikilink' href='//www.smspower.org/Maps/Index'>Maps</a> - <a class='wikilink' href='//www.smspower.org/Cheats/Index'>Cheats</a> - <a class='wikilink' href='//www.smspower.org/Credits/Index'>Credits</a><br /><a class='wikilink' href='//www.smspower.org/Music/Index'>Music</a> - <a class='wikilink' href='//www.smspower.org/Videos/Index'>Videos</a> - <a class='wikilink' href='//www.smspower.org/Development/Index'>Development</a> - <a class='wikilink' href='//www.smspower.org/Hacks/Index'>Hacks</a> - <a class='wikilink' href='//www.smspower.org/Translations/Index'>Translations</a> - <a class='wikilink' href='//www.smspower.org/Homebrew/Index'>Homebrew</a>
+</p><form action='//www.smspower.org/Development/MemoryMap' method='get'><input type='hidden' name='action' value='search' /><input type='search' name='q' value='' size='40' /><input type='submit' name='' value='Search' class='inputbutton' /><input type='checkbox' name='group' value='Development' id='group' /><label for='group'>Development only</label></form>
+<div id='menubar'>
+<ul><li><a class='wikilink' href='/forums/login.php?redirect=redirect.php%3fn%3dDevelopment/MemoryMap'>Login</a>
+</li><li><a class='forumtopiclink' href="https://www.smspower.org/forums/viewtopic.php?t=12440">Report an error</a>
+</li><li><a rel='nofollow' class='wikilink' href='//www.smspower.org/Development/MemoryMap?action=print'>Print</a>
+</li></ul></div>
+</td></tr></table>
+
+<h2 class='pagetitle'>Memory Map</h2>
+
+<hr />
+</div>
+
+
+<div id='wikitext'>
+<h2>Introduction</h2>
+<p>This page gives a fast reference to the memory maps of Sega 8-bit consoles. See other pages for more detailed information.
+</p>
+<div class='vspace'></div><h2>Master System/Mark III/Game Gear</h2>
+<table border='1'><tr><th align='center'>Region</th><th align='center'>Maps to</th></tr>
+<tr><td align='center'>$0000-$bfff</td><td align='center'>Cartridge (ROM/RAM/etc) (or other attached hardware)</td></tr>
+<tr><td align='center'>$c000-$dfff</td><td align='center'>System RAM</td></tr>
+<tr><td align='center'>$e000-$ffff</td><td align='center'>System RAM (mirror)</td></tr>
+</table>
+<p class='vspace'>The "Cartridge" region is defined by the currently active cartridge, card or expansion device (where applicable). In nearly all cases, these correspond to ROM or on-cartridge RAM.
+</p>
+<div class='vspace'></div><h2>Master System/Mark III (assuming Sega <a class='wikilink' href='//www.smspower.org/Development/Mapper'>mapper</a>)</h2>
+<table border='1'><tr><th align='center'>Region</th><th align='center'>Maps to</th></tr>
+<tr><td align='center'>$0000-$03ff</td><td align='center'>ROM (unpaged)</td></tr>
+<tr><td align='center'>$0400-$3fff</td><td align='center'>ROM mapper slot 0</td></tr>
+<tr><td align='center'>$4000-$7fff</td><td align='center'>ROM mapper slot 1</td></tr>
+<tr><td align='center'>$8000-$bfff</td><td align='center'>ROM/RAM mapper slot 2</td></tr>
+<tr><td align='center'>$c000-$dfff</td><td align='center'>System RAM</td></tr>
+<tr><td align='center'>$e000-$ffff</td><td align='center'>System RAM (mirror)</td></tr>
+<tr><td align='center'>$fff8</td><td align='center'>3D glasses control</td></tr>
+<tr><td align='center'>$fff9-$fffb</td><td align='center'>3D glasses control (mirrors)</td></tr>
+<tr><td align='center'>$fffc</td><td align='center'>Cartridge RAM mapper control</td></tr>
+<tr><td align='center'>$fffd</td><td align='center'>Mapper slot 0 control</td></tr>
+<tr><td align='center'>$fffe</td><td align='center'>Mapper slot 1 control</td></tr>
+<tr><td align='center'>$ffff</td><td align='center'>Mapper slot 2 control</td></tr>
+</table>
+<p class='vspace'>Where control registers overlap with mirrored RAM, values written will affect the device and also be written to RAM. Reads simply return the value stored in RAM.
+</p>
+<div class='vspace'></div><h2>SG-1000/SC-3000</h2>
+<table border='1'><tr><th align='center'>Region</th><th align='center'>Maps to</th></tr>
+<tr><td align='center'>$0000-$bfff</td><td align='center'>Cartridge (ROM/RAM/etc)</td></tr>
+<tr><td align='center'>$c000-$c3ff</td><td align='center'>System RAM</td></tr>
+<tr><td align='center'>$c400-$ffff</td><td align='center'>System RAM (mirrored every 1KB)</td></tr>
+</table>
+<p class='vspace'>Cartridges may disable the system RAM and thus take over the full 64KB address space.
+</p><hr />
+<div class='fpltemplate'><ul><li><a class='wikilink' href='//www.smspower.org/Development/MemorySystem-Index'>Back to Memory System index</a>
+</li></ul>
+</div>
+<ul><li><a class='wikilink' href='//www.smspower.org/Development/Index'>Back to Development index</a>
+</li></ul><div class='vspace'></div>
+</div>
+<hr>
+
+<div class="addthis_toolbox addthis_default_style ">
+<a class="addthis_button_preferred_1"></a>
+<a class="addthis_button_preferred_2"></a>
+<a class="addthis_button_preferred_3"></a>
+<a class="addthis_button_preferred_4"></a>
+<a class="addthis_button_compact"></a>
+<a class="addthis_counter addthis_bubble_style"></a>
+</div>
+<script type="82e5ae4142f9b792f5c7bcb9-text/javascript">var addthis_config = {"data_track_clickback":true};</script>
+<script type="82e5ae4142f9b792f5c7bcb9-text/javascript" src="https://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4d6b8488365a9b75"></script>
+
+</div>
+
+<div><a href='#top'><img src='//www.smspower.org/uploads/Site/ReturnToTop.gif' alt='' /></a><br /><a href='#top'>Return to top</a><br /><span style='font-size:69%'>0.06s</span></div>
+
+<script type="82e5ae4142f9b792f5c7bcb9-text/javascript" src='//www.smspower.org/pub/ape/ape.js'></script><script src=//www.smspower.org/pub/nicetitle.js type="82e5ae4142f9b792f5c7bcb9-text/javascript"></script><link type='text/css' href='//www.smspower.org/pub/nicetitle.css' rel='stylesheet' />
+<script src="https://ajax.cloudflare.com/cdn-cgi/scripts/7089c43e/cloudflare-static/rocket-loader.min.js" data-cf-settings="82e5ae4142f9b792f5c7bcb9-|49" defer=""></script></body>
+</html>
