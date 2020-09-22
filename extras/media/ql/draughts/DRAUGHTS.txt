@@ -1,0 +1,24 @@
+     DRAUGHTS by Dilwyn Jones
+
+     This is a draughts (known as 'checkers' in some
+countries) game listing I wrote for QL Today publication. It
+does not play a particularly string game, but is adequate and
+since it is in SuperBASIC, you can have fun trying to improve
+its game play.
+
+     Moves are entered as two square co-ordinates, the from
+and to squares entered separately, e.g.
+
+     C3 (press ENTER)
+     C4 (press ENTER)
+
+     The program handles 'jumps' and will detect when a game
+has been won by the computer or the player.
+
+     To start the program, LRUN dddn_DRAUGHTS_bas.
+
+     dddn_ is the drive/directory from where DRAUGHTS is to
+be run.
+
+     Draughts works on both SuperBASIC and SBASIC.
+

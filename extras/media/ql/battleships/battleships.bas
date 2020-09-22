@@ -1,0 +1,341 @@
+1 REMark QL Version adepted by RWG 1986
+2 REMark Source: CP/M system, author unknown
+6 MODE 4
+10 OPEN#1,con_512x256a0x0
+11 pos=22
+15 CLS: RESTORE
+20 DIM SPIELER$(1,20):DIM TREFFER(1):DIM FELD$(11,23,2):DIM SCHIFF$(8,30):DIM BU$(10,30)
+32 PRINT TO(15); "*****************************************"
+33 PRINT TO(15); "*                                       *"
+34 PRINT TO(15); "*       N A V A L   B A T T L E         *"
+35 PRINT TO(15); "*                                       *"
+36 PRINT TO(15); "*****************************************"
+37 PRINT
+38 PRINT TO(9);"You play on a 10*10 field against the computer."
+39 PRINT TO(9);"The computer and you move in turn. If you HIT or SINK a ship,"
+40 PRINT TO(9);"you can fire again."
+41 PRINT TO(9);"To input the position of your ships use the coordinates."
+42 PRINT TO(9);"E2 - E4 means a ship of three boxes from E2 to E4"
+43 PRINT
+44 PRINT TO(9);"Signs on the playing-field:"
+45 PRINT TO(9);"       ' . '  :  WATER, not occupied or fired on"
+46 PRINT TO(9);"       '   '  :  WATER, already fired on"
+47 PRINT TO(9);"       ' o '  :  SHIP"
+48 PRINT TO(9);"       ' x '  :  SHIP, damaged"
+49 PRINT:PRINT TO(9);"To abort the game press ESC."
+50 PRINT TO(9);"The game will stop and the computer reveals"
+51 PRINT TO(9);"the position of his ships. Much fun !"
+55 AT 22,0
+57 INPUT "         Input your name:  ";SPIELER$(0)
+59 SPIELER$(1) = "QL"
+60 FOR I = 1 TO 8: READ SCHIFF$(I)
+61 DATA "    AIRCRAFT-CARRIER (4 boxes):       "
+62 DATA "    FRIGATES (3 boxes):        "
+63 DATA "    CRUISERS (2 boxes):          "
+64 DATA "    SUBMARINES (1 box):    "
+65 DATA "    AIRCRAFT-CARRIER (4 boxes):   "
+66 DATA "    FRIGATE (3 boxes):         "
+67 DATA "    CRUISER (2 boxes):          "
+68 DATA "    SUBMARINE (1 box):     "
+69 FOR I = 1 TO 10: READ BU$(I)
+70 DATA "A","B","C","D","E","F","G","H","I","K"
+71 TREFFER(0) = 0 : TREFFER(1) = (0)
+80 FOR I=0 TO 11
+84  FOR K=0 TO 23:FELD$(I,K) = " ."
+87 NEXT I
+88 FEHL$=FILL$(" ",29):NT=0:OT=0:ST=0:WT=0
+89 ZUG=0:BUMM=0:N=0:O=0:S=0:W=0:YES=0:TEST=0:EROR=0
+90 CLS: AT pos,0
+110 GO SUB 1200
+115 CLS: GO SUB 1000
+120 FOR I=1 TO 4
+123   FOR K=1 TO I
+125     ZB$ = " o"
+130     GO SUB 1700
+175   NEXT K
+180 NEXT I
+181 AT pos,0
+182 PRINT "       Do you want to correct something (Y/N) ? ";: GO SUB 1300
+183 IF ANTWORT = 1:GO SUB 1800
+184 AT pos,0: PRINT FILL$(" ",65)
+185 AT pos,0: PRINT "       Do you want to start the game (Y/N) ? ";: GO SUB 1300
+186 ZEIG = ANTWORT-1
+220 GO SUB 1000
+230 IF ZEIG = 1:GO SUB 1400: GO TO 260
+240 AT pos,0: PRINT "       your move, ";SPIELER$(0);" ? ";
+241 PRINT FILL$(" ",30): AT pos,45
+242 PRINT " - ";:GO SUB 1100
+245 IF BS$ = "!" THEN YES=1: GO SUB 1000: GO TO 300
+250 B = B+12
+260 IF FELD$(A,B) = "  " OR FELD$(A,B) = " x":AT pos,30: PRINT "already fired on  ";: BEEP 3000,12: PAUSE 100: GO TO 240
+270 IF FELD$(A,B) = " .":GO TO 400
+271 TREFFER(ZEIG) = TREFFER(ZEIG) + 1
+272 FELD$(A,B) = " x"
+274 IF FELD$(A+1,B)=" o" OR FELD$(A-1,B)=" o" OR FELD$(A,B+1)=" o" OR FELD$(A,B-1)=" o":GO TO 420
+275 IF FELD$(A+1,B)<>" x" OR A>9:GO TO 278
+276 IF FELD$(A+2,B)=" o":GO TO 420
+277 IF A<8:IF FELD$(A+2,B)=" x":IF FELD$(A+3,B)=" o":GO TO 420
+278 IF FELD$(A-1,B)<>" x" OR A<2:GO TO 281
+279 IF FELD$(A-2,B)=" o":GO TO 420
+280 IF A>3:IF FELD$(A-2,B)=" x":IF FELD$(A-3,B)=" o":GO TO 420
+281 IF ZEIG=0:GO TO 288
+282 IF FELD$(A,B+1)<>" x" OR B>9:GO TO 285
+283 IF FELD$(A,B+2)=" o":GO TO 420
+284 IF B<8:IF FELD$(A,B+2)=" x":IF FELD$(A,B+3)=" o":GO TO 420
+285 IF FELD$(A,B-1)<>" x" OR B<2:GO TO 294
+286 IF FELD$(A,B-2)=" o":GO TO 420
+287 IF B>3:IF FELD$(A,B-2)=" x":IF FELD$(A,B-3)=" o":GO TO 420
+288 IF FELD$(A,B+1)<>" x" OR B>21:GO TO 291
+289 IF FELD$(A,B+2)=" o":GO TO 420
+290 IF B<20:IF FELD$(A,B+2)=" x":IF FELD$(A,B+3)=" o":GO TO 420
+291 IF FELD$(A,B-1)<>" x" OR B<14:GO TO 294
+292 IF FELD$(A,B-2)=" o":GO TO 420
+293 IF B>15:IF FELD$(A,B-2)=" x":IF FELD$(A,B-3)=" o":GO TO 420
+294 AT pos,30: PRINT"+++ DESTROYED !";: BEEP 3000,12
+295 TEST = 0
+296 IF TREFFER(ZEIG) <> 20:GO TO 350
+297 YES=1 : GO SUB 1000
+298 AT pos,0: PRINT "    * * *    ";SPIELER$(ZEIG); " has won !    * * *"
+299 PAUSE 300
+301 AT pos,0: PRINT FILL$(" ",65)
+303 AT pos,0
+309 PRINT "     Play again (Y/N) ? ";: GO SUB 1300: BEEP
+310 ON ANTWORT GO TO 71,9999
+350 ENDA=A:ENDB=B:HA=A:IF ZEIG=1:BUMM=0:N=0:O=0:S=0:W=0:NT=0:OT=0:ST=0:WT=0
+352 IF FELD$(A-1,B) = " x":A=A-1: GO TO 352
+353 IF FELD$(ENDA+1,B) = " x":ENDA=ENDA+1 : GO TO 353
+354 IF FELD$(HA,B-1) = " x":B=B-1: GO TO 354
+355 IF FELD$(HA,ENDB+1) = " x":ENDB=ENDB+1: GO TO 355
+360 FOR I=A-1 TO ENDA+1
+364   FOR K=B-1 TO ENDB+1:IF FELD$(I,K) = " .":FELD$(I,K) = "  "
+368 END FOR I
+370 GO TO 220
+400 AT pos,30: PRINT"+++ WATER !";: PAUSE 100
+404 FELD$(A,B) = "  "
+405 IF ZEIG = 1:GO TO 412
+406 KOX=19+2*B : KOY=2+A : GO SUB 9000
+407 PRINT " "
+408 KOX=0 : KOY=16 : GO SUB 9000
+410 ZEIG = 1 - ZEIG
+411 GO TO 230
+412 KOX=9+2*B : KOY=2+A : GO SUB 9000
+414 PRINT " "
+415 KOX=0 : KOY=16 : GO SUB 9000
+417 GO TO 410
+420 AT pos,30: PRINT"+++ HIT !";: BEEP 3000,12: PAUSE 100
+430 IF ZEIG = 1:BUMM=BUMM+1 : GO TO 220
+431 KOX=19+2*B : KOY=2+A : GO SUB 9000
+432 PRINT "x"
+433 KOX=0 : KOY=16 : GO SUB 9000
+435 GO TO 230
+1012 IF YES=1:CLS:GO TO 1020
+1020 AT 5,0
+1030 PRINT TO(11);" 1 2 3 4 5 6 7 8 9 0               1 2 3 4 5 6 7 8 9 0 "
+1040 FOR Z=1 TO 10
+1041   PRINT TO(10);BU$(Z);
+1043   FOR Y=1 TO 10:PRINT FELD$(Z,Y);
+1044   PRINT " ";BU$(Z);"           ";BU$(Z);
+1045   FOR Y=13 TO 22
+1046    IF FELD$(Z,Y) <> " o":GO TO 1049
+1047    IF YES = 1:PRINT " o"; :ELSE PRINT " .";
+1048    GO TO 1050
+1049    PRINT FELD$(Z,Y);
+1050   END FOR Y
+1051   PRINT " ";BU$(Z)
+1052 END FOR Z
+1053 PRINT TO(11);" 1 2 3 4 5 6 7 8 9 0               1 2 3 4 5 6 7 8 9 0 "
+1054 PRINT:PRINT
+1060 RETurn
+1120 BS$=""
+1122 REPeat KEY_LOOP
+1125 BS$=INKEY$:IF CODE(BS$) > 96:BS$=CHR$(CODE(BS$)-32)
+1128 IF BS$='':NEXT KEY_LOOP
+1129 IF BS$ INSTR 'ABCDEFGHIKQ'&CHR$(27):EXIT KEY_LOOP
+1130 BEEP 500,10
+1131 END REPeat KEY_LOOP
+1132 IF BS$="A":A=1
+1133 IF BS$="B":A=2
+1134 IF BS$="C":A=3
+1135 IF BS$="D":A=4
+1136 IF BS$="E":A=5
+1137 IF BS$="F":A=6
+1138 IF BS$="G":A=7
+1139 IF BS$="H":A=8
+1140 IF BS$="I":A=9
+1141 IF BS$="K":A=10
+1142 IF BS$="Q":CLS: STOP
+1143 IF BS$=CHR$(27):PRINT "   I give up !!!"  : RETurn
+1150 PRINT !BS$;
+1160 ZL$=""
+1163 REPeat KEY_LOOP:ZL$=INKEY$:IF ZL$<>'':IF ZL$ INSTR '1234567890':EXIT KEY_LOOP:ELSE BEEP 500,10
+1171 B=ZL$:IF B=0:B=10
+1190 PRINT ZL$;
+1195 RETurn
+1210 VZ=RND
+1220 FOR I=1 TO 4
+1230   FOR K=1 TO I
+1231     X =  1+9*RND
+1232     Y = 13+9*RND
+1233     LNG = 4-I
+1234     RHT = 1+9*RND
+1235     IF RHT < 6:A=X+LNG : B=Y :ELSE A=X : B=Y+LNG
+1236     IF A > 10:A=X-LNG
+1237     IF B > 22:B=Y-LNG
+1238     IF Y > B:H=B : B=Y : Y=H
+1239     IF X > A:H=A : A=X : X=H
+1240     IF X=A:IF B-Y<>4-I:GO TO 1231
+1241     IF Y=B:IF A-X<>4-I:GO TO 1231
+1242     FOR L=X TO A
+1244       FOR M=Y TO B:IF FELD$(L,M) <> " .":GO TO 1231
+1246     END FOR L
+1250     FOR L=X-1 TO A+1
+1252       FOR M=Y-1 TO B+1:IF FELD$(L,M) <> " .":GO TO 1231
+1254     END FOR L
+1260     FOR L=X TO A
+1262       FOR M=Y TO B:FELD$(L,M) = " o"
+1264     END FOR L
+1266   END FOR K
+1268 END FOR I
+1270 RETurn
+1310 REPeat LOOP:ANTWORT$ = INKEY$(-1):IF ANTWORT$ INSTR 'YyNn':EXIT LOOP:ELSE BEEP 3000,12
+1315 VZ=RND
+1330 IF ANTWORT$ == "y":PRINT" yes":ANTWORT = 1:RETurn
+1355 IF ANTWORT$ == "n":PRINT " no":ANTWORT = 2:RETurn
+1410 REMark
+1420 IF BUMM > 0:GO TO 1470
+1421 cta=1:FOR A=1 TO 10
+1422 FOR B=1 TO 10:IF FELD$(A,B)<>'  ':IF FELD$(A,B)<>' x':cta=cta+1
+1423 END FOR A
+1425 bta=RND(1 TO cta):cta=0
+1426 FOR A=1 TO 10
+1427 FOR B=1 TO 10:IF FELD$(A,B)<>'  ':IF FELD$(A,B)<>' x':cta=cta+1:IF bta=cta:EXIT A
+1429 END FOR A
+1460 GO TO 1600
+1470 IF BUMM > 1:GO TO 1517
+1480 IF NT<>0 OR OT<>0 OR ST<>0 OR WT<>0:GO TO 1512
+1490 KOA=A : KOB=B
+1500 IF A>1:IF FELD$(A-1,B) <> "  ":IF FELD$(A-1,B) <> " x":N=1
+1501 IF A>2:IF N=1:IF FELD$(A-2,B)<>"  ":IF FELD$(A-2,B)<>" x":N=2
+1502 IF A>3:IF N=2:IF FELD$(A-3,B)<>"  ":IF FELD$(A-3,B)<>" x":N=3
+1503 IF B<10:IF FELD$(A,B+1) <> "  ":IF FELD$(A,B+1) <> " x":O=1
+1504 IF B<9:IF O=1:IF FELD$(A,B+2)<>"  ":IF FELD$(A,B+2)<>" x":O=2
+1505 IF B<8:IF O=2:IF FELD$(A,B+3)<>"  ":IF FELD$(A,B+3)<>" x":O=3
+1506 IF A<10:IF FELD$(A+1,B) <> "  ":IF FELD$(A+1,B) <> " x":S=1
+1507 IF A<9:IF S=1:IF FELD$(A+2,B)<>"  ":IF FELD$(A+2,B)<>" x":S=2
+1508 IF A<8:IF S=2:IF FELD$(A+3,B)<>"  ":IF FELD$(A+3,B)<>" x":S=3
+1509 IF B>1:IF FELD$(A,B-1) <> "  ":IF FELD$(A,B-1) <> " x":W=1
+1510 IF B>2:IF W=1:IF FELD$(A,B-2)<>"  ":IF FELD$(A,B-2)<>" x":W=2
+1511 IF B>3:IF W=2:IF FELD$(A,B-3)<>"  ":IF FELD$(A,B-3)<>" x":W=3
+1512 IF N > 0:IF NT=0:A = KOA-1 : B=KOB   : NT=1 : GO TO 1600
+1513 IF O > 0:IF OT=0:A = KOA   : B=KOB+1 : OT=1 : GO TO 1600
+1514 IF W > 0:IF WT=0:A = KOA   : B=KOB-1 : WT=1 : GO TO 1600
+1515 IF S > 0:IF ST=0:A = KOA+1 : B=KOB   : ST=1 : GO TO 1600
+1516 GO TO 1520
+1517 IF BUMM > 2:GO TO 1530
+1520 IF ST=1:WT=5:OT=5:IF S>1:A=KOA+2:B=KOB:ST=2:GO TO 1600 :ELSE GO TO 1512
+1521 IF WT=1:NT=5:ST=5:IF W>1:A=KOA:B=KOB-2:WT=2:GO TO 1600 :ELSE GO TO 1513
+1522 IF OT=1:NT=5:ST=5:IF O>1:A=KOA:B=KOB+2:OT=2:GO TO 1600 :ELSE GO TO 1514
+1523 IF NT=1:WT=5:OT=5:IF N>1:A=KOA-2:B=KOB:NT=2:GO TO 1600 :ELSE GO TO 1515
+1524 GO TO 1512
+1530 IF ST=2:IF S>2:A=KOA+3:B=KOB:ST=3:NT=0:GO TO 1600
+1531 IF WT=2:IF W>2:A=KOA:B=KOB-3:WT=3:OT=0:GO TO 1600
+1532 IF OT=2:IF O>2:A=KOA:B=KOB+3:OT=3:WT=0:GO TO 1600
+1533 IF NT=2:IF N>2:A=KOA-3:B=KOB:NT=3:ST=0:GO TO 1600
+1534 GO TO 1512
+1600 IF FELD$(A,B)='  ' OR FELD$(A,B)=' x':GO TO 1400
+1602 ZUG = ZUG+1
+1610 AT pos,0: PRINT "      I fire on:  ";TO(45);" - ";BU$(A);
+1612 IF B<>10:PRINT B; :ELSE PRINT "0";
+1620 PAUSE 20: RETurn
+1700 AT pos,0
+1710 PRINT I+1-K;
+1711 IF K=I:PRINT SCHIFF$(I+4) :ELSE PRINT SCHIFF$(I)
+1712 PRINT "    ? ";: GO SUB 1100: X=A : Y=B
+1720 IF I <> 4:PRINT " - ";: GO SUB 1100 :ELSE PRINT "     ";
+1721 IF Y > B:H=B : B=Y : Y=H
+1736 IF X > A:H=A : A=X : X=H
+1740 IF X=A:IF B-Y<>4-I:FEHL$="      WRONG NUMBER OF BOXES !":GO TO 1758
+1741 IF Y=B:IF A-X<>4-I:FEHL$="      WRONG NUMBER OF BOXES !":GO TO 1758
+1742 IF X<>A:IF Y<>B:FEHL$="      NOT PERMITTED !          ":GO TO 1758
+1743 FOR L=X TO A
+1744  FOR M=Y TO B
+1745  IF FELD$(L,M)<>" .":FEHL$="      ALREADY OCCUPIED !        ":GO TO 1758
+1746  END FOR M
+1747 END FOR L
+1750 FOR L=X-1 TO A+1
+1751  FOR M=Y-1 TO B+1
+1752  IF FELD$(L,M)<>" .":FEHL$="      TO LITTLE SPACE !   " :GO TO 1758
+1756  END FOR M
+1757 END FOR L
+1758 AT 23,0: PRINT FEHL$
+1759 IF FEHL$<>"                             ":AT 23,0: BEEP 500,10: PAUSE 200: PRINT FILL$(" ",32): FEHL$="                             ":AT 23,0: GO TO 1712
+1760 FOR L=X TO A
+1762  FOR M=Y TO B:FELD$(L,M) = ZB$
+1764 END FOR L
+1765 FOR CC=0 TO 4-I
+1766   IF X=A:KOX=9+2*Y+2*CC : KOY=2+X : GO TO 1768
+1767   KOX=9+2*Y : KOY=2+X+CC
+1768   GO SUB 9000
+1769   PRINT "o"
+1770 END FOR CC
+1771 KOX=0 : KOY=16 : GO SUB 9000
+1772 AT 19,0
+1773 PRINT "                                                       "
+1774 AT 18,0
+1775 RETurn
+1811 AT 18,0: PRINT "      What kind of ship you want to correct ?              "
+1812 PRINT "      Aircraft-carrier --> 1"
+1813 PRINT "      Frigate          --> 2"
+1814 PRINT "      Cruiser          --> 3"
+1815 PRINT "      Submarine        --> 4                                "
+1817 ZL$=""
+1818 ZL$=INKEY$: IF ZL$=" " OR ZL$="":GO TO 1818
+1819 IF ZL$ INSTR "1234":I=ZL$ : GO TO 1824
+1823 GO TO 1818
+1824 K = I
+1825 KOX=0 : KOY=16 : GO SUB 9000: AT 18,0
+1826 FOR WW=1 TO 6:PRINT FILL$(" ",65):NEXT WW
+1827 KOX=0 : KOY=16 : GO SUB 9000
+1828 AT pos,0: PRINT "       Input coordinates of the ship you want to  cancel !"
+1831 PRINT "  ?         ": AT 23,4: GO SUB 1100: X=A : Y=B
+1832 IF I <> 4:PRINT " - ";: GO SUB 1100 :ELSE PRINT "     ";
+1835 IF Y > B:H=B : B=Y : Y=H
+1836 IF X > A:H=A : A=X : X=H
+1840 IF X=A:IF B-Y<>4-I:FEHL$="     WRONG NUMBER OF BOXES !":GO TO 1858
+1841 IF Y=B:IF A-X<>4-I:FEHL$="     WRONG NUMBER OF BOXES !":GO TO 1858
+1842 IF X<>A:IF Y<>B:FEHL$="     NOT PERMITTED !          ":GO TO 1858
+1843 FOR L=X TO A
+1844   FOR M=Y TO B
+1845     IF FELD$(L,M) <> " o":FEHL$="     WRONG COORDINATES !    ":GO TO 1858
+1846   END FOR M
+1847 END FOR L
+1850 FOR L=X-1 TO A+1
+1851  IF FELD$(L,B+1)=" o":FEHL$="     WRONG COORDINATES !    ":GO TO 1858
+1852  IF FELD$(L,Y-1)=" o":FEHL$="     WRONG COORDINATES !    ":GO TO 1858
+1853 END FOR L
+1854 FOR M=Y TO B
+1855  IF FELD$(X-1,M)=" o":FEHL$="     WRONG COORDINATES !    ":GO TO 1858
+1856  IF FELD$(A+1,M)=" o":FEHL$="     WRONG COORDINATES !    ":GO TO 1858
+1857 END FOR M
+1858 PRINT FEHL$
+1859 IF FEHL$<>"                             ":AT 23,0: BEEP 500,10: PAUSE 300: PRINT FILL$(" ",40):AT 23,0: FEHL$="                             ":GO TO 1831
+1860 FOR L=X TO A
+1862   FOR M=Y TO B:FELD$(L,M) = " ."
+1864 END FOR L
+1865 FOR CC=0 TO 4-I
+1866  IF X=A:KOX=9+2*Y+2*CC : KOY=2+X : GO TO 1868
+1867  KOX=9+2*Y : KOY=2+X+CC
+1868  GO SUB 9000
+1869  PRINT "."
+1870 NEXT CC
+1871 KOX=0 : KOY=16 : GO SUB 9000
+1872 AT pos,0: PRINT FILL$(" ",65)
+1873 PRINT FILL$(" ",65)
+1875 GO SUB 1700: AT pos,0: PRINT FILL$(" ",55)
+1876 AT pos,0: PRINT "      Do you want to correct something (Y/N) ? ";:GO SUB 1300
+1877 IF ANTWORT = 1:GO TO 1811
+1878 RETurn
+9020 IF KOX > 79:RETurn
+9030 IF KOY > 22:RETurn
+9040 AT KOY+3,KOX+1
+9070 RETurn

@@ -1,0 +1,10 @@
+BATTLESHIPS
+
+A rendition of an old favourite. Place your ships on your grid
+and then blast away at the computer as it tries to destroy your
+ships. Note that there must be at least one square between each
+ship.
+
+Full instructions are given on loading.
+
+Simply LRUN FLP1_BATTLESHIPS_BAS.
