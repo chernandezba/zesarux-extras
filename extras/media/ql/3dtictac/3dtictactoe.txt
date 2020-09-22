@@ -1,0 +1,16 @@
+3D NOUGHTS AND CROSSES
+
+by T. J.Arnfield
+
+This is the TIC TAC TOE game in 3D on a 4x4x4x4 grid.
+
+The object of the game is to get 4 in a line, through all four grids,
+at any angle, or on a single grid, in any row or across the diagonal.
+When it's your move, use the arrow keys to move your 'piece' in the
+indicated direction,  or the SPACE bar to move it onto the next plane
+When you are at the square of your choice,  press the ENTER key for
+your move.
+
+Hopefully, all will become clear when you play the game!
+
+These instructions are also contained in the program itself.
