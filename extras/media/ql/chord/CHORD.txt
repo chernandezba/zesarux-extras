@@ -1,0 +1,17 @@
+Phill Sproston
+phillip_sproston@hotmail.com
+Quantum Soft
+01564774307
+
+CHORD09_bas is a guitar chord database, written in SuperBasic.
+
+Start with the LRUN command. Instructions available within the program
+
+
+Other Phill Sproston Quantum Soft games:
+
+MASTER   - Mastermind code breaking game
+HANGMAN  - Hangman game
+STAR     - Star Trek type space game
+ADVENT   - Advent2 with Character definition. Graphic adventure.
+WORDBLOK - Word Game
