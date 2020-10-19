@@ -1,0 +1,80 @@
+100 REMark MUSIC PLAYER - 26 Feb 94
+110 REMark Simple graphics added SNG
+120 REMark Version 1.05, 19 Sep 99, MSW
+130 :
+140 REMark BEEP <dur>,<pitch> gives freq.
+150 REMark approx to 11447/(10.6+<pitch>)
+160 REMark & dur. of <dur>*72/1000000 secs
+170 :
+180 PLAY_MUSIC
+190 STOP
+200 :
+9000 REMark This program is FREEWARE
+9010 :
+9020 REMark To remove graphics, delete the
+9030 REMark lines marked: "-gfx-".
+9040 :
+9050 DEFine PROCedure PLAY_MUSIC
+9060  LOCal Title$(16),Author$(21),tempo,Note$(3),dur,pitch,getdata,loop,poll
+9070  OPEN#3;"Con_272x134a120x60":WINDOW#3;272,134,120,60:PAPER#3;0:INK#3;7:CLS#3:BORDER#3;3,2:BORDER#3;2,0:REMark -gfx-
+9080  RESTORE 9590:READ Title$,Author$,tempo
+9090  WINDOW#3;256,120,128,68:PAPER#3;0:INK#3;7:CSIZE#3;3,1:PRINT#3;Title$:CSIZE#3;2,0:AT#3;11,0:INK#3;4:PRINT#3;Author$;:REMark -gfx-
+9100  WINDOW#3;256,86,128,90:PAPER#3;2:CLS#3:REMark -gfx-
+9110  REPeat loop
+9120   IF NOT (KEYROW(1)&&1) THEN EXIT loop
+9130  END REPeat loop
+9140  REPeat loop
+9150   RESTORE 9610
+9160   REPeat getdata
+9170    IF (KEYROW(1)&&1) THEN EXIT loop
+9180    READ Note$,dur
+9190    IF Note$=="QIT" THEN EXIT loop
+9200    IF Note$=="LUP" THEN EXIT getdata
+9210    SCROLL#3;dur+1:REMark -gfx-
+9220    IF Note$=="GAP" THEN 
+9230     REPeat poll : IF NOT BEEPING THEN EXIT poll
+9240     PAUSE 50*dur*tempo
+9250    ELSE 
+9260     pitch=INT(11447/((55*2^(Note$(3)-1))*(EXP(LN(2)*((Note$(1 TO 2)INSTR"C C#D D#E F F#G G#A A#B "-19)/2)/12)))-10.6+.5)
+9270     REPeat poll : IF NOT BEEPING THEN EXIT poll
+9280     BLOCK#3;8,dur,pitch-9,0,7:REMark -gfx-
+9290     BEEP dur*tempo*1000000/72,pitch
+9300    END IF 
+9310   END REPeat getdata
+9320  END REPeat loop
+9330  CLOSE#3: REMark -gfx-
+9340 END DEFine 
+9350 :
+9500 REMark Store music in DATA statements
+9510 REMark first: title,author,tempo
+9520 REMark then: note,dur,note,dur,etc.
+9530 REMark Lowest note F 1, highest B 4.
+9540 REMark Note order C,D,E,F,G,A,B etc
+9550 REMark Middle C is "C 4"
+9560 REMark Use # symbol for sharp notes,
+9570 REMark i.e. "F#1", "A#2" etc.
+9580 :
+9590 DATA " PLAYMUSIC 1v05"," Hit <ENTER> to quit",6E-2
+9600 :
+9610 DATA "G 3",2,"A 3",2
+9620 DATA "B 3",4,"B 3",4,"B 3",4,"B 3",4
+9630 DATA "A 3",4,"B 3",4,"G 3",4,"G 2",2,"A 2",2
+9640 DATA "B 2",4,"B 2",4,"B 2",4,"A 2",2,"G 2",2
+9650 DATA "B 2",4,"B 2",4,"B 2",4,"G 3",2,"A 3",2
+9660 DATA "B 3",4,"B 3",4,"B 3",4,"B 3",4
+9670 DATA "A 3",4,"B 3",4,"G 3",4,"G 2",2,"A 2",2
+9680 DATA "B 2",4,"B 2",4,"B 2",4,"A 2",2,"G 2",2
+9690 DATA "B 2",12,"B 3",4
+9700 DATA "B 3",6,"C 4",2,"D 4",4,"B 3",4
+9710 DATA "E 4",4,"E 4",4,"D 4",4,"B 3",4
+9720 DATA "B 3",6,"C 4",2,"D 4",4,"B 3",4
+9730 DATA "A 3",4,"G 3",4,"F#3",4,"G 3",2,"A 3",2
+9740 DATA "B 3",4,"B 3",4,"B 3",4,"B 3",4
+9750 DATA "A 3",4,"B 3",4,"D 3",4,"G 3",2,"A 3",2
+9760 DATA "B 3",4,"B 3",4,"B 3",4,"A 3",2,"G 3",2
+9770 DATA "A 3",2,"G 3",2,"A 3",2,"B 3",2,"C 4",4,"G 3",2,"A 3",2
+9780 DATA "B 3",4,"B 3",4,"B 3",4,"A 3",2,"G 3",2
+9790 DATA "A#3",8,"G 3",4,"A 3",2,"G 3",2
+9800 DATA "B 3",4,"B 3",4,"B 3",4,"A 3",2,"F#3",2
+9810 DATA "G 3",12
+9820 DATA "LUP",0

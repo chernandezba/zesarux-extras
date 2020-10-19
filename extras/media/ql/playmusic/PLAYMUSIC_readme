@@ -1,0 +1,50 @@
+Short:    program to play sheet music from a DATA statement
+Version:  1.05
+Author:   Mark J Swift
+Uploader: msw@blackpool.ac.uk
+Type:     sound/beep
+
+
+Demonstrates the musical capabilities of the BEEP command.
+
+The music is stored in DATA statements at the end of the program.
+
+The DATA follows the following format:
+
+  firstly:
+    DATA title(string),author(string),tempo(float)
+
+  then:
+    DATA note(string),dur(int),note(string),dur(int),etc.
+
+The lowest note is "F 1" and the highest is "B 4".
+Middle C is "C 4". Notes follow the order C,D,E,F,G,A,B etc.
+Use # symbol to define sharp notes, i.e. "F#1", "G#2" etc.
+
+
+The program makes use of the fact that the command:
+
+ BEEP <pitch>,<dur>
+
+gives a frequency approximately equal to 11447/(10.6+<pitch>) hz
+and a duration of <dur>*72/1000000 seconds
+
+
+ARCHIVE CONTENTS
+
+ PLAYMUSIC_bas     - program to play music from a DATA statement
+ PLAYMUSIC_readme  - this file
+
+
+FEATURES
+
+* FREEWARE
+
+
+CONTACT
+
+  post: MARK J SWIFT          e-mail: msw@blackpool.ac.uk
+        175 CHURCH STREET
+        BLACKPOOL
+        LANCS
+        FY1 3NX
