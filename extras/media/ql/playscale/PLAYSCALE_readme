@@ -1,0 +1,34 @@
+Short:    simple program to play a musical scale
+Author:   Mark J Swift
+Uploader: msw@blackpool.ac.uk
+Type:     sound/beep
+
+Demonstrates the musical capabilities of the BEEP command.
+
+Makes use of the fact that the command
+
+ BEEP <pitch>,<duration>
+
+gives a frequency approximately equal to 11447/(10.6+<pitch>) hz
+and a duration of <duration>*72/1000000 seconds
+
+
+ARCHIVE CONTENTS
+
+ PLAYSCALE_bas     - simple program to play a musical scale
+ PLAYSCALE_readme  - this file
+
+
+FEATURES
+
+* simple and small
+* FREEWARE
+
+
+CONTACT
+
+  post: MARK J SWIFT          e-mail: msw@blackpool.ac.uk
+        175 CHURCH STREET
+        BLACKPOOL
+        LANCS
+        FY1 3NX

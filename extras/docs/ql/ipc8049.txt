@@ -1,0 +1,2035 @@
+;
+; ********** IPC 8049, Sinclair QL, JV 970715 ****************
+:
+0000: 04 09   JMP  $009       IPCinit
+0002: 00      NOP             
+;
+; EXT interrupt
+0003: 04 DE   JMP  $0DE       ISR external interrupt = SER2RXD & SER1TXD (either H->L)
+0005: 00      NOP             
+0006: 00      NOP             
+;
+; TIM interrupt
+0007: 24 00   JMP  $100       ISR timer; get here when counter++ overflows from #FF->#00
+;
+; IPCinit
+0009: 65      STOP TCNT       
+000A: 15      DIS  I          
+000B: 35      DIS  TCNTI      
+000C: 85      CLR  F0         
+000D: 95      CPL  F0         
+000E: 8A 01   ORL  P2,#01     p2.0=H,RXDin&TXDin
+0010: 9A FD   ANL  P2,#FD     p2.1=L,speaker
+0012: 8A 04   ORL  P2,#04     p2.2=H,ipl0-2
+0014: 8A 08   ORL  P2,#08     p2.3=H,ipl1
+0016: 8A 10   ORL  P2,#10     p2.4=H,CTSout
+0018: 8A 20   ORL  P2,#20     p2.5=H,DTRout
+001A: 8A 40   ORL  P2,#40     p2.6=H,??
+001C: 8A 80   ORL  P2,#80     p2.7=H,comdata
+001E: B8 20   MOV  R0,#20     
+0020: BA 60   MOV  R2,#60     
+0022: B0 00   MOV  @R0,#00    
+0024: 18      INC  R0         
+0025: EA 22   DJNZ R2,#0022   cleared memory 020..07F
+;
+; init variables
+0027: B8 29   MOV  R0,#29     
+0029: B0 FF   MOV  @R0,#FF    KEY current key
+002B: B8 2B   MOV  R0,#2B     
+002D: B0 2C   MOV  @R0,#2C    keybuf ptr=2C
+002F: B8 24   MOV  R0,#24     
+0031: B0 03   MOV  @R0,#03    baud=9600
+0033: B8 4E   MOV  R0,#4E     
+0035: B0 52   MOV  @R0,#52    SER1SPTR=#52
+0037: 18      INC  R0         
+0038: B0 52   MOV  @R0,#52    SER1RPTR=#52
+003A: 18      INC  R0         
+003B: B0 69   MOV  @R0,#69    SER2SPTR=#69
+003D: 18      INC  R0         
+003E: B0 69   MOV  @R0,#69    SER2RPTR=#69
+0040: A5      CLR  F1         
+0041: 14 4A   CALL $04A       
+0043: 0A      IN   A,P2       wait for IPC cmd
+0044: 53 80   ANL  A,#80      
+0046: C6 43   JZ   #0043      
+0048: A4 00   JMP  $500       scan keyboard
+;
+; 
+004A: 65      STOP TCNT       
+004B: D5      SEL  RB1        bank 1 from here on (till 08F,0DA,413)
+004C: B8 20   MOV  R0,#20     
+004E: F0      MOV  A,@R0      
+004F: 53 02   ANL  A,#02      sound on/off
+0051: B8 22   MOV  R0,#22     
+0053: C6 5D   JZ   #005D      jump if no sound
+0055: F0      MOV  A,@R0      
+0056: 43 04   ORL  A,#04      set #22,b2
+0058: 53 EF   ANL  A,#EF      clr #22,b4
+005A: A0      MOV  @R0,A      
+005B: 64 E4   JMP  $3E4       update speaker with #22,b4 inverted
+;
+; 
+005D: BA 00   MOV  R2,#00     
+005F: B8 4C   MOV  R0,#4C     SER1NUM
+0061: F0      MOV  A,@R0      
+0062: 37      CPL  A          
+0063: 17      INC  A          positive length
+0064: 53 3F   ANL  A,#3F      
+0066: 03 EC   ADD  A,#EC      
+0068: E6 6E   JNC  #006E      jump if < #14 chars in buffer (watermark)
+006A: FA      MOV  A,R2       
+006B: 43 10   ORL  A,#10      
+006D: AA      MOV  R2,A       
+006E: 18      INC  R0         SER2NUM
+006F: F0      MOV  A,@R0      
+0070: 37      CPL  A          same for SER2..
+0071: 17      INC  A          
+0072: 53 3F   ANL  A,#3F      
+0074: 03 EC   ADD  A,#EC      
+0076: E6 7C   JNC  #007C      
+0078: FA      MOV  A,R2       
+0079: 43 20   ORL  A,#20      
+007B: AA      MOV  R2,A       
+007C: FA      MOV  A,R2       
+007D: 37      CPL  A          bit 4,5 indicate that SER1,2 buffer is almost full
+007E: B8 20   MOV  R0,#20     IPCSTAT
+0080: 50      ANL  A,@R0      is SER1,2 open?
+0081: B8 22   MOV  R0,#22     
+0083: 92 9F   JB4  #009F      SER1 buf almost fullinit SER1 rcv
+0085: B2 91   JB5  #0091      SER2 buf almost fullinit SER2 rcv
+0087: 65      STOP TCNT       
+0088: 23 00   MOV  A,#00      init for 256 ticks
+008A: 62      MOV  T,A        
+008B: 35      DIS  TCNTI      
+008C: 25      EN   TCNTI      
+008D: 55      STRT T          start timer @11Mhz/32 -> 1 tick/2.9 usec -> timeout=744 usec
+008E: FF      MOV  A,R7       
+008F: C5      SEL  RB0        
+0090: 93      RETR            
+;
+; init SER2 rcv
+0091: F0      MOV  A,@R0      
+0092: 43 01   ORL  A,#01      set CHANOVF
+0094: A0      MOV  @R0,A      store IOSTAT
+0095: BA 51   MOV  R2,#51     SER2RPTR
+0097: B9 4D   MOV  R1,#4D     SER2NUM
+0099: BE 80   MOV  R6,#80     SER2 Buffer End
+009B: BC 80   MOV  R4,#80     
+009D: 04 B4   JMP  $0B4       
+;
+; init SER1 rcv
+009F: B2 AF   JB5  #00AF      
+00A1: F0      MOV  A,@R0      
+00A2: 53 FE   ANL  A,#FE      clr CHANOVF
+00A4: A0      MOV  @R0,A      store IOSTAT
+00A5: BA 4F   MOV  R2,#4F     SER1RPTR
+00A7: B9 4C   MOV  R1,#4C     SER1NUM
+00A9: BE 97   MOV  R6,#97     SER1 Buffer End
+00AB: BC 40   MOV  R4,#40     
+00AD: 04 B4   JMP  $0B4       
+;
+; 
+00AF: F0      MOV  A,@R0      
+00B0: 12 A1   JB0  #00A1      ?? check CHANOVF???
+00B2: 04 91   JMP  $091       init SER2 rcv
+;
+; 
+00B4: FC      MOV  A,R4       
+00B5: 37      CPL  A          
+00B6: 50      ANL  A,@R0      
+00B7: 53 FD   ANL  A,#FD      
+00B9: 43 08   ORL  A,#08      
+00BB: A0      MOV  @R0,A      IOSTAT
+00BC: C8      DEC  R0         
+00BD: B0 00   MOV  @R0,#00    0->#21
+00BF: 18      INC  R0         
+00C0: 18      INC  R0         
+00C1: B0 00   MOV  @R0,#00    0->#23
+00C3: B8 4B   MOV  R0,#4B     
+00C5: FA      MOV  A,R2       
+00C6: A0      MOV  @R0,A      store SERxRPTR in CRPTR
+00C7: A8      MOV  R0,A       
+00C8: F0      MOV  A,@R0      
+00C9: AA      MOV  R2,A       R2 is value of current RPTR
+00CA: B8 22   MOV  R0,#22     
+00CC: B5      CPL  F1         set F1 flag (always 0 when 0A4 is called)
+00CD: BB 00   MOV  R3,#00     
+00CF: 05      EN   I          
+00D0: 35      DIS  TCNTI      
+00D1: FC      MOV  A,R4       
+00D2: F2 D9   JB7  #00D9      jump if SER2
+00D4: FF      MOV  A,R7       
+00D5: C5      SEL  RB0        
+00D6: 9A EF   ANL  P2,#EF     P2.4=L, CTSout (other side should stop transmitting now...)
+00D8: 93      RETR            
+00D9: FF      MOV  A,R7       
+00DA: C5      SEL  RB0        
+00DB: 9A DF   ANL  P2,#DF     P2.5=L, DTRout (other side should stop transmitting now...)
+00DD: 93      RETR            
+;
+; ISR external interrupt = SER2RXD & SER1TXD (either H->L)
+00DE: B6 E1   JF0  #00E1      
+00E0: 93      RETR            
+00E1: D5      SEL  RB1        bank 1
+00E2: AF      MOV  R7,A       
+00E3: 23 FF   MOV  A,#FF      init for 1 event
+00E5: 62      MOV  T,A        
+00E6: 25      EN   TCNTI      
+00E7: 45      STRT CNT        start counter: will interrupt at next H->L on T1 input
+00E8: 15      DIS  I          dis ext. interrupt
+00E9: FF      MOV  A,R7       
+00EA: 93      RETR            RETR also restores bank 0??
+00EB: 00      NOP             
+00EC: 00      NOP             
+00ED: 00      NOP             
+00EE: 00      NOP             
+00EF: 00      NOP             
+00F0: 00      NOP             
+00F1: 00      NOP             
+00F2: 00      NOP             
+00F3: 00      NOP             
+00F4: 00      NOP             
+00F5: 00      NOP             
+00F6: 00      NOP             
+00F7: 00      NOP             
+00F8: 00      NOP             
+00F9: 00      NOP             
+00FA: 00      NOP             
+00FB: 00      NOP             
+00FC: 00      NOP             
+00FD: 00      NOP             
+00FE: 00      NOP             
+00FF: 00      NOP             
+;
+; ISR timer; get here when counter++ overflows from #FF->#00
+0100: B6 03   JF0  #0103      
+0102: 93      RETR            
+0103: D5      SEL  RB1        
+0104: AF      MOV  R7,A       
+0105: 65      STOP TCNT       stop counting
+0106: 23 FC   MOV  A,#FC      
+0108: 62      MOV  T,A        
+0109: 45      STRT CNT        set counter for 4 cycles H->L on T1 input (= 4 * baudrate)
+010A: 76 37   JF1  #0137      handle serial data input after timer expiry interrupt
+010C: B8 22   MOV  R0,#22     IOSTAT
+010E: F0      MOV  A,@R0      
+010F: 53 04   ANL  A,#04      
+0111: 96 15   JNZ  #0115      
+0113: 04 4A   JMP  $04A       
+0115: 64 27   JMP  $327       timer expiry interrupt F1=0, IOSTATb4?
+;
+; IPCOM 2/3, SER1,2 open
+0117: B8 20   MOV  R0,#20     
+0119: 12 21   JB0  #0121      
+011B: F0      MOV  A,@R0      
+;
+; SER1 open
+011C: 43 10   ORL  A,#10      
+011E: A0      MOV  @R0,A      set SER1open in IPCSTAT
+011F: A4 00   JMP  $500       scan keyboard
+0121: F0      MOV  A,@R0      
+;
+; SER2 open
+0122: 43 20   ORL  A,#20      
+0124: A0      MOV  @R0,A      set SER2open in IPCSTAT
+0125: A4 00   JMP  $500       scan keyboard
+;
+; IPCOM 4/5, SER1,2 close 
+0127: B8 20   MOV  R0,#20     
+0129: 12 31   JB0  #0131      
+012B: F0      MOV  A,@R0      
+;
+; SER1 close
+012C: 53 EF   ANL  A,#EF      
+012E: A0      MOV  @R0,A      clr SER1open in IPCSTAT
+012F: A4 00   JMP  $500       scan keyboard
+0131: F0      MOV  A,@R0      
+;
+; SER2 close
+0132: 53 DF   ANL  A,#DF      
+0134: A0      MOV  @R0,A      clr SER1open in IPCSTAT
+0135: A4 00   JMP  $500       scan keyboard
+;
+; handle serial data input after timer expiry interrupt
+0137: 0A      IN   A,P2       
+0138: 53 01   ANL  A,#01      P2.0: RXD in
+013A: 2B      XCH  A,R3       
+013B: 96 55   JNZ  #0155      
+013D: 2B      XCH  A,R3       R3=0, no bits received yet.
+013E: 96 4C   JNZ  #014C      jump if RXD = H
+0140: F0      MOV  A,@R0      received a real start bit (L)
+0141: 53 F7   ANL  A,#F7      clr b3 IOSTAT
+0143: A0      MOV  @R0,A      
+0144: C8      DEC  R0         
+0145: B0 00   MOV  @R0,#00    0->#21
+0147: 18      INC  R0         
+0148: BB 09   MOV  R3,#09     expect 9 bits
+014A: FF      MOV  A,R7       
+014B: 93      RETR            
+014C: 65      STOP TCNT       noise detected, restart the receive process all over
+014D: 35      DIS  TCNTI      
+014E: 05      EN   I          
+014F: F0      MOV  A,@R0      
+0150: 43 08   ORL  A,#08      set b3 IOSTAT
+0152: A0      MOV  @R0,A      
+0153: FF      MOV  A,R7       
+0154: 93      RETR            
+0155: 2B      XCH  A,R3       restore R3
+0156: EB 8A   DJNZ R3,#018A   
+0158: 65      STOP TCNT       got the whole byte now
+0159: 35      DIS  TCNTI      
+015A: 05      EN   I          
+015B: 96 64   JNZ  #0164      ???
+015D: F0      MOV  A,@R0      code never reached
+015E: 5C      ANL  A,R4       
+015F: 96 84   JNZ  #0184      
+0161: FC      MOV  A,R4       
+0162: 40      ORL  A,@R0      bit 6/7 never set in IOSTAT???
+0163: A0      MOV  @R0,A      
+0164: FA      MOV  A,R2       current buf ptr
+0165: A8      MOV  R0,A       
+0166: FD      MOV  A,R5       
+0167: A0      MOV  @R0,A      store the received byte
+0168: F1      MOV  A,@R1      
+0169: 07      DEC  A          
+016A: A1      MOV  @R1,A      decrement SERxNUM (negative length)
+016B: 18      INC  R0         
+016C: F8      MOV  A,R0       current buf ptr
+016D: 6E      ADD  A,R6       add Buffer End to see if end of RAM reached
+016E: F8      MOV  A,R0       
+016F: E6 73   JNC  #0173      jump if not yet at end
+0171: 03 E9   ADD  A,#E9      back to buffer start, $17 bytes less in RAM
+0173: AA      MOV  R2,A       update buf ptr
+0174: B8 22   MOV  R0,#22     restore correct bank1 R0 (#22)
+0176: F1      MOV  A,@R1      
+0177: 03 14   ADD  A,#14      
+0179: 96 81   JNZ  #0181      jump if num of char in buffer != $14 (watermark)
+017B: 8A 30   ORL  P2,#30     P2.4/5=H CTSout,DTRout (other side may resume now)
+017D: F0      MOV  A,@R0      
+017E: 43 02   ORL  A,#02      
+0180: A0      MOV  @R0,A      
+0181: 18      INC  R0         
+0182: 10      INC  @R0        #23++
+0183: C8      DEC  R0         
+0184: F0      MOV  A,@R0      
+0185: 43 08   ORL  A,#08      
+0187: A0      MOV  @R0,A      
+0188: FF      MOV  A,R7       
+0189: 93      RETR            
+018A: 67      RRC  A          shift this bit into R5
+018B: FD      MOV  A,R5       
+018C: 67      RRC  A          
+018D: AD      MOV  R5,A       
+018E: FF      MOV  A,R7       
+018F: 93      RETR            
+0190: 00      NOP             
+0191: 00      NOP             
+0192: 00      NOP             
+0193: 00      NOP             
+0194: 00      NOP             
+0195: 00      NOP             
+0196: 00      NOP             
+0197: 00      NOP             
+0198: 00      NOP             
+0199: 00      NOP             
+019A: 00      NOP             
+019B: 00      NOP             
+019C: 00      NOP             
+019D: 00      NOP             
+019E: 00      NOP             
+019F: 00      NOP             
+01A0: 00      NOP             
+01A1: 00      NOP             
+01A2: 00      NOP             
+01A3: 00      NOP             
+01A4: 00      NOP             
+01A5: 00      NOP             
+01A6: 00      NOP             
+01A7: 00      NOP             
+01A8: 00      NOP             
+01A9: 00      NOP             
+01AA: 00      NOP             
+01AB: 00      NOP             
+01AC: 00      NOP             
+01AD: 00      NOP             
+01AE: 00      NOP             
+01AF: 00      NOP             
+01B0: 00      NOP             
+01B1: 00      NOP             
+01B2: 00      NOP             
+01B3: 00      NOP             
+01B4: 00      NOP             
+01B5: 00      NOP             
+01B6: 00      NOP             
+01B7: 00      NOP             
+01B8: 00      NOP             
+01B9: 00      NOP             
+01BA: 00      NOP             
+01BB: 00      NOP             
+01BC: 00      NOP             
+01BD: 00      NOP             
+01BE: 00      NOP             
+01BF: 00      NOP             
+01C0: 00      NOP             
+01C1: 00      NOP             
+01C2: 00      NOP             
+01C3: 00      NOP             
+01C4: 00      NOP             
+01C5: 00      NOP             
+01C6: 00      NOP             
+01C7: 00      NOP             
+01C8: 00      NOP             
+01C9: 00      NOP             
+01CA: 00      NOP             
+01CB: 00      NOP             
+01CC: 00      NOP             
+01CD: 00      NOP             
+01CE: 00      NOP             
+01CF: 00      NOP             
+01D0: 00      NOP             
+01D1: 00      NOP             
+01D2: 00      NOP             
+01D3: 00      NOP             
+01D4: 00      NOP             
+01D5: 00      NOP             
+01D6: 00      NOP             
+01D7: 00      NOP             
+01D8: 00      NOP             
+01D9: 00      NOP             
+01DA: 00      NOP             
+01DB: 00      NOP             
+01DC: 00      NOP             
+01DD: 00      NOP             
+01DE: 00      NOP             
+01DF: 00      NOP             
+01E0: 00      NOP             
+01E1: 00      NOP             
+01E2: 00      NOP             
+01E3: 00      NOP             
+01E4: 00      NOP             
+01E5: 00      NOP             
+01E6: 00      NOP             
+01E7: 00      NOP             
+01E8: 00      NOP             
+01E9: 00      NOP             
+01EA: 00      NOP             
+01EB: 00      NOP             
+01EC: 00      NOP             
+01ED: 00      NOP             
+01EE: 00      NOP             
+01EF: 00      NOP             
+01F0: 00      NOP             
+01F1: 00      NOP             
+01F2: 00      NOP             
+01F3: 00      NOP             
+01F4: 00      NOP             
+01F5: 00      NOP             
+01F6: 00      NOP             
+01F7: 00      NOP             
+01F8: 00      NOP             
+01F9: 00      NOP             
+01FA: 00      NOP             
+01FB: 00      NOP             
+01FC: 00      NOP             
+01FD: 00      NOP             
+01FE: 00      NOP             
+01FF: 00      NOP             
+;
+; get IPCOM cmd or else scan keyboard 
+0200: 0A      IN   A,P2       
+0201: 53 80   ANL  A,#80      
+0203: C6 07   JZ   #0207      comdata=L?
+0205: A4 00   JMP  $500       scan keyboard
+0207: F4 4F   CALL $74F       get 4bit data from ZX8302, ret A.lsb
+0209: 03 0C   ADD  A,#0C      
+020B: B3      JMPP @A         jump according IPCOM table $20C
+;
+; IPCOM jump table
+020C: 1C      DFB  #1C        0: init IPC
+020D: 28      DFB  #28        1: get interrupt status
+020E: 1E      DFB  #1E        2: open ser1
+020F: 1E      DFB  #1E        3: open ser2
+0210: 20      DFB  #20        4: close ser1
+0211: 20      DFB  #20        5: close ser2
+0212: 89      DFB  #89        6: serial1 receive
+0213: 89      DFB  #89        7: serial2 receive
+0214: 4D      DFB  #4D        8: read keyboard
+0215: 76      DFB  #76        9: keyrow
+0216: 22      DFB  #22        a: set sound
+0217: 24      DFB  #24        b: kill sound
+0218: C3      DFB  #C3        c: set P2.3
+0219: CF      DFB  #CF        d: set serial baudrate
+021A: E3      DFB  #E3        e: get random 
+021B: F0      DFB  #F0        f: test
+021C: 04 09   JMP  $009       IPCinit
+021E: 24 17   JMP  $117       IPCOM 2/3, SER1,2 open
+0220: 24 27   JMP  $127       IPCOM 4/5, SER1,2 close 
+0222: 64 00   JMP  $300       IPCOM A, set sound
+0224: 64 1F   JMP  $31F       IPCOM B, kill sound
+0226: A4 00   JMP  $500       scan keyboard
+;
+; IPCOM 1, get IPC status (from 50Hz poll)
+0228: 0A      IN   A,P2       
+0229: 53 40   ANL  A,#40      P2.6, not connected; MDV writeprot never asserted
+022B: B8 20   MOV  R0,#20     
+022D: 40      ORL  A,@R0      
+022E: 53 CF   ANL  A,#CF      clr b5,4: ser1/2 open
+0230: 72 34   JB3  #0234      repeat key?
+0232: 44 36   JMP  $236       no
+0234: 43 01   ORL  A,#01      yes, set keyboard interrupt
+0236: AA      MOV  R2,A       
+0237: B8 4C   MOV  R0,#4C     SER1NUM
+0239: F0      MOV  A,@R0      
+023A: C6 40   JZ   #0240      
+023C: FA      MOV  A,R2       
+023D: 43 10   ORL  A,#10      SER1 data available
+023F: AA      MOV  R2,A       
+0240: 18      INC  R0         SER2NUM
+0241: F0      MOV  A,@R0      
+0242: C6 48   JZ   #0248      
+0244: FA      MOV  A,R2       
+0245: 43 20   ORL  A,#20      SER2 data available
+0247: AA      MOV  R2,A       
+0248: FA      MOV  A,R2       
+0249: F4 84   CALL $784       send byte to ZX8302
+024B: A4 00   JMP  $500       scan keyboard
+;
+; IPCOM 8, getkey
+024D: B8 2B   MOV  R0,#2B     current free pos
+024F: F0      MOV  A,@R0      
+0250: 03 D4   ADD  A,#D4      -#2C (keybuf start)
+0252: 97      CLR  C          
+0253: 67      RRC  A          
+0254: AA      MOV  R2,A       
+0255: B9 20   MOV  R1,#20     
+0257: F1      MOV  A,@R1      
+0258: 53 08   ANL  A,#08      
+025A: 4A      ORL  A,R2       b3=repeatkey,b2-0=nr of keys
+025B: F4 89   CALL $789       send A.lsb to ZX8302
+025D: FA      MOV  A,R2       
+025E: C6 6E   JZ   #026E      
+0260: B9 2C   MOV  R1,#2C     keybuf ptr
+0262: F1      MOV  A,@R1      b3 ovf, b2 SHFT, b1 CNTL, b0 ALT
+0263: F4 89   CALL $789       send A.lsb to ZX8302
+0265: 19      INC  R1         
+0266: F1      MOV  A,@R1      key
+0267: F4 84   CALL $784       send byte to ZX8302
+0269: 19      INC  R1         
+026A: EA 62   DJNZ R2,#0262   
+026C: B0 2C   MOV  @R0,#2C    reset ptr
+026E: B8 20   MOV  R0,#20     
+0270: F0      MOV  A,@R0      
+0271: 53 FE   ANL  A,#FE      
+0273: A0      MOV  @R0,A      clear keyb. interrupt status
+0274: A4 00   JMP  $500       scan keyboard
+;
+; IPCOM 9, keyrow
+0276: F4 4F   CALL $74F       get 4bit data from ZX8302, ret A.lsb
+0278: 53 07   ANL  A,#07      
+027A: 17      INC  A          
+027B: AA      MOV  R2,A       
+027C: 23 00   MOV  A,#00      
+027E: 97      CLR  C          
+027F: A7      CPL  C          
+0280: F7      RLC  A          A=1<<row
+0281: EA 80   DJNZ R2,#0280   
+0283: B4 C8   CALL $5C8       scan keyboard, entry A (one bit=1), ret A
+0285: F4 84   CALL $784       send byte to ZX8302
+0287: A4 00   JMP  $500       scan keyboard
+;
+; IPCOM 6/7, SER1,2 rcv
+0289: 12 93   JB0  #0293      
+028B: B8 4C   MOV  R0,#4C     SER1NUM
+028D: BC 97   MOV  R4,#97     SER1 Buffer End
+028F: BD 4E   MOV  R5,#4E     SER1SPTR
+0291: 44 99   JMP  $299       
+0293: B8 4D   MOV  R0,#4D     SER2NUM
+0295: BC 80   MOV  R4,#80     SER2 Buffer End
+0297: BD 50   MOV  R5,#50     SER2SPTR
+0299: F0      MOV  A,@R0      get SERxNUM
+029A: 37      CPL  A          
+029B: 17      INC  A          A=-SERxNUM
+029C: 53 3F   ANL  A,#3F      
+029E: AB      MOV  R3,A       
+029F: B9 22   MOV  R1,#22     
+02A1: F1      MOV  A,@R1      
+02A2: 53 C0   ANL  A,#C0      select SER12 stopbits from IOSTAT
+02A4: 4B      ORL  A,R3       
+02A5: F4 84   CALL $784       send byte to ZX8302
+02A7: FB      MOV  A,R3       
+02A8: C6 C1   JZ   #02C1      stop if no bytes available
+02AA: FD      MOV  A,R5       get SERxSPTR
+02AB: A9      MOV  R1,A       
+02AC: F1      MOV  A,@R1      
+02AD: A9      MOV  R1,A       R1 points to current byte to be sent
+02AE: F1      MOV  A,@R1      
+02AF: F4 84   CALL $784       send byte to ZX8302
+02B1: 10      INC  @R0        increment buffer length (=negative)
+02B2: 19      INC  R1         
+02B3: F9      MOV  A,R1       
+02B4: 6C      ADD  A,R4       add SERx Buffer Eend
+02B5: E6 BB   JNC  #02BB      jump if not at end of buffer
+02B7: F9      MOV  A,R1       
+02B8: 03 E9   ADD  A,#E9      
+02BA: A9      MOV  R1,A       ptr=ptr-$17 (SERrcv buffer length=$17)
+02BB: EB AE   DJNZ R3,#02AE   jump if not all bytes were sent yet
+02BD: FD      MOV  A,R5       
+02BE: A8      MOV  R0,A       
+02BF: F9      MOV  A,R1       
+02C0: A0      MOV  @R0,A      SERxSPTR now points to next byte in buffer
+02C1: A4 00   JMP  $500       scan keyboard
+;
+; IPCOM C, set IPL1L as in A.b0
+02C3: F4 4F   CALL $74F       get 4bit data from ZX8302, ret A.lsb
+02C5: 12 CB   JB0  #02CB      
+02C7: 9A F7   ANL  P2,#F7     P2.3=L, IPL1L
+02C9: A4 00   JMP  $500       scan keyboard
+02CB: 8A 08   ORL  P2,#08     P2.3=H, IPL1L
+02CD: A4 00   JMP  $500       scan keyboard
+;
+; IPCOM D, baudrate
+02CF: F4 4F   CALL $74F       get 4bit data from ZX8302, ret A.lsb
+02D1: 53 07   ANL  A,#07      
+02D3: 03 DB   ADD  A,#DB      
+02D5: A3      MOVP A,@A       
+02D6: B8 24   MOV  R0,#24     
+02D8: A0      MOV  @R0,A      
+02D9: A4 00   JMP  $500       scan keyboard
+;
+; BAUD table
+02DB: 01      DFB  #01         19200
+02DC: 03      DFB  #03          9600
+02DD: 07      DFB  #07          4800
+02DE: 0F      DFB  #0F          2400
+02DF: 1F      DFB  #1F          1200
+02E0: 3F      DFB  #3F           600
+02E1: 7F      DFB  #7F           300
+02E2: FF      DFB  #FF            75
+;
+; IPCOM E, random
+02E3: F4 3A   CALL $73A       generate RANDOM nr in #25,#26
+02E5: B9 25   MOV  R1,#25     
+02E7: F1      MOV  A,@R1      
+02E8: F4 84   CALL $784       send byte to ZX8302
+02EA: 19      INC  R1         
+02EB: F1      MOV  A,@R1      
+02EC: F4 84   CALL $784       send byte to ZX8302
+02EE: A4 00   JMP  $500       scan keyboard
+;
+; IPCOM F, test
+02F0: F4 7C   CALL $77C       get byte from ZX8302, ret A
+02F2: F4 84   CALL $784       send byte to ZX8302
+02F4: A4 00   JMP  $500       scan keyboard
+02F6: 00      NOP             
+02F7: 00      NOP             
+02F8: 00      NOP             
+02F9: 00      NOP             
+02FA: 00      NOP             
+02FB: 00      NOP             
+02FC: 00      NOP             
+02FD: 00      NOP             
+02FE: 00      NOP             
+02FF: 00      NOP             
+;
+; IPCOM A, set sound
+0300: B8 3A   MOV  R0,#3A     
+0302: B9 08   MOV  R1,#08     
+0304: F4 7C   CALL $77C       get byte from ZX8302, ret A
+0306: A0      MOV  @R0,A      
+0307: 18      INC  R0         
+0308: E9 04   DJNZ R1,#0304   store all 8 params at #3A and up
+030A: 94 15   CALL $415       choose pitch, ret R0=42
+030C: 18      INC  R0         prepare #42..#49 sound variables
+030D: A0      MOV  @R0,A      
+030E: 18      INC  R0         
+030F: A0      MOV  @R0,A      
+0310: B9 05   MOV  R1,#05     
+0312: 18      INC  R0         
+0313: B0 00   MOV  @R0,#00    
+0315: E9 12   DJNZ R1,#0312   
+0317: B8 20   MOV  R0,#20     
+0319: F0      MOV  A,@R0      
+031A: 43 02   ORL  A,#02      set sound on
+031C: A0      MOV  @R0,A      
+031D: A4 00   JMP  $500       scan keyboard
+;
+; IPCOM B, kill sound
+031F: B8 20   MOV  R0,#20     
+0321: F0      MOV  A,@R0      
+0322: 53 FD   ANL  A,#FD      sound off
+0324: A0      MOV  @R0,A      
+0325: A4 00   JMP  $500       scan keyboard
+;
+; timer expiry interrupt F1=0, IOSTATb4?
+0327: 65      STOP TCNT       
+0328: B8 20   MOV  R0,#20     
+032A: F0      MOV  A,@R0      
+032B: 53 02   ANL  A,#02      
+032D: 96 3B   JNZ  #033B      jump if sound on
+032F: B8 22   MOV  R0,#22     
+0331: F0      MOV  A,@R0      
+0332: 53 FB   ANL  A,#FB      clr IOSTAT.b2
+0334: 53 DF   ANL  A,#DF      clr IOSTAT.b5
+0336: A0      MOV  @R0,A      
+0337: 9A FD   ANL  P2,#FD     P2.1=L, speaker
+0339: 04 4A   JMP  $04A       
+033B: B8 3E   MOV  R0,#3E     beep duration
+033D: F0      MOV  A,@R0      
+033E: 96 44   JNZ  #0344      
+0340: 18      INC  R0         
+0341: F0      MOV  A,@R0      
+0342: C6 65   JZ   #0365      
+0344: B8 4A   MOV  R0,#4A     
+0346: 10      INC  @R0        
+0347: 10      INC  @R0        
+0348: B9 47   MOV  R1,#47     
+034A: B8 44   MOV  R0,#44     
+034C: F0      MOV  A,@R0      
+034D: 96 51   JNZ  #0351      
+034F: 23 FF   MOV  A,#FF      
+0351: F4 16   CALL $716       memory ADD: ((R1),(R1+1))+=A, keep R1 (16bit little endian)
+0353: B8 4A   MOV  R0,#4A     
+0355: F0      MOV  A,@R0      
+0356: F4 16   CALL $716       memory ADD: ((R1),(R1+1))+=A, keep R1 (16bit little endian)
+0358: B8 3F   MOV  R0,#3F     
+035A: 19      INC  R1         
+035B: F4 0B   CALL $70B       memory SUB16: ret. A=((R1+1),(R1))-((R0+1),(R0)), keep R0/R1
+035D: E6 65   JNC  #0365      
+035F: B8 22   MOV  R0,#22     
+0361: F0      MOV  A,@R0      
+0362: 43 20   ORL  A,#20      
+0364: A0      MOV  @R0,A      
+0365: B9 45   MOV  R1,#45     
+0367: B8 44   MOV  R0,#44     
+0369: F0      MOV  A,@R0      
+036A: 96 6E   JNZ  #036E      
+036C: 23 FF   MOV  A,#FF      
+036E: F4 16   CALL $716       memory ADD: ((R1),(R1+1))+=A, keep R1 (16bit little endian)
+0370: B8 4A   MOV  R0,#4A     
+0372: F0      MOV  A,@R0      
+0373: F4 16   CALL $716       memory ADD: ((R1),(R1+1))+=A, keep R1 (16bit little endian)
+0375: B8 3D   MOV  R0,#3D     
+0377: 19      INC  R1         
+0378: F4 0B   CALL $70B       memory SUB16: ret. A=((R1+1),(R1))-((R0+1),(R0)), keep R0/R1
+037A: E6 E4   JNC  #03E4      update speaker with #22,b4 inverted
+037C: B8 4A   MOV  R0,#4A     
+037E: F0      MOV  A,@R0      
+037F: 03 03   ADD  A,#03      
+0381: A0      MOV  @R0,A      
+0382: B8 45   MOV  R0,#45     
+0384: B0 00   MOV  @R0,#00    
+0386: 18      INC  R0         
+0387: B0 00   MOV  @R0,#00    
+0389: B8 42   MOV  R0,#42     
+038B: B9 40   MOV  R1,#40     
+038D: F1      MOV  A,@R1      
+038E: 47      SWAP A          
+038F: 43 F0   ORL  A,#F0      
+0391: 72 95   JB3  #0395      
+0393: 53 0F   ANL  A,#0F      
+0395: 60      ADD  A,@R0      
+0396: A0      MOV  @R0,A      
+0397: B9 3A   MOV  R1,#3A     
+0399: F4 00   CALL $700       memory SUB8: ret. A=(R1)-(R0), keep R0/R1
+039B: F6 A5   JC   #03A5      
+039D: B9 3B   MOV  R1,#3B     
+039F: F4 00   CALL $700       memory SUB8: ret. A=(R1)-(R0), keep R0/R1
+03A1: C6 A5   JZ   #03A5      
+03A3: F6 D3   JC   #03D3      
+03A5: B8 4A   MOV  R0,#4A     
+03A7: 10      INC  @R0        
+03A8: 10      INC  @R0        
+03A9: B8 40   MOV  R0,#40     
+03AB: F0      MOV  A,@R0      
+03AC: B8 49   MOV  R0,#49     
+03AE: 43 F0   ORL  A,#F0      
+03B0: 17      INC  A          
+03B1: C6 BD   JZ   #03BD      
+03B3: 07      DEC  A          
+03B4: 53 0F   ANL  A,#0F      
+03B6: C6 C2   JZ   #03C2      
+03B8: 37      CPL  A          
+03B9: 17      INC  A          
+03BA: 60      ADD  A,@R0      
+03BB: F6 C2   JC   #03C2      
+03BD: 10      INC  @R0        
+03BE: 94 15   CALL $415       choose pitch, ret R0=42
+03C0: 64 D3   JMP  $3D3       
+03C2: B0 00   MOV  @R0,#00    
+03C4: B9 40   MOV  R1,#40     
+03C6: F1      MOV  A,@R1      
+03C7: 47      SWAP A          
+03C8: 37      CPL  A          
+03C9: 17      INC  A          
+03CA: 53 0F   ANL  A,#0F      
+03CC: 47      SWAP A          
+03CD: AA      MOV  R2,A       
+03CE: F1      MOV  A,@R1      
+03CF: 53 0F   ANL  A,#0F      
+03D1: 4A      ORL  A,R2       
+03D2: A1      MOV  @R1,A      
+03D3: B9 41   MOV  R1,#41     
+03D5: F1      MOV  A,@R1      
+03D6: 47      SWAP A          
+03D7: A1      MOV  @R1,A      
+03D8: 94 22   CALL $422       update sound random/fuzz
+03DA: B9 42   MOV  R1,#42     
+03DC: 61      ADD  A,@R1      
+03DD: 19      INC  R1         
+03DE: A1      MOV  @R1,A      
+03DF: B9 41   MOV  R1,#41     
+03E1: F1      MOV  A,@R1      
+03E2: 47      SWAP A          
+03E3: A1      MOV  @R1,A      
+;
+; update speaker with #22,b4 inverted
+03E4: B8 22   MOV  R0,#22     
+03E6: F0      MOV  A,@R0      
+03E7: 53 10   ANL  A,#10      
+03E9: C6 F3   JZ   #03F3      
+03EB: 9A FD   ANL  P2,#FD     P2.1=L, speaker
+03ED: F0      MOV  A,@R0      
+03EE: 53 EF   ANL  A,#EF      
+03F0: A0      MOV  @R0,A      
+03F1: 84 00   JMP  $400       
+03F3: 8A 02   ORL  P2,#02     P2.1=H, speaker
+03F5: F0      MOV  A,@R0      
+03F6: 43 10   ORL  A,#10      
+03F8: A0      MOV  @R0,A      
+03F9: 84 00   JMP  $400       
+03FB: 00      NOP             
+03FC: 00      NOP             
+03FD: 00      NOP             
+03FE: 00      NOP             
+03FF: 00      NOP             
+0400: 94 22   CALL $422       update sound random/fuzz
+0402: B9 43   MOV  R1,#43     
+0404: 61      ADD  A,@R1      
+0405: 19      INC  R1         
+0406: A1      MOV  @R1,A      
+0407: 37      CPL  A          
+0408: 17      INC  A          
+0409: 65      STOP TCNT       
+040A: 62      MOV  T,A        
+040B: 35      DIS  TCNTI      
+040C: 25      EN   TCNTI      
+040D: 55      STRT T          start timer @11Mhz/32 -> 1 tick/2.9 usec -> timeout=A*2.9 usec
+040E: B8 4A   MOV  R0,#4A     
+0410: B0 04   MOV  @R0,#04    
+0412: FF      MOV  A,R7       
+0413: C5      SEL  RB0        
+0414: 93      RETR            
+;
+; choose pitch, ret R0=42
+0415: B8 40   MOV  R0,#40     
+0417: F0      MOV  A,@R0      
+0418: B9 3B   MOV  R1,#3B     pitch2
+041A: F2 1D   JB7  #041D      pitch,b3?
+041C: C9      DEC  R1         
+041D: B8 42   MOV  R0,#42     
+041F: F1      MOV  A,@R1      
+0420: A0      MOV  @R0,A      chosen pitchx in #42
+0421: 83      RET             
+;
+; update sound random/fuzz
+0422: B8 41   MOV  R0,#41     
+0424: F0      MOV  A,@R0      
+0425: 72 29   JB3  #0429      
+0427: 27      CLR  A          
+0428: 83      RET             
+0429: B8 4A   MOV  R0,#4A     
+042B: F0      MOV  A,@R0      
+042C: 03 07   ADD  A,#07      
+042E: A0      MOV  @R0,A      
+042F: F4 3A   CALL $73A       generate RANDOM nr in #25,#26
+0431: B8 41   MOV  R0,#41     
+0433: B9 25   MOV  R1,#25     
+0435: F0      MOV  A,@R0      
+0436: 53 07   ANL  A,#07      
+0438: 17      INC  A          
+0439: AA      MOV  R2,A       
+043A: 27      CLR  A          
+043B: 97      CLR  C          
+043C: A7      CPL  C          
+043D: F7      RLC  A          
+043E: EA 3C   DJNZ R2,#043C   
+0440: 51      ANL  A,@R1      
+0441: 83      RET             
+0442: 00      NOP             
+0443: 00      NOP             
+0444: 00      NOP             
+0445: 00      NOP             
+0446: 00      NOP             
+0447: 00      NOP             
+0448: 00      NOP             
+0449: 00      NOP             
+044A: 00      NOP             
+044B: 00      NOP             
+044C: 00      NOP             
+044D: 00      NOP             
+044E: 00      NOP             
+044F: 00      NOP             
+0450: 00      NOP             
+0451: 00      NOP             
+0452: 00      NOP             
+0453: 00      NOP             
+0454: 00      NOP             
+0455: 00      NOP             
+0456: 00      NOP             
+0457: 00      NOP             
+0458: 00      NOP             
+0459: 00      NOP             
+045A: 00      NOP             
+045B: 00      NOP             
+045C: 00      NOP             
+045D: 00      NOP             
+045E: 00      NOP             
+045F: 00      NOP             
+0460: 00      NOP             
+0461: 00      NOP             
+0462: 00      NOP             
+0463: 00      NOP             
+0464: 00      NOP             
+0465: 00      NOP             
+0466: 00      NOP             
+0467: 00      NOP             
+0468: 00      NOP             
+0469: 00      NOP             
+046A: 00      NOP             
+046B: 00      NOP             
+046C: 00      NOP             
+046D: 00      NOP             
+046E: 00      NOP             
+046F: 00      NOP             
+0470: 00      NOP             
+0471: 00      NOP             
+0472: 00      NOP             
+0473: 00      NOP             
+0474: 00      NOP             
+0475: 00      NOP             
+0476: 00      NOP             
+0477: 00      NOP             
+0478: 00      NOP             
+0479: 00      NOP             
+047A: 00      NOP             
+047B: 00      NOP             
+047C: 00      NOP             
+047D: 00      NOP             
+047E: 00      NOP             
+047F: 00      NOP             
+0480: 00      NOP             
+0481: 00      NOP             
+0482: 00      NOP             
+0483: 00      NOP             
+0484: 00      NOP             
+0485: 00      NOP             
+0486: 00      NOP             
+0487: 00      NOP             
+0488: 00      NOP             
+0489: 00      NOP             
+048A: 00      NOP             
+048B: 00      NOP             
+048C: 00      NOP             
+048D: 00      NOP             
+048E: 00      NOP             
+048F: 00      NOP             
+0490: 00      NOP             
+0491: 00      NOP             
+0492: 00      NOP             
+0493: 00      NOP             
+0494: 00      NOP             
+0495: 00      NOP             
+0496: 00      NOP             
+0497: 00      NOP             
+0498: 00      NOP             
+0499: 00      NOP             
+049A: 00      NOP             
+049B: 00      NOP             
+049C: 00      NOP             
+049D: 00      NOP             
+049E: 00      NOP             
+049F: 00      NOP             
+04A0: 00      NOP             
+04A1: 00      NOP             
+04A2: 00      NOP             
+04A3: 00      NOP             
+04A4: 00      NOP             
+04A5: 00      NOP             
+04A6: 00      NOP             
+04A7: 00      NOP             
+04A8: 00      NOP             
+04A9: 00      NOP             
+04AA: 00      NOP             
+04AB: 00      NOP             
+04AC: 00      NOP             
+04AD: 00      NOP             
+04AE: 00      NOP             
+04AF: 00      NOP             
+04B0: 00      NOP             
+04B1: 00      NOP             
+04B2: 00      NOP             
+04B3: 00      NOP             
+04B4: 00      NOP             
+04B5: 00      NOP             
+04B6: 00      NOP             
+04B7: 00      NOP             
+04B8: 00      NOP             
+04B9: 00      NOP             
+04BA: 00      NOP             
+04BB: 00      NOP             
+04BC: 00      NOP             
+04BD: 00      NOP             
+04BE: 00      NOP             
+04BF: 00      NOP             
+04C0: 00      NOP             
+04C1: 00      NOP             
+04C2: 00      NOP             
+04C3: 00      NOP             
+04C4: 00      NOP             
+04C5: 00      NOP             
+04C6: 00      NOP             
+04C7: 00      NOP             
+04C8: 00      NOP             
+04C9: 00      NOP             
+04CA: 00      NOP             
+04CB: 00      NOP             
+04CC: 00      NOP             
+04CD: 00      NOP             
+04CE: 00      NOP             
+04CF: 00      NOP             
+04D0: 00      NOP             
+04D1: 00      NOP             
+04D2: 00      NOP             
+04D3: 00      NOP             
+04D4: 00      NOP             
+04D5: 00      NOP             
+04D6: 00      NOP             
+04D7: 00      NOP             
+04D8: 00      NOP             
+04D9: 00      NOP             
+04DA: 00      NOP             
+04DB: 00      NOP             
+04DC: 00      NOP             
+04DD: 00      NOP             
+04DE: 00      NOP             
+04DF: 00      NOP             
+04E0: 00      NOP             
+04E1: 00      NOP             
+04E2: 00      NOP             
+04E3: 00      NOP             
+04E4: 00      NOP             
+04E5: 00      NOP             
+04E6: 00      NOP             
+04E7: 00      NOP             
+04E8: 00      NOP             
+04E9: 00      NOP             
+04EA: 00      NOP             
+04EB: 00      NOP             
+04EC: 00      NOP             
+04ED: 00      NOP             
+04EE: 00      NOP             
+04EF: 00      NOP             
+04F0: 00      NOP             
+04F1: 00      NOP             
+04F2: 00      NOP             
+04F3: 00      NOP             
+04F4: 00      NOP             
+04F5: 00      NOP             
+04F6: 00      NOP             
+04F7: 00      NOP             
+04F8: 00      NOP             
+04F9: 00      NOP             
+04FA: 00      NOP             
+04FB: 00      NOP             
+04FC: 00      NOP             
+04FD: 00      NOP             
+04FE: 00      NOP             
+04FF: 00      NOP             
+;
+; scan keyboard
+0500: B8 27   MOV  R0,#27     
+0502: 10      INC  @R0        KBDSEED++
+0503: BA 08   MOV  R2,#08     
+0505: 23 80   MOV  A,#80      scan ctl/alt/sh keyrow
+0507: B4 C8   CALL $5C8       scan keyboard, entry A (one bit=1), ret A
+0509: AE      MOV  R6,A       
+050A: 53 07   ANL  A,#07      
+050C: 03 C0   ADD  A,#C0      
+050E: A3      MOVP A,@A       get SH/CTRL/ALT code from table $5C0
+050F: AC      MOV  R4,A       
+0510: B8 28   MOV  R0,#28     
+0512: D0      XRL  A,@R0      
+0513: C6 21   JZ   #0521      same again? skip it
+0515: B9 20   MOV  R1,#20     a new key combination
+0517: F1      MOV  A,@R1      
+0518: 43 04   ORL  A,#04      set key pressed
+051A: 53 F7   ANL  A,#F7      clr repeat key
+051C: A1      MOV  @R1,A      
+051D: FC      MOV  A,R4       
+051E: A0      MOV  @R0,A      store it in #28
+051F: A4 BE   JMP  $5BE       goto $600
+0521: FE      MOV  A,R6       restore 8bit scanned pattern
+0522: 53 F8   ANL  A,#F8      proceed with 5 MSB bits, as for all next rows
+0524: BE FF   MOV  R6,#FF     
+0526: B4 D3   CALL $5D3       process key scan in A, ret Cset if key processing necessary
+0528: F6 3F   JC   #053F      
+052A: CA      DEC  R2         
+;
+; loop through other keyrows
+052B: FB      MOV  A,R3       R3 was stored in $5C8
+052C: 77      RR   A          
+052D: B4 C8   CALL $5C8       scan keyboard, entry A (one bit=1), ret A
+052F: B4 D3   CALL $5D3       process key scan in A, ret Cset if key processing necessary
+0531: F6 3F   JC   #053F      
+0533: EA 2B   DJNZ R2,#052B   loop through other keyrows
+0535: FE      MOV  A,R6       
+0536: 17      INC  A          
+0537: 96 4E   JNZ  #054E      jump if R6 != #FF
+0539: B8 20   MOV  R0,#20     no keys; re-init all
+053B: F0      MOV  A,@R0      
+053C: 53 FB   ANL  A,#FB      clr (s/c/a?) key pressed
+053E: A0      MOV  @R0,A      
+053F: B8 20   MOV  R0,#20     found key (in previous scan, keycode in A)
+0541: F0      MOV  A,@R0      
+0542: 53 F7   ANL  A,#F7      clr repeat key
+0544: A0      MOV  @R0,A      
+0545: B8 29   MOV  R0,#29     
+0547: B0 FF   MOV  @R0,#FF    
+0549: 18      INC  R0         
+054A: B0 00   MOV  @R0,#00    
+054C: A4 BE   JMP  $5BE       
+054E: B8 20   MOV  R0,#20     
+0550: F0      MOV  A,@R0      
+0551: 53 04   ANL  A,#04      key pressed?
+0553: 96 BE   JNZ  #05BE      
+0555: B8 29   MOV  R0,#29     
+0557: F0      MOV  A,@R0      
+0558: DE      XRL  A,R6       
+0559: C6 62   JZ   #0562      jump if #29 == R6 (still same key?)
+055B: FE      MOV  A,R6       
+055C: A0      MOV  @R0,A      else store new key in #29
+055D: 18      INC  R0         
+055E: B0 00   MOV  @R0,#00    clear #2A
+0560: A4 BE   JMP  $5BE       
+0562: 18      INC  R0         
+0563: F0      MOV  A,@R0      get #2A
+0564: 03 FC   ADD  A,#FC      -4
+0566: C6 6D   JZ   #056D      jump if #2A == 4
+0568: F6 B8   JC   #05B8      jump if #2A > 4handle repeat key
+056A: 10      INC  @R0        
+056B: A4 BE   JMP  $5BE       
+056D: 10      INC  @R0        #2A++ (5)
+056E: B8 28   MOV  R0,#28     
+0570: F0      MOV  A,@R0      
+0571: 03 FD   ADD  A,#FD      
+0573: 96 8D   JNZ  #058D      jump if sca != 03 'ctl alt'store key in buffer
+0575: FE      MOV  A,R6       
+0576: 03 C1   ADD  A,#C1      
+0578: 96 8D   JNZ  #058D      jump if key != 3f '7'store key in buffer
+;
+; do the 'ctl-alt-7' thing
+057A: 9A FB   ANL  P2,#FB     P2.2=L, IPL0-2L -> int 5.
+057C: 15      DIS  I          
+057D: 35      DIS  TCNTI      
+057E: 65      STOP TCNT       
+057F: 8A 10   ORL  P2,#10     P2.4=H, CTSout
+0581: 8A 20   ORL  P2,#20     P2.5=H, DTRout
+0583: B8 FF   MOV  R0,#FF     
+0585: B9 FF   MOV  R1,#FF     
+0587: E9 87   DJNZ R1,#0587   
+0589: E8 85   DJNZ R0,#0585   
+058B: 04 09   JMP  $009       IPCinit
+;
+; store key in buffer
+058D: B8 2B   MOV  R0,#2B     
+058F: F0      MOV  A,@R0      
+0590: A9      MOV  R1,A       
+0591: 03 C6   ADD  A,#C6      -3A
+0593: C6 B0   JZ   #05B0      jump if curr ptr==#3A (overflow)handle buffer overflow
+0595: B8 28   MOV  R0,#28     
+0597: F0      MOV  A,@R0      
+0598: A1      MOV  @R1,A      store SCA in keybuf
+0599: 19      INC  R1         
+059A: FE      MOV  A,R6       
+059B: A1      MOV  @R1,A      store KEY in keybuf
+059C: 19      INC  R1         
+059D: F9      MOV  A,R1       
+059E: B8 2B   MOV  R0,#2B     
+05A0: A0      MOV  @R0,A      update BUFPTR
+05A1: B8 20   MOV  R0,#20     
+05A3: F0      MOV  A,@R0      
+05A4: 43 01   ORL  A,#01      set keyboard interrupt
+05A6: A0      MOV  @R0,A      
+05A7: B8 27   MOV  R0,#27     use key press timing to create better randomness
+05A9: F0      MOV  A,@R0      
+05AA: B9 25   MOV  R1,#25     update RANDOM
+05AC: F4 16   CALL $716       memory ADD: ((R1),(R1+1))+=A, keep R1 (16bit little endian)
+05AE: A4 BE   JMP  $5BE       
+;
+; handle buffer overflow
+05B0: B8 38   MOV  R0,#38     
+05B2: F0      MOV  A,@R0      
+05B3: 43 08   ORL  A,#08      set OVF bit in #38 (with 7th key)
+05B5: A0      MOV  @R0,A      
+05B6: A4 BE   JMP  $5BE       
+;
+; handle repeat key
+05B8: B8 20   MOV  R0,#20     
+05BA: F0      MOV  A,@R0      
+05BB: 43 08   ORL  A,#08      set repeat key
+05BD: A0      MOV  @R0,A      
+05BE: C4 00   JMP  $600       
+;
+; SH/CTRL/ALT conversion; scancode to SCAcode
+05C0: 00      DFB  #00        none
+05C1: 04      DFB  #04        SH
+05C2: 02      DFB  #02        CTRL
+05C3: 06      DFB  #06        SH/CTRL
+05C4: 01      DFB  #01        ALT
+05C5: 05      DFB  #05        SH/ALT
+05C6: 03      DFB  #03        CTRL/ALT
+05C7: 07      DFB  #07        SH/CTRL/ALT
+;
+; scan keyboard, entry A (one bit=1), ret A
+05C8: 39      OUTL P1,A       output A on P1
+05C9: AB      MOV  R3,A       
+05CA: 80      MOVX A,@R0      put P0 in read mode=HI-Z ??
+05CB: 00      NOP             wait a bit
+05CC: 00      NOP             
+05CD: 00      NOP             
+05CE: 00      NOP             
+05CF: 00      NOP             
+05D0: 00      NOP             
+05D1: 08      IN   A,P0       get P0 into A
+05D2: 93      RETR            
+;
+; process key scan in A, ret Cset if key processing necessary
+05D3: C6 F9   JZ   #05F9      jump if no key pressed
+05D5: 2E      XCH  A,R6       
+05D6: 17      INC  A          
+05D7: C6 DC   JZ   #05DC      jump if R6 == #FF
+05D9: 97      CLR  C          else process previous and new scan data
+05DA: A7      CPL  C          return with Cset
+05DB: 83      RET             
+05DC: BC 08   MOV  R4,#08     
+05DE: FE      MOV  A,R6       restore scan
+05DF: F2 E8   JB7  #05E8      key pressed?
+05E1: E7      RL   A          
+05E2: EC DF   DJNZ R4,#05DF   
+05E4: BE FF   MOV  R6,#FF     reinit R6, ret Cset. ??code cannot be not reached
+05E6: 97      CLR  C          
+05E7: 83      RET             
+05E8: 53 7F   ANL  A,#7F      
+05EA: 96 D9   JNZ  #05D9      jump if more keys pressed
+05EC: FA      MOV  A,R2       R2: current row
+05ED: 07      DEC  A          
+05EE: 37      CPL  A          
+05EF: 53 07   ANL  A,#07      
+05F1: E7      RL   A          
+05F2: E7      RL   A          
+05F3: E7      RL   A          
+05F4: AE      MOV  R6,A       
+05F5: FC      MOV  A,R4       R4: current column
+05F6: 07      DEC  A          
+05F7: 4E      ORL  A,R6       A=(row-1)*8+(column-1)
+05F8: AE      MOV  R6,A       R6 current pressed key
+05F9: 97      CLR  C          
+05FA: 83      RET             
+05FB: 00      NOP             
+05FC: 00      NOP             
+05FD: 00      NOP             
+05FE: 00      NOP             
+05FF: 00      NOP             
+0600: 76 11   JF1  #0611      
+0602: B8 22   MOV  R0,#22     
+0604: F0      MOV  A,@R0      
+0605: 53 20   ANL  A,#20      
+0607: C6 0F   JZ   #060F      
+0609: B8 20   MOV  R0,#20     
+060B: F0      MOV  A,@R0      
+060C: 53 FD   ANL  A,#FD      clr sound off??
+060E: A0      MOV  @R0,A      
+060F: 44 00   JMP  $200       get IPCOM cmd or else scan keyboard 
+0611: B8 22   MOV  R0,#22     
+0613: F0      MOV  A,@R0      
+0614: 53 08   ANL  A,#08      
+0616: C6 4A   JZ   #064A      
+0618: B8 24   MOV  R0,#24     BAUDRATE
+061A: B9 21   MOV  R1,#21     
+061C: 11      INC  @R1        
+061D: F4 00   CALL $700       memory SUB8: ret. A=(R1)-(R0), keep R0/R1
+061F: E6 4A   JNC  #064A      
+0621: B8 20   MOV  R0,#20     
+0623: F0      MOV  A,@R0      
+0624: 53 80   ANL  A,#80      ??b7 IPCSTAT
+0626: C6 3E   JZ   #063E      
+0628: 85      CLR  F0         
+0629: F0      MOV  A,@R0      
+062A: 53 7F   ANL  A,#7F      
+062C: A0      MOV  @R0,A      
+062D: 65      STOP TCNT       
+062E: 15      DIS  I          
+062F: 35      DIS  TCNTI      
+0630: B5      CPL  F1         
+0631: D5      SEL  RB1        
+0632: B8 4B   MOV  R0,#4B     
+0634: F0      MOV  A,@R0      
+0635: A9      MOV  R1,A       (#4B)->R1,bank1 (CRPTR)
+0636: FA      MOV  A,R2       
+0637: A1      MOV  @R1,A      R2,bank1->(R1,bank1) (current pointer)
+0638: C5      SEL  RB0        
+0639: 14 4A   CALL $04A       
+063B: 95      CPL  F0         
+063C: 44 00   JMP  $200       get IPCOM cmd or else scan keyboard 
+;
+; 
+063E: 8A 30   ORL  P2,#30     P2.4/5=H, CTSout/DTRout
+0640: B8 20   MOV  R0,#20     
+0642: F0      MOV  A,@R0      set b7 IPCSTAT
+0643: 43 80   ORL  A,#80      
+0645: A0      MOV  @R0,A      
+0646: B1 00   MOV  @R1,#00    clr #21
+0648: 44 00   JMP  $200       get IPCOM cmd or else scan keyboard 
+;
+; 
+064A: B9 23   MOV  R1,#23     
+064C: F1      MOV  A,@R1      
+064D: 03 E9   ADD  A,#E9      
+064F: F6 3E   JC   #063E      jump if #23>=$17
+0651: B8 22   MOV  R0,#22     
+0653: F0      MOV  A,@R0      
+0654: 53 02   ANL  A,#02      
+0656: 96 3E   JNZ  #063E      
+0658: 44 00   JMP  $200       get IPCOM cmd or else scan keyboard 
+065A: 00      NOP             
+065B: 00      NOP             
+065C: 00      NOP             
+065D: 00      NOP             
+065E: 00      NOP             
+065F: 00      NOP             
+0660: 00      NOP             
+0661: 00      NOP             
+0662: 00      NOP             
+0663: 00      NOP             
+0664: 00      NOP             
+0665: 00      NOP             
+0666: 00      NOP             
+0667: 00      NOP             
+0668: 00      NOP             
+0669: 00      NOP             
+066A: 00      NOP             
+066B: 00      NOP             
+066C: 00      NOP             
+066D: 00      NOP             
+066E: 00      NOP             
+066F: 00      NOP             
+0670: 00      NOP             
+0671: 00      NOP             
+0672: 00      NOP             
+0673: 00      NOP             
+0674: 00      NOP             
+0675: 00      NOP             
+0676: 00      NOP             
+0677: 00      NOP             
+0678: 00      NOP             
+0679: 00      NOP             
+067A: 00      NOP             
+067B: 00      NOP             
+067C: 00      NOP             
+067D: 00      NOP             
+067E: 00      NOP             
+067F: 00      NOP             
+0680: 00      NOP             
+0681: 00      NOP             
+0682: 00      NOP             
+0683: 00      NOP             
+0684: 00      NOP             
+0685: 00      NOP             
+0686: 00      NOP             
+0687: 00      NOP             
+0688: 00      NOP             
+0689: 00      NOP             
+068A: 00      NOP             
+068B: 00      NOP             
+068C: 00      NOP             
+068D: 00      NOP             
+068E: 00      NOP             
+068F: 00      NOP             
+0690: 00      NOP             
+0691: 00      NOP             
+0692: 00      NOP             
+0693: 00      NOP             
+0694: 00      NOP             
+0695: 00      NOP             
+0696: 00      NOP             
+0697: 00      NOP             
+0698: 00      NOP             
+0699: 00      NOP             
+069A: 00      NOP             
+069B: 00      NOP             
+069C: 00      NOP             
+069D: 00      NOP             
+069E: 00      NOP             
+069F: 00      NOP             
+06A0: 00      NOP             
+06A1: 00      NOP             
+06A2: 00      NOP             
+06A3: 00      NOP             
+06A4: 00      NOP             
+06A5: 00      NOP             
+06A6: 00      NOP             
+06A7: 00      NOP             
+06A8: 00      NOP             
+06A9: 00      NOP             
+06AA: 00      NOP             
+06AB: 00      NOP             
+06AC: 00      NOP             
+06AD: 00      NOP             
+06AE: 00      NOP             
+06AF: 00      NOP             
+06B0: 00      NOP             
+06B1: 00      NOP             
+06B2: 00      NOP             
+06B3: 00      NOP             
+06B4: 00      NOP             
+06B5: 00      NOP             
+06B6: 00      NOP             
+06B7: 00      NOP             
+06B8: 00      NOP             
+06B9: 00      NOP             
+06BA: 00      NOP             
+06BB: 00      NOP             
+06BC: 00      NOP             
+06BD: 00      NOP             
+06BE: 00      NOP             
+06BF: 00      NOP             
+06C0: 00      NOP             
+06C1: 00      NOP             
+06C2: 00      NOP             
+06C3: 00      NOP             
+06C4: 00      NOP             
+06C5: 00      NOP             
+06C6: 00      NOP             
+06C7: 00      NOP             
+06C8: 00      NOP             
+06C9: 00      NOP             
+06CA: 00      NOP             
+06CB: 00      NOP             
+06CC: 00      NOP             
+06CD: 00      NOP             
+06CE: 00      NOP             
+06CF: 00      NOP             
+06D0: 00      NOP             
+06D1: 00      NOP             
+06D2: 00      NOP             
+06D3: 00      NOP             
+06D4: 00      NOP             
+06D5: 00      NOP             
+06D6: 00      NOP             
+06D7: 00      NOP             
+06D8: 00      NOP             
+06D9: 00      NOP             
+06DA: 00      NOP             
+06DB: 00      NOP             
+06DC: 00      NOP             
+06DD: 00      NOP             
+06DE: 00      NOP             
+06DF: 00      NOP             
+06E0: 00      NOP             
+06E1: 00      NOP             
+06E2: 00      NOP             
+06E3: 00      NOP             
+06E4: 00      NOP             
+06E5: 00      NOP             
+06E6: 00      NOP             
+06E7: 00      NOP             
+06E8: 00      NOP             
+06E9: 00      NOP             
+06EA: 00      NOP             
+06EB: 00      NOP             
+06EC: 00      NOP             
+06ED: 00      NOP             
+06EE: 00      NOP             
+06EF: 00      NOP             
+06F0: 00      NOP             
+06F1: 00      NOP             
+06F2: 00      NOP             
+06F3: 00      NOP             
+06F4: 00      NOP             
+06F5: 00      NOP             
+06F6: 00      NOP             
+06F7: 00      NOP             
+06F8: 00      NOP             
+06F9: 00      NOP             
+06FA: 00      NOP             
+06FB: 00      NOP             
+06FC: 00      NOP             
+06FD: 00      NOP             
+06FE: 00      NOP             
+06FF: 00      NOP             
+;
+; memory SUB8: ret. A=(R1)-(R0), keep R0/R1
+0700: F0      MOV  A,@R0      
+0701: C6 07   JZ   #0707      
+0703: 37      CPL  A          
+0704: 17      INC  A          
+0705: 61      ADD  A,@R1      
+0706: 83      RET             
+0707: F1      MOV  A,@R1      
+0708: 97      CLR  C          
+0709: A7      CPL  C          
+070A: 83      RET             
+;
+; memory SUB16: ret. A=((R1+1),(R1))-((R0+1),(R0)), keep R0/R1
+070B: F4 00   CALL $700       memory SUB8: ret. A=(R1)-(R0), keep R0/R1
+070D: 96 15   JNZ  #0715      
+070F: C8      DEC  R0         
+0710: C9      DEC  R1         
+0711: F4 00   CALL $700       memory SUB8: ret. A=(R1)-(R0), keep R0/R1
+0713: 18      INC  R0         
+0714: 19      INC  R1         
+0715: 83      RET             
+;
+; memory ADD: ((R1),(R1+1))+=A, keep R1 (16bit little endian)
+0716: 61      ADD  A,@R1      
+0717: A1      MOV  @R1,A      
+0718: 19      INC  R1         
+0719: 23 00   MOV  A,#00      
+071B: 71      ADDC A,@R1      
+071C: A1      MOV  @R1,A      
+071D: C9      DEC  R1         
+071E: 83      RET             
+;
+; 8*16bit MUL R2*(R4,R3)->(R6,R5)
+071F: BD 00   MOV  R5,#00     
+0721: BE 00   MOV  R6,#00     
+0723: 97      CLR  C          
+0724: B8 08   MOV  R0,#08     
+0726: FA      MOV  A,R2       
+0727: 67      RRC  A          
+0728: AA      MOV  R2,A       
+0729: E6 31   JNC  #0731      
+072B: FB      MOV  A,R3       
+072C: 6D      ADD  A,R5       
+072D: AD      MOV  R5,A       
+072E: FC      MOV  A,R4       
+072F: 7E      ADDC A,R6       
+0730: AE      MOV  R6,A       
+0731: FB      MOV  A,R3       
+0732: F7      RLC  A          
+0733: AB      MOV  R3,A       
+0734: FC      MOV  A,R4       
+0735: F7      RLC  A          
+0736: AC      MOV  R4,A       
+0737: E8 26   DJNZ R0,#0726   
+0739: 83      RET             
+;
+; generate RANDOM nr in #25,#26
+073A: B9 26   MOV  R1,#26     
+073C: F1      MOV  A,@R1      
+073D: AA      MOV  R2,A       
+073E: BB 8D   MOV  R3,#8D     
+0740: F4 1F   CALL $71F       8*16bit MUL R2*(R4,R3)->(R6,R5)
+0742: FE      MOV  A,R6       
+0743: B9 26   MOV  R1,#26     
+0745: A1      MOV  @R1,A      
+0746: C9      DEC  R1         
+0747: FD      MOV  A,R5       
+0748: F4 16   CALL $716       memory ADD: ((R1),(R1+1))+=A, keep R1 (16bit little endian)
+074A: 23 8B   MOV  A,#8B      
+074C: F4 16   CALL $716       memory ADD: ((R1),(R1+1))+=A, keep R1 (16bit little endian)
+074E: 83      RET             
+;
+; get 4bit data from ZX8302, ret A.lsb
+074F: BE 00   MOV  R6,#00     
+0751: BF 04   MOV  R7,#04     
+0753: 0A      IN   A,P2       
+0754: 53 80   ANL  A,#80      
+0756: 96 53   JNZ  #0753      loop until comdata=L
+0758: 90      MOVX @R0,A      assert WRN
+0759: 0A      IN   A,P2       ??
+075A: 90      MOVX @R0,A      assert WRN
+075B: F7      RLC  A          
+075C: FE      MOV  A,R6       
+075D: F7      RLC  A          
+075E: AE      MOV  R6,A       shift bits into R6
+075F: EF 53   DJNZ R7,#0753   
+0761: 93      RETR            R6=A = 4bit cmd
+;
+; send 4bit data to ZX8302, ent A.msb=data
+0762: BF 04   MOV  R7,#04     
+0764: AE      MOV  R6,A       
+0765: 0A      IN   A,P2       
+0766: 53 80   ANL  A,#80      loop until comdata=H
+0768: 96 65   JNZ  #0765      
+076A: FE      MOV  A,R6       
+076B: 90      MOVX @R0,A      
+076C: F2 72   JB7  #0772      
+076E: 9A 7F   ANL  P2,#7F     
+0770: E4 74   JMP  $774       
+0772: 8A 80   ORL  P2,#80     
+0774: 90      MOVX @R0,A      
+0775: E7      RL   A          
+0776: AE      MOV  R6,A       
+0777: 8A 80   ORL  P2,#80     
+0779: EF 65   DJNZ R7,#0765   
+077B: 93      RETR            
+;
+; get byte from ZX8302, ret A
+077C: F4 4F   CALL $74F       get 4bit data from ZX8302, ret A.lsb
+077E: 47      SWAP A          
+077F: AD      MOV  R5,A       
+0780: F4 4F   CALL $74F       get 4bit data from ZX8302, ret A.lsb
+0782: 4D      ORL  A,R5       
+0783: 93      RETR            
+;
+; send byte to ZX8302
+0784: F4 62   CALL $762       send 4bit data to ZX8302, ent A.msb=data
+0786: F4 62   CALL $762       send 4bit data to ZX8302, ent A.msb=data
+0788: 93      RETR            
+;
+; send A.lsb to ZX8302
+0789: 47      SWAP A          
+078A: F4 62   CALL $762       send 4bit data to ZX8302, ent A.msb=data
+078C: 93      RETR            
+078D: 00      NOP             
+078E: 00      NOP             
+078F: 00      NOP             
+0790: 00      NOP             
+0791: 00      NOP             
+0792: 00      NOP             
+0793: 00      NOP             
+0794: 00      NOP             
+0795: 00      NOP             
+0796: 00      NOP             
+0797: 00      NOP             
+0798: 00      NOP             
+0799: 00      NOP             
+079A: 00      NOP             
+079B: 00      NOP             
+079C: 00      NOP             
+079D: 00      NOP             
+079E: 00      NOP             
+079F: 00      NOP             
+07A0: 00      NOP             
+07A1: 00      NOP             
+07A2: 00      NOP             
+07A3: 00      NOP             
+07A4: 00      NOP             
+07A5: 00      NOP             
+07A6: 00      NOP             
+07A7: 00      NOP             
+07A8: 00      NOP             
+07A9: 00      NOP             
+07AA: 00      NOP             
+07AB: 00      NOP             
+07AC: 00      NOP             
+07AD: 00      NOP             
+07AE: 00      NOP             
+07AF: 00      NOP             
+07B0: 00      NOP             
+07B1: 00      NOP             
+07B2: 00      NOP             
+07B3: 00      NOP             
+07B4: 00      NOP             
+07B5: 00      NOP             
+07B6: 00      NOP             
+07B7: 00      NOP             
+07B8: 00      NOP             
+07B9: 00      NOP             
+07BA: 00      NOP             
+07BB: 00      NOP             
+07BC: 00      NOP             
+07BD: 00      NOP             
+07BE: 00      NOP             
+07BF: 00      NOP             
+07C0: 00      NOP             
+07C1: 00      NOP             
+07C2: 00      NOP             
+07C3: 00      NOP             
+07C4: 00      NOP             
+07C5: 00      NOP             
+07C6: 00      NOP             
+07C7: 00      NOP             
+07C8: 00      NOP             
+07C9: 00      NOP             
+07CA: 00      NOP             
+07CB: 00      NOP             
+07CC: 00      NOP             
+07CD: 00      NOP             
+07CE: 00      NOP             
+07CF: 00      NOP             
+07D0: 00      NOP             
+07D1: 00      NOP             
+07D2: 00      NOP             
+07D3: 00      NOP             
+07D4: 00      NOP             
+07D5: 00      NOP             
+07D6: 00      NOP             
+07D7: 00      NOP             
+07D8: 00      NOP             
+07D9: 00      NOP             
+07DA: 00      NOP             
+07DB: 00      NOP             
+07DC: 00      NOP             
+07DD: 00      NOP             
+07DE: 00      NOP             
+07DF: 00      NOP             
+07E0: 00      NOP             
+07E1: 00      NOP             
+07E2: 00      NOP             
+07E3: 00      NOP             
+07E4: 00      NOP             
+07E5: 00      NOP             
+07E6: 00      NOP             
+07E7: 00      NOP             
+07E8: 00      NOP             
+07E9: 00      NOP             
+07EA: 00      NOP             
+07EB: 00      NOP             
+07EC: 00      NOP             
+07ED: 00      NOP             
+07EE: 00      NOP             
+07EF: 00      NOP             
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IPC notes
+
+CPU register usage
+register bank 0: normal
+register bank 1: interrupt processing, serial
+
+F0:	1=waiting for start bit?? set at init $00D s.a.:0de,100,628,63B
+F1:	clr at init $040 s.a.:0CC,10A,600,630
+
+The 8049 does not generate interrupts to the 68008. Instead, it is
+polled during the 50Hz interrupt.
+
+SER1CTS (DTE) is output, SER2DTR (DCE) is output. See QLUG, concepts p13/14.
+
+Memory use
+00..07	8049 bank0 register bank (general purpose use)
+08..17	Stack to allow for 8 level deep subroutine calls
+18..1F	register bank 1 (Used during serial receive process)
+18	R0: #22, IOSTAT
+19	R1: SERxNUM
+1A	R2: current buf rptr
+1B	R3: number of bits received
+1C	R4: 40 for SER1, 80 for SER2
+1D	R5: serial bits received so far
+1E	R6: SERx Buffer End
+1F	R7: temp storage for 'A'
+
+20	IPCSTAT, status
+	bit 0: keyboard interrupt
+	bit 1: sound on/off
+	bit 2: a (s/c/a?) key pressed
+	bit 3: repeat key?
+	bit 4: SER1 open/close
+	bit 5: SER2 open/close
+	(bit 6): for P2.6 in IPCOM.1 sa $229
+	bit 7: ? $624,642
+
+21	? 646
+22	IOSTAT
+	bit 0: CHANOVF: 0=SER1, 1=SER2 almost overflown
+	bit 1: see $0B7,$17E,654
+	bit 2:
+	bit 3: see $0B9,$185,$104,614
+	bit 4: last speaker state H/L, LSP update in $3EB ff.
+	bit 4,5: buf SER1,2 almost overflown
+	bit 6: SER1 stopbit, $15E,161
+	bit 7: SER2 stopbit
+23	see $182
+24	BAUDRATE: 1->19200baud, FF->75baud, init with #03 (=9600)
+
+25,26 	RANDOM: current random value
+27	KBDSEED: kbd seed for random? sa 500,5A7
+
+28	SCA: code of current SH/CTRL/ALT
+29	KEY: keycode of current key; re-init as #FF, $547
+2A	KCC: key cycle count. 4 cycles before storage in KEYBUF; init #00, $54A,55E
+
+2B	BUFPTR: ptr to current free key pos
+2C..39	KEYBUF: buffer of 7 keys, 2 bytes each: ovf/sh/ctl/alt(SCA); keycode
+2C,2D	1
+2E,2F	2
+30,31	3
+32,33	4
+34,35	5
+36,37	6
+38,39	7
+38	bit 3, set at $5B0 to indicate buffer overflow; new keys are ignored.
+
+3A..41	8 byte IPCOM sound parameters
+3A	pitch1
+3B	pitch2
+3C,3D	step interval
+3E,3F	duration
+40	pitch/wrap
+41	random/fuzz
+
+42	pitchx use 3A or 3B dep. on 40.b7
+43,44	id.
+45	5*sound par?? (see $313)
+46
+47
+48
+49	
+4A
+
+4B	CRPTR, current SERxPTR $0C6, $632
+4C	SER1NUM negative number of bytesdata #bytes? $05F,$237
+4D	SER2NUM
+
+4E	SER1SPTR, send to ZX8032 pointer, init as #52
+4F	SER1RPTR, receive from serial line pointer, init as #52
+50	SER2SPTR, send to ZX8032 pointer, init as #69
+51	SER2RPTR, receive from serial line pointer, init as #69
+
+52..68	SER1BUF SER2 receive buffer. $17 (=23) bytes 
+69..7F	SER2BUF SER2 receive buffer
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+----------------------------------------------------------------
+|                                                              |
+|                                                              |
+|                            Intel                             |
+|                                                              |
+|             88888      000         4      88888              |
+|            8     8    0   0       44     8     8             |
+|            8     8   0   0 0     4 4     8     8             |
+|             88888    0  0  0    4  4      88888              |
+|            8     8   0 0   0   4444444   8     8             |
+|            8     8    0   0        4     8     8             |
+|             88888      000         4      88888              |
+|                                                              |
+|          8048/8049/8748/8749/8035/8039 Single-Chip           |
+|            MICROCOMPUTER Instruction Set Summary             |
+|                                                              |
+|                                                              |
+|                                                              |
+|                                                              |
+|                    _________    _________                    |
+|                  _|         \__/         |_                  |
+|         <--> T0 |_|1                   40|_| Vcc (+5V)       |
+|                  _|                      |_                  |
+|       --> XTAL1 |_|2                   39|_| T1 <--          |
+|                  _|                      |_                  |
+|       --> XTAL2 |_|3                   38|_| P27 <-->        |
+|           _____  _|                      |_                  |
+|       --> RESET |_|4                   37|_| P26 <-->        |
+|              __  _|                      |_                  |
+|          --> SS |_|5                   36|_| P25 <-->        |
+|             ___  _|                      |_                  |
+|         --> INT |_|6                   35|_| P24 <-->        |
+|                  _|                      |_                  |
+|          --> EA |_|7                   34|_| P17 <-->        |
+|              __  _|                      |_                  |
+|          <-- RD |_|8                   33|_| P16 <-->        |
+|            ____  _|                      |_                  |
+|        <-- PSEN |_|9        8048       32|_| P15 <-->        |
+|              __  _|         8049         |_                  |
+|          <-- WR |_|10       8748       31|_| P14 <-->        |
+|                  _|         8749         |_                  |
+|         <-- ALE |_|11       8035       30|_| P13 <-->        |
+|                  _|         8039         |_                  |
+|        <--> DB0 |_|12                  29|_| P12 <-->        |
+|                  _|                      |_                  |
+|        <--> DB1 |_|13                  28|_| P11 <-->        |
+|                  _|                      |_                  |
+|        <--> DB2 |_|14                  27|_| P10 <-->        |
+|                  _|                      |_                  |
+|        <--> DB3 |_|15                  26|_| Vdd             |
+|                  _|                      |_                  |
+|        <--> DB4 |_|16                  25|_| PROG <-->       |
+|                  _|                      |_                  |
+|        <--> DB5 |_|17                  24|_| P23 <-->        |
+|                  _|                      |_                  |
+|        <--> DB6 |_|18                  23|_| P22 <-->        |
+|                  _|                      |_                  |
+|        <--> DB7 |_|19                  22|_| P21 <-->        |
+|                  _|                      |_                  |
+|       (GND) Vss |_|20                  21|_| P20 <-->        |
+|                   |______________________|                   |
+|                                                              |
+|                                                              |
+|                                                              |
+|                                                              |
+|                                                              |
+|                                                              |
+|Written by     Jonathan Bowen                                 |
+|               Programming Research Group                     |
+|               Oxford University Computing Laboratory         |
+|               8-11 Keble Road                                |
+|               Oxford OX1 3QD                                 |
+|               England                                        |
+|                                                              |
+|               Tel +44-865-273840                             |
+|                                                              |
+|Created        May 1983                                       |
+|Updated        April 1985                                     |
+|Issue          1.1                Copyright (C) J.P.Bowen 1985|
+----------------------------------------------------------------
+----------------------------------------------------------------
+|Mnemonic  |Op|CA|F|~|Description              |Notes          |
+|----------+--+--+-+-+-------------------------+---------------|
+|ADD  A,rr |68|**|A|1|Add register             |A=A+rr         |
+|ADD  A,@r |60|**|B|1|Add memory               |A=A+[r]        |
+|ADD  A,#n |03|**|C|2|Add immediate            |A=A+n          |
+|ADDC A,rr |78|**|A|1|Add with Carry register  |A=A+rr+C       |
+|ADDC A,@r |70|**|B|1|Add with Carry memory    |A=A+[r]+C      |
+|ADDC A,#n |13|**|C|2|Add with Carry immediate |A=A+n+C        |
+|ANL  A,rr |58|--|A|1|AND Logical register     |A=A&rr         |
+|ANL  A,@r |50|--|B|1|AND Logical memory       |A=A&[r]        |
+|ANL  A,#n |53|--|C|2|AND Logical Immediate    |A=A&n          |
+|ANL  pp,#n|98|--|D|2|AND Logical I/O port     |pp=pp&n        |
+|ANLD ep,A |9C|--|E|2|AND Logical expander port|ep=ep&A        |
+|CALL a    |14|--|F|2|Call subroutine          |[SP]+={PSW,PC},|
+|CLR  A    |27|--|G|1|Clear accumulator        |A=0        PC=a|
+|CLR  C    |97|0-|G|1|Clear carry status       |C=0            |
+|CLR  F0   |85|--|G|1|Clear flag #0            |F0=0           |
+|CLR  F1   |A5|--|G|1|Clear flag #1            |F1=0           |
+|CPL  A    |37|--|G|1|Complement accumulator   |A=~A           |
+|CPL  C    |A7|*-|G|1|Complement carry status  |C=~C           |
+|CPL  F0   |95|--|G|1|Complement flag #0       |F0=~F0         |
+|CPL  F1   |B5|--|G|1|Complement flag #1       |F1=~F1         |
+|DA   A    |57|--|G|1|Decimal Adjust acc.      |A=BCD{A}       |
+|DEC  A    |07|--|G|1|Decrement accumulator    |A=A-1          |
+|DEC  rr   |C8|--|A|1|Decrement register       |rr=rr-1        |
+|DIS  I    |15|--|G|1|Disable external int.    |               |
+|DIS  TCNTI|35|--|G|1|Disable timer interrupt  |               |
+|DJNZ rr,l |E8|--|H|2|Dec. and Jump if Non-Zero|rr=rr-1,if rr  |
+|EN   I    |05|--|G|1|Enable external interrupt|               |
+|EN   TCNTI|25|--|G|1|Enable timer interrupt   |               |
+|ENT0 CLK  |75|--|G|1|Enable timer output      |               |
+|IN   A,p  |08|--|I|2|Input from I/O port      |A=p            |
+|INC  A    |17|--|G|1|Increment accumulator    |A=A+1          |
+|INC  rr   |18|--|A|1|Increment register       |rr=rr+1        |
+|INC  @r   |10|--|B|1|Increment memory         |[r]=[r]+1      |
+|INS  A,BUS|08|--|G|2|Input bus with strobe    |A=BUS          |
+|JBn  l    |12|--|J|2|Jump if Bit set (n=0-7)  |If A<n>=1      |
+|JC   l    |F6|--|K|2|Jump if Carry set        |If C=1         |
+|JF0  l    |B6|--|K|2|Jump if Flag #0 set      |If F0=1        |
+|JF1  l    |76|--|K|2|Jump if Flag #1 set      |If F1=1        |
+|JMP  a    |04|--|F|2|Unconditional Jump       |PC=a           |
+|JMPP @A   |B3|--|G|2|Jump on accumulator      |PC=PC<8:11>+A  |
+|JNC  l    |E6|--|K|2|Jump if Not Carry        |If C=0         |
+|JNI  l    |86|--|K|2|Jump if Not Interrupt    |If I=0         |
+|JNT0 l    |26|--|K|2|Jump if Not Test i/p #0  |If T0=0        |
+|JNT1 l    |46|--|K|2|Jump if Not Test i/p #1  |If T1=0        |
+|JNZ  l    |96|--|K|2|Jump if Not Zero         |If A<>0        |
+|JOBF l    |86|--|K|2|Jump if OBF set          |If OBF=1       |
+|JTF  l    |16|--|K|2|Jump if Timer Flag set   |If TF=1, TF=0  |
+|JT0  l    |36|--|K|2|Jump if Test i/p #0 set  |If T0=1        |
+|JT1  l    |56|--|K|2|Jump if Test i/p #1 set  |If T1=1        |
+|JZ   l    |C6|--|K|2|Jump if Zero             |If A=0         |
+|MOV  A,#n |23|--|C|2|Move from immediate      |A=n            |
+|MOV  A,PSW|C7|--|G|1|Move from PSW            |A=PSW          |
+|MOV  A,rr |F8|--|A|1|Move from register       |A=rr           |
+|MOV  A,@r |F0|--|B|1|Move from memory         |A=[r]          |
+|MOV  A,T  |42|--|G|1|Move from timer          |A=T            |
+|MOV  PSW,A|D7|**|G|1|Move to PSW              |PSW=A          |
+|MOV  rr,A |A8|--|A|1|Move to register         |rr=A           |
+|MOV  rr,#n|B8|--|L|2|Move immediate to reg.   |rr=n           |
+|MOV  @r,A |A0|--|B|1|Move to memory           |[r]=A          |
+|MOV  @r,#n|B0|--|M|2|Move immediate to memory |[r]=n          |
+|MOV  T,A  |62|--|G|1|Move to timer            |T=A            |
+|MOVD A,ep |0C|--|E|2|Move from expander port  |A=ep           |
+|MOVD ep,A |3C|--|E|2|Move to expander port    |ep=A           |
+|MOVP A,@A |A3|--|G|1|2|Move from memory       |A=[PC<8:11>+A] |
+|MOVP3 A,@A|E3|--|G|2|Move from memory         |A=[300H+A]     |
+|MOVX A,@r |80|--|B|2|Move from external memory|A=[r]          |
+|MOVX @r,A |90|--|B|2|Move to external memory  |[r]=A          |
+|NOP       |00|--|G|1|No Operation             |               |
+|ORL  A,rr |48|--|A|1|OR Logical register      |A=Avrr         |
+|ORL  A,@r |40|--|B|1|OR Logical memory        |A=Av[r]        |
+|ORL  A,#n |43|--|C|2|OR Logical immediate     |A=Avn          |
+|ORL  pp,#n|88|--|D|2|OR Logical I/O port      |pp=ppvn        |
+|ORLD ep,A |8C|--|E|2|OR Logical expander port |ep=epvA        |
+|OUTL BUS,A|02|--|G|2|Output to bus            |BUS=A          |
+|OUTL p,A  |38|--|I|2|Output to I/O port       |p=A            |
+|RET       |83|--|G|2|Return from subroutine   |PC=[SP]-       |
+----------------------------------------------------------------
+----------------------------------------------------------------
+|Mnemonic  |Op|CA|F|~|Description              |Notes          |
+|----------+--+--+-+-+-------------------------+---------------|
+|RETR      |93|**|G|2|Return and Restore status|{PC,PSW}=[SP]- |
+|RL   A    |E7|--|G|1|Rotate Left              |A={A}<-        |
+|RLC  A    |F7|*-|G|1|Rotate Left thru Carry   |A={A,C}<-      |
+|RR   A    |77|--|G|1|Rotate Right             |A=->{A}        |
+|RRC  A    |67|*-|G|1|Rotate Right thru Carry  |A=->{C,A}      |
+|SEL  MBk  |E5|--|N|1|Select Memory Bank       |PC<11>=k       |
+|SEL  RBk  |C5|--|N|1|Select Register Bank     |Reg bank=k     |
+|STOP TCNT |65|--|G|1|Stop timer/counter       |               |
+|STRT CNT  |45|--|G|1|Start counter            |               |
+|STRT T    |55|--|G|1|Start timer              |               |
+|SWAP A    |47|--|G|1|Swap accumulator nibbles |A<0:3><->A<4:7>|
+|XCH  A,rr |28|--|A|1|Exchange register        |A<->rr         |
+|XCH  A,@r |20|--|B|1|Exchange memory          |A<->[r]        |
+|XCHD A,@r |30|--|B|1|Exchange lower nibbles   |A<0:3><->[r<:>]|
+|XRL  A,rr |D8|--|A|1|Exclusive OR register    |A=Axrr         |
+|XRL  A,@r |D0|--|B|1|Exclusive OR memory      |A=Ax[r]        |
+|XRL  A,#n |D3|--|C|2|Exclusive OR immediate   |A=Axn          |
+|-------------+--+-+-+-----------------------------------------|
+| PSW         |-*| | |Flag unaffected/affected or zero (0)     |
+| C           |C | | |Carry (Bit 7)                            |
+| AC          | A| | |Auxilary Carry (Bit 6)                   |
+| F0   F1     |  | | |Flags (F0, bit 5, F1 bit 4)              |
+| SP          |  | | |Stack Pointer (Bits 0-2)                 |
+|----------------+-+-+-----------------------------------------|
+| -----nnn       |A| |nnn = R0/R1/R2/R3/R4/R5/R6/R7 (3 bits)   |
+| -------r       |B| |r   = R0/R1 (1 bit)                      |
+| -------- MM    |C| |MM  = 8 bits of immediate data           |
+| ------pp MM    |D| |pp  = BUS/P1/P2/? (2 bits)               |
+| ------ee       |E| |ee  = P4/P5/P6/P7 (2 bits)               |
+| xxx----- XX    |F| |xxx = high-order 3 bits of memory address|
+| --------       |G| |XX  = low-order 8 bits of memory address |
+| -----nnn XX    |H| |nnn = as above                           |
+| ------qq       |I| |qq  = ?/P1/P2/? (2 bits)                 |
+| bbb----- XX    |J| |bbb = 3-bit bit number of accumulator    |
+| -------- XX    |K| |XX  = as above                           |
+| -----nnn MM    |L| |nnn = as above                           |
+| -------r MM    |M| |r   = as above                           |
+| ---k----       |N| |k   = 0/1 (1 bit)                        |
+|--------------------+-----------------------------------------|
+| A                  |Accumulator (8-bit)                      |
+| BUS                |Bus I/O port (8-bit)                     |
+| OBF                |Output Buffer Full flag (1-bit)          |
+| MB0  MB1           |Memory Banks                             |
+| P1   P2            |I/O Ports (8-bit)                        |
+| PC                 |Program Counter register (12-bit)        |
+| PORT               |I/O Port P1 and P2                       |
+| PSW                |Processor Status Word (8-bit)            |
+| RB0  RB1           |Register Banks                           |
+| Rn                 |Registers (8-bit, n=0-7)                 |
+| Rn'                |Alternative Registers (8-bit, n=0-7)     |
+| T0   T1            |Test inputs                              |
+|--------------------+-----------------------------------------|
+| a                  |11-bit address quantity (0 to 2047)      |
+| ep                 |8243 expander port P4, P5, P6 or P7      |
+| k                  |1-bit data quantity (0 or 1)             |
+| l                  |Low-order 8 bits of a memory address     |
+| n                  |8-bit data quantity (0 to 255)           |
+| p                  |I/O port P1 or P2                        |
+| pp                 |I/O port PORT, P1 or P2                  |
+| r                  |Register R0 or R1                        |
+| rr                 |Register R0, R1, R2, R3, R4, R5, R6 or R7|
+|--------------------+-----------------------------------------|
+| +    -             |Arithmetic addition/subtraction          |
+| &    ~             |Logical AND/NOT                          |
+| v    x             |Logical inclusive/exclusive OR           |
+| <-   ->            |Rotate left/right                        |
+| <->                |Exchange                                 |
+| < >  < : >         |Bit number/range                         |
+| [ ]                |Indirect addressing                      |
+| [ ]+ -[ ]          |Indirect address auto-increment/decrement|
+| { }                |Combination of operands                  |
+|--------------------+-----------------------------------------|
+| 00H to 07H         |General purpose registers R0-R7 (8-bit)  |
+| 08H to 17H         |Stack area S0-S7 (16-bit)                |
+| 18H to 1FH         |Alternative registers R0'-R7' (8-bit)    |
+| 20H to 3FH         |General scratchpad memory area           |
+----------------------------------------------------------------

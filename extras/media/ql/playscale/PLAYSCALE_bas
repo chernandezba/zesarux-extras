@@ -1,0 +1,27 @@
+100 REMark SCALE - v1.01
+110 REMark M.J.Swift - 26 Sep 93
+120 REMark SNG - Coda and tweaks 11 Feb 94
+130 :
+140 CLS:CSIZE 2,1:PRINT "PLAY_SCALE v1.01":CSIZE 0,0
+150 N$="B A#A G#G F#F E D#D C#C "
+160 TR2=EXP(LN(2)/12)
+170 dur=250000/72
+180 a=11447
+190 b=10.6
+200 PRINT \"Frequency","BEEP","Note"
+210 CLS#0
+220 PRINT #0;" frequency approx = ";a;"/(";b;"+pitch)"
+230 PRINT #0;"     pitch approx = ";a;"/freq";"-";b
+240 f=440:n=3
+250 REPeat loop
+260  p=INT(a/f-b+.5)
+270  IF p>255 THEN EXIT loop
+280  PRINT ,INT(f*100+5E-3)/100,p,N$(n+n-1 TO n+n)
+290  REPeat poll : IF NOT BEEPING THEN EXIT poll
+300  BEEP dur,p
+310  f=f/TR2:n=1+(n MOD 12)
+320 END REPeat loop
+330 PAUSE 50 :REMark Coda!
+340 BEEP dur,252/8
+350 PRINT \"Bye..."
+360 BEEP dur,8,0,3,7,0,3
