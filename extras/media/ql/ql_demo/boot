@@ -1,0 +1,5 @@
+10 WINDOW #0,4,4,0,0
+20 PAPER #0,0
+30 base=RESPR(61440)
+40 LBYTES flp1_Demo_Bin,base
+50 CALL base,#1,#2

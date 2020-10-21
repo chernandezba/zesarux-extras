@@ -1,0 +1,16 @@
+100 REMark SCALE - v1.01
+110 REMark M.J.Swift - 26 Sep 93
+120 REMark SNG - Coda and tweaks 11 Feb 94
+130 :
+140 CLS:CSIZE 2,1:PRINT "PLAY_SCALE v1.01":CSIZE 0,0
+150 N$="B A#A G#G F#F E D#D C#C "
+160 TR2=EXP(LN(2)/12)
+170 dur=250000/72
+180 a=11447
+190 b=10.6
+200 PRINT \"Frequency","BEEP"
+210 CLS#0
+220 FOR p=0 to 255
+230 f=a/(p+b-0.5)
+240 PRINT ,f,p
+250 NEXT p
