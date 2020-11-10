@@ -1,69 +1,69 @@
-порт 0 "расширенная память"
-разряды D0 - D3 переключают страници по 32Kb
-страница 0 - ПЗУ
-разряды D4 - D7 не используются
+port 0 "extended memory"
+bits D0 - D3 switch pages by 32Kb
+page 0 - ROM
+digits D4 - D7 are not used
 
-порты 1 - 5 "обеспечивают связь с SPECTRUM'ом"
+ports 1 - 5 "provide communication with SPECTRUM"
 
-порт 1
-чтение команды General Sound'ом
-D0 - D7   - код команды
+port 1
+read command by General Sound
+D0 - D7 - command code
 
-порт 2
-чтение данных General Sound'ом
-D0 - D7   - данные
+port 2
+reading data by General Sound
+D0 - D7 - data
 
-порт 3
-запись данных General Sound'ом для SPECTRUM'a
-D0 - D7   - данные
+port 3
+General Sound data recording for SPECTRUM
+D0 - D7 - data
 
-порт 4
-чтение слова состояния General Sound'ом
-D0  - флаг команд
-D7  - флаг данных
+port 4
+read status word by General Sound
+D0 - command flag
+D7 - data flag
 
-порт 5
-сбрасывает бит D0 (флаг команд) слова состояния
+port 5
+clears bit D0 (command flag) of the status word
 
-порты 6 - 9 "регулировка громкости"
-соответственно в каналах 1 - 4
-D0 - D5  - громкость
-D6,D7  - не используются
+ports 6 - 9 "volume control"
+respectively in channels 1 - 4
+D0 - D5 - volume
+D6, D7 - not used
 
-порт А
-устанавливает бит D7 слова состояния не равным биту D0 порта 0
+port A
+sets bit D7 of the status word to not equal to bit D0 of port 0
 
-порт B
-устанавливает бит D0 слова состояния равным биту D5 порта 6
+port B
+sets bit D0 of the status word equal to bit D5 of port 6
 
-                         Распределение памяти
+                         Memory allocation
 
-#0000 - #3FFF  -  первые 16Kb ПЗУ
-#4000 - #7FFF  -  первые 16Kb первой страницы ОЗУ
-#8000 - #FFFF  -  листаемые страницы по 32Kb
-                  страница 0  - ПЗУ,
-                  страница 1  - первая страница ОЗУ
-                  страницы 2... ОЗУ
+# 0000 - # 3FFF - first 16Kb of ROM
+# 4000 - # 7FFF - first 16Kb of the first page of RAM
+# 8000 - #FFFF - turnable pages of 32Kb
+                  page 0 - ROM,
+                  page 1 - first page of RAM
+                  page 2 ... RAM
 
 
-Данные в каналы заносятся при чтении процессором ОЗУ по адресам  #6000
-- #7FFF автоматически.
-Данные для каналов должны находиться по следующим адресам:
+Data are entered into channels when the processor reads RAM at addresses # 6000
+- # 7FFF automatically.
+Data for channels should be located at the following addresses:
 ╔═════════════╤═══════════════╗
-║разряд адреса│  для канала   ║   #6000 - #60FF  - данные канала 1
-║             ├───┬───┬───┬───╢   #6100 - #61FF  - данные канала 2
-║             │ 1 │ 2 │ 3 │ 4 ║   #6200 - #62FF  - данные канала 3
-╟─────────────┼───┼───┼───┼───╢   #6300 - #63FF  - данные канала 4
-║  A0 - A7    │ X │ X │ X │ X ║   #6400 - #64FF  - данные канала 1
-║             │   │   │   │   ║                  .
-║     A8      │ 0 │ 1 │ 0 │ 1 ║                  .
-║             │   │   │   │   ║                  .
-║     A9      │ 0 │ 0 │ 1 │ 1 ║                  .
-║             │   │   │   │   ║                  .
-║  A10-A12    │ X │ X │ X │ X ║                  .
-║             │   │   │   │   ║                  .
-║  A13,A14    │ 1 │ 1 │ 1 │ 1 ║                  .
-║             │   │   │   │   ║                  .
-║    A15      │ 0 │ 0 │ 0 │ 0 ║   #7D00 - #7DFF  - данные канала 2
-║             │   │   │   │   ║   #7E00 - #7EFF  - данные канала 3
-╚═════════════╧═══╧═══╧═══╧═══╝   #7F00 - #7FFF  - данные канала 4
+║address bit  │ for channel   ║ # 6000 - # 60FF - channel 1 data
+║             ├───┬───┬───┬───╢ # 6100 - # 61FF - channel 2 data
+║             │ 1 │ 2 │ 3 │ 4 ║ # 6200 - # 62FF - channel 3 data
+╟─────────────┼───┼───┼───┼───╢ # 6300 - # 63FF - channel 4 data
+║ A0 - A7     │ X │ X │ X │ X ║ # 6400 - # 64FF - channel 1 data
+║             │   │   │   │   ║                 .
+║ A8          │ 0 │ 1 │ 0 │ 1 ║                 .
+║             │   │   │   │   ║                 .
+║ A9          │ 0 │ 0 │ 1 │ 1 ║                 .
+║             │   │   │   │   ║                 .
+║ A10-A12     │ X │ X │ X │ X ║                 .
+║             │   │   │   │   ║                 .
+║ A13, A14    │ 1 │ 1 │ 1 │ 1 ║                 .
+║             │   │   │   │   ║                 .
+║ A15         │ 0 │ 0 │ 0 │ 0 ║ # 7D00 - # 7DFF - channel 2 data
+║             │   │   │   │   ║ # 7E00 - # 7EFF - channel 3 data
+╚═════════════╧═══╧═══╧═══╧═══╝ # 7F00 - # 7FFF - channel 4 data
