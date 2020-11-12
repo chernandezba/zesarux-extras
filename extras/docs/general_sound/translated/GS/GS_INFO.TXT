@@ -1,152 +1,105 @@
-   Инструкция  пользователя  по  подключению и эксплуатации
-              музыкальной карты "General Sound".
+User manual for connection and operation
+              music card "General Sound".
 
-Карта  "General  Sound"  (в  дальнейшем  GS)  предназначна для
-совмвстной  работы  с  любым  Spectrum-совместимым компьютером
-48/128/256/512...  И  обеспечивает  качественное  проигрывание
-оцифрованных музыкальных тем в формате *.MOD, а также проигры-
-вание  отдельных оцифровнных сэмплов. Проигрывание осуществля-
-ется  благодаря собственному микропроцессору, собственной опе-
-ративной  памяти  и собственному плейеру MOD-файлов и сэмплов,
-находящемуся в ПЗУ. Управление GS осуществляется программно со
-стороны компьютера.
+The "General Sound" card (hereinafter GS) is intended for
+compatible with any Spectrum-compatible computer
+48/128/256/512 ... and provides high-quality playback
+digitized music themes in * .MOD format, as well as playback
+vyvanie separate digitized samples. Playback is carried out
+thanks to its own microprocessor, its own
+memory and own player of MOD files and samples,
+located in ROM. GS is controlled by software from
+side of the computer.
 
- ВНИМАНИЕ!  Очень полезно проконтролировать напряжение питания
-          вашего  компьютера,  часто оно бывает очень занижено
-          (вплоть  до  4.5  вольт вместо 5.0 вольт). Это может
-          сказаться  на  качестве  работы GS вплоть до сбоев в
-          работе.  Устойчивая работа GS гарантивуется при нап-
-          ряжении  питания не менее 4.8 вольт. Как правило, во
-          всех  импульсных блоках питания предусмотрена точная
-          ручная подстройка напряжения.
+ ATTENTION! It is very useful to check the supply voltage
+          your computer, it is often very underestimated
+          (up to 4.5 volts instead of 5.0 volts). It may
+          affect the quality of the GS up to failures in
+          work. The stable operation of the GS is guaranteed when
+          The power supply is at least 4.8 volts. As a rule, during
+          all switching power supplies have an accurate
+          manual voltage adjustment.
 
- ВНИМАНИЕ!!!  Все  манипуляции с подключениями производить при
-          выключенном  компьютере!!! При подключении к систем-
-          ному  разъему  следить за совпадением контактов, так
-          как системный разъем не имеет ключа от неправильного
-          подключения!
+ ATTENTION!!! All manipulations with the connections should be performed when
+          turned off computer !!! When connected to systems
+          the connector to monitor the coincidence of contacts, so
+          how the system connector has no key to wrong
+          connections!
 
-General Sound вставляется так, что его микросхемы "смотрят" на
-микросхемы компьютера.
+General Sound is inserted so that its microcircuits "look" at
+computer microcircuits.
 
-                 Расположение разъемов GS      Аудио выход
-  -------------------------------------------------------
- |               ..................               ЛК ПК  |
- |               ..................                 ..   |
- |               разъем ext. memory                 ..   |
- |                                                КОРПУС |
- |                                                       |
- |                   Вид со стороны                      |
- |                       деталей                         |
- |                                                       |
- |                                                       |
- |                                                       |
- |                                                       |
- |                                                       |
- |                                                       |
- |                                                       |
- |                                                       |
- |                                                       |
-  ---                                                 ---
-     |                                               |
-     | 1             СИСТЕМНЫЙ РАЗЪЕМ             30 |
+                 Location of connectors GS Audio output
+  -------------------------------------------------- -----
+ | .................. PC PC |
+ | .................. .. |
+ | connector ext. memory .. |
+ | CASE |
+ | |
+ | Side view |
+ | details |
+ | |
+ | |
+ | |
+ | |
+ | |
+ | |
+ | |
+ | |
+ | |
+  --- ---
+     | |
+     | 1 SYSTEM CONNECTOR 30 |
       -----------------------------------------------
-А - Сторона монтажа    B - сторона деталей
+A - Mounting side B - component side
 
-General Sound можно подключить к любому Спектрум - совместимо-
-му  компьютеру при помощи проводов. При этом следует соблюдать
-некоторые условия:
-1.  Используйте  максимально  короткие провода (не более 20-25
-см), иначе возможны сбои в работе вашего компьютера.
-2.  Питане лучше брать непосредственно с блока питания, а не с
-платы компьютера.
-3. Подключение производить аккуратно!
+General Sound can be connected to any Spectrum - compatible
+computer using wires. In this case, you should observe
+some conditions:
+1. Use the shortest possible wires (no more than 20-25
+cm), otherwise your computer may malfunction.
+2. It is better to take the power supply directly from the power supply unit, and not from
+computer boards.
+3. Connect carefully!
 
-Все нужные сигналы находятся на ножках процессора вашего комп-
-ьютера,  поэтому  шарить по плате в поисках нужных сигналов не
-следует. Для удобства приводим их в таблице:
+All the necessary signals are located on the legs of your computer's processor.
+computer, so fumbling around the board in search of the necessary signals is not
+follows. For convenience, we present them in the table:
 
-Цоколевка разъема интерфейса General Sound
+General Sound interface connector pinout
 
-------------------------------     --------------------------------
-Сигнал   Ножка Z80   Контакт         Сигнал   Ножка Z80   Контакт
-------------------------------     --------------------------------
-  A0.........30.........A9             D0.........14.........B6
-  A1.........31.........A10            D1.........15.........B7
-  A2.........32.........A11            D2.........12.........B8
-  A3.........33.........A12            D3..........8.........B11
-  A4.........34.........A24            D4..........7.........B12
-  A5.........35.........A23            D5..........9.........B10
-  A6.........36.........A22            D6.........10.........B9
-  A7.........37.........A21            D7.........13.........B3
+------------------------------ -------------------- ------------
+Signal Leg Z80 Contact Signal Leg Z80 Contact
+------------------------------ -------------------- ------------
+  A0 ......... 30 ......... A9 D0 ......... 14 ......... B6
+  A1 ......... 31 ......... A10 D1 ......... 15 ......... B7
+  A2 ......... 32 ......... A11 D2 ......... 12 ......... B8
+  A3 ......... 33 ......... A12 D3 .......... 8 ......... B11
+  A4 ......... 34 ......... A24 D4 .......... 7 ......... B12
+  A5 ......... 35 ......... A23 D5 .......... 9 ......... B10
+  A6 ......... 36 ......... A22 D6 ......... 10 ......... B9
+  A7 ......... 37 ......... A21 D7 ......... 13 ......... B3
 
-  WR.........22.........B19           IORQ.......20..........B17
-                                      IORQCE....СМ.ПРИМЕЧ....А13
- RESET.......26.........A20           +5V........11..........A3
-  M1.........27.........B24           GND........29......A6,A7,A30,B30
+  WR ......... 22 ......... B19 IORQ ....... 20 .......... B17
+                                      IORQCE .... SEE NOTE .... A13
+ RESET ....... 26 ......... A20 + 5V ........ 11 .......... A3
+  M1 ......... 27 ......... B24 GND ........ 29 ...... A6, A7, A30, B30
 
-Если  Вы  не  знаете, где у вашего спектрума сигнал IORQCE, то
-выполните следущие действия.
-  1. Отсоедините 20-ю ногу процессора от всех цепей (IORQ).
-  2. В разрыв впаяйте резистор 330-470 Ом.
-  3. Теперь  20-я  нога процессора будет называться IORQ, а то
-     место, куда она шла раньше, будет называться IORQCE.
-  4. Доработанный  компьютер  полностью сохранит работоспособ-
-     ность.
+If you do not know where your Spectrum IORQCE signal is, then
+follow these steps.
+  1. Disconnect the 20th leg of the processor from all circuits (IORQ).
+  2. Solder a 330-470 ohm resistor into the gap.
+  3. Now the 20th leg of the processor will be called IORQ, otherwise
+     the place where she went before will be called IORQCE.
+  4. The modified computer will remain fully functional.
+     ness.
 
-Кстати,  этот сигнал IORQCE пригодится вам при подключении лю-
-бых других перифирийных устройств.
+By the way, this IORQCE signal will be useful to you when connecting any
+other peripheral devices.
 
-Тест правильности подключения:
+Connection test:
 10 OUT 187,244
 15 PAUSE 100
 20 PRINT IN 179
-На экране должно появится число 3.
---------------------------------------------------------------
-Карта расширения памяти для "General Sound"
-Инструкция по подключению.
-
-Карта  устанавливается  в разъем расширения в GS (вертикальные
-штырьки)  так,  что  после установки она закрывает собой часть
-платы GS.
-При  этом она автоматически инициализируется и ни каких допол-
-нительных программных средств не требуется.
- Тест правильности подключения:
-
- 1 OUT 187,244
- 2 PAUSE 400
- 3 PRINT IN 179
-
- На экране - число 14.
-
-Теперь максимальный объем загружаемых модулей - 466 килобайт.
-
-Внимание!  на  плате GS отсутствует проводник, подводящий один
-из сигналов к разъему расширения!
-
-Необходимо соеденить 27-ю ножку любой из микросхем ОЗУ на пла-
-те  GS  со  17-м  PIN-ом  ряда "A" разъема расширения (показан
-звездочкой на рисунке). Микросхемы ОЗУ - это напаянные друг на
-друга М/С.
-                   Разъем расширения
-               (вид со стороны деталей)
-
- ------------------------------------------------------------
- |        . . . . . . . . . . . . . . . . * .    "A"        |
- |        . . . . . . . . . . . . . . . . . .    "B"        |
- |                                                          |
- |        1                                 18              |
- |                                                          |
- |                                                          |
- |                                              Плата "GS"  |
- |                                                          |
- |                                                          |
- |                                                          |
- |                                                          |
- |                                                          |
-  -------                                            -------
-        |                                            |
-        |                                            |
-         --------------------------------------------
-
-Проверьте, возможно, эта доработка в вашем GS уже сделана!
+The number 3 should appear on the screen.
+-----------

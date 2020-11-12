@@ -1,316 +1,315 @@
+                   Recoded by Evgeny Muchkin 10/06/1998
+                  SysOp of PALLY_STATION tel: 176-74-19
 
-                   Recoded by Evgeny Muchkin 06.10.1998
-                  SysOp of PALLY_STATION  tel: 176-74-19
+                               (c) STINGER &
+                               (c) CYRAX- (*)
 
-                               (с) STINGER &
-                               (с) CYRAX- (*)
-
-                      Руководство по программированию
+                      Programming Guide
                               General Sound.
 
-                        Версия v1.04. Редакция 004.
+                        Version v1.04. Revision 004.
 
-                 1. Краткие технические характеристики GS.
+                 1. Brief technical characteristics of GS.
                   --------------------------------------
 
-Процессор: Z80, 12MHz, без циклов wait
-ROM      : 32k, 27256
-RAM      : Static Ram  128k всего,  112k  доступно для модулей и сэмплов в
-           базовой версии
-INT      : 37.5 KHz Каналы: 4 независимых 8-и битных канала,  каждый с 6-и
-           битным контролем громкости.
+Processor: Z80, 12MHz, no wait cycles
+ROM: 32k, 27256
+RAM: Static Ram 128k total, 112k available for modules and samples in
+           basic version
+INT: 37.5 KHz Channels: 4 independent 8-bit channels, each with 6
+           bit volume control.
 
-             2. Краткое описание GS, или много всякой лабуды.
+             2. A short description of GS, or a lot of crap.
              ------------------------------------------------
 
-  GS - музыкальная карточка,  предназначенная для проигрывания  музыкальных
-модулей и отдельных сэмплов (эффектов).
+  GS is a music card designed for playing music
+modules and individual samples (effects).
 
-  Модули для GS - это стандартные Амижные и PCшные 4-х канальные MOD файлы,
-а сэмплы - как Амижные signed sample, так и PCшные unsigned sample.
+  Modules for GS are standard Amiga and PC 4-channel MOD files,
+and samples - both Amiga signed sample and PC unsigned sample.
 
-  Проигрыватель MOD  файлов  в  GS  является  практически  полным  аналогом
-ProTracker'а на Амиге и создавался при интенсивном  использовании  исходни-
-ков ProTracker'a. (Исходники были из Protracker'а v2.1A by Lars "ZAP" Hamre
+  The MOD file player in GS is almost a complete analogue
+ProTracker'a on Amiga and was created with intensive use of the source
+kov ProTracker'a. (The sources were from Protracker v2.1A by Lars "ZAP" Hamre
 - Amiga Freelancers)
 
-  MOD Player поддерживает все команды Pro Tracker'а, за исключением двух:
+  MOD Player supports all Pro Tracker commands except for two:
 
- Е01 Filter On Амига-специфичная команда, включает фильтр высоких частот.
+ E01 Filter On Amiga-specific command, turns on the high-pass filter.
 
- EFX Invert Loop я еще не видел плейера,  который бы поддерживал эту коман-
-ду. Возможно, она поддерживается на каких-то старых плейерах.
+ EFX Invert Loop I have not yet seen a player that would support this command
+doo. Perhaps it is supported on some old players.
 
-  GS представляет из себя,  по-сути,  микропроцессорный комплекс  со  своим
-процессором, ПЗУ, ОЗУ и портами, и абсолютно не зависит от главного процес-
-сора Спектрума,  что позволяет,  например,  загрузить свой любимый  модуль,
-сбросить Спектрум,  загрузить ассемблер и творить под любимую музыку.  Soft
-внутри GS полностью берет на себя задачи проигрывания звука,  интерпретации
-модуля и т.д.  Программирование GS'а сводится к передаче байт за байтом мо-
-дуля и/или сэмплов,  а затем требуется только подавать команды типа: запус-
-тить модуль,  установить глобальную громкость проигрывания модуля,   запус-
-тить сэмпл #09 в канале #02 и т.д.
+  GS is, in fact, a microprocessor complex with its
+processor, ROM, RAM and ports, and is absolutely independent of the main process
+litter of the Spectrum, which allows, for example, to load your favorite module,
+reset Spectrum, load assembler and create to your favorite music. Soft
+within GS completely takes over the tasks of sound reproduction, interpretation
+module, etc. Programming GS'a comes down to transferring byte by byte mo-
+dul and / or samples, and then you only need to give commands like: start
+play the module, set the global volume for playing the module, start
+Typing sample # 09 in channel # 02, etc.
 
-  Если предполагается загрузить модуль вместе с сэмплами, то в GENERAL тре-
-буется загружать вначале модуль, а затем сэмплы.
+  If you intend to load the module along with the samples, then in the GENERAL tre-
+tries to load the module first, and then the samples.
 
-  При загрузке модуля очень рекомендуется оставить  свободными  2к  памяти,
-т.е. загружать модули длиной максимум 110K. Это условие не является необхо-
-димым, но его исполнение очень желательно в целях совместимости с последую-
-щими версиями.
+  When loading the module, it is highly recommended to leave 2k memory free,
+those. load modules with a maximum length of 110K. This condition is not necessary
+dim, but its performance is highly desirable for compatibility with subsequent
+versions.
 
-  Аналогично очень рекомендуется оставлять по 80 байт для  каждого  сэмпла,
-например, если требуется загрузить 63-х килобайтный модуль и 18 сэмплов, то
-имеем:
+  Likewise, it is highly recommended to leave 80 bytes for each sample,
+for example, if you need to load a 63-kilobyte module and 18 samples, then
+we have:
 
-  Total_Sample_Length=112*1024-63*1024-2*1024-18*80=46688 байт
+  Total_Sample_Length = 112 * 1024-63 * 1024-2 * 1024-18 * 80 = 46688 bytes
 
-  Это суммарная длина сэмплов, которые при таком положении вещей могут быть
-загружены.
+  This is the total length of the samples, which in this state of affairs can be
+loaded.
 
-  Если же, например, требуется вычислить,  сколько поместится в память GS'а
-2-х килобайтных сэмплов, то это вычисляется следующим образом:
+  If, for example, you need to calculate how much will fit in GS's memory
+2 kilobyte samples, it is calculated as follows:
 
- 112*1024/(2048+80)=53 сэмпла.
+ 112 * 1024 / (2048 + 80) = 53 samples.
 
-  В GS'е имеются 4 физических канала, которые и проигрывают звук.
+  In GS'e there are 4 physical channels that play sound.
 
-  Каналы 0 и 1 - левые, а 2 и 3 - правые.
+  Channels 0 and 1 are left, and 2 and 3 are right.
 
-                        3. Интерфейс со Спектрумом.
+                        3. Interface with the Spectrum.
                         ---------------------------
 
-  На мир GS смотрит при помощи 4 регистров:
+  GS looks at the world using 4 registers:
 
-1. Command register - регистр команд,  доступный для записи порт по  адресу
-187 (#BB). В этот регистр записываются команды.
+1. Command register - command register, writeable port at address
+187 (#BB). Commands are written to this register.
 
-2. Status register  -  регистр состояния,  доступный для чтения порт по ад-
-ресу 187 (#BB).
+2. Status register - status register, readable port by ad-
+resu 187 (#BB).
 
-  Биты регистра:
+  Register bits:
 
-   7 - Data bit, флаг данных
-   6 - Неопределен
-   5 - Неопределен
-   4 - Неопределен
-   3 - Неопределен
-   2 - Неопределен
-   1 - Неопределен
-   0 - Command bit, флаг команд
+   7 - Data bit, data flag
+   6 - Undefined
+   5 - Undefined
+   4 - Undefined
+   3 - Undefined
+   2 - Undefined
+   1 - Undefined
+   0 - Command bit, command flag
 
-  Этот регистр позволяет определить состояние GS, в частности можно ли про-
-читать или записать очередной байт данных, или подать очередную команду,  и
-т.п.
+  This register allows you to determine the state of the GS, in particular, whether it is possible to
+read or write the next data byte, or send the next command, and
+etc.
 
-3. Data register - регистр данных,  доступный для записи порт по адресу 179
-(#B3). В этот регистр Спектрум записывает данные, например,  это могут быть
-аргументы команд.
+3. Data register - data register, writeable port at address 179
+(# B3). Spectrum writes data to this register, for example, it can be
+command arguments.
 
-4. Output register - регистр вывода,  доступный для чтения порт  по  адресу
-179 (#B3). Из этого регистра Спектрум читает данные, идущие от GS.
+4. Output register - output register, readable port at address
+179 (# B3). From this register the Spectrum reads the data coming from the GS.
 
-  Command bit в регистре состояний устанавливается аппаратно  после  записи
-команды в регистр команд. Сбрасываться в 0 он может только из GS,  что сиг-
-нализирует об определенном этапе исполнения команды.
+  Command bit in the status register is set by hardware after writing
+commands to the command register. It can be reset to 0 only from GS, which signal
+will analyze a certain stage of the command execution.
 
-  Data bit в регистре состояний может быть установлен или  сброшен  как  по
-желанию Спектрума,  так и по желанию GS: при записи  Спектрумом  в  регистр
-данных он аппаратно устанавливается в 1,  а после чтения GS'ом из этого ре-
-гистра сбрасывается в 0. При записи GS в регистр вывода он (все тот же Data
-bit) аппаратно устанавливается в 1,  а после чтения из этого порта Спектру-
-мом сбрасывается аппаратно в 0.
+  The data bit in the status register can be set or cleared as per
+at the request of the Spectrum, and at the request of the GS: when recording the Spectrum in the register
+data, it is hardware set to 1, and after reading GS'om from this re-
+register is reset to 0. When GS is written to the output register, it (all the same Data
+bit) is set to 1 by hardware, and after reading from this port to the Spectrum
+mom is reset by hardware to 0.
 
-  Несмотря на то,  что регистр данных и регистр вывода расположены в  прос-
-транстве адресов портов по одному и тому же адресу и воздействуют на один и
-тот же бит данных,  они являются двумя независимыми регистрами.   Значение,
-один раз записанное в один из этих регистров,  остается неизменным в нем до
-новой записи.
+  Despite the fact that the data register and the output register are located in a simple
+multiple port addresses at the same address and affect one and
+the same data bit, they are two independent registers. Value,
+once written to one of these registers, remains unchanged in it until
+new record.
 
-  Состояние бита данных очень часто неопределено, и если в спецификации ко-
-манд не определены значения этого бита на опреденных этапах исполнения  ко-
-манды,  недопустимо делать какие-либо предположения  относительно  значения
-этого бита.
+  The state of the data bit is very often undefined, and if the specification contains
+mand, the values ​​of this bit are not defined at certain stages of execution of the command
+manda, it is unacceptable to make any assumptions about the meaning
+this bit.
 
-                           4. Система команд GS.
+                           4. System of commands GS.
                            ---------------------
 
-  Вначале позволю себе небольшое отступление от собственно системы  команд.
-GS,  как известно,  предназначен в основном для проигрывания модулей и сэм-
-плов.  В данной версии (1.03) GS ROM допукается загрузка одного модуля и/и-
-ли до 32 сэмплов.
+  First, I will allow myself a small digression from the actual command system.
+GS, as you know, is intended mainly for playing modules and sam-
+pilaf. This version (1.03) of GS ROM allows loading one module and / and
+or up to 32 samples.
 
-  Каждый сэмпл при загрузке его в память получает свой уникальный идентифи-
-катор, который однозначно определяет обращение к данному сэмплу в командах,
-которые требуют номер сэмпла.  Самый первый загруженный сэмпл получает  но-
-мер (handle) = 1, следующий - номер 2, и т.д.
+  Each sample, when loaded into memory, gets its own unique identifier.
+a cator that uniquely determines the reference to this sample in commands,
+which require a sample number. The very first sample loaded receives a new
+measure (handle) = 1, next is number 2, etc.
 
-  То же самое применимо и к модулям,  и этот единственный  загруженный  мо-
-дуль будет иметь handle=1 после загрузки.
+  The same applies to modules, and this single loaded mo-
+the muzzle will have handle = 1 after loading.
 
-  Особенностью данной версии является также то,  что вначале требуется заг-
-ружать модуль, а затем уже сэмплы.
+  A feature of this version is also the fact that first you need to download
+Start the module, and then the samples.
 
-  Особенности описания команд:
+  Features of the command description:
 
-  Команды описываются следующим образом:
+  The commands are described as follows:
 
- 1. Hex код команды
- 2. Название команды
- 3. Выполняемые действия при исполнении команды
- 4. Формат команды
- 5. Комментарии к команде
+ 1. Hex command code
+ 2. Team name
+ 3. Actions performed during command execution
+ 4. Command format
+ 5. Comments to the team
 
-  Формат команды описывается следующим образом:
+  The command format is described as follows:
 
  GSCOM EQU 187
  GSDAT EQU 179
 
-SC #NN    : Послать код команды в регистр команд
+SC #NN: Send command code to command register
 
-          LD A,#NN
-          OUT (GSCOM),A
+          LD A, # NN
+          OUT (GSCOM), A
 
-WC      : Ожидание сброса Command bit
+WC: Waiting for Reset Command bit
 
-     WCLP IN A,(GSCOM)
+     WCLP IN A, (GSCOM)
           RRCA
-          JR C,WCLP
+          JR C, WCLP
 
-SD Data : Послать данные в регистр данных
+SD Data: Send data to data register
 
-          LD A,Data
-          OUT (GSDAT),A
+          LD A, Data
+          OUT (GSDAT), A
 
-WD      : Ожидание  сброса Data bit, по сути, ожидание,  пока GS не примет
-          посланные ему данные
+WD: Waiting for Data bit to be reset, essentially waiting until GS accepts
+          data sent to him
 
-     WDLP IN A,(GSCOM)
+     WDLP IN A, (GSCOM)
           RLCA
-          JR C,WDLP
+          JR C, WDLP
 
-GD Data : Принять данные из регистра данных
+GD Data: Receive data from data register
 
-          IN A,(GSDAT)
+          IN A, (GSDAT)
 
-WN      : Ожидание  установки Data bit, по сути, ожидание очередных данных
-          от GS
+WN: Waiting for the Data bit to be set, in fact, waiting for the next data
+          from GS
 
-     WNLP IN A,(GSCOM)
+     WNLP IN A, (GSCOM)
           RLCA
-          JR NC,WNLP
+          JR NC, WNLP
 
 
-                                Команды GS:
+                                GS commands:
 
-#00 Reset flags
-    Сбрасывает флаги Data bit и Command bit.
+# 00 Reset flags
+    Clears the Data bit and Command bit flags.
 
-    SC #00
+    SC # 00
     WC
 
-    (Data bit=0, Command bit=0)
+    (Data bit = 0, Command bit = 0)
 
-#01 Set silence (*)
-    Выводит в ЦАПы всех каналов #80. По сути устанавливает тишину.
+# 01 Set silence (*)
+    Outputs to DACs of all channels # 80. Essentially sets up silence.
 
-    SC #01
+    SC # 01
     WC
 
-#02 Set low volume (*)
-    Устанавливает громкостx ЦАПов всех каналов в ноль.
+# 02 Set low volume (*)
+    Sets the DAC volume of all channels to zero.
 
-    SC #02
+    SC # 02
     WC
 
-#03 Set high volume (*)
-    Устанавливает громкость ЦАПов всех каналов в максимум.
+# 03 Set high volume (*)
+    Sets the volume of the DACs of all channels to maximum.
 
-    SC #03
+    SC # 03
     WC
 
-#04 Set 'E' 3bits (*)
-    Устанавливает в 'E' регистре GS 3 младших бита в соответствии с  задан-
-    ным значением (2  младших  бита  в  сущности  являются  номером  канала
-    #00-#03).
+# 04 Set 'E' 3bits (*)
+    Sets the GS 'E' register to the 3 least significant bits in accordance with the specified
+    value (the 2 least significant bits are essentially the channel number
+    # 00- # 03).
 
-    SD Chan (#00-#07)
-    SC #04
+    SD Chan (# 00- # 07)
+    SC # 04
     WC
 
-#05 Out volume port (*)
-    Устанавливает громкость канала, номер которого содержится в 'E', в ука-
-    занное значение. (Команда срабатывает при условии,  что 'E' находится в
-    пределах #00-#03)
+# 05 Out volume port (*)
+    Sets the volume of the channel, the number of which is contained in the 'E', in the
+    the assigned value. (The command works if 'E' is in
+    within # 00- # 03)
 
-    SD Volume (#00-#3F)
-    SC #05
+    SD Volume (# 00- # 3F)
+    SC # 05
     WC
 
-#06 Send to DAC (*)
-    Выводит байт в ЦАП канала, указываемого по 'E'.
+# 06 Send to DAC (*)
+    Outputs a byte to the DAC of the channel indicated by 'E'.
 
     SD Byte
-    SC #06
+    SC # 06
     WC
 
-#07 Send to DAC and to volume port (*)
-    Выводит байт в ЦАП ('E') с заданной громкостью.
+# 07 Send to DAC and to volume port (*)
+    Outputs a byte to the DAC ('E') at the specified volume.
 
     SD Byte
-    SC #07
+    SC # 07
     WC
     SD Volume
     WD
 
-#08 - то же что и команда #00
+# 08 - the same as command # 00
 
-#09 Sets one's byte volume. (*)
-    Установка громкости канала, номер которого задан в 2х старших битах.
+# 09 Sets one's byte volume. (*)
+    Setting the volume of the channel, the number of which is specified in the 2x MSB.
 
     SD Byte (ccvvvvvv)
-    SC #09
+    SC # 09
     WC
 
-    cc - Номер канала
-    vvvvvv - Его громкость
+    cc - Channel number
+    vvvvvv - Its volume
 
-#0A DAC output (*)
-    Еще один непосредственный вывод в ЦАП.
+# 0A DAC output (*)
+    Another direct output to the DAC.
 
     SD Byte
-    SC #0A
+    SC # 0A
     WC
-    SD Chan (#00-#03)
+    SD Chan (# 00- # 03)
     WD
 
-#0B DAC and Volume output (*)
-    И наконец последний вывод в ЦАП с установкой громкости.
+# 0B DAC and Volume output (*)
+    And finally, the last output to the DAC with volume setting.
 
     SD Fbyte
-    SC #0B
+    SC # 0B
     WC
     SD Sbyte (ccvvvvvv)
     WD
 
-    Назначение битов Sbyte как и у к.#09)
+    The assignment of the Sbyte bits is the same as in # 09)
 
-    Команды #01  - #0B служат в основном для построения различных  Covox'ов
-    и поигрывателей,  при этом не слишком углубляясь во внутреннюю структу-
-    ру GS.
+    Teams # 01 - # 0B are mainly used to build various Covoxes
+    and players, while not delving too deeply into the internal structure
+    ru GS.
 
-    vvvvvv - Его громкость
+    vvvvvv - Its volume
 
-#0C DAC output (*)
-    Еще один непосредственный вывод в ЦАП.
+# 0C DAC output (*)
+    Another direct output to the DAC.
 
-#0C Call SounDrive Covox mode (*)
-    Вызывает режим четырехканального Ковокса,  последовательно копирует ре-
-    гистр данных по каналам.  Выход из режима  автоматически  после  вывода
-    четвертого байта.
+# 0C Call SounDrive Covox mode (*)
+    Calls the four-channel Kovoks mode, sequentially copies the re-
+    data gist by channels. Exit automatically after output
+    fourth byte.
 
     SD CH1
-    SC #0C
+    SC # 0C
     WC
     SD CH2
     WD
@@ -319,14 +318,14 @@ WN      : Ожидание  установки Data bit, по сути, ожид
     SD CH4
     WD
 
-#0D Call Ultravox mode (*)
-    Вызывает режим универсального Ковокса,   последовательно  копирует  ре-
-    гистр данных по каналам,  число которых регулируется (1-4).В отличие от
-    предыдущего варианта синхронизация не производится.  Выход также произ-
-    водится автоматически по записи последнего байта.
+# 0D Call Ultravox mode (*)
+    Calls the universal Kovoks mode, sequentially copies the re-
+    data histr by channels, the number of which is adjustable (1-4).
+    the previous version is not synchronized. The output is also produced
+    is set automatically by writing the last byte.
 
     SD CHANS
-    SC #0D
+    SC # 0D
     WC
 
     SD CH1
@@ -334,93 +333,93 @@ WN      : Ожидание  установки Data bit, по сути, ожид
     SD CH3
     SD CH4
 
-    CHANS (4-е младших бита) указывает какие каналы будут  задействованы  -
-    для включения канала соответствующий бит  нужно  установить.Если  канал
-    выключен,  то поступивший байт попадает на следующий  включенный  канал
-    (если успеет :)
+    CHANS (4th least significant bit) indicates which channels will be used -
+    the corresponding bit must be set to enable the channel.
+    off, then the received byte goes to the next enabled channel
+    (if you have time :)
 
 
-#0E Go to LPT Covox mode
-    Переходит в режим одноканального Ковокса,   напрямую  копирует  регистр
-    данных в ЦАПы двух (правого и левого) каналов.  Выход из этого режима -
-    запись #00 в регистр команд.
+# 0E Go to LPT Covox mode
+    Goes into single-channel Kovoks mode, directly copies the register
+    data into DACs of two (right and left) channels. Exit from this mode -
+    writing # 00 to the command register.
 
-    SC #0E
+    SC # 0E
     WC
 
-    SD  \
-    SD   \
-    ...   Это вывод в ЦАПы
+    SD \
+    SD \
+    ... This is the output to the DACs
         /
-    SD  /
+    SD /
 
-    SC #00
+    SC # 00
     WC
 
-#0F Go in Profi Covox mode (*)
-    Переходит в режим двухканального Ковокса,   напрямую  копирует  регистр
-    данных в ЦАПы одного канала,  а регистр каманд в ЦАПы  второго  канала.
-    Выход из этого режима - запись #4Е в регистр данных,  затем  последова-
-    тельно #0F и #AA в регистр команд.
+# 0F Go in Profi Covox mode (*)
+    Goes into two-channel Kovoks mode, directly copies the register
+    data in the DACs of one channel, and the kamand register in the DACs of the second channel.
+    Exit from this mode - writing # 4E to the data register, then sequentially
+    # 0F and #AA in the command register.
 
-    SD #59
-    SC #0F
+    SD # 59
+    SC # 0F
     WC
 
-    SD  \
-    SC   \
-    SD    \
-    SC      Это вывод в ЦАПы
-    ...   /
-    SD   /
-    SC  /
+    SD \
+    SC \
+    SD \
+    SC This is the output to the DACs
+    ... /
+    SD /
+    SC /
 
-    SD #4E
+    SD # 4E
     WD
-    SC #0F
+    SC # 0F
     WC
     SC #AA
     WC
 
-#10 Out to any port (*)
-    Выводит байт вo внутренний порт GS (#00-#09).
+# 10 Out to any port (*)
+    Outputs bytes to internal GS port (# 00- # 09).
 
     SD Port
-    SC #10
+    SC # 10
     WC
     SD Data
     WD
 
-#11 In from any port (*)
-    читает байт из внутреннего порта GS (#00-#09).
+# 11 In from any port (*)
+    reads a byte from the internal GS port (# 00- # 09).
 
     SD Port
-    SC #10
+    SC # 10
     WC
     GD Data
     WN
 
-#12 OUT to 0 port (*)
-    Выводит байт в порт кофигурации GS (#00).
+# 12 OUT to 0 port (*)
+    Outputs a byte to the GS config port (# 00).
 
     SD Data
-    SC #12
+    SC # 12
     WC
 
-#13 Jump to Address (*)
-    Передает управление по заданному адресу.
+# 13 Jump to Address (*)
+    Transfers control to the specified address.
 
     SD ADR.L
-    SC #13
+    SC # 13
     WC
     SD ADR.H
     WD
 
-#14 Load memory block (*)
-    Загрузка блока кодов по указанному адресу с заданной длиной.
+# 14 Load memory block (*)
+    Loading a block of codes at a specified address with a specified length.
 
     SD LEN.L
-    SC #14
+    SC # 14
     SD LEN.H
     WD
     SD ADR.L
@@ -428,18 +427,18 @@ WN      : Ожидание  установки Data bit, по сути, ожид
     SD ADR.H
 
     SD \
-    WD  \
-    SD   \
-    WD     Блок данных длиной LEN
-    ...  /
-    SD  /
+    WD \
+    SD \
+    WD Data block length LEN
+    ... /
+    SD /
     WD /
 
-#15 Get memory block (*)
-    Выгрузка блока кодов по указанному адресу с заданной длиной.
+# 15 Get memory block (*)
+    Unloading a block of codes at a specified address with a specified length.
 
     SD LEN.L
-    SC #15
+    SC # 15
     SD LEN.H
     WD
     SD ADR.L
@@ -447,637 +446,639 @@ WN      : Ожидание  установки Data bit, по сути, ожид
     SD ADR.H
 
     GD \
-    WN  \
-    GD   \
-    WN     Блок данных длиной LEN
-    ...  /
-    GD  /
+    WN \
+    GD \
+    WN Data block LEN length
+    ... /
+    GD /
     WN /
 
-#16 Poke to address (*)
-    Записывает единичный байт по указанному адресу.
+# 16 Poke to address (*)
+    Writes a single byte to the specified address.
 
     SD ADR.L
-    SC #16
+    SC # 16
     WC
     SD ADR.H
     WD
     SD Byte
     WD
 
-#17 Peek from address (*)
-    Считывает единичный байт из указанного адреса.
+# 17 Peek from address (*)
+    Reads a single byte from the specified address.
 
     SD ADR.L
-    SC #17
+    SC # 17
     WC
     SD ADR.H
     WD
-    GD Byte
+    Gd byte
     WN
 
-#18 Load DE Pair (*)
-    Загружает регистовую пару DE (относящуюся к GS,  не путать с  одноимен-
-    ной парой Main CPU) указанным словом.
+# 18 Load DE Pair (*)
+    Loads register pair DE (related to GS, not to be confused with the same name
+    pair of Main CPU) with the specified word.
 
     SD B.E
-    SC #18
+    SC # 18
     WC
     SD B.D
     WD
 
-#19 Poke to (DE) address (*)
-    Записывает байт по адресу указанному в DE.
+# 19 Poke to (DE) address (*)
+    Writes a byte to the address specified in DE.
 
     SD Byte
-    SC #19
+    SC # 19
     WC
 
-#1A Peek from (DE) address (*)
-    Считывает содержимое адреса, указываемого по DE.
+# 1A Peek from (DE) address (*)
+    Reads the contents of the DE address.
 
-    SC #1A
+    SC # 1A
     WC
-    GD Byte
+    Gd byte
     WN
 
-#1B Increment of DE Pair (*)
-    Увеличивает пару DE на единичку.
+# 1B Increment of DE Pair (*)
+    Increases the DE pair by one.
 
-    SC #1B
+    SC # 1B
     WC
 
-#1C Poke to (#20XX) address (*)
-    Записывает байт по адресу, старший байт которого равен #20.
+# 1C Poke to (# 20XX) address (*)
+    Writes a byte to the address whose high byte is # 20.
 
     SD ADR.L
-    SC #1C
+    SC # 1C
     WC
     SD Byte
     WD
 
-#1D Peek from (#20XX) address (*)
-    читает байт с адреса, старший байт которого равен #20.
+# 1D Peek from (# 20XX) address (*)
+    reads a byte from the address, the high byte of which is # 20.
 
     SD ADR.L
-    SC #1D
+    SC # 1D
     WC
-    GD Byte
+    Gd byte
     WN
 
-#1E - #1F Зарезервированы.
-#F1 - #F2 Зарезервированы.
+# 1E - # 1F Reserved.
+# F1 - # F2 Reserved.
 
-#F3 Warm restart
-    Сбрасывает полностью GS,  но пропускает  этапы  определения  количества
-    страниц памяти и их провеки,  что очень сильно ускоряет процесс инициа-
-    лизации.
+# F3 Warm restart
+    Resets GS completely, but skips quantification steps
+    memory pages and their checking, which greatly speeds up the process of
+    lization.
 
-    SC #F3
+    SC # F3
     WC
 
-#F4 Cold restart
-    Полный перезапуск GS со всеми проверками. По сути, JP #0000.
+# F4 Cold restart
+    Complete restart of GS with all checks. Essentially JP # 0000.
 
-    SC #F4
+    SC # F4
     WC
 
-#F5 Busy on
-    Устанавливает флаг занятости в #FF
+# F5 Busy on
+    Sets busy flag to #FF
 
-    SC #F5
+    SC # F5
     WC
 
-#F6 Busy off
-    Устанавливает флаг занятости в #00
+# F6 Busy off
+    Sets busy flag to # 00
 
-    SC #F6
+    SC # F6
     WC
 
-   Изначально Busy=#00.  Исполнение всех команд в GS выполняется в  главном
- цикле командного интерпретатора.  Этот цикл в условном виде можно предста-
- вить так:
+   Initially Busy = # 00. All commands in the GS are executed in the main
+ shell loop. This cycle can be conditionally represented
+ twist like this:
 
- 1 if Command bit=0 then go to 1
+ 1 if Command bit = 0 then go to 1
  2 Execute Command
- 3 if Command bit=1 then go to 2
- 4 if Playing=0 then go to 1
- 5 if Busy=#FF then go to 1
+ 3 if Command bit = 1 then go to 2
+ 4 if Playing = 0 then go to 1
+ 5 if Busy = # FF then go to 1
  6 Process Sound
  7 go to 1
 
-  Используя команды Busy можно например инициировать  проигрывание  сэмплов
-во всех каналах потом скажем изменить параметры проигрывания  в  каналах  а
-потом запустить это все одновременно. Если же их не использовать то возмож-
-на такая ситуация: инициируется первый (сэмпл станет проигрываться а только
-потом инициируется второй сэмпл и т.д.)
+  Using the Busy commands, you can, for example, initiate the playback of samples
+in all channels, then let's say change the playback parameters in channels a
+then run it all at the same time. If you do not use them, then it is possible
+to such a situation: the first is initiated (the sample will be played but only
+then the second sample is initiated, etc.)
 
-#F7 Get HX Register (*)
-    Получить содержимое регистра HX (GS)
-    HX участвует в обработке флага Busy.
+# F7 Get HX Register (*)
+    Get the contents of the HX register (GS)
+    HX is involved in processing the Busy flag.
 
-    SC #F7
+    SC # F7
     WC
     GD HX
     WN
 
-#F8 - #F9 Зарезервированы.
+# F8 - # F9 Reserved.
 
 #FA Out zero_to_zero
-    Вывод нуля в нулевой (конфигурационный) порт GS.   Делает  приостановку
-    звучания музыки до следующего чтения из к.л. порта.
+    Zero output to zero (configuration) GS port. Makes a suspension
+    sounding music until the next reading from K.L. port.
 
     SC #FA
 
     WC
 
-#FB - #FF Зарезервированы.
+#FB - #FF Reserved.
 
-#20 Get total RAM
-    Получить общий объем доступной памяти на GS. (В базовой версии это 112к)
+# 20 Get total RAM
+    Get the total available memory on the GS. (In the basic version it is 112k)
 
-    SC #20
+    SC # 20
     WC
-    GD RAM.L(Младшая часть)
+    GD RAM.L (Junior part)
     WN
-    GD RAM.M(Средняя часть)
+    GD RAM.M (Middle)
     WN
-    GD RAM.H(Старшая часть)
+    GD RAM.H (Major part)
 
-Total RAM=65536*RAM.H+256*RAM.M+RAM.L
+Total RAM = 65536 * RAM.H + 256 * RAM.M + RAM.L
 
-#21 Get free RAM
-    Получить общий об'ем свободной памяти на GS.
+# 21 Get free RAM
+    Get the total amount of free memory on the GS.
 
-    SC #20
+    SC # 20
     WC
-    GD RAM.L(Младшая часть)
+    GD RAM.L (Junior part)
     WN
-    GD RAM.M(Средняя часть)
+    GD RAM.M (Middle)
     WN
-    GD RAM.H(Старшая часть)
+    GD RAM.H (Major part)
 
- Free_RAM=65536*RAM.H+256*RAM.M+RAM.L
+ Free_RAM = 65536 * RAM.H + 256 * RAM.M + RAM.L
 
-#23 Get number of RAM Pages
-    Получить число страниц на  GS.
+# 23 Get number of RAM Pages
+    Get the number of pages per GS.
 
-    SC #23
+    SC # 23
     WC
     GD Number_RAM_Pages
 
-    В базовой версии 3 страницы.
+    The basic version has 3 pages.
 
-#24 - #29 Зарезервированы.
+# 24 - # 29 Reserved.
 
-#2A Set Module Master Volume
-    Установить громкость проигрывания модулей.
+# 2A Set Module Master Volume
+    Set the volume of playing modules.
 
-    SD Module_Master_Volume [#00..#40]
-    SC #2A
+    SD Module_Master_Volume [# 00 .. # 40]
+    SC # 2A
     WC
-    [GD Old_Master_Volume] - Старая громк.
+    [GD Old_Master_Volume] - Old loud.
 
-    Маленький пример использования данной команды:
+    A small example of using this command:
 
-    (Предполагается, что играется модуль)
+    (Assumes module being played)
 
-           LD B,#40
+           LD B, # 40
 
-     LOOP: LD A,B
-           OUT (GSDAT),A
-           LD A,#2A
-           OUT (GSCOM),A
+     LOOP: LD A, B
+           OUT (GSDAT), A
+           LD A, # 2A
+           OUT (GSCOM), A
            EI
            HALT
            DJNZ LOOP
 
-           LD A,#32
-           OUT (GSCOM),A
+           LD A, # 32
+           OUT (GSCOM), A
 
-  Вышеописанное плавно снижает громкость играющего модуля, а затем останав-
-ливает его.
+  The above smoothly reduces the volume of the playing module, and then stops
+pours it.
 
-#2B Set FX Master Volume
-    Установить громкость проигрывания эффектов.
+# 2B Set FX Master Volume
+    Set the volume for playing the effects.
 
-    SD FX_Master_Volume [#00..#40]
-    SC #2B
+    SD FX_Master_Volume [# 00 .. # 40]
+    SC # 2B
     WC
-    [GD Old_FX_Volume] - Старая громкость
+    [GD Old_FX_Volume] - Old volume
 
-  Аналогично предыдущей команде, но действует на сэмплы.
+  Similar to the previous command, but affects samples.
 
-  С помощью этих двух команд можно регулировать баланс громкостей модуля  и
-сэмплов, и т.п.
+  With these two commands, you can adjust the volume balance of the module and
+samples, etc.
 
-#2E Set Current FX
-    Установить текущий эффект. Просто присваивает переменной CURFX это зна-
-    чение. Если какая-либо команда требует номер сэмпла (sample handle), то
-    можно вместо этого номера подать ей #00 и интерпретатор подставит вмес-
-    то этого нуля значение переменной CURFX. (См. команды #38, #39, #40-#4F
-    для понимания вышеизложенного.)
+# 2E Set Current FX
+    Set the current effect. Just assigns this to the CURFX variable
+    reading. If any command requires a sample handle, then
+    instead of this number you can give her # 00 and the interpreter will substitute
+    then this zero is the value of the variable CURFX. (See commands # 38, # 39, # 40- # 4F
+    for understanding the above.)
 
     SD Cur_FX
-    SC #2E
+    SC # 2E
     WC
 
-#30 Load Module
-    Загрузка модуля в память.
+# 30 Load Module
+    Loading the module into memory.
 
-    SC #30
+    SC # 30
     WC
-   [GD Module_Handle]-номер модуля
-   (Command bit=0, Data bit=0)
-    SC #D1 (Open Stream-открыть поток)
-    WC
-
-    SD \
-    WD  \
-    ...   Байты модуля
-    SD  /
-    WD /
-
-    SC #D2 (Close Stream-закрыть поток)
-    WC
-
-    Пример:
-             LD HL,Mod_adress
-             LD DE,0-Mod_length
-             LD C,GSCOM
-
-             LD A,#30
-             CALL SENDCOM
-             LD A,#D1
-             CALL SENDCOM
-
-             LD A,(HL)
-     LOOP:   IN B,(C)
-             JP P,READY
-             IN B,(C)
-             JP M,LOOP
-     READY:  OUT (GSDAT),A
-             INC HL
-             LD A,(HL)
-             INC E
-             JP NZ,LOOP
-             INC D
-             JP NZ,LOOP
-     WAIT:   IN B,(C)  ;Ждем принятия
-             JP M,WAIT ;последнего байта
-             LD A,#D2
-             CALL SENDCOM
-             IN A,(GSDAT) ; Номер модуля
-             OUT (GSDAT),A
-             LD A,#31
-
-    SENDCOM: OUT (GSCOM),A
-    WAITCOM: IN A,(GSCOM)
-             RRCA
-             JR C,WAITCOM
-             RET
-
-#31 Play module
-    Проигрывание модуля.
-
-    SD Module_Handle - номер модуля
-    SC #31
-    WC
-
-#32 Stop module
-    Остановить проигрывание модуля.
-
-    SC #32
-    WC
-
-#33 Continue module
-    Продолжить проигрывание модуля после остановки.
-
-    SC #33
-    WC
-
-#35 Set Module Volume
-    Установить громкость проигрывания модулей.
-
-    SD Module_Master_Volume [#00..#40]
-    SC #35
-    WC
-   [GD Old_Master_Volume] - Старая громк.
-
-#36 Data on (*)
-    Устанавливает регистр данных в #FF.
-
-    SC #36
-    WC
-   [GD Data (#FF) ]
-
-#37 Reinitialisation (*)
-    Переустанавливает внутренние переменные в исходное состояние.
-
-    SC #37
-    WC
-
-#38 Load FX
-    Загрузка сэмпла эффекта в память. Загружает беззнаковые сэмплы (PC type)
-
-    SC #38
-    WC
-   [GD FX_Handle]-номер сэмпла
-   (Command bit=0, Data bit=0)
-    SC #D1 (Open Stream-открыть поток)
+   [GD Module_Handle] - module number
+   (Command bit = 0, Data bit = 0)
+    SC # D1 (Open Stream - open stream)
     WC
 
     SD \
-    WD  \
-    ...   Байты сэмпла
-    SD  /
+    WD \
+    ... Module Bytes
+    SD /
     WD /
 
-    SC #D2 (Close Stream-закрыть поток)
+    SC # D2 (Close Stream-close stream)
     WC
 
-  При загрузке каждого сэмпла, в памяти GS создается для этого сэмпла заго-
-ловок, в котором описываются различные параметры сэмпла. После загрузки эти
-параметры устанавливаются в определенные значения, как то:
+    Example:
+             LD HL, Mod_adress
+             LD DE, 0-Mod_length
+             LD C, GSCOM
 
-  Note=60,    Volume=#40,    FineTune=0,    SeekFirst=#0F,    SeekLast=#0F,
-Priority=#80,  No Loop и внутренняя переменная CurFX устанавливается равной
-FX_Handle.
-
-  Затем командами #40, #41, #42, #45, #46 и #47 можно эти значения по умол-
-чанию сменить на свои.  Это требуется потому что команда #39 для  инициации
-проигрывания сэмпла использует значения параметров из заголовка сэмпла.
-
-  В своем естественном виде сэмплы обычно плохо пакуются компрессорами,  но
-сжимаемость обычно можно поднять,  если перевести сэмпл в Delta-вид,   т.е.
-хранить не абсолютные значения сэмпла,  а  относительное  смещение  относи-
-тельно предыдущего байта.  Примерно вот так вот  можно  перевести  сэмпл  в
-Delta-вид:
-
-            LD HL,Start_of_sample
-            LD DE,0-Length_of_sample
-            LD C,#00
-
-      LOOP: LD A,(HL)
-            SUB C
-            LD C,(HL)
-            LD (HL),A
-            INC E
-            JP NZ,LOOP
-            INC D
-            JP NZ,LOOP
-
-    А вот как можно закачать сэмпл:
-
-             LD IX,Parameters
-             LD HL,Sample_adress
-             LD DE,0-Sample_length
-             LD C,GSCOM
-
-             LD A,#38
+             LD A, # 30
              CALL SENDCOM
-             LD A,#D1
+             LD A, # D1
              CALL SENDCOM
 
-             LD A,(HL)
-     LOOP:   IN B,(C)
-             JP P,READY
-             IN B,(C)
-             JP M,LOOP
-     READY:  OUT (GSDAT),A
+             LD A, (HL)
+     LOOP: IN B, (C)
+             JP P, READY
+             IN B, (C)
+             JP M, LOOP
+     READY: OUT (GSDAT), A
              INC HL
-             ADD A,(HL)
+             LD A, (HL)
              INC E
-             JP NZ,LOOP
+             JP NZ, LOOP
              INC D
-             JP NZ,LOOP
-     WAIT:   IN B,(C)  ;Ждем принятия
-             JP M,WAIT ;последнего байта
-             LD A,#D2
+             JP NZ, LOOP
+     WAIT: IN B, (C); Waiting for acceptance
+             JP M, WAIT; last byte
+             LD A, # D2
              CALL SENDCOM
-
-      ; Теперь переопределяем параметры
-      ; сэмпла по умолчанию своими
-      ; значениями
-
-             LD A,(IX+#00)
-             OUT (GSDAT),A  ; Нота
-             LD A,#40
-             CALL SENDCOM
-             LD A,(IX+#01)
-             OUT (GSDAT),A  ; Громкость
-             LD A,#41
+             IN A, (GSDAT); Module number
+             OUT (GSDAT), A
+             LD A, # 31
 
     SENDCOM: OUT (GSCOM), A
-    WAITCOM: IN A,(GSCOM)
+    WAITCOM: IN A, (GSCOM)
              RRCA
-             JR C,WAITCOM
+             JR C, WAITCOM
              RET
 
-#39 Play FX
-    Проигрывание эффекта.
+# 31 Play module
+    Playing a module.
 
-    SD FX_Handle - номер сэмпла
-    SC #39
+    SD Module_Handle - module number
+    SC # 31
     WC
 
-  При исполнении этой команды происходит следующее: смотрятся каналы,  ука-
-занные в SeekFirst параметре нашего сэмпла, и если хотя-бы один из них сво-
-боден,  в нем и проигрывается сэмпл,  в противном случае смотрятся  каналы,
-указанные в SeekLast и если один из них свободен,  в нем и играется  сэмпл,
-если свободных нет, то просматриваются все каналы,  указанные SeekLast,  из
-них выбирается канал с наименьшим приоритетом и сравнивается с  приоритетом
-нашего сэмпла (имеется в виду сэмпл,  который мы хотим проиграть),  если  у
-этого сэмпла будет больший приоритет, чем у сэмпла, уже играющего в канале,
-то играющий в канале сэмпл будет остановлен,  а наш сэмпл будет  запущен  в
-этом канале вместо старого сэмпла. Вот такая вот приоритетная схема...
+# 32 Stop module
+    Stop playing the module.
 
-  Тогда сэмпл запускается в канале, то его нота, громкость и т.п.  парамет-
-ры записываются в область данных канала из заголовка сэмпла.
-
-  В общем случае,  что-бы проиграть сэмпл с нужными параметрами,  вы можете
-установить эти параметры после загрузки сэмпла и смело использовать  коман-
-ду #39. Если же параметры должны меняться, то можно поступать следующим об-
-разом: командой #2E сделать текущим требуемый сэмпл,  командами  #4x  изме-
-нить его параметры, а затем уже запускать его командой #39.
-
-  Альтернативный метод запуска сэмплов предоставляют команды #80..#9F,  при
-исполнении этих команд вы прямо в коде команды указываете,  в каком  канале
-требуется запустить сэмпл,  и кроме этого,  вы можете также указать с какой
-нотой и/или громкостью требуется запустить сэмпл.
-
-#3A Stop FX in channels
-    установка проигрывания эффектов в заданных каналах,  которые указывают-
-    ся в маске каналов (Channel Mask).  В ней единица в n-ном  бите  указы-
-    вает на то, что эффект в n-ном канале требуется остановить
-
-    SD Channel_Mask
-    SC #3A
+    SC # 32
     WC
 
-  Описанное выше есть идеальный вариант работы данной команды, но к сожале-
-нию не все так просто в этом мире, и эта команда действует не так,  а имен-
-но: единица в бите 7 останавливает сэмпл в нулевом канале, и т.п. В следую-
-щих версиях это будет исправлено,  а пока я могу порекомендовать останавли-
-вать вообще все сэмплы маской #FF.
+# 33 Continue module
+    Continue playing the module after stopping.
 
-#3D Set FX Volume
-    Установить громкость проигрывания эффектов.
-
-    SD FX Volume [#00..#40]
-    SC #3D
+    SC # 33
     WC
-   [GD Old_FX_Volume] - Старая громкость
 
-#3E Load FX (Extended version)
-    Загрузка сэмпла эффекта в память. Позволяет загружать сэмплы со знаком.
-    (Amiga type)
+# 35 Set Module Volume
+    Set the volume of playing modules.
 
-    SD #01 (Signed sample)
-    SC #3E
+    SD Module_Master_Volume [# 00 .. # 40]
+    SC # 35
     WC
-   [GD FX_Handle]-номер сэмпла
-   (Command bit=0, Data bit=0)
-    SC #D1 (Open Stream-открыть поток)
+   [GD Old_Master_Volume] - Old loud.
+
+# 36 Data on (*)
+    Sets the data register to # FF.
+
+    SC # 36
+    WC
+   [GD Data (#FF)]
+
+# 37 Reinitialisation (*)
+    Resets internal variables to their original state.
+
+    SC # 37
+    WC
+
+# 38 Load FX
+    Loading an effect sample into memory. Loads unsigned samples (PC type)
+
+    SC # 38
+    WC
+   [GD FX_Handle] -sample number
+   (Command bit = 0, Data bit = 0)
+    SC # D1 (Open Stream - open stream)
     WC
 
     SD \
-    WD  \
-    ...   Байты сэмпла
-    SD  /
+    WD \
+    ... Sample Bytes
+    SD /
     WD /
 
-    SC #D2 (Close Stream-закрыть поток)
+    SC # D2 (Close Stream-close stream)
     WC
 
-#40 Set FX Sample Playing Note
-    Установка ноты по умолчанию для текущего эффекта.
+  Each time you load a sample, a GS memory is created for that sample.
+A clever way to describe the various parameters of the sample. Once downloaded, these
+parameters are set to specific values, such as:
+
+  Note = 60, Volume = # 40, FineTune = 0, SeekFirst = # 0F, SeekLast = # 0F,
+Priority = # 80, No Loop and CurFX internal variable is set to
+FX_Handle.
+
+  Then, using commands # 40, # 41, # 42, # 45, # 46 and # 47, you can use these values ​​by default.
+change to your own. This is required because command # 39 to initiate
+playing the sample uses the parameter values ​​from the sample header.
+
+  In their natural form, samples are usually poorly packed with compressors, but
+compressibility can usually be increased by converting the sample to Delta-view, i.e.
+store not the absolute values ​​of the sample, but the relative offset relative to
+only the previous byte. This is how you can translate a sample into
+Delta view:
+
+            LD HL, Start_of_sample
+            LD DE, 0-Length_of_sample
+            LD C, # 00
+
+      LOOP: LD A, (HL)
+            SUB C
+            LD C, (HL)
+            LD (HL), A
+            INC E
+            JP NZ, LOOP
+            INC D
+            JP NZ, LOOP
+
+    And here's how you can upload a sample:
+
+             LD IX, Parameters
+             LD HL, Sample_adress
+             LD DE, 0-Sample_length
+             LD C, GSCOM
+
+             LD A, # 38
+             CALL SENDCOM
+             LD A, # D1
+             CALL SENDCOM
+
+             LD A, (HL)
+     LOOP: IN B, (C)
+             JP P, READY
+             IN B, (C)
+             JP M, LOOP
+     READY: OUT (GSDAT), A
+             INC HL
+             ADD A, (HL)
+             INC E
+             JP NZ, LOOP
+             INC D
+             JP NZ, LOOP
+     WAIT: IN B, (C); Waiting for acceptance
+             JP M, WAIT; last byte
+             LD A, # D2
+             CALL SENDCOM
+
+      ; Now override the parameters
+      ; samples by default
+      ; values
+
+             LD A, (IX + # 00)
+             OUT (GSDAT), A; Note
+             LD A, # 40
+             CALL SENDCOM
+             LD A, (IX + # 01)
+             OUT (GSDAT), A; Volume
+             LD A, # 41
+
+    SENDCOM: OUT (GSCOM), A
+    WAITCOM: IN A, (GSCOM)
+             RRCA
+             JR C, WAITCOM
+             RET
+
+# 39 Play FX
+    Playing the effect.
+
+    SD FX_Handle - sample number
+    SC # 39
+    WC
+
+  When this command is executed, the following occurs: the channels that indicate
+set in the SeekFirst parameter of our sample, and if at least one of them is
+boden, the sample is played in it, otherwise the channels look
+specified in SeekLast and if one of them is free, the sample is played in it,
+if there are no free ones, then all channels specified by SeekLast are viewed from
+them, the channel with the lowest priority is selected and compared with the priority
+our sample (meaning the sample that we want to play), if
+this sample will have higher priority than the sample already playing in the channel,
+then the sample playing in the channel will be stopped, and our sample will be launched at
+this channel instead of the old sample. Here is such a priority scheme ...
+
+  Then the sample starts in the channel, then its note, volume, etc. parameter-
+They are written to the channel data area from the sample header.
+
+  In general, to play a sample with the desired parameters, you can
+set these parameters after loading the sample and feel free to use the command
+do # 39. If the parameters must change, then you can proceed as follows
+at once: with the command # 2E make the required sample current, with the commands # 4x change
+thread its parameters, and then start it with command # 39.
+
+  An alternative method for starting samples is provided by commands # 80 .. # 9F, when
+execution of these commands, you directly in the command code indicate in which channel
+you want to run the sample, and besides this, you can also specify with which
+note and / or volume, you want to start the sample.
+
+# 3A Stop FX in channels
+    setting the playback of effects in the specified channels, which indicate
+    in the Channel Mask. In it, the unit in the nth bit indicates
+    indicates that the effect in the nth channel needs to be stopped
+
+    SD Channel_Mask
+    SC # 3A
+    WC
+
+  The above is the ideal way for this team to work, but unfortunately
+not everything is so simple in this world, and this team does not act like that,
+but: one in bit 7 stops the sample in channel zero, etc. In the next
+this will be fixed in future versions, but for now I can recommend stopping
+In general, use the #FF mask for all samples.
+
+# 3D Set FX Volume
+    Set the volume for playing the effects.
+
+    SD FX Volume [# 00 .. # 40]
+    SC # 3D
+    WC
+   [GD Old_FX_Volume] - Old volume
+
+# 3E Load FX (Extended version)
+    Loading an effect sample into memory. Allows to load signed samples.
+    (Amiga type)
+
+    SD # 01 (Signed sample)
+    SC # 3E
+    WC
+   [GD FX_Handle] -sample number
+   (Command bit = 0, Data bit = 0)
+    SC # D1 (Open Stream - open stream)
+    WC
+
+    SD \
+    WD \
+    ... Sample Bytes
+    SD /
+    WD /
+
+    SC # D2 (Close Stream-close stream)
+    WC
+
+
+
+# 40 Set FX Sample Playing Note
+    Sets the default note for the current effect.
 
     SD Note [0..95]
-    SC #40
+    SC # 40
     WC
 
-Note=
+Note =
  0 C-0
- 1 C#0
+ 1 C # 0
 12 C-1
 24 C-2
-36 C-3 (C-1 в Амиге)
-48 C-4 (C-2 в Амиге)
-60 C-5 (C-3 в Амиге)
+36 C-3 (C-1 in Amiga)
+48 C-4 (C-2 in Amiga)
+60 C-5 (C-3 in Amiga)
 72 C-6
 84 C-7
 
-  В данной версии Sound Generators Wave 2,  3 могут воспроизвести октавы 3,
-4 и 5,  поэтому допустимым значением параметра Note является диапазон от 36
-до 71.
+  In this version Sound Generators Wave 2, 3 can reproduce 3 octaves,
+4 and 5, so a valid Note value is 36
+up to 71.
 
-#41 Set FX Sample Volume
-    Установка громкости по умолчанию для текущего эффекта.
+# 41 Set FX Sample Volume
+    Sets the default volume for the current effect.
 
-    SD FX_Volume [#00..#40]
-    SC #41
+    SD FX_Volume [# 00 .. # 40]
+    SC # 41
     WC
 
-#42 Set FX Sample Finetune
-    Установка Finetune по умолчанию для текущего эффекта.
+# 42 Set FX Sample Finetune
+    The default Finetune setting for the current effect.
 
-    SD FX_Finetune [#00..#40]
-    SC #42
+    SD FX_Finetune [# 00 .. # 40]
+    SC # 42
     WC
 
-#43 - #44 Зарезервированы.
+# 43 - # 44 Reserved.
 
-#45 Set FX Sample Priority
-    Установка приоритета для текущего эффекта. (См. команду #39)
+# 45 Set FX Sample Priority
+    Sets the priority for the current effect. (See command # 39)
 
-    SD FX_Priority [#01..#fe]
-    SC #45
+    SD FX_Priority [# 01 .. # fe]
+    SC # 45
     WC
 
-#46 Set FX Sample Seek First parameter
-    Установка параметра Seek First для текущего эффекта. (См. команду #39)
+# 46 Set FX Sample Seek First parameter
+    Sets the Seek First parameter for the current effect. (See command # 39)
 
     SD FX_SeekFirst
-    SC #46
+    SC # 46
     WC
 
-#47 Set FX Sample Seek Last parameter
-    Установка параметра Seek Last для текущего эффекта. (См. команду #39)
+# 47 Set FX Sample Seek Last parameter
+    Sets the Seek Last parameter for the current effect. (See command # 39)
 
     SD FX_SeekLast
-    SC #47
+    SC # 47
     WC
 
-#48 Set FX Sample Loop Begin (*)
-    Установка начала цикла для текущего эффекта.
+# 48 Set FX Sample Loop Begin (*)
+    Sets the start of the loop for the current effect.
 
     SD LEN.L
-    SC #48
+    SC # 48
     WC
     SD LEN.M
     WD
     SD LEN.H
     WD
 
-    При равенстве LEN.H - #FF зацикливание не производится
+    If LEN.H - #FF is equal, no looping is performed
 
-#49 Set FX Sample Loop End (*)
-    Установка конца цикла для текущего эффекта.
+# 49 Set FX Sample Loop End (*)
+    Sets the end of the loop for the current effect.
 
     SD LEN.L
-    SC #49
+    SC # 49
     WC
     SD LEN.M
     WD
     SD LEN.H
     WD
 
-#4A - #4F Зарезервированы.
+# 4A - # 4F Reserved.
 
-#51 - #5F Зарезервированы.
+# 51 - # 5F Reserved.
 
-#60 Get Song Position
-    Получение значения переменной Song_Position в текущем модуле.
+# 60 Get Song Position
+    Getting the value of the Song_Position variable in the current module.
 
-    SC #60
+    SC # 60
     WC
-    GD Song_Position  [#00..#FF]
+    GD Song_Position [# 00 .. # FF]
 
-  Можно интерпретировать как количество проигранных паттернов модуля.  Пос-
-ле старта модуля принимает значение 0  и  увеличивается  на  единицу  после
-проигрывания очередного паттерна.  Эта переменная может использоваться  для
-синхронизирования процессов в Спектруме с проигрыванием модуля.  Для  этого
-можно,  например,  в начале процедуры обработки прерывания сделать SC  #60,
-затем выполнить процедуры различных операций с экраном,  скроллинга строчек
-и т.п. (т.е. чтобы была достаточная для выполнения команды задержка), а за-
-тем прочитать значение порта 179 (GD Song_Position),  и сравнить его с тре-
-буемым и, в случае равенства, перейти на следующую часть демы, т.е.
+  Can be interpreted as the number of patterns played in the module. Pos-
+le the start of the module takes on the value 0 and increases by one after
+playing the next pattern. This variable can be used to
+synchronizing processes in the Spectrum with playing the module. For this
+you can, for example, make SC # 60 at the beginning of the interrupt handling routine,
+then perform the procedures of various operations with the screen, scrolling the lines
+etc. (that is, so that there is sufficient delay for the command to execute), and
+then read the value of port 179 (GD Song_Position), and compare it with the
+buoyant and, in case of equality, go to the next part of the demos, i.e.
 
-  if (Song_Position==My_Position)
+  if (Song_Position == My_Position)
   then goto Next_Part_Of_Demo
 
-#61 Get Pattern Position
-    Получение значения переменной Pattern_Position в текущем модуле.
+# 61 Get Pattern Position
+    Getting the value of the Pattern_Position variable in the current module.
 
-    SC #61
+    SC # 61
     WC
-    GD Pattern_Position  [#00..#3F]
+    GD Pattern_Position [# 00 .. # 3F]
 
-  Получить значение смещения в паттерне (текущий ROW), использование - ана-
-логично предыдущей команде, однако требуется заметить, что эта величина из-
-меняется довольно быстро, и поэтому
+  Get the offset value in the pattern (current ROW), use - ana
+logical to the previous command, however, it is required to note that this value is due to
+changes quite quickly, and therefore
 
- if (Pattern_Position>=My_Position) then goto Next_Part_Of_Demo
+ if (Pattern_Position> = My_Position) then goto Next_Part_Of_Demo
 
-#62 Get Mixed Position
-    Получить значение Pattern_Position, немного смешанной с Song_Position.
+# 62 Get Mixed Position
+    Get the Pattern_Position value mixed a little with Song_Position.
 
-    SC #62
+    SC # 62
     WC
     GD Mixed_Position
 
-    Mixed_Position: (по битам)
+    Mixed_Position: (bit by bit)
 
     7-Song_Position.1
     6-Song_Position.0
@@ -1088,15 +1089,15 @@ Note=
     1-Pattern_Position.1
     0-Pattern_Position.0
 
-  Т.е если получить Mixed_Position и сделать с ним AND #3F,   то  получится
-вылитый Pattern_Position,  а если после получения его немного RLCA,   RLCA,
-AND #02 - то это будут младшие два бита Song_Position. См. примечания к ко-
-мандам #60 и #61.
+  That is, if you get Mixed_Position and do AND # 3F with it, you get
+poured Pattern_Position, and if after receiving it a little RLCA, RLCA,
+AND # 02 - these will be the lower two bits of Song_Position. See notes to
+mandam # 60 and # 61.
 
-#63 Get Channel Notes
-    Получить ноты всех каналов модуля.
+# 63 Get Channel Notes
+    Get notes of all channels of the module.
 
-    SC #63
+    SC # 63
     WC
     GD Note_of_channel_0
     WN
@@ -1106,21 +1107,21 @@ AND #02 - то это будут младшие два бита Song_Position. �
     WN
     GD Note_of_channel_3
 
-  Если в каком-либо канале значение ноты изменилось с  последнего  исполне-
-ния команды #63, то бит 7 полученного заначения
+  If in any channel the note value has changed since the last performance
+command # 63, then bit 7 of the received value
 
             Note_of_channel_N
 
-будет в нуле, если же это значение то же самое, что и было раньше,  то этот
-бит будет в единице.  Младшие семь битов и есть собственно нота от 0 до 95;
-если это значение равно 127,  то это означает,  что никакие сэмплы в канале
-не играют. Данная команда предназначена в основном для построения на ее ос-
-нове различных анализаторов.
+will be at zero, but if this value is the same as before, then this
+the bit will be one. The least significant seven bits are the actual note from 0 to 95;
+if this value is 127, it means that no samples in the channel
+do not play. This command is intended mainly for building on its basis
+newer different analyzers.
 
-#64 Get Channel Volumes
-    Получить громкости всех каналов модуля.
+# 64 Get Channel Volumes
+    Get the volume of all channels of the module.
 
-    SC #64
+    SC # 64
     WC
     GD Volume_of_channel_0
     WN
@@ -1130,142 +1131,142 @@ AND #02 - то это будут младшие два бита Song_Position. �
     WN
     GD Volume_of_channel_3
 
-   См. описание команды #63
+   See command # 63 description
 
-#65 Jump to position (*)
-    Делает переход на заданную позицию.
+# 65 Jump to position (*)
+    Makes a transition to a given position.
 
     SD Position
-    SC #65
+    SC # 65
     WC
 
-#66 Set speed/tempo (*)
-    Установка скорости в пределах #01-#1F. При значениях #20-#FF устанавли-
-    вается темп проигрывания. Значения темпа соответствуют оригинальным при
-    скорости равной #06.
+# 66 Set speed / tempo (*)
+    Speed ​​setting within # 01- # 1F. For values ​​# 20- # FF, set
+    The playback tempo is set. The tempo values ​​correspond to the original ones when
+    speed equal to # 06.
 
-    SD Speed/Tempo
-    SC #66
+    SD Speed ​​/ Tempo
+    SC # 66
     WC
 
-#67 Get speed value (*)
-    Чтение текущей скорости.
+# 67 Get speed value (*)
+    Reading the current speed.
 
-    SC #67
+    SC # 67
     WC
     GD Speed
     WD
 
-#68 Get tempo value (*)
-    Чтение текущего темпа.
+# 68 Get tempo value (*)
+    Reading the current tempo.
 
-    SC #68
+    SC # 68
     WC
     GD Tempo
     WD
 
-#6A - #7F зарезервированы.
+# 6A - # 7F are reserved.
 
-#80 Direct Play FX Sample (#80..#83)
-    Проигрывание сэмпла в заданном канале.
-
-    SD Sample_Number
-    SC #80..#83 (Младшие биты определяют непосредственно номер канала, в
-                 котором требуется играть сэмпл) WC
-
-#88 Direct Play FX Sample (#88..#8B)
-    Проигрывание сэмпла в заданном канале с заданной нотой.
+# 80 Direct Play FX Sample (# 80 .. # 83)
+    Playing a sample in the specified channel.
 
     SD Sample_Number
-    SC #88..#8B (Младшие биты определяют непосредственно номер канала, в
-                 котором требуется играть сэмпл) WC SD Note [0..95] WD
+    SC # 80 .. # 83 (The least significant bits determine directly the channel number, in
+                 which you want to play the sample) WC
 
-#90 Direct Play FX Sample (#90..#93)
-    Проигрывание сэмпла в заданном канале с заданной громкостью.
+# 88 Direct Play FX Sample (# 88 .. # 8B)
+    Plays a sample in the specified channel with the specified note.
 
     SD Sample_Number
-    SC #90..#93 (Младшие биты определяют непосредственно номер канала, в
-                 котором требуется играть сэмпл)
+    SC # 88 .. # 8B (The least significant bits determine directly the channel number, in
+                 which you want to play the sample) WC SD Note [0..95] WD
+
+# 90 Direct Play FX Sample (# 90 .. # 93)
+    Playing a sample in a specified channel with a specified volume.
+
+    SD Sample_Number
+    SC # 90 .. # 93 (The least significant bits determine directly the channel number, in
+                 which you want to play the sample)
     WC
-    SD Volume [#00..#40]
+    SD Volume [# 00 .. # 40]
     WD
 
-#98 Direct Play FX Sample (#98..#9B)
-    Проигрывание сэмпла в заданном канале с заданной нотой и громкостью.
+# 98 Direct Play FX Sample (# 98 .. # 9B)
+    Plays a sample in a specified channel with a specified note and volume.
 
     SD Sample_Number
-    SC #98..#9B (Младшие биты определяют непосредственно номер канала,    в
-                 котором требуется играть сэмпл)
+    SC # 98 .. # 9B (The least significant bits determine directly the channel number, in
+                 which you want to play the sample)
     WC
     SD Note [0..95]
     WD
-    SD Volume [#00..#40]
+    SD Volume [# 00 .. # 40]
     WD
 
-#B0 - #F0 Зарезервированы.
+# B0 - # F0 Reserved.
 
-    Примечание: Команды, отмеченные как (*),  являются недокументированными
-    и в полной мере относятся только к версии 1.04.   На  работоспособность
-    этих команд в последующих версиях автор описания (2) ответственности не
-    несет.
-    2.Напоминаю, что регистры (их имена), упомянутые в этом описании, отно-
-    сятся только и только к внутренним регистрам GS и никакого отношения  к
-    регистрам основного процессора не имеют.
+    Note: Commands marked with (*) are undocumented
+    and fully apply only to version 1.04. For performance
+    these commands in subsequent versions, the author of the description (2) is not responsible
+    carries.
+    2. I remind you that the registers (their names) mentioned in this description are
+    only and only to internal GS registers and nothing to do with
+    registers of the main processor do not have.
 
 
-                           5. Heмнoгo лиpики...
+                           5. A few lyrics ...
 
-                         Автopы GS : ( 2 штуки ;)
+                         Autops GS: (2 pieces;)
 
-                          ─── Cлaвa Dangеrous ───
-                                 (X-Tradе)
+                          ─── Dangerous word ───
+                                 (X-Trade)
 
- Eму пpинaдлeжит идeя сoздaния GS'a, aппapaтнaя peaлизaция oнoгo, нeкoтopыe
-пoжeлaния oтнoситeльнo Soft'a GS'a,  a тaкжe Amiga 1200,  нa  кoтopoй  мнoю
-пpoизвoдились всячeскиe экспepимeнты.  Oн eдинстeнный и нeпoвтopимый пpoиз-
-вoдитeль General Sound'a и имeннo oн зaвeдуeт пpoизвoдствoм и пpoдaжeй GS.
+ It has the idea of ​​creating GS'a, the hardware implementation of it, some
+wishes regarding Soft'a GS'a, as well as the Amiga 1200, on which I
+There have been thousands of experiments. It is one-of-a-kind and irreparable
+is the driver of General Sound and it is he who takes over the production and sales of GS.
 
                               ─── Stingеr ───
 
- Этo я,  aвтop сeгo oпусa  и  пo-сoвмeститeльству  душa  и  сepдцe  General
-Sound'a.  Я  являюсь  paзpaбoтчикoм  всeгo  встpoeннoгo  Soft'a  в  GS'e  и
-пpeдпoлaгaю и дaльшe зaнимaться сим дeйствoм. (Дa,  я тaкжe являюсь aвтopoм
-нeкoтopыx xитpыx нaвopoтoв в aппapaтнoй чaсти GS'a,  и был бы  aвтopoм  eщe
-мнoгиx,  eсли бы нe был всe вpeмя сдepживaeм Cлaвoй,  пoстoяннo oзaбoчeнным
-пpoблeмaми пoнижeния цeны. )
+ This is me, the author of this opus and by the joint soul and heart of General
+Sound'a. I am the developer of all the built-in Soft'a in GS'e and
+I presume to continue to do this action. (Yes, I am also the author
+some tricky hacks in the hardware part of the GS'a, and would be the author of another
+many, if it were not for the whole time we hold on to the Word, constantly
+problems of price reduction. )
 
- Haписaв oкoлo 20 кб кoдa зa пoл-гoдa,  пpизaнaться,  я нeмнoгo устaл,   нo
-имeю дoвoльнo бoльшиe плaны oтнoситeльнo слeдующиx вepсий GS'a, кaк-тo:
+ Having written about 20 kb of the code for half a year, to practice, I was a little tired, but
+I have pretty big plans for the following GS versions, for example:
 
- - Wave 4 Sound Generators вoспpoизвoдящиx всe oктaвы.
- - Ускopeниe зa счeт oныx пpoцeнтoв нa 30-40 гeнepaции звукa.
- - Oчeнь xoтeлoсь бы пpoигpывaниe STM'oв oт PC.
- - Paзвитaя систeмa кoмaнд.
- - Paзличныe  спeцэффeкты  нaд  сэмплaми
- - Xpaнeниe пaттepнoв в  зaкoмпpeссoвaннoм  видe  (oстaeтся  oкoлo  15%  oт
-   изнaчaльнoгo oбьeмa).
- - И мнoгoe дpугoe
+ - Wave 4 Sound Generators that reproduce all octaves.
+ - Acceleration at the expense of these percentages for 30-40 sound generation.
+ - I would very much like to play STM'ov from PC.
+ - Advanced command system.
+ - Various special effects over samples
+ - Storage of patters in a pre-printed form (about 15% of the
+   the initial volume).
+ - And many other
 
- Bсe пpoгpaммнoe oбeспeчeниe  дoлжнo  paбoтaть  и  нa  пoслeдующиx  вepсияx
-пpoшивки,   eсли  oнo  нaписaнo  в  сooтвeтствии  с  мoими  вышeизлoжeнными
-пoжeлaниями и тpeбoвaниями.  Кpoмe oписaнныx кoмaнд в GS'e  сущeствуeт  eщe
-бoльшoe кoличeствo кoмaнд,  кoтopыe нe дoкумeнтиpoвaны,  и  я  oстaвляю  зa
-сoбoй  пpaвo  измeнять  иx  кaким-угoднo  oбpaзoм  и  тoлькo   oтнoситeльнo
-дoкумeнтиpoвaныx кoмaнд пpиeмлю зaкoнныe пpeтeнзии  типa:  "B  дoкумeнтaции
-нaписaнo тaк, a в пpoшивкe этo paбoтaeт пo дpугoму... "
+ ALL SOFTWARE SHOULD WORK ON FUTURE VERSIONS
+firmware, if it is written in accordance with my above
+wishes and requirements. In addition to the described teams in GS'e there are also
+a large number of teams who are not well-documented, and I leave for
+one has the right to change them in whatever way and only relative
+of the doocumented teams, I accept the legal prescriptions of the type: "In the docoument
+it is written so, but in the firmware it works in a different way ... "
 
- Я плaниpую знaчитeльнoe paсшиpeниe систeмы кoмaнд, и буду paд кoнстpуктив-
-ным (жeлaтeльнo кoнкpeтным) пpeдлoжeниям.
+ I am planning a significant expansion of the command system, and I will be glad to construct
+nym (desirably specific) offers.
 
-Taк чтo, eсли вы oзвучивaeтe игpушку или пишeтe музыкaльный peдaктop для GS
-и oбнapуживaeтe,  чтo вaм oчeнь нe xвaтaeт кaкoй-либo кoмaнды,  тo  звoнитe
-мнe и выскaзывaйтe пpeдлoжeния. (Teлeфoн, я думaю,  oсoбoгo тpудa узнaть нe
-сoстaвит ;)
+So what if you sound a toy or write a music editor for GS
+and find that you really do not have enough of any team, that is to ring
+me and make your suggestions. (Phone, I think it’s not a special job to recognize
+compose;)
 
                            Sanx 4 moral support:
-                              Димa (X-Trade)
+                              Dima (X-Trade)
                                SParker (XLD)
                  _________________________________________
 
-                               -= THE END =-
+                               - = THE END = -
 
