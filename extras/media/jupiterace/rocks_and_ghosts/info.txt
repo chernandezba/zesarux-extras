@@ -6,3 +6,6 @@ To load game use this command:
 More info:
 
 https://nihirash.itch.io/rocks-and-ghosts
+
+
+Note: You need at least 19 KB ram to load it
