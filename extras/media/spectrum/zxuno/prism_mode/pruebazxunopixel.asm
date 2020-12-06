@@ -29,6 +29,15 @@ enable_prism_mode:
         ld a,128
         out (c),a
         ret
+        
+enable_prism_mapping:
+        ld bc,64571
+        ld a,80
+        out (c),a
+        inc b
+        ld a,64
+        out (c),a
+        ret        
 
 disable_prism_mode:
         ld bc,64571
@@ -74,7 +83,7 @@ poke_vram:
 		di
 
 
-		call enable_prism_mode
+		call enable_prism_mapping
 
         ld a,(32770)
         call set_rom
@@ -245,7 +254,7 @@ putpixel_prism:
 		di
 
 
-		call enable_prism_mode
+		call enable_prism_mapping
 
         ;get color in c
         ld bc,(32771)
