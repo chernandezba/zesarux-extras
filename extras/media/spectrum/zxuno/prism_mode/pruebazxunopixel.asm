@@ -26,27 +26,41 @@ enable_prism_mode:
         ld a,80
         out (c),a
         inc b
-        ld a,128
+        in a,(c)
+        or 128
         out (c),a
         ret
-        
-enable_prism_mapping:
-        ld bc,64571
-        ld a,80
-        out (c),a
-        inc b
-        ld a,64
-        out (c),a
-        ret        
 
 disable_prism_mode:
         ld bc,64571
         ld a,80
         out (c),a
         inc b
-        xor a
+        in a,(c)
+        and 127
+        out (c),a
+        ret           
+        
+enable_prism_mapping:
+        ld bc,64571
+        ld a,80
+        out (c),a
+        inc b
+        in a,(c)
+        or 64
         out (c),a
         ret        
+
+disable_prism_mapping:
+        ld bc,64571
+        ld a,80
+        out (c),a
+        inc b
+        in a,(c)
+        and 255-64
+        out (c),a
+        ret
+     
 
 set_rom:
         ;bit bajo
@@ -93,7 +107,7 @@ poke_vram:
 
         ld (hl),a
 
-        call disable_prism_mode
+        call disable_prism_mapping
 
         ld a,3
         call set_rom
@@ -300,7 +314,7 @@ putpixel_prism_buc:
         ld a,3
         call set_rom
 
-        call disable_prism_mode
+        call disable_prism_mapping
 
         ei
 
