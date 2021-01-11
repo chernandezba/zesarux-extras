@@ -1,0 +1,64 @@
+Note: extract from chapter
+
+5.  TECHNICAL INFORMATION
+
+of
+
+Sinclair ZX Spectrum Emulator 'Z80' v4.00  -  6/3/99  -  by G.A. Lunter
+
+
+
+
+
+
+
+
+
+5.6  The SamRam
+
+
+    The SamRam contains a 32K static CMOS Ram chip, and some I/O logic for
+    port 31.  If this port is read, it returns the position of the
+    joystick, as a normal Kempston joystickinterface would.  If written to,
+    the port controls a programmable latch chip (the 74LS259) which
+    contains 8 latches:
+
+
+       Bit    7   6   5   4   3   2   1   0
+            ÚÄÄÄÂÄÄÄÂÄÄÄÂÄÄÄÂÄÄÄÂÄÄÄÂÄÄÄÂÄÄÄ¿
+       WRITE³   ³   ³   ³   ³  address  ³bit³
+            ÀÄÄÄÁÄÄÄÁÄÄÄÁÄÄÄÁÄÄÄÁÄÄÄÁÄÄÄÁÄÄÄÙ
+
+
+    The address selects on of the eight latches; bit 0 is the new state of
+    the latch.  The 16 different possibilities are collected in the diagram
+    below:
+
+        OUT 31,   ³  Latch  ³ Result
+        ÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+            0     ³    0    ³ Switch on write protect of CMOS RAM
+            1     ³    "    ³ Writes to CMOS RAM allowed
+            2     ³    1    ³ turn on CMOS RAM (see also 6/7)
+            3     ³    "    ³ turn off CMOS RAM (standard Spec.  ROM)
+            4     ³    2    ³ -
+            5     ³    "    ³ Ignore all OUT's to 31 hereafter
+            6     ³    3    ³ Select CMOS bank 0 (Basic ROM)
+            7     ³    "    ³ Select CMOS bank 1 (Monitor,...)
+            8     ³    4    ³ Select interface 1
+            9     ³    "    ³ Turn off IF 1 (IF1 rom won't be paged)
+           10     ³    5    ³ Select 32K ram bank 0 (32768-65535)
+           11     ³    "    ³ Select 32K ram bank 1 (32768-65535)
+           12     ³    6    ³ Turn off beeper
+           13     ³    "    ³ Turn on beeper
+           14     ³    7    ³ -
+           15     ³    "    ³ -
+
+    At reset, all latches are 0.  If an OUT 31,5 is issued, only a reset
+    will give you control over the latches again.  The write protect latch
+    is not emulated; you're never able to write the emulated CMOS ram in
+    the emulator.  Latch 4 pulls up the M1 output at the expansion port of
+    the Spectrum.  The Interface I won't page its ROM anymore then.
+
+
+
+

@@ -1,0 +1,10 @@
+Additional notes I (Cesar Hernandez) got talking with Gerton Lunter:
+
+Q: I assume your interface had 32 kB of ram, which you maped in the rom space
+
+A: "Yes, that’s right; I used a static 32k ram chip that I mapped into the 0-16kb range, twice.  One bank contained a modified copy of the original rom, the other contained the extensions mentioned in that bit of text."
+
+Q: But what about the shadow 32 k ram? I suppose this is where you stored the ramdisk and the screen buffers... But where does it come from? My guess is that you enabled the "unused" 32kb ram on all spectrums 48kb (the known story about Clive Sinclair buying  64kb defective chips, which only used half of the chip). So... do you enabled that “defective” half chip for your samram?
+
+A: "And yes, I indeed used the unused 32k bank of dynamic ram chips.  The original spectrum used defective chips (to cut costs, always a major focus of Clive Sinclair it seemed).  My own spectrum was a bit younger, and at that time I suppose not many chips were defective, so they just put regular chips in - mine had no bad bits."
+"
