@@ -8,3 +8,46 @@ Q: But what about the shadow 32 k ram? I suppose this is where you stored the ra
 
 A: "And yes, I indeed used the unused 32k bank of dynamic ram chips.  The original spectrum used defective chips (to cut costs, always a major focus of Clive Sinclair it seemed).  My own spectrum was a bit younger, and at that time I suppose not many chips were defective, so they just put regular chips in - mine had no bad bits."
 "
+
+---
+
+So, samram has 32kb of static ram than can be mapped on rom address (0-16383), and also uses 32kb of ram (from the unused defective chips) than can be mapped on 32768-65535
+
+I assume the 32kb of static ram preserve its contents after shutting down the machine. 
+In ZEsarUX, I treat these 32kb as if it were a rom, needs to be loaded from disk and can not be written
+
+
+Also, I discovered some new opcodes (only emulated, not real Z80 opcodes of course) that are used on Samram:
+
+-EDF9:
+
+LD A,(DE)   (from samram rom)
+LD (HL),A 
+INC E 
+INC H
+
+-EDFA:
+RAMBANK LD A,(HL)
+Not 100% sure:
+
+if (HL<32768) normal read
+if not, read unmapped ram block:
+-if mapped normal ram, read shadow ram
+-if mapped shadow ram, read normal ram
+
+-EDFB:
+RAMBANK LD (HL),A
+Not 100% sure:
+
+if (HL<32768) normal write
+if not, write to unmapped ram block:
+-if mapped normal ram, write to shadow ram
+-if mapped shadow ram, write to normal ram
+
+-EDFE:
+ROMPOKE HL,A
+
+Poke to normal ram
+
+
+
