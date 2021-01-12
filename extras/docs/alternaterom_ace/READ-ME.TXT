@@ -1,0 +1,39 @@
+This is an hybrid Collection, presenting 3 elements:
+ - The DOS based ACE32 emulator for imediate trial, under DosBox (OS free).
+ - The ACE ROM Documentation Project, after several versions not published.
+ - The ROM patch restoring a few of FORTH ACE non-inclusions due (whatever).
+
+Last mentioned, not the least, the Patched ROM restores the ACE in 3 ways.
+It is distributed under GPL-3 terms (expressed in GPL3.txt).
+
+1 - It restores CODE word 
+    This used to build Primary Words (as well as restoring the missing)
+2 - It replaces OVER word
+    OVER is a stack operator, a Primary word unfortunately turned Secondary
+3 - A few hacks on some hidden Secondaries 
+    Some words used in arithmetic need to be (code) Primaries. (30% faster)
+
+  ( For a fast tryout of SIEVE, under ACE32, press F5.      )
+  ( Or you may load the SPOOL.txt as keyb input, using F9.  )
+  ( Or even rename SPOOL, to rename and use the other one.  ) 
+
+What can we say? Change [2] demanded 3 bytes, could be done in hours.
+Not the case after the fact, we needed to get some space (40 years later).
+
+In the last 3 months, after years studying Both FORTH and the ACE, we
+manage to do what has been considered "impossible" (always a teaser).
+Naturally, we had time. Not all these years...free from shedules.
+
+In honnour of a dream, that could: The ACE
+___
+P.S. Beyond the importance of the ACE to me, thus honnouring it,
+     The ACE, its real history hidden in code, the environment
+     of people using it hints... to me is mirror of the world.
+     A lesson, of opportunities lost and more (not to say).
+
+     I may be suspicious saying this, as Conways "LIFE" was
+     an hint to much more, unspeakable. A lesson too!
+     ... So may you, looking (without prejudice).
+
+     Ha! Yes, FORTH is much more than just a Language.
+

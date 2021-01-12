@@ -1,0 +1,83 @@
+First, the support:
+
+ACE32 is a fair and small emulator. As a DOS program, runs where DosBox does.
+Not perfect, the downside is that it does not allow *all* ROM patches.
+
+Reason: it hacks a small section of code with the intent to fix RAMTOP to 32k, 
+thus overcoming an emulation limitation. Conveniences added make it our choice.
+Though limited to 32k, you can alter the RAMTOP ACE SysVar to smaller values.
+(You may wish to suffer the Jupiter with its 1k, allowing 900 bytes user space) 
+
+RAM changes will be efective after ABORT cleans the stacks, enforcing a new value.
+To note that ACE32 Documentation was altered to ease the debugger use, if desired.
+
+What to find 
+------------
+The reason for this pack is ACE+CODE.
+
+This ROM is fully compatible with the original, with a small correction 
+we had time to develop. The first is a correction Jupiter ACE author would
+had done, if he had time (we had time for that and more). 
+
+Thus you'll find 3 ROM files: Workable ACE.ROM, and two backups.
+These are named ACE_0.ROM and ACE_R.ROM (as DOS does not allow + on names)
+
+The differences
+---------------
+The difference of the two ROMS may seem small. Results are not.
+You may distinguish ACE+CODE from the original ACE-ROM with VLIST.
+    ACE+CODE will start with "FORTH CODE UFLOAT <...>  
+    ACE-ROM  will start with "FORTH UFLOAT <...>
+
+So you have a way to distinguish them, and a way to choose whish to use.
+    Just copy the desired one over ACE.ROM, overwriting the previous.
+    Fear not, ACE.ROM is already a copy (for now, of ACE+CODE)
+
+Different results
+-----------------
+Right away, everythind seems the same. Its not.
+
+ACE+CODE goes 7% faster (globaly), from 15.7xSpec to 16.8x Spec.
+ByteMag SIEVE Bench showed ACE-ROM as 12.4xSpectrum (realy 15.7x). 
+Thus Jupiter Cantab carefull announcement of "10x" (now corrected).
+
+ACE+CODE it now shows 17.5xSpec on SIEVE while being 16.8x by our mesures.
+What happened? ... Sieve is now less distorted, as we corrected OVER.
+
+There is still a bit of distortion, fortunately now near the real
+global value of speed, mesured with an equaly precise method but 
+more accurate when dealing with FORTH: The WEIGHT-3 method.
+
+Weight-3 is based on Words frequency use, while Sieve is limited on words.
+It just happened that OVER and < were used. That, the reason for the slip.
+Officially, 12.4 was rounded to a confortable "10x", not knowing to be 15.7x
+(These values consider general use.) Arithmetic work was not considered, as it
+depends on particular implementation routines, not on Language general speed)
+
+However, ACE+CODE is also 30% faster on "/" (division).
+Restoration (and built) of Primary words (as by loading the available Primaries Lib)
+is now cleanner with the CODE word readily available. 
+
+Hope you enjoy both, as we enjoyed the recover... and its chalenges.
+(To prove what was hidden in sight, is just a bonus. Believe not, understand instead.)
+
+How to test?
+-----------
+ACE32 has a simple mechanism to load correct text listings.
+On Normal mode, F9 reads SPOOL.TXT redirecting it to the keyboard
+at a pace compatible with the ACE scan speed. 
+
+If finding slow to load a file, temporarily enter Turbo-mode 
+(by using the number-keypad + key)... not forgetting to exit
+after load. DosBox will determine the available speed. 
+We advise 20000 cycles for correct emulation, and 80000 
+for the mentioned turbo-Speed on ACE32). 
+
+We have assume you'll be using DosBox, a very good emulator
+even for running emulators. Both working well in conjuction.
+An alternatively GUI emulator, the most correct is ZEsarUX.
+( You also have to rename and overwrite the rom,"ace.rom" )
+___
+# And on similar 4MHz, both Languages? 
+ACE+CODE is 18xSpectrum... and that is just this +CODE patch. 
+(On 3.25MHz, the 20x barrier has also been breached)
