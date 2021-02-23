@@ -1,0 +1,173 @@
+DivIDE programming model (v1.03)
+--------------------------------
+
+Pavel "Zilog" Cimbal (xcimbal@quick.cz)
+English rewritten by J. G. Harston
+Further corrections by Milos "baze" Bazelides
+
+
+The DivIDE interacts with the ZX Spectrum using I/O accesses or automatically
+by paging in external memory over the internal ROM when there is a CPU fetch
+from certain entry points. This automatic paging can be enabled and disabled.
+
+DivIDE contains 8 KB ROM/EPROM/EEPROM paged in at 0000h-1FFFh and 32 KB RAM
+paged in in 8 KB banks at 2000h-3FFFh. DivIDE can use the 3rd 8 KB bank of RAM
+for its system. Accidental writes to EEPROM can be disabled with an on-board
+link (E). If the current lower 8 KB is EEPROM and the link is removed, it can
+be reprogrammed in situ.
+
+The other link (A) should be always linked on Amstrad Spectrum models +2A/+3.
+
+All ports are decoded using low address lines A0..A7 only, so short I/O
+instructions (INI/INIR and OUTI/OTIR) can be used. All eight ATA command block
+registers are at addresses xxxx xxxx  101r rr11. Other DivIDE features are
+controlled with the DivIDE Control Register at address xxxx xxxx 1110 0011.
+
+
+ATA command block registers
+---------------------------
+
+xxxx xxxx  1010 0011, 0A3h, 163 - DATA REGISTER (R/W)
+
+This register is used to read and write data. It is 16 bits wide, so divIDE
+joins pairs of 8-bit writes into words and splits read words into bytes.
+
+When reading from this register each ODD access will return low byte of 
+read word, latching the high byte. Each EVEN access will return the latched
+high byte.
+
+When writing, each ODD access latches the byte as the low byte of the word
+to be written. Each EVEN access writes the peviously latched low byte with
+the byte written as the high byte.
+
+After any access to any other ATA register, or to the divIDE control
+register, any following data register access will be an ODD access. Accesses
+outside the divIDE ports do not change the ODD/EVEN state. After reset or
+power-on the ODD/EVEN state is undefined.
+
+xxxx xxxx  1010 0111, 0a7h, 167 - ERROR REGISTER (R) / FEATURES REGISTER (W)
+xxxx xxxx  1010 1011, 0abh, 171 - SECTOR COUNT (R/W)
+xxxx xxxx  1010 1111, 0afh, 175 - SECTOR NUMBER or LBA bits 0..7 (R/W)
+xxxx xxxx  1011 0011, 0b3h, 179 - CYLINDER LOW or LBA bits 8..15 (R/W)
+xxxx xxxx  1011 0111, 0b7h, 183 - CYLINDER HIGH or LBA bits 16..23 (R/W)
+xxxx xxxx  1011 1011, 0bbh, 187 - DRIVE/HEAD or LBA bits 24..28 (R/W)
+xxxx xxxx  1011 1111, 0bfh, 191 - STATUS REGISTER (R) / COMMAND REGISTER (W)
+
+For detailed desription of ATA command registers, see http://www.t13.org .
+
+
+DivIDE control register
+-----------------------
+
+xxxx xxxx 1110 0011, 0E3h, 227 - divIDE Control Register (Write Only)
+
+This register is write only. All bits are reset to '0' after each power-on.
+Unimplemented bits, marked 'X', should be written as zero for future
+compatibility divIDEs with more than 32K RAM.
+
+    7        6     5  4  3  2   1       0
+[ CONMEM , MAPRAM, X, X, X, X, BANK1, BANK0 ]
+
+BANK1 and BANK0 select which 8 KB bank is paged in at 2000h-3FFFh when divIDE
+memory is paged in. Bits 2 to 5 are reserved for accessing up to 512 KB of
+memory.
+
+Setting MAPRAM to '1' write protects RAM bank 3 and enables it to act as ROM.
+Bank 3 is paged in at 0000h-1FFFh either automatically upon reaching ROM entry
+point or instantly if the divIDE memory is already mapped. Once set to '1',
+MAPRAM can only be reset again with a power-on. RESET leaves it unchanged.
+MAPRAM can be overridden by setting CONMEM. That is, ROM/EPROM/EEPROM will be
+mapped to 0000h-1FFFh instead of bank 3.
+
+CONMEM instantly pages ROM/EPROM/EEPROM in at 0000h-1FFFh and RAM set with
+BANK 1..0 at 2000h-3FFFh, regardless of any automatic paging. Memory at
+2000h-3FFFh is always writable - even bank 3 if MAPRAM is active. Memory at
+0000h-1FFFh is writable if the write protect (E) link is removed and EEPROM
+is installed.
+
+To load a replacement ROM image you must do the following:
+
+ * Disable interrupts
+ * CALL 1FFBh ('RET') to reset automatic memory mapper
+ * Set CONMEM to override write protect
+ * load new code to 0000h-3FFFh
+ * Clear CONMEM, Set MAPRAM
+ * Enable interupts
+
+The values written to the control register can be summarised as follows:
+
+ * 00h-03h: When divIDE is activated the specified RAM bank will be paged in
+            at 2000h-3FFFh. Depending on MAPRAM state, either ROM/EPROM/EEPROM
+            or bank 3 will be mapped to 0000h-1FFFh.
+ * 40h-43h: When divIDE is activated, write protected bank 3 will be paged
+            in at 0000h-1FFFh, and the specified RAM bank will be paged in at
+            2000h-3FFFh (bank 3 is not writable).
+ * 80h-83h: Immediately page divIDE ROM/EPROM/EEPROM in at 0000h-1FFFh and the
+            specified RAM bank at 2000h-3FFFh (which is always writable).
+
+Note: While it is perfectly possible to set both CONMEM and MAPRAM by single
+instruction, firmware developers are advised not to use this combination
+as it may be used in future hardware revisions of divIDE to expand the function
+of the control register.
+
+
+Memory mapping
+--------------
+
+DivIDE memory can be mapped in instantly by setting CONMEM or automatically
+when the CPU fetches an opcode from an entry point. Automatic mapping only
+happens if EPROM/EEPROM is present, indicated with the the 'E' link being
+present, or if MAPRAM is set in the Control Register.
+
+Automatic mapping occurs at the begining of refresh cycle after fetching an
+opcode (after the M1 cycle) from 0000h, 0008h, 0038h, 0066h, 04C6h and 0562h.
+Mapping also occurs instantly when executing an opcode at 3D00h-3DFFh, 100 ns
+after the /MREQ falling edge.
+
+DivIDE memory is paged out in the refresh cycle of any instruction fetch
+from 1FF8h-1FFFh, referred to as the 'off-area'.
+
+The one-instruction delay can be used to distinguish between nested calls to
+the same place. To do this you should place different instructions at the
+entry point address than is in the original ROM. The first call will execute
+the original instruction, but any subsequent call will execute the
+instruction in the paged-in memory.
+
+This is particularly useful for avoiding nested NMI calls, which can not be
+easily implemented using hardware. It also allows the divIDE to use INTs for
+timing. When divIDE code is excuted, external calls will map divIDE out and
+continue at the original code at 0038h, but nested INTs can jump to
+different code.
+
+When automatic memory paging occurs, if MAPRAM is set, the write-protected
+RAM bank 3 is paged in at 2000h-3FFFh.
+
+Memory at 0000h-3FFFh is as follows:
+
+CONMEN set:
+
+0000h-1FFFh - EEPROM/EPROM/NOTHING (if empty socket), writable if 'E' link
+              absent
+2000h-3FFFh - 8K RAM selected by BANK bits, always writable.
+
+CONMEM clear, MAPRAM set, entrypoint executed:
+
+0000h-1FFFh - Bank 3, read-only
+2000h-3FFFh - 8K RAM selected by BANK bits. Writable, unless bank 3.
+
+CONMEM clear, MAPRAM clear, entrypoint executed:
+
+0000h-1FFFh - EEPROM/EPROM/NOTHING (if empty socket), read-only.
+2000h-3FFFh - 8K RAM selected by BANK bits, always writable.
+
+Otherwise there is normal Spectrum memory layout.
+
+
+Final words
+-----------
+
+It might sound complex but it's actually not if you try reading it again.
+Feel free to ask me (Zilog) at xcimbal@quick.cz. I hope you will enjoy this
+piece of hardware, I have spent months optimising it.
+
+Zilog
