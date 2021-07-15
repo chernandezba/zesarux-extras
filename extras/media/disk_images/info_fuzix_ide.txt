@@ -1,0 +1,1 @@
+fuzix_ide.zip es una imagen ide comprimida (de 128 MB) para que ocupe mucho menos
