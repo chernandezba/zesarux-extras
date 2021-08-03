@@ -1,0 +1,61 @@
+Estructura memoria
+
+4 vram nuevas de 8kb. Implementadas como
+Bram en zxuno
+
+Se paginan los 8kb de una de las 4 vram en segmento 4000-5fff
+
+
+Paginación
+
+Mediante los bits de rom de +2A: si se selecciona rom X, se selecciona vram X en segmento 4000-5fff
+
+
+Modo vídeo
+
+Estructura lineal igual que spectrum. 16 colores de paleta spectrum 
+Vram0 define el bit más bajo del color de cada bit, vram1 define el bit 1 del color, vram2 define el bit 2, y vram3 define el bit 3
+
+Paleta de colores
+
+16 colores simultáneos de una paleta de XX bits (total NN colores). En ZEsarUX se usará una paleta de 15 bits (5 bits por componente) por limitaciones del propio emulador, es más, será la misma paleta usada en la emulación de ZX Evo TSConf.
+
+Registros ZX Uno
+
+$50 P|V|U|U|I3|I2|I1|I0
+    I=palette index
+    U=unused
+    V=enable VRAM paging. 1=Enabled. 0=Disabled
+    P=show Prism mode. 1=Enabled. 0=Disabled. En ZEsarUX se puede también asignar una tecla F para conmutar este bit
+$51 palette value
+      first write RED
+      second write GREEN
+      third write BLUE (autoincrement index)
+
+
+
+Color de borde
+IxxxxGRB puerto FE
+3xxxx210 ordenación bits
+
+Paleta por defecto
+IGRB  color      puro    real
+0000  negro      000000  060800
+0001  azul       0000C0  0D13A7
+0010  rojo       C00000  BD0707
+0011  magenta    C000C0  C312AF
+0100  verde      00C000  07BA0C
+0101  cyan       00C0C0  0DC6B4
+0110  amarillo   C0C000  BCB914
+0111  blanco     C0C0C0  C2C4BC
+1000  negro b    606060  64665E
+1001  azul b     0000FF  161CB0
+1010  rojo b     FF0000  CE1818
+1011  magenta b  FF00FF  DC2CC8
+1100  verde b    00FF00  28DC2D
+1101  cyan b     00FFFF  36EFDE
+1110  amarillo b FFFF00  EEEB46
+1111  blanco b   FFFFFF  FDFFF7
+
+
+
