@@ -3013,6 +3013,7 @@ L1859:          LD      A,(BORDCR)
                 RET
 
 ;=============================================================================
+L186D:
 
 READ_SECTOR:    CALL    L1720           ;RUTINA QUE CARGA UN SECTOR?
                 EX      AF,AF'          ;Aparentemente A=indica nr. sector
