@@ -5,9 +5,9 @@ Puerto FF
 
 Lectura:
 
-
-Bit 3: A 0 si se abre la tapa 
-Bit 2: A 0 si no hay cinta
+Bit 6: A 1 si grabador encendido
+Bit 3: A 1 si se abre la tapa
+Bit 2: A 1 si hay cinta insertada
 
 Escritura:
 

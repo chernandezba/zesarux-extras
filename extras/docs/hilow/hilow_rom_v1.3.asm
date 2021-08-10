@@ -889,7 +889,7 @@ L0742:          PUSH    HL
                 CALL    L10C0
                 RET
 
-L0768:          LD      A,$7F           ; Esta rutina testea BREAK (NC)
+L0768:          LD      A,$7F           ; Esta rutina testea BREAK (NC) y también symbol shift
                 IN      A,($FE)         ; y ejecuta el sonido característico
                 RRA                     ; cuando se cancela algo.
                 JR      NC,L0777
