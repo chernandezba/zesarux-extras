@@ -1,0 +1,26 @@
+Información preliminar puerto control Data drive:
+
+Puerto FF
+
+
+Lectura:
+
+
+Bit 3: A 0 si se abre la tapa 
+Bit 2: A 0 si no hay cinta
+
+Escritura:
+
+Parece que van controlados mediante valores de comando:
+
+00H: ??
+22H: ??
+26H: leer sector??
+28H: cancelacion?? fin de operacion??
+
+80H: Format?
+A8H: ??
+
+
+Bit de valor 08H tambien parece tener algo que ver
+Puede que esos comandos sea combinacion de bits
