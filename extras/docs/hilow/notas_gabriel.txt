@@ -1,0 +1,49 @@
+From Carlos Galucci
+	•	los grabadores que usamos eran partes de una computadora de la epoca llamada Coleco. 
+	•	La cinta en si era un cassette estandar, aunque habia que hacerle un cortecito para que entrara en el driver. 
+	•	Para leer esas cintas y recuperar los datos, se necesitaria un grabador similar ya que tanto los cabezales como la velocidad de la cinta era propia de esos aparatos.  
+	•	El modo de grabacion tambien era diferente al usado por la Spectrum. 
+	•	La cinta debia ser formateada antes de usar. En el proceso de formateo el sistema grababa marcas en la cinta que eran despues usadas para encontrar los sectores.  
+	•	El comienzo de la cinta tenia un directorio con los nombres de los archivos y una lista de sectores a donde el Datadrive iba a buscar paquetes de datos que, una vez armados, recuperaban el archivo original. 
+	•	Justamente la parte del proyecto que estuvo a mi cargo fue el desarrollo de las funciones de formateo de cinta, creacion de directorios, etc. etc. (lo que vendria a ser el file system). Una cosa interesante del Datadrive era que los comandos se le enviaban a traves del comando "Save" nativo de Spectrum. 
+	•	Las cintas no fueron grabadas en un grabador convencional sino en uno propietario de Coleco. 
+	•	La cinta se grababa en ambas caras pero no dando vuelta el cassette sino que tenia dos cabezales paralelos seleccionables electronicamente. Nuestro driver decidia cual cabeza trabajaba en cada momento. 
+	•	Es posible que puedas recuperar el audio con un grabador convencional un lado por vez y despues rearmarlo (tal vez en dos canales de audio) tomando en cuenta que uno de los lados debe invertirse. Va a ser complicado "alinear" los dos lados... 
+	•	Una vez leidos los datos, el problema de interpretarlos no es menor. En los grabadores la velocidad de la cinta es fija y constante; en estos sin embargo, es variable y sobre todo poco constante (mucho error etn la velocidad) Estos grabadores no tenian el cabrestante que es el que regula la velocidad en los grabadores convencionales, sino que la cinta se movia segun la velocidad con que giraran los motores. Para nada constante si se considera que, ademas de ser en si mismo poco exacto, el diametro de la cinta enrollada va cambiando. 
+	•	Otro problema es la forma en la que se grabaron los datos. Las cintas que grababa Spectrum codificaban los 0s y los 1s con dos frecuencias. No podia ir muy rapido ya que cada 0 y cada 1 tenia que tener cierta duracion para que se pudiera detectar su frecuencia. En nuestro caso, en vez de grabar frecuencias (alternando rapidamente entre + y - al cabezal de grabacion), usamos directamente el + para el 1 y el - para el 0. Con ese metodo no se pueden grabar-leer mas de unos pocos bits antes de perder el sincronismo. 
+	•	Lo que hicimos fue grabar señales de inicio de byte (creo que era una frecuencia) y una señal de fin de byte. El programa leia la señal y podia detectar a que velocidad se estaba moviendo la cinta en ese instante. Con ese dato temporizaba para leer 8 bits y repetia el proceso para cada byte. De ese modo, las variaciones de velocidad no afectaban la grabacion-lectura. Como podras imaginar, a la hora de convertir eso a audio, no vas a encontrar un patron que se repita sino una serie de pulsos de distinta duracion. 
+	•	Las cintas tenian, al comienzo, un directorio con determinado formato donde para cada archivo habia informacion de su ubicación en la cinta. La cinta estaba dividida en sectores y los archivos se dividian en varios sectores no necesariamente contiguos. Ademas, a medida que se grababa un archivo, se pasaba de un lado a otro (un cabezal a otro) para optimizar el uso de la cinta y minimizar el tiempo de acceso. 
+Tape format
+Side A
+A few sectors, only the first ones contain data, the rest are formatted but empty:
+
+￼
+An empty sector:
+￼
+
+A sector with data (but padded with zeros):
+￼
+
+Beginning of sector:
+￼
+~2 seconds of 2ms/500Hz pulses. Side B has silence here - this could be used to align sides A and B.
+
+
+Inside a sector: header and then data (zeros)?
+￼
+
+The “header” has data between three short lower-frequency bursts (middle one highlighted):
+￼
+These also seem to be present in Side B - this could be used to align sides A and B.
+
+
+
+Data in the empty sector (zeros?):
+￼
+Each “group” is ~8ms. It contains
+	•	The “big drop” (~2ms) ==> byte mark? 
+	•	8 peaks and valleys (~6ms) ==> the 8 bits in a byte? 
+
+A few “zeros” and a few non-zeros:
+￼
+
