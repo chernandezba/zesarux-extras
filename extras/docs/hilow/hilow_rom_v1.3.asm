@@ -672,9 +672,9 @@ L05D9:          CALL    L06FC
 L05E0:          DEC     A
                 JP      Z,L0032
                 DEC     A
-                JP      Z,L0622
+                JP      Z,L0622  ;directorio lleno
                 LD      A,$03
-                CALL    L09A8
+                CALL    L09A8   ;sin lugar en la cinta
                 RST     30H
 
 L05EE:          XOR     A
@@ -698,7 +698,7 @@ L0610:          LD      IX,(L3F2B)
                 CALL    L077B
                 RST     30H
 
-L0622:          LD      A,$04
+L0622:          LD      A,$04   ;Directorio lleno
                 CALL    L09A8
                 RST     30H
 
@@ -736,7 +736,7 @@ L065C:          LD      IX,L3F19
 L0660:          CALL    L0DC7
                 JP      Z,L113E
                 CALL    L097A
-                CALL    NZ,L09A3
+                CALL    NZ,FILE_NOT_FOUND ;Archivo no encontrado
                 RST     30H
 
 L066D:          SLA     B
@@ -832,7 +832,7 @@ L06F3:          LD      A,(HL)
                 SCF
                 RET
 
-L06FC:          CALL    L0947
+L06FC:          CALL    L0947    ;?leer sector 0
 L06FF:          CALL    L1F46           ;Esta parte aparentemente salva
                 JR      NZ,L0724        ;un bloque de bytes cuyos datos
                 LD      A,$01           ;son los siguientes:
@@ -1034,7 +1034,7 @@ L085D:          PUSH    HL
 L086B:          PUSH    HL
                 LD      HL,L3EF9
                 RES     2,(HL)
-                JP      L05D9
+                JP      L05D9    ;aqui se salta al hacer un save...
 
 ; Esta rutina formatea/recupera un cassette...
 
@@ -1130,6 +1130,7 @@ TEST_DOOR:      XOR     A
                 SCF                     ;NZ=tapa abierta/no hay cassette
                 RET
 
+;Leer sector 0?
 RD_SECTCAT:     PUSH    IX
                 XOR     A
                 INC     A
@@ -1152,6 +1153,7 @@ INSERT_TAPE:    CALL    W_SOUND         ;Esta rutina pide que se inserte
                 RRA
                 RET
 
+;Aparentemente leer sector 0
 L0947:          CALL    TEST_OFF
                 CALL    TEST_DOOR
                 CALL    Z,INSERT_TAPE
@@ -1227,7 +1229,8 @@ L099A:          INC     DE
                 DJNZ    L0989
                 RET
 
-L09A3:          LD      A,$02
+;L09A3
+FILE_NOT_FOUND: LD      A,$02    ;Imprime error de archivo no encontrado
                 CALL    W_SOUND
 L09A8:          RST     28H
                 CALL    L09AF
@@ -1294,7 +1297,7 @@ L0A0E:          XOR     A
                 CALL    L0947
                 CALL    L1F46
                 POP     IX
-                JP      NZ,L0A6E
+                JP      NZ,L0A6E   ;?Archivo no encontrado
                 LD      A,(HL)
                 CP      (IX+0)
                 JR      Z,L0A2E
@@ -1338,7 +1341,7 @@ L0A68:          CALL    W_SOUND_SPC
                 DEFW    E_BREAKPRG
 
 L0A6E:          CALL    L119E
-                CALL    L09A3
+                CALL    FILE_NOT_FOUND ;Archivo no encontrado
                 POP     HL
                 POP     HL
                 POP     HL
@@ -1514,7 +1517,7 @@ L0B7B:          INC     H               ;Esta rutina retorna en HL la dir.
                 LD      H,A
                 RET
 
-L0B8A:          CALL    L09A3
+L0B8A:          CALL    FILE_NOT_FOUND ;Archivo no encontrado
                 XOR     A
                 LD      (L3EF6),A
                 JP      BREAKCONT
@@ -1652,12 +1655,12 @@ L0C71:          LD      A,(L3EF3)
                 AND     A
                 JR      Z,L0C85
                 CP      $03
-                JR      NC,L0C7F
+                JR      NC,L0C7F  ;indicamos direccion de cinta de tipo CODE
 L0C7B:          LD      A,$06
                 RST     10H
                 RET
 
-L0C7F:          LD      DE,MSCAT3
+L0C7F:          LD      DE,MSCAT3   ;Indicamos direccion de cinta de tipo CODE
                 RST     20H
                 JR      L0C90
 
@@ -1914,7 +1917,7 @@ L0E8B:          CALL    W_SOUND
 L0EB5:          CALL    L1F46
                 JR      Z,L0EC0
 
-L0EBA:          CALL    L09A3
+L0EBA:          CALL    FILE_NOT_FOUND ;Archivo no encontrado
                 JP      BREAKCONT
 
 ;-----------------------------------
@@ -2339,7 +2342,7 @@ L113E:          CALL    L0947
                 LD      A,(L380B)
                 CP      $FF
                 JR      NZ,L114C
-L1148:          CALL    L09A3
+L1148:          CALL    FILE_NOT_FOUND ;Archivo no encontrado
                 RST     30H
 
 L114C:          CALL    L11A1
@@ -3028,6 +3031,11 @@ READ_SECTOR:    CALL    L1720           ;RUTINA QUE CARGA UN SECTOR?
                 LD      DE,$0000        ;a los 2 directorios.
                 EX      DE,HL           ;IX creo que apunta a la dirección
                 ADD     HL,SP           ;en donde cargar los 2048 bytes.
+
+;IX parece que tiene la longitud final donde guardara los datos, pero no siempre, por ejemplo:
+;En LOAD ".nombre" screen$, IX vale 16384
+;En un SAVE " ", que lee el sector 0, pero IX vale 5CD2H
+
                 EX      DE,HL
                 EXX                     ;Y retornaría con A=0 el resultado
                 EX      AF,AF'          ;de la lectura, según la siguiente
@@ -3536,19 +3544,20 @@ L1C91:          LD      IX,L3D65
                 CALL    L1726
                 RET
 
-L1CA2:          LD      HL,L380B
+;Busca archivo en directorio
+L1CA2:          LD      HL,L380B   ;Contiene byte tipo archivo+nombre de la entrada de directorio del sector 0?
 L1CA5:          PUSH    IX
                 POP     DE
                 INC     DE
                 INC     DE
                 LD      A,(HL)
-                CP      $FF
+                CP      $FF    ;FF=tipo archivo borrado?
                 JR      Z,L1CC0
-                INC     HL
-                INC     HL
+                INC     HL  ;aparentemente se salta el tipo, ok
+                INC     HL  ;pero tambien se salta primer caracter??
                 PUSH    HL
                 LD      B,$09
-                CALL    L1CC6
+                CALL    L1CC6   ;Le envia a comparar 9 bytes?? Desde el segundo caracter de la entrada de directorio, comparando respecto al comando LOAD ".A12..." desde la A
                 POP     HL
                 JR      Z,L1CC2
                 LD      DE,$002B
@@ -3563,7 +3572,7 @@ L1CC2:          DEC     HL
                 LD      A,(HL)
                 RET
 
-L1CC6:          LD      A,(DE)
+L1CC6:          LD      A,(DE) ;Aparentemente en DE , para un LOAD ".A012345678" solo vemos ".A01234567" o sea falta 1 caracter?
                 SUB     (HL)
                 RET     NZ
                 INC     HL
