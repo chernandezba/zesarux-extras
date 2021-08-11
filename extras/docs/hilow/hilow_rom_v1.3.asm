@@ -2754,6 +2754,13 @@ L16BF:          DJNZ    L16BF
 
                 LD      B,H             ; ¡¿?!
 
+
+;quiza escribir sector?
+; IX=inicio datos
+; DE=longitud datos
+; A= sector
+
+
 L16D0:          PUSH    AF
                 PUSH    IX
                 PUSH    DE
@@ -3262,8 +3269,9 @@ L1A54:          LD      A,$28
                 OUT     (HLWPORT),A
                 JP      L1859
 
-DD_FORMAT:      CALL    L1720
-                CALL    L1D88
+L1A5B:
+DD_FORMAT:      CALL    L1720    ;mostrar logos y textos
+                CALL    L1D88    ;mostrar logos y textos
                 EXX
                 LD      DE,$0000
                 EX      DE,HL
@@ -3310,7 +3318,7 @@ L1AC0:          LD      C,$36
                 CALL    L157C
                 LD      H,$00
                 LD      E,$01
-                CALL    L1BDA
+                CALL    L1BDA   ; por aqui se cambian colores del border...
                 LD      A,(L3D6D)
                 LD      H,A
                 LD      E,$04
@@ -3318,7 +3326,7 @@ L1AC0:          LD      C,$36
                 LD      IX,$0000
                 LD      DE,$0800
                 LD      A,(L3D6D)
-                CALL    L16D0
+                CALL    L16D0     ;escribir sector? IX=inicio direccion, DE=longitud, A=sector?
                 LD      HL,L3D6D
                 INC     (HL)
                 LD      A,(HL)
