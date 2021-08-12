@@ -1684,7 +1684,7 @@ L0C9B:          LD      E,(IX+11)
                 CALL    L068C
                 CP      $1A
                 JR      C,L0CAF
-L0CAC:          RST     18H
+L0CAC:          RST     18H           ;Por qué este error? Devuelve un B Integer out of range
                 DEFW    E_OUTRANGE
 
 L0CAF:          LD      C,A
