@@ -11,3 +11,6 @@ PRUEBA
 hay que cargar con
 
 LOAD ".RUEBA"
+
+
+- para formatear, despues de quitar cinta y poner, pulsar symbol shift para seleccionar opciones
