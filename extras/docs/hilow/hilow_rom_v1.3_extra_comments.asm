@@ -1107,7 +1107,7 @@ L08EF:          LD      A,$BF           ;sin tener que preparar una cabecera,
 
 L08F7:          IN      A,(HLWPORT)
                 BIT     3,A
-                JP      Z,BREAKCONT
+L08FB:          JP      Z,BREAKCONT
 L08FE:          PUSH    IX
                 LD      BC,(L3800)
                 INC     BC
