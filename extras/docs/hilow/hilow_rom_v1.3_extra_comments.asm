@@ -1114,7 +1114,7 @@ L08FE:          PUSH    IX
                 LD      (L3800),BC
                 XOR     A
                 CALL    EX_RDSECT
-                POP     IX
+L090D:          POP     IX
                 RET
 
 L0910:          CALL    L08F7
@@ -1136,7 +1136,7 @@ RD_SECTCAT:     PUSH    IX
                 INC     A
                 LD      A,$00
                 SCF
-                CALL    EX_RDSECT
+L0931:          CALL    EX_RDSECT
                 POP     IX
                 RET
 
@@ -1306,7 +1306,7 @@ L0A0E:          XOR     A
                 JP      LOAD_NMI
 
 L0A2E:          LD      (L3F2B),HL
-                LD      BC,$0011
+                LD      BC,$0011  ; Transferir cabecera ??
                 ADD     IX,BC
                 PUSH    IX
                 POP     DE
@@ -3652,7 +3652,7 @@ L1D44:          POP     DE
                 PUSH    AF
                 PUSH    DE
                 CALL    READ_SECTOR
-                AND     A
+L1D52:          AND     A
                 JR      NZ,L1D59
                 POP     DE
                 POP     DE
