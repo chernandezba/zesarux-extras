@@ -1,3 +1,6 @@
+; Este código contiene comentarios agregados por César Hernández Bañó,
+; en su labor de poder emular el dispositivo
+
 ; #########################################################################
 ; #                                                                       #
 ; #                        NOTAS ABRIL / 2019                             #
