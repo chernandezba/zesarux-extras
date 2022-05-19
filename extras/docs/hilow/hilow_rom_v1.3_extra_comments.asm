@@ -1551,10 +1551,10 @@ L0B94:          LD      A,$0D
                 LD      A,$41
                 RST     10H
                 LD      BC,(L3800)      ; ==> NRO. DE ACTUALIZACIONES
-NOTA1:          BIT     7,B
+NOTA1:          BIT     7,B   ;Si numero de actualizaciones/usage es > 32767, hacer ruido
                 CALL    NZ,W_SOUND_SPC
-                CALL    NZ,L1009
-                BIT     2,B
+                CALL    NZ,L1009 ; y parpadeo
+                BIT     2,B   ;Si bit 2 de nibble alto, mostrar parpadeo
                 CALL    NZ,L1009
                 RES     7,B
                 RST     18H
