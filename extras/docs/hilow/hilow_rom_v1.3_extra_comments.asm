@@ -789,6 +789,7 @@ L06AF:          LD      BC,$002D
                 JR      NZ,L06AF
                 RET
 
+;Aqui se llama al borrar archivos, para liberar todos sus sectores usados
 L06BA:          LD      DE,$0011
                 PUSH    HL
                 ADD     HL,DE
@@ -796,7 +797,7 @@ L06BA:          LD      DE,$0011
                 POP     HL
                 LD      DE,$0012
                 ADD     HL,DE
-L06C5:          LD      A,(HL)
+L06C5:          LD      A,(HL)   ;Sector usado por un archivo?
                 PUSH    HL
                 PUSH    BC
                 CALL    L06D1
@@ -806,22 +807,24 @@ L06C5:          LD      A,(HL)
                 DJNZ    L06C5
                 RET
 
+;Agregar un sector a la tabla de sectores disponibles
+;Entrada: A=sector a agregar
 L06D1:          PUSH    AF
-                LD      A,(L3BF3)
+                LD      A,(L3BF3)   ;probablemente esto indica sectores libres
                 LD      D,$00
                 LD      E,A
                 INC     A
                 LD      (L3BF3),A
                 POP     AF
-                LD      HL,L3BF5
+                LD      HL,L3BF5    ;inicio de la tabla de sectores libres
                 ADD     HL,DE
                 PUSH    HL
                 POP     DE
                 INC     DE
 L06E4:          LDD
-                CP      (HL)
-                JR      C,L06E4
-                LD      (DE),A
+                CP      (HL)     ;comparar con el sector a agregar
+                JR      C,L06E4  ;en cuanto el valor de memoria es menor o igual que A, se detiene. El inicio de esta tabla debe ser 0 siempre
+                LD      (DE),A   ;aunque el sector 0 no se usa para archivos
                 RET
 
 L06EB:          LD      B,$16
@@ -898,7 +901,7 @@ L0768:          LD      A,$7F           ; Esta rutina testea BREAK (NC) y tambi�
                 JR      NC,L0777
                 RRA
                 JR      C,L0768
-                CALL    L1079
+                CALL    W_SOUND_ACE
                 SCF
                 RET
 
@@ -1041,6 +1044,7 @@ L086B:          PUSH    HL
 
 ; Esta rutina formatea/recupera un cassette...
 
+L0874:
 FORMAT:         CALL    L11A1           ;Borra pantalla
                 CALL    L1198           ;Abre canal #2
                 LD      A,(IX+2)
@@ -1490,7 +1494,7 @@ L0B5A:          LD      A,$7F
                 RRA
                 RRA
                 JR      C,L0B34
-                CALL    L1079
+                CALL    W_SOUND_ACE
                 EX      AF,AF'
                 LD      A,$00
                 RST     28H
@@ -1739,7 +1743,7 @@ L0D5B:          LD      A,$EF
                 RET     Z
                 BIT     1,A
                 JR      NZ,L0D5B
-                CALL    L1079
+                CALL    W_SOUND_ACE
                 LD      B,C
                 AND     A
                 RET
@@ -2216,7 +2220,7 @@ W_SOUND_SPC:    CALL    SAVE_REGS       ;Emite el sonido de cancelación
                 LD      HL,$3500
                 JR      L105E
 
-L1079:          CALL    SAVE_REGS       ;Emite el sonido de aceptación
+W_SOUND_ACE:    CALL    SAVE_REGS       ;Emite el sonido de aceptación
                 LD      B,$96           ;cuando se presiona SHIFT
                 LD      HL,$2100
                 JR      L105E
@@ -2761,7 +2765,7 @@ L16BF:          DJNZ    L16BF
                 LD      B,H             ; ¡¿?!
 
 
-;quiza escribir sector?
+;quiza formateo sector?
 ; IX=inicio datos
 ; DE=longitud datos
 ; A= sector
@@ -2898,13 +2902,13 @@ L17A8:          LD      A,C
                 CALL    RETARDO
 L17B0:          IN      A,(HLWPORT)
                 BIT     0,A
-                JR      Z,L17D0
+L17B4:          JR      Z,L17D0
                 EXX
                 DEC     C
                 LD      A,C
                 EXX
                 AND     A
-                JP      Z,L1A33
+L17BB:          JP      Z,L1A33   ;error en la cinta
                 XOR     A
                 OUT     (HLWPORT),A
                 CALL    RETARDO
@@ -2918,7 +2922,9 @@ L17B0:          IN      A,(HLWPORT)
 L17D0:          SCF
                 RET
 
+L17D2:
 RETARDO:        LD      HL,RETARDO1
+L17D5:
 L_RETARDO:      DEC     HL
                 LD      A,H
                 OR      L
@@ -3294,13 +3300,13 @@ DD_FORMAT:      CALL    L1720    ;mostrar logos y textos
                 INC     HL
                 INC     HL
                 LD      DE,L3802
-                LD      BC,$0009
+                LD      BC,$0009 ;escribir label?
                 LDIR
                 LD      HL,L380B
                 LD      DE,L380C
-                LD      BC,$0509
+                LD      BC,$0509 ;inicializar directorio
                 LD      (HL),$FF
-                LDIR
+L1A81:          LDIR
                 LD      HL,$0000
                 LD      (L3BF3),HL
                 LD      (L3800),HL
@@ -3312,7 +3318,7 @@ DD_FORMAT:      CALL    L1720    ;mostrar logos y textos
                 CP      $3F
                 JP      Z,L1C19
                 CALL    L1BE6
-                LD      A,(L3EF9)
+L1AA1:          LD      A,(L3EF9)
                 BIT     0,A
                 JR      Z,L1AB5
                 LD      C,$32
@@ -3383,7 +3389,7 @@ L1B42:          CALL    L1830
                 LD      C,$26
                 LD      A,L
                 CP      $04
-                JP      NC,L1A47
+L1B4C:          JP      NC,L1A47  ;Cinta no sirve
                 CALL    L1BA6
                 LD      HL,L3BF3
                 LD      A,$01
@@ -3436,15 +3442,15 @@ L1BA6:          LD      (L3D6E),A
                 AND     A
                 CALL    L1A2D
                 CALL    L1726
-                RET     NC
+L1BBC:          RET     NC
                 LD      IX,$0000
                 LD      DE,$0800
                 LD      A,(L3D6E)
                 AND     A
                 CALL    L1726
-                RET     NC
+L1BCB:          RET     NC
                 LD      A,(L3D6E)
-                LD      HL,L3BF3
+                LD      HL,L3BF3   ;Ultimo sector disponible?
                 INC     (HL)
                 LD      B,$00
                 LD      C,(HL)
@@ -3846,7 +3852,7 @@ L380B:          EQU     LAST_BYTE+$180B
 L380C:          EQU     LAST_BYTE+$180C
 L3BF1:          EQU     LAST_BYTE+$1BF1
 L3BF2:          EQU     LAST_BYTE+$1BF2
-L3BF3:          EQU     LAST_BYTE+$1BF3
+L3BF3:          EQU     LAST_BYTE+$1BF3 ;sectores disponibles
 L3BF5:          EQU     LAST_BYTE+$1BF5
 L3D14:          EQU     LAST_BYTE+$1D14 ;Aqui se guarda el contenido previo de la RAM
                                         ;a partir de LFFC4 cuando va a ser necesario

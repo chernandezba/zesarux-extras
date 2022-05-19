@@ -99,24 +99,25 @@ Para ello se usan las teclas de subir y bajar, se presiona SYMBOL SHIFT y luego 
 
 Borrado de ficheros:
 
+Desde menu
 SAVE " ERASE "            ---> (ERASE es el TOKEN no la palabra)
+o
 SAVE "|"
+
+symbol para borrar cada archivo. luego espacio finalizar. symbol de nuevo para confirmar / espacio cancela
+
+
+Indicando el nombre
 SAVE " ERASE programa"
+o
 SAVE "|programa"
 
 ==================================================================
 
 CARGAR PROGRAMA BASIC, BYTES, MATRICES, O SCREEN$
 
-LOAD "." o LOAD "&"
-
-ej:
-
-LOAD "."
-
-y luego con las teclas de subir y bajar se selecciona el programa BASIC y se confirma la carga con SYMBOL SHIFT o bien se presiona SPACE para cancelar
-
-pero si queremos cargar un programa directamente sin pasar por el menú de selección del HiLow, se puede hacer:
+Ejemplo:
+Cargar un juego:
 
 LOAD ".juego"
 
@@ -129,11 +130,23 @@ LOAD ".pantalla" SCREEN$
 
 (en el caso de CODE y SCREEN$ el nombre es opcional, si no lo ponemos el HiLow nos permite elegir cual de ellos cargar)
 
+- Cargar con selector de archivos
+
+LOAD "."            ->  para programas
+LOAD "." CODE       ->  para bloques de bytes
+LOAD "." SCREEN$    ->  para bloques de bytes
+LOAD "." DATA a()   -> para matrices numericas
+LOAD "." DATA$ a$() -> para matrices alfanumericas
+LOAD "*"            -> para snapshots nmi
+
+Luego con las teclas de subir y bajar se selecciona el archivo y se confirma la carga con SYMBOL SHIFT o bien se presiona SPACE para cancelar
+
+Nota: Supuestamente tambien LOAD "&" invocaria el menú pero no es así, utilizaria la rutina normal de carga de cinta
+
 ==================================================================
 
-VERIFICAR:
+GRABAR y VERIFICAR:
 
-SAVE ":"
 SAVE ":juego"
 
 ==================================================================

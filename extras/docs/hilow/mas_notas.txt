@@ -1,16 +1,2 @@
--parece que grabar un nombre con 10 caracteres para hilow no esta permitido, pues da un error de invalid file name del basic, dado que cuenta 11 con el . delante:
-
-save ".1234567890"
-
-por tanto siempre deberian ser de 9 caracteres
-
--al cargar por alguna razon, hay que indicar desde el segundo caracter (en las fuentes de la rom hay algo comentado). o sea, si el programa se llama:
-
-PRUEBA
-
-hay que cargar con
-
-LOAD ".RUEBA"
-
 
 - para formatear, despues de quitar cinta y poner, pulsar symbol shift para seleccionar opciones
