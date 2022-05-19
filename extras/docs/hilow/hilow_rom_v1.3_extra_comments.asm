@@ -1138,12 +1138,13 @@ TEST_DOOR:      XOR     A
                 RET
 
 ;Leer sector 0?
+L0927:
 RD_SECTCAT:     PUSH    IX
                 XOR     A
                 INC     A
                 LD      A,$00
                 SCF
-L0931:          CALL    EX_RDSECT
+L092E:          CALL    EX_RDSECT
                 POP     IX
                 RET
 
@@ -1942,7 +1943,7 @@ PROTECCION:     JR      NZ,L0EE0        ; no?==>vamos a copiar
                 CALL    W_SOUND_SPC     ; sonido de aviso
 
                                         
-                CALL    TEST_HIW        ; pero entonces.... 
+L0ED0:          CALL    TEST_HIW        ; pero entonces.... 
                                         ; !!!aquí comprueba algo interesante!!!
                                         ; si a la salida de esta rutina se
                                         ; pulsaron en secuencia las teclas
@@ -1996,7 +1997,7 @@ L0F02:          IN      A,(HLWPORT)
                 CALL    TEST_DOOR
                 CALL    Z,INSERT_TAPE
                 JP      NC,RESET
-                CALL    RD_SECTCAT
+L0F20:          CALL    RD_SECTCAT ;leer sector 0 (catalogo?)
                 AND     A
                 JP      NZ,L0FBD
                 CALL    L08D0
@@ -3846,7 +3847,7 @@ SCRCT:          EQU     $5C8C           ;SCR_CT
 ;hecho de ahorrar la mayor cantidad posible de memoria)
 
 L37DE:          EQU     LAST_BYTE+$17DE
-L3800:          EQU     LAST_BYTE+$1800 ;2 bytes. Nro. de actualizaciones (ver NOTA 1)
+L3800:          EQU     LAST_BYTE+$1800 ;2 bytes. Nro. de actualizaciones/contador de uso (ver NOTA 1)
 L3802:          EQU     LAST_BYTE+$1802
 L380B:          EQU     LAST_BYTE+$180B
 L380C:          EQU     LAST_BYTE+$180C
