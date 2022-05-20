@@ -1554,8 +1554,8 @@ L0B94:          LD      A,$0D
 NOTA1:          BIT     7,B   ;Si numero de actualizaciones/usage es > 32767, hacer ruido
                 CALL    NZ,W_SOUND_SPC
                 CALL    NZ,L1009 ; y parpadeo
-                BIT     2,B   ;Si bit 2 de nibble alto, mostrar parpadeo
-                CALL    NZ,L1009
+                BIT     2,B      ; Si bit 2 de nibble alto
+                CALL    NZ,L1009 ; parpadeo tambien
                 RES     7,B
                 RST     18H
                 DEFW    STACK_BC
@@ -3077,7 +3077,7 @@ L18A6:          JP      L1A4F
 
 L18A9:          POP     AF              ; RUTINA LLAMADA P/CARGA SECTOR
                 JP      Z,L19D6
-                CALL    L18F3
+L18AD:          CALL    L18F3
                 CALL    NC,L18F3
                 JR      C,L18E1
                 LD      HL,(L3D63)
@@ -3090,8 +3090,8 @@ L18BD:          CALL    L1946
                 LD      A,(L3D64)
                 AND     A
                 JR      NZ,L18D6
-                LD      HL,(L3800)
-                SET     7,H
+                LD      HL,(L3800)  ; Contador de actualizaciones/uso
+                SET     7,H         ; Por qué le activa el bit alto?
                 LD      (L3800),HL
                 JR      L18DE
 
@@ -3142,7 +3142,7 @@ L1927:          LD      A,(L3D63)
                 LD      A,(L3D6E)
                 LD      (L3D63),A
                 LD      HL,(L3800)
-                LD      (L3D65),HL
+                LD      (L3D65),HL  ;quiza aqui esta el segundo contador de actualizaciones/uso??
                 LD      A,(L3BF1)
                 RET
 
