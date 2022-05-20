@@ -3035,7 +3035,7 @@ L1859:          LD      A,(BORDCR)
 ;=============================================================================
 L186D:
 
-READ_SECTOR:    CALL    L1720           ;RUTINA QUE CARGA UN SECTOR?
+READ_SECTOR:    CALL    L1720           ;RUTINA QUE CARGA, GRABA o VERIFICA UN SECTOR
                 EX      AF,AF'          ;Aparentemente A=indica nr. sector
                 EXX                     ;siendo 0 y 1 los que corresponden
                 LD      DE,$0000        ;a los 2 directorios.
