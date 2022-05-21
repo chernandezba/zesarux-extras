@@ -844,7 +844,7 @@ L06FF:          CALL    L1F46           ;Esta parte aparentemente salva
                 LD      A,$01           ;son los siguientes:
                 RST     28H             ;(IX+$0B) --- LONGITUD
                 CALL    W_SOUND         ;(IX+$0C) -+
-                CALL    L0768           ;(IX+$0D) --- COMIENZO
+                CALL    ASK_SYM_SPACE           ;(IX+$0D) --- COMIENZO
                 LD      A,$00           ;(IX+$0E) -+
                 RST     28H             ;(IX+$00) --- FLAG (*)
                 LD      A,$01           ;(IX+$01) --- NOMBRE (10 bytes)
@@ -895,12 +895,13 @@ L0742:          PUSH    HL
                 CALL    L10C0
                 RET
 
-L0768:          LD      A,$7F           ; Esta rutina testea BREAK (NC) y también symbol shift
+L0768:
+ASK_SYM_SPACE:  LD      A,$7F           ; Esta rutina testea BREAK (NC) y también symbol shift
                 IN      A,($FE)         ; y ejecuta el sonido característico
                 RRA                     ; cuando se cancela algo.
                 JR      NC,L0777
                 RRA
-                JR      C,L0768
+                JR      C,ASK_SYM_SPACE
                 CALL    W_SOUND_ACE
                 SCF
                 RET
@@ -1057,7 +1058,7 @@ FORMAT:         CALL    L11A1           ;Borra pantalla
 L088A:          LD      A,$0F           ;Mensaje: "PONGA CASSETTE A FORMATEAR"
                 RST     28H             ;                                    ^
                 CALL    W_SOUND         ;sonido de aviso                     ¦
-                CALL    L0768           ;testea BREAK (NC si es así)         ¦
+                CALL    ASK_SYM_SPACE           ;testea BREAK (NC si es así)         ¦
                 LD      A,$00           ;                                    ¦
                 RST     28H             ;                                    ¦
                 JP      NC,L0032        ;SI SE PRESIONO BREAK ==> CANCELA    ¦
@@ -1151,7 +1152,7 @@ L092E:          CALL    EX_RDSECT
 INSERT_TAPE:    CALL    W_SOUND         ;Esta rutina pide que se inserte
                 LD      A,$05           ;un cassette
                 RST     28H
-                CALL    L0768           ;retorna NC si no se hizo
+                CALL    ASK_SYM_SPACE           ;retorna NC si no se hizo
                 LD      A,$00
                 RST     28H
                 RET     NC
@@ -1907,7 +1908,7 @@ L0E77:          CALL    L1056
 L0E8B:          CALL    W_SOUND
                 LD      A,$08
                 RST     28H
-                CALL    L0768
+                CALL    ASK_SYM_SPACE
                 LD      A,$00
                 RST     28H
                 JP      NC,BREAKCONT
@@ -1990,7 +1991,7 @@ L0F02:          IN      A,(HLWPORT)
                 CALL    W_SOUND
                 LD      A,$09
                 RST     28H
-                CALL    L0768
+                CALL    ASK_SYM_SPACE
                 LD      A,$00
                 RST     28H
                 JP      NC,RESET
@@ -2014,7 +2015,7 @@ L0F20:          CALL    RD_SECTCAT ;leer sector 0 (catalogo?)
                 JR      Z,L0F42
                 LD      A,$03
 L0F42:          RST     28H
-                CALL    L0768
+                CALL    ASK_SYM_SPACE
                 XOR     A
                 RST     28H
                 JR      L0EF6
@@ -2029,39 +2030,39 @@ L0F4A:          CALL    L08FE
                 CALL    L1F4F
                 AND     A
                 JP      NZ,RESET
-                LD      A,$0A
+                LD      A,$0A ;"Verifica?"
                 RST     28H
-                CALL    L0768
+                CALL    ASK_SYM_SPACE  
                 JR      NC,L0F88
-                XOR     A
+                XOR     A    ;Verificamos entonces
                 RST     28H
                 LD      IX,(L3F2B)
                 CALL    L0FA8
                 LD      (L3F31),DE
                 LD      C,$00
                 CALL    L1F4F
-                LD      A,$0B
+                LD      A,$0B ;"Verificado"
                 JR      Z,L0F84
-                LD      A,$06
+                LD      A,$06 ;"Error en la cinta"
 L0F84:          RST     28H
                 CALL    L09AF
 L0F88:          XOR     A
                 RST     28H
-                LD      A,$0C
+                LD      A,$0C ;"Otra copia?"
                 RST     28H
                 CALL    W_SOUND
 L0F90:          LD      A,$7F
                 IN      A,($FE)
                 RRA
                 JR      NC,L0F90
-                CALL    L0768
+L0F97:          CALL    ASK_SYM_SPACE
                 LD      A,$00
                 RST     28H
                 JP      C,L0EF6
-RESET:          LD      HL,$0000        ;ESTE FRAGMENTO PROVOCA UN RESET
-                LD      SP,$0000
-                PUSH    HL
-                RST     30H
+RESET:          LD      HL,$0000    ;Finalizar la copia con un reset
+                LD      SP,$0000    ;Tiene bastante sentido porque la copia de datos sobreescribe la ram
+                PUSH    HL          ;con el archivo que se copia, y si estabamos en basic, es muy probable
+                RST     30H         ;que se nos quede el sistema en un estado inconsistente
 
 L0FA8:          LD      A,(IX+0)
                 CP      $03
@@ -2077,7 +2078,7 @@ L0FB6:          LD      E,(IY+25)
 L0FBD:          CALL    L08D0
                 LD      A,$06
                 RST     28H
-                CALL    L0768
+                CALL    ASK_SYM_SPACE
                 XOR     A
                 RST     28H
                 JP      L0EF6
@@ -2380,7 +2381,7 @@ L1178:          LD      A,$7F
                 IN      A,($FE)
                 RRA
                 JR      NC,L1178
-                CALL    L0768
+                CALL    ASK_SYM_SPACE
                 LD      A,$00
                 RST     28H
                 JR      NC,L118B
