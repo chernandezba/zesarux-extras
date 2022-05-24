@@ -58,6 +58,10 @@ ej formateo cassette con nombre (en este caso "juegos1"):
 SAVE "@juegos1"
 SAVE " FORMAT juegos1"
 
+Recuperar un cassette:
+
+SAVE "FORMAT ?"
+
 ==================================================================
 
 GUARDAR DATOS:
@@ -155,6 +159,17 @@ COPIAR FICHEROS ENTRE UN CASSETTE Y OTRO
 
 SAVE "="
 SAVE "=programa"
+
+Si se intenta copiar un snapshot de nmi, avisa con error "NMI no se copia". PERO se puede copiar dicho snapshot, cuando sale ese error, pulsar secuencia de teclas:
+
+1) soltamos cualquier tecla que estuviera pulsada
+2) pulsamos la [H]
+3) sin soltar la [H] se pulsa la [I]
+4) soltamos la [H]
+5) sin soltar la [I] se pulsa la [W]
+6) soltamos la [I]
+
+
 
 ==================================================================
 

@@ -162,7 +162,7 @@ CONTINT:        AND     A               ;------ Notar que aquí continúa la NMI
 NOTA2:          HALT                    ;quedará un 0 en L3EED si IM1, o un 1
                 DI                      ;si fué una IM2. QUE INGENIOSO!
                 POP     HL
-                LD      A,(L3EED)       ;La rutina L0116 que se llama más
+L008F:          LD      A,(L3EED)       ;La rutina L0116 que se llama más
                 LD      C,A             ;adelante comprueba las teclas [1] y
                 LD      A,L             ;[SPACE]... es decir:
                 OR      C
@@ -175,7 +175,7 @@ TEST_1SPACE:    CALL    L0116
                 IN      A,(HLWPORT)     ;Aquí cancela el SAVE del snap NMI si
                 BIT     3,A             ;se abrió la tapa del grabador, además
                 JP      Z,L0E31         ;también cancela si el SAVE si es que
-                LD      A,(L3EEC)       ;ya fue usado.
+L00AB:          LD      A,(L3EEC)       ;ya fue usado.
                 CP      $7B             ;La rutina L0D32 prueba SYMBOL y SPACE
                 JP      NZ,L0E31        ;si se pulsa SYMBOL hace el SAVE, si
                 JP      L0D32           ;se pulsa SPACE retorna.
@@ -1083,10 +1083,10 @@ L08BB:          LD      DE,MSFORM       ;DE=Mensaje "FORMATEANDO CASSETTE..."
 
 GO_FORMAT:      CALL    EX_FORMAT
                 AND     A
-                JP      NZ,ERR_IO
+L08C4:          JP      NZ,ERR_IO       ;Retornar error si falló el formateo
                 LD      A,$80
                 OUT     (HLWPORT),A
-                CALL    L0910
+                CALL    L0910    ;Escribir sector directorio
                 JR      CATALOGO
 
 L08D0:          LD      A,$28
@@ -1690,10 +1690,10 @@ L0C9B:          LD      E,(IX+11)
                 LD      A,D
                 OR      E
                 JR      Z,L0CAC
-                CALL    L068C
-                CP      $1A
+                CALL    L068C  
+                CP      $1A  ;Registro A contiene sectores que va a usar. Maximo 25 sectores puede usar un archivo (1AH=26)
                 JR      C,L0CAF
-L0CAC:          RST     18H           ;Por qué este error? Devuelve un B Integer out of range
+L0CAC:          RST     18H           
                 DEFW    E_OUTRANGE
 
 L0CAF:          LD      C,A
@@ -2217,11 +2217,13 @@ L1065:          CALL    SAVE_REGS       ;Emite uno de los sonidos de
                 LD      HL,$1400        ;de archivos o elección de opciones
                 JR      L105E           ;en las ventanas-menu.
 
+L106F:
 W_SOUND_SPC:    CALL    SAVE_REGS       ;Emite el sonido de cancelación
                 LD      B,$00           ;cuando se presiona SPACE
                 LD      HL,$3500
                 JR      L105E
 
+L1079:
 W_SOUND_ACE:    CALL    SAVE_REGS       ;Emite el sonido de aceptación
                 LD      B,$96           ;cuando se presiona SHIFT
                 LD      HL,$2100
@@ -2232,6 +2234,7 @@ L1083:          CALL    SAVE_REGS       ;Emite el sonido de "sirena" cuando
                 LD      HL,$1443        ;haber echo un SAVE "*..."
                 JR      L105E
 
+L108D:
 W_SOUND:        CALL    SAVE_REGS       ;Esta rutina emite el sonido de
                 LD      A,(BORDCR)      ;"ATENCION" cuando se imprime alguna
                 RRA                     ;ventana con mensaje de error.
