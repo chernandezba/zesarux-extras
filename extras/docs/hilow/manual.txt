@@ -1,52 +1,37 @@
-Hola a todos! 
-Gracias por el esfuerzo!
 
->Cuando se pagina la rom del hilow sobre la de spectrum? Al acceder a algunas direcciones? Cuales? Se pagina 8k/16kb... cuantos?
+==================================================================
+Minimanual del dispositivo HiLow para ZX-Spectrum y TK90X, hasta
+donde yo se, ning˙n manual a sobrevivido, lo que sigue a 
+continuaciÛn es un resumen de sus "comandos" a partir del estudio
+de su ROM y su cÛdigo fuente.
+==================================================================
 
-A través de mi estudio de la ROM, puedo decir con seguridad que como mínimo se pagina cuando se detecta en el bus de direcciones una de estas en tiempo de ejecución del procesador:
 
-04C2 (entrada rutina load)
-0556 (entrada rutina save)
-0976 (en donde se interpreta el nombre fichero al hacer un save en la rom normal del spectrum)
+Uso de comandos
 
-Finalmente y por hardware al activar NMI:
+Cuando se presenta un cuadro de dialogo, las siguientes teclas son validas:
 
-0038 (petición de NMI)
+- symbol shift: aceptar
+- espacio: cancelar
+En algunas acciones, el enter también acepta
 
-También es importante saber cuando se DESpagina y por lo que pude ver al estudiar su ROM se produce cuando hay un acceso a la dirección #0052 en tiempo de ejecución, en donde en la rom spectrum hay una instrucción
+Si en los comandos no se indica nombre (por ejemplo LOAD ".") entonces HiLow mostrará un listado de los archivos que concuerden con el tipo de
+operación, para que podamos elegir sobre el cual hay que operar.
 
-RET
-
-Cuando se activa el interfaz, se paginan 8K de ROM a partir de #0000 naturalmente como si fuera el Interface 1, al accederse a cualquiera de las direcciones anteriormente dichas.
-
-Pero, por otro lado, también se paginan 2K de RAM estática a partir de #2000, la particularidad es que la RAM está cableada de tal manera que se mapea simultáneamente entre:
-
-#2000 -> #27FF
-#2800 -> #2FFF
-#3000 -> #37FF
-#3800 -> #3FFF
-
-dicho de otro modo
+Para ello se usan las teclas de subir y bajar, se presiona SYMBOL SHIFT para efectuar la accion, si se presiona SPACE se cancela.
 
 
 
-Con esto quiero decir que si hiciera "POKE #2000,#FF" afectaría igualmente a las posiciones #2800, #3000, y #3800, es algo así como la RAM "fantasma" de los 128K cuando tenemos paginada la RAM 7 a partir de #C000, y si hacemos un POKE #C000,#FF veremos una rayita en #4000
+Listado de comandos:
 
--tienes la rom en formato binario?
 
-Si definitivamente, va como adjunto, posiblemente en poco días tengamos un volcado de la versión 2.1, la adjunta es la versión 1.3e
 
--tienes una lista de comandos para acceder al Basic desde el hilow?
-
-El Hilow al paginarse cuando se accede a la dirección #0976 antedicha, comienza a analizar el nombre de fichero usado en el comando SAVE y responde con diferentes acciones dependiendo del primer carácter del mismo.
-
-Me explico: (aunque ya es mas una cuestión de software y no de hardware)
-
-Formatear un cassette:
+FORMATEAR UN CASSETTE:
 
 SAVE " FORMAT " o SAVE "@" ---> (FORMAT es el TOKEN no la palabra)
 
-opcionalmente puede llevar un nombre para nombrar el cassette siempre con la misma restricción del largo de cinta de 10 caracteres incluyendo el primer carácter (lo que resulta 9 caracteres en la práctica)
+opcionalmente puede llevar un nombre para nombrar el cassette siempre con la misma restricción del 
+largo de cinta de 10 caracteres incluyendo el primer carácter (lo que resulta 9 caracteres en la práctica)
 
 ej formateo cassette sin nombre:
 
@@ -58,9 +43,31 @@ ej formateo cassette con nombre (en este caso "juegos1"):
 SAVE "@juegos1"
 SAVE " FORMAT juegos1"
 
-Recuperar un cassette:
+==================================================================
 
-SAVE "FORMAT ?"
+RECUPERAR UN CASSETTE:
+
+
+Este comando parece ser una variante del formateo que crea la tabla de directorio en base a los datos que encuentra a los sectores.
+No se ha podido testear su funcionamiento en emulador
+
+
+UN detalle final sobre el FORMATEO, a veces podía ocurrir que el
+directorio se corrompiera, no era muy común pero podía ocurrir, por
+quitar el cassette antes de grabarlo etc., si uno no era cuidadoso.
+
+Hay una forma especial de FORMATEO que lo que hace en realidad es
+tratar de RECUPERAR el cassette examinando todos los sectores y
+recrear el directorio, este proceso toma casi tanto tiempo como
+un formateo sin borrado.
+
+La sintaxis es
+
+SAVE " FORMAT ?"
+o
+SAVE "@?"
+
+
 
 ==================================================================
 
@@ -83,38 +90,6 @@ SAVE ".data$" DATA a$()
 
 para guardar una pantalla
 SAVE ".pantalla" SCREEN$
-
-==================================================================
-
-CATALOGO:
-
-SAVE " CAT " ---> (CAT es el TOKEN no la palabra)
-SAVE " "     ---> (espacio en blanco)
-SAVE "^"
-
-==================================================================
-
-El resto de los "comandos" luego del primer carácter pueden llevar opcionalmente el nombre del fichero, si no se hace entonces HiLow mostrará un listado de los archivos que concuerden con el tipo de
-operación, para que podamos elegir sobre el cual hay que operar.
-
-Para ello se usan las teclas de subir y bajar, se presiona SYMBOL SHIFT y luego SPACE para confirmar (en algunos casos) y SYMBOL SHIFT nuevamente para efectuar la accion, si se presiona SPACE se cancela.
-
-==================================================================
-
-Borrado de ficheros:
-
-Desde menu
-SAVE " ERASE "            ---> (ERASE es el TOKEN no la palabra)
-o
-SAVE "|"
-
-symbol para borrar cada archivo. luego espacio finalizar. symbol de nuevo para confirmar / espacio cancela
-
-
-Indicando el nombre
-SAVE " ERASE programa"
-o
-SAVE "|programa"
 
 ==================================================================
 
@@ -149,6 +124,35 @@ Nota: Supuestamente tambien LOAD "&" invocaria el menú pero no es así, utiliza
 
 ==================================================================
 
+
+CATALOGO:
+
+SAVE " CAT " ---> (CAT es el TOKEN no la palabra)
+SAVE " "     ---> (espacio en blanco)
+SAVE "^"
+
+==================================================================
+
+
+
+Borrado de ficheros:
+
+Desde menu
+SAVE " ERASE "            ---> (ERASE es el TOKEN no la palabra)
+o
+SAVE "|"
+
+symbol para borrar cada archivo. luego espacio finalizar. symbol de nuevo para confirmar / espacio cancela
+
+
+Indicando el nombre
+SAVE " ERASE programa"
+o
+SAVE "|programa"
+
+==================================================================
+
+
 GRABAR y VERIFICAR:
 
 SAVE ":juego"
@@ -177,7 +181,7 @@ RENOMBRAR
 
 SAVE "[nuevo"
 
-Este "comando" es diferente, HiLow nos permite seleccionar el fichero a renombrar y le da el nuevo nombre que pusimos en el argumento, en este caso "nuevo"
+Este "comando" nos permite seleccionar el fichero a renombrar y le da el nuevo nombre que pusimos en el argumento, en este caso "nuevo"
 
 
 ==================================================================
@@ -189,6 +193,8 @@ Si queremos guardar un snapshot de un juego o lo que sea, PRIMERO ANTES DE CARGA
 SAVE "*juego"
 
 Eso hace que se grabe una entrada en el directorio y se compruebe que hay espacio suficiente.
+
+Desde este momento no se debe ejecutar ningún comando de HiLow (ni SAVE "CAT"), o no funcionará al disparar la NMI.
 
 Posteriormente se carga desde cinta el juego en forma normal, y cuando termine de cargar se presiona el botón NMI, con lo que suena una sirena en el parlante del Spectrum o el TV si fuera una TK90/TK95.
 
@@ -204,23 +210,24 @@ LOAD "*juego"
 
 ==================================================================
 
-A modo de ejemplo y curiosidad dejo adjunto un fichero Z80 apto para usar en cualquier emulador, que contiene una ROM modificada para ejecutarse a partir de #C000 (creo recordar) con un mini-programa que va llamando a la rutina ubicada en RST 28H (es en realidad #C028 en el caso de este demo) al que se le pasa como argumento en el registro 'A' el nro de mensaje a imprimir de la tabla MSGSYS1 (ver fuente)
+OTROS DETALLES SOBRE EL BOTON NMI:
 
-Si se lograra emular el interfaz paginándolo y despaginándolo en las direcciones antedichas, deberiamos ver una pantalla mas o menos así:
+El TK90X o el Spectrum "gomas" no tenÌan botÛn de RESET pero si se
+presiona el botÛn NMI y la tecla "1" se hace un RESET.
 
+TambiÈn hay un detalle curioso, si se presiona el botÛn NMI y la 
+tecla SPACE, fuerza un "D BREAK - CONT repeats, xx:xx" siempre que
+sea posible.
 
+En assembler serÌa:
+RST #08
+DB  $0C
 
-Con esto estaría completado la emulación del interfaz.... (eso creo)
+Y una curiosidad final si hacemos:
 
-El asunto complicado para mi es emular la electrónica del datadrive, lamentablemente no soy entendido en electrónica (ni de lejos) y no se como ayudar en ello, solo puedo decir que el interfaz se comunica con el datadrive a través del puerto #FF muy probablemente en formato serial, lo mejor sería entender como es que funcionaba el datadrive de la Adam Coleco (ignoro si hay bibliografía sobre ello).
+SAVE "*pantalla" SCREEN$
 
-Se comentó que el datadrive tenía modificaciones, pero en realidad no tiene ninguna, sólamente se le quitó unas muescas mediante el método de romperlas, que servían para que no se pudiese insertar un cassette de audio común excepto los "oficiales" de Coleco.
-
-Por si acaso adjunto el código fuente adaptado para usarse con ensambladores cruzados mas "modernos" como sjasmplus, el cual es perfectamente funcional en W10, LINUX, incluso MAC, produciendo un binario perfecto de la ROM original simplemente ejecutando 
-
-sjasmplus hilow_rom_v1.3.zx
-
-
-
-
+y despuÈs de cargar el juego desde cinta pulsamos el boton NMI se
+guarda la pantalla que estuviera en ese momento, en vez del programa
+en sÌ.
 

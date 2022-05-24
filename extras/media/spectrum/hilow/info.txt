@@ -1,0 +1,4 @@
+A modo de ejemplo y curiosidad dejo adjunto un fichero Z80 apto para usar en cualquier emulador, que contiene una ROM modificada 
+para ejecutarse a partir de #C000 (creo recordar) con un mini-programa que va llamando a la rutina ubicada en RST 28H 
+(es en realidad #C028 en el caso de este demo) al que se le pasa como argumento en el registro 'A' el nro de mensaje a imprimir de la tabla MSGSYS1 
+(ver fuente)
