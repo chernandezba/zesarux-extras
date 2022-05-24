@@ -211,7 +211,9 @@ dicho de otro modo
 
 
 
-Con esto quiero decir que si hiciera "POKE #2000,#FF" afectaría igualmente a las posiciones #2800, #3000, y #3800, es algo así como la RAM "fantasma" de los 128K cuando tenemos paginada la RAM 7 a partir de #C000, y si hacemos un POKE #C000,#FF veremos una rayita en #4000
+Con esto quiero decir que si hiciera "POKE #2000,#FF" afectaría igualmente a las posiciones #2800, #3000, y #3800, 
+es algo así como la RAM "fantasma" de los 128K cuando tenemos paginada la RAM 7 a partir de #C000, y si hacemos un POKE #C000,#FF 
+veremos una rayita en #4000
 
 
 
