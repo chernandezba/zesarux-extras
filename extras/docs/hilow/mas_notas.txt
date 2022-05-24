@@ -1,2 +1,0 @@
-
-- para formatear, despues de quitar cinta y poner, pulsar symbol shift para seleccionar opciones
