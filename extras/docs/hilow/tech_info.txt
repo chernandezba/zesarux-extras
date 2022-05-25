@@ -1,30 +1,59 @@
-Info de Carlos Galucci:
+Te cuento brevemente de qué se trataba el Datadrive Hilow:
 
-te cuento brevemente de qué se trataba el Datadrive Hilow:
-en los tiempos de la Spectrum, alla por los 80's, compramos un cabezal "cassettero" de Coleco Adam. Desde afuera, y a primera vista, luce como un cassetero normal, pero no lo es.
+en los tiempos de la Spectrum, alla por los 80's, compramos un cabezal "cassettero" de Coleco Adam. Desde afuera, y a primera vista, 
+luce como un cassetero normal, pero no lo es.
 Despues de estudiarlo (ingenieria inversa) logramos entender qué hace cada uno de los cables de su conector. 
-A diferencia de los cassetteros normales, el cassettero Adam tiene dos motores, cada uno de ellos unidos directamente a los ejes de las "ruedas" de los cassettes y no tiene cabrestante para regular la velocidad. Vale decir que la velocidad de la cinta no es constante ni precisa. Desde sus cables conectores digitales se pueden encender o apagar los motores individualmente, moverlos hacia adelante o hacia atras, seleccionar la velocidad "alta" o "baja", etc.
-Ademas de la mecanica de movimiento de la cinta, estaban los controles del cablezal de lectura/escritura. Se podia seleccionar lado A o lado B sin dar vuelta el cassette, etc.
-Cualquier intento de grabar datos con un sistema similar al de Spectrum fracazaria debido a la velocidad absolutamente variable de la cinta.
+A diferencia de los cassetteros normales, el cassettero Adam tiene dos motores, cada uno de ellos unidos directamente a los ejes 
+de las "ruedas" de los cassettes y no tiene cabrestante para regular la velocidad. Vale decir que la velocidad de la cinta no es constante ni precisa. 
+Desde sus cables conectores digitales se pueden encender o apagar los motores individualmente, moverlos hacia adelante o hacia atras, seleccionar 
+la velocidad "alta" o "baja", etc.
+Ademas de la mecanica de movimiento de la cinta, estaban los controles del cabezal de lectura/escritura. Se podia seleccionar 
+lado A o lado B sin dar vuelta el cassette, etc.
+
+Cualquier intento de grabar datos con un sistema similar al de Spectrum fracasaria debido a la velocidad absolutamente variable de la cinta.
 Desarrollamos un modo de grabar muy poco convencional y que no estaba basado en las famosas frecuencias que distinguen al 0 del 1.
-En nuestro desarrollo, enviamos pulsos al grabador para generar marcas de sincronismo, temporizacion, etc. Muy complejo pero extremadamente fiable. Tanto es asi que hoy, 30 años despues, los cassettes se leen sin problemas.
+En nuestro desarrollo, enviamos pulsos al grabador para generar marcas de sincronismo, temporizacion, etc. Muy complejo pero 
+extremadamente fiable. Tanto es asi que hoy, 30 años despues, los cassettes se leen sin problemas.
 Una vez que vimos que podiamos usar efectivamente ese tipo de unidades de cinta, pasamos a pensar cómo usarlo en Spectrum.
 Lo que hicimos fue lo siguiente:
-Una interfase se conecta al conector trasero de Spectrum. Cuando el Z80 ejecuta codigo en determinadas direcciones (ProgramCounter, bus de direcciones, M1, etc.) la interfase "bloquea" al procesaror, pagina la rom y ram de la interfase a partir de la direccion 0, y "desbloquea" para que continue la ejecucion. 
-La idea era atrapar las llamadas a Save y Load (despues te pasaremos detalles) y analizar el nombre que se habia puesto como argumento. Reservamos ciertos nombres para usarlos como comandos. Por ejemplo, si desde la consola de Basic de Spectrum se digita Save "FORMAT", la interfase lo interpreta como comando para formatear la cinta y procede a hacerlo. Al final de la tarea, devuelve el control a la rom de Spectrum en el pundo donde regresaria de su Save "normal". Si el nombre no correspondia a ninguna de las palabras reservadas, dejamos que la rom de Spectrum continue normalmente.
-En todos los casos, desde la consola o el programa que invoca Save, todo luce normal. Eso permitia retrocompatibilidad con practicamente todo el software existente que grabe o lea datos de cassette, desde utilitarios de dibujo, editores de texto, ensambladores,  hasta juegos multi-carga. No era necesario programar especificamente para Datadrive Hilow. 
-Hay varios comandos que se podian enviar a la interfase. Uno de ellos era para visualizar la lista de archivos grabados en un cassette. Como tenia ram propia, podia mostrar datos en pantalla y despues reestablecer la que estaba antes.
-Ademas de esas funcionalidades tenia un boton NMI para copiar imagenes de 48k a cinta. Para evitar que se nos "acusara" de apoyar la pirateria, el datadrive se negaba a copiar de un cassette a otro un archivo que haya sido grabado con el boton NMI.
-En fin, son tantas las funcionalidades que tenia que no las recuerdo todas. Inclusive hay usuarios actualmente que conocen mucho mas del manejo del cacharro que nosotros.
-Los circuitos de la interfase y del controlador de la unidad de cita se perdieron en el pasado. La ingenieria inversa de las interfases que todavia estan funcionando no es factible debido a la proteccion que le pusimos en su tiempo y que, por lo visto, resulto ser muy eficiente. Una cucharada de masilla plastica cubriendo parte del circuito!!! Hubo intentos infructuosos de remover la masilla... Tal vez con un tomografo se podria ver algo...
-Los fuentes originales tambien se perdieron. Afortunadamente un entusiasta hacker logro extraer el codigo de la rom del Datadrive Hilow (no se como hizo). Gracias a su esfuerzo, no solo tenemos los fuentes sino que los comentó muy cuidadosamente.
-Los he revisado por encima y hasta donde pude ver los comentarios son correctos. Algunas imprecisiones pero a grandes razgos muy acertados. La parte de grabacion en si,  muy comprensiblemente, no esta comentada. El codigo esta estrechamente ligado al hardware y dado lo particular del sistema de grabacion/lectura, no me extraña que no haya podido entenderlo totalmente.
+Una interfase se conecta al conector trasero de Spectrum. Cuando el Z80 ejecuta codigo en determinadas direcciones 
+(ProgramCounter, bus de direcciones, M1, etc.) la interfase "bloquea" al procesador, pagina la rom y ram de la interfase
+a partir de la direccion 0, y "desbloquea" para que continue la ejecucion. 
+La idea era atrapar las llamadas a Save y Load (despues te pasaremos detalles) y analizar el nombre que se habia puesto 
+como argumento. Reservamos ciertos nombres para usarlos como comandos. Por ejemplo, si desde la consola de Basic de Spectrum se 
+digita Save "FORMAT", la interfase lo interpreta como comando para formatear la cinta y procede a hacerlo. Al final de la tarea, 
+devuelve el control a la rom de Spectrum en el pundo donde regresaria de su Save "normal". Si el nombre no correspondia a ninguna 
+de las palabras reservadas, dejamos que la rom de Spectrum continue normalmente.
+
+En todos los casos, desde la consola o el programa que invoca Save, todo luce normal. Eso permitia retrocompatibilidad con 
+practicamente todo el software existente que grabe o lea datos de cassette, desde utilitarios de dibujo, editores de texto, 
+ensambladores,  hasta juegos multi-carga. No era necesario programar especificamente para Datadrive Hilow. 
+Hay varios comandos que se podian enviar a la interfase. Uno de ellos era para visualizar la lista de archivos grabados en un cassette. 
+Como tenia ram propia, podia mostrar datos en pantalla y despues reestablecer la que estaba antes.
+Ademas de esas funcionalidades tenia un boton NMI para copiar imagenes de 48k a cinta. Para evitar que se nos "acusara" de apoyar la pirateria, 
+el datadrive se negaba a copiar de un cassette a otro un archivo que haya sido grabado con el boton NMI.
+En fin, son tantas las funcionalidades que tenia que no las recuerdo todas. Inclusive hay usuarios actualmente 
+que conocen mucho mas del manejo del cacharro que nosotros.
+Los circuitos de la interfase y del controlador de la unidad de cita se perdieron en el pasado. 
+La ingenieria inversa de las interfases que todavia estan funcionando no es factible debido a la proteccion que le pusimos en su tiempo 
+y que, por lo visto, resulto ser muy eficiente. Una cucharada de masilla plastica cubriendo parte del circuito!!! 
+Hubo intentos infructuosos de remover la masilla... Tal vez con un tomografo se podria ver algo...
+Los fuentes originales tambien se perdieron. Afortunadamente un entusiasta hacker logro extraer el codigo de la rom del 
+Datadrive Hilow (no se como hizo). Gracias a su esfuerzo, no solo tenemos los fuentes sino que los comentó muy cuidadosamente.
+Los he revisado por encima y hasta donde pude ver los comentarios son correctos. Algunas imprecisiones pero a grandes rasgos 
+muy acertados. La parte de grabacion en si,  muy comprensiblemente, no esta comentada. El codigo esta estrechamente ligado al 
+hardware y dado lo particular del sistema de grabacion/lectura, no me extraña que no haya podido entenderlo totalmente.
 
 
 En cuanto a la emulacion hay 2 noticias; una mala y una buena:
 La mala es que el modo propietario de grabacion de la cinta hace que sea casi imposible emular su lectura con un stream de audio o algo parecido. 
-La buena es que el desarrollo esta separado en 2 capas bien definidas. En la capa inferior esta todo lo relativo al control del hardware y a las rutinas de grabacion/lectura de bajo nivel. En la capa supuerior esta todo el manejo de la logica de uso de la unidad, inclusive la gestion del directorio, el interprete de comandos, etc. Las dos capas se comunican a traves de una pequeña tabla de saltos. Posiblemente, para emularlo sea buena idea atrapar las llamdas a la tabla de saltos e implementar las funciones que no son mucho mas que guardar o cargar memoria. Eso lo sabras tu mucho mejor que yo.
-El desarrollo original tenia contemplado poder cambiar un dia la unidad de cinta por una disketera manteniendo exatamente la misma funcionalidad, interfase, etc. El cambio por la disketera no llego nunca pero tal vez hoy el cambio llegue a traves de un emulador!!!
+La buena es que el desarrollo esta separado en 2 capas bien definidas. En la capa inferior esta todo lo relativo al control del hardware y 
+a las rutinas de grabacion/lectura de bajo nivel. En la capa superior esta todo el manejo de la logica de uso de la unidad, inclusive la 
+gestión del directorio, el interprete de comandos, etc. Las dos capas se comunican a traves de una pequeña tabla de saltos. 
+Posiblemente, para emularlo sea buena idea atrapar las llamdas a la tabla de saltos e implementar las funciones que no son mucho mas que 
+guardar o cargar memoria. Eso lo sabras tu mucho mejor que yo.
+El desarrollo original tenia contemplado poder cambiar un dia la unidad de cinta por una disketera manteniendo exatamente la misma 
+funcionalidad, interfase, etc. El cambio por la disketera no llego nunca pero tal vez hoy el cambio llegue a traves de un emulador!!!
 
 ---
 	•	los grabadores que usamos eran partes de una computadora de la epoca llamada Coleco.
@@ -81,41 +110,158 @@ El desarrollo original tenia contemplado poder cambiar un dia la unidad de cinta
 Mas info:
 
 Hay algunos datos que me gustaría aportar y que espero sean tomados en cuenta para el proyecto de emulación.
-El dispositivo de grabación no tiene modificaciones de hardware. Como bien lo dijo Dejotaerre, lo unico que se hizo fue romperle unos pinitos que no dejaban insertar cassettes communes.
+El dispositivo de grabación no tiene modificaciones de hardware. Como bien lo dijo Dejotaerre, lo unico que se hizo fue romperle 
+unos pinitos que no dejaban insertar cassettes communes.
 El dispositivo de grabacion es practicamente igual a cualquier grabador de cassettes pero con las siguientes diferencias:
-No tiene cabrestante que regule la velocidad. La cinta se arrastra con el giro de dos motores que mueven directamente el eje de las ruedas del cassette. Ambos motores se controlan por separado tanto en sentido de giro como en velocidad (detenido, alta velocidad o baja)
-De a) se desprende que la velocidad de la cinta no es ni remotamente estable ni precisa. Varia, no solo por la falta de cabrestante, sino tambien por el diametro de la cinta enrollada en el eje.
-El cabezal de grabacion tiene 2 canales. Uno cubre la mitad superior de la cinta y otro la inferior. Eso permite que se graben las “2 caras” de un cassette sin necesidad de darlo Vuelta. Vale mencionar que la seleccion de “lado” no permite que se lea ni se grabe simultaneamente en ambos lados.
+No tiene cabrestante que regule la velocidad. La cinta se arrastra con el giro de dos motores que mueven directamente el eje de las 
+ruedas del cassette. Ambos motores se controlan por separado tanto en sentido de giro como en velocidad (detenido, alta velocidad o baja)
+De a) se desprende que la velocidad de la cinta no es ni remotamente estable ni precisa. Varia, no solo por la falta de cabrestante, 
+sino tambien por el diametro de la cinta enrollada en el eje.
+El cabezal de grabacion tiene 2 canales. Uno cubre la mitad superior de la cinta y otro la inferior. 
+Eso permite que se graben las “2 caras” de un cassette sin necesidad de darlo Vuelta. Vale mencionar que la seleccion de “lado” no permite 
+que se lea ni se grabe simultaneamente en ambos lados.
 Tanto en velocidad alta como baja, el cabezal puede grabar o leer.
-Una debilidad del dispositivo original era que muchas veces, al detenerse los motores, por inercia uno de ellos giraba un poco mas dejando un bucle en la cinta. Al moverse de nuevo, la cita pegaba un tiron y se cortaba (o se enrredaba).
-En el controlador del HiLow, ese problema se resolvió con un circuito que, una vez que el software dejaba de actuar, rebobinaba la cinta y cuidadosamente giraba los motores en sentido opuesto para dejar la cinta tensa.
-El cabezal de grabación/lectura, salvo por el hecho de abarcar toda la cinta, es igual al de un grabador convencional de cassette. No tiene ninguna funcionalidad para grabar bits ni bytes ni nada de eso. Es igual a cualquier grabador.
-Ha pasado mucho tiempo y la verdad es que no recuerdo los detalles de nuestras rutinas de grabación/lectura. Sin embargo recuerdo el concepto de fondo.
-En los cassettes normales de Spectrum (y los de la mayoría de computadoras que grababan datos en cassette) se grababan básicamente 2 frecuencias; una para el “1” o otra para el “0”. Las rutinas de la ROM de Spectrum son muy claras y se ve que están 100% basadas en 2 premisas: 1) La velocidad del clock de las distintas Spectrums es constante y 2) la velocidad de la cinta es constante. Con eso en mente, grabar 0s y 1s usando sendas frecuencias no presenta problemas.
-En nuestro caso, dado que la velocidad de la cinta no es ni remotamente estable, el método de las frecuencias fracasaría (a menos que se usaran frecuencias muy bajas, reduciendo la capacidad del cassette y aumentando los tiempos de lectura/escritura)
+Una debilidad del dispositivo original era que muchas veces, al detenerse los motores, por inercia uno de ellos giraba un poco mas 
+dejando un bucle en la cinta. Al moverse de nuevo, la cita pegaba un tiron y se cortaba (o se enrredaba).
+En el controlador del HiLow, ese problema se resolvió con un circuito que, una vez que el software dejaba de actuar, 
+rebobinaba la cinta y cuidadosamente giraba los motores en sentido opuesto para dejar la cinta tensa.
+El cabezal de grabación/lectura, salvo por el hecho de abarcar toda la cinta, es igual al de un grabador convencional de cassette. 
+No tiene ninguna funcionalidad para grabar bits ni bytes ni nada de eso. Es igual a cualquier grabador.
+Ha pasado mucho tiempo y la verdad es que no recuerdo los detalles de nuestras rutinas de grabación/lectura. 
+Sin embargo recuerdo el concepto de fondo.
+En los cassettes normales de Spectrum (y los de la mayoría de computadoras que grababan datos en cassette) se grababan básicamente 2 frecuencias; 
+una para el “1” o otra para el “0”. Las rutinas de la ROM de Spectrum son muy claras y se ve que están 100% basadas en 2 premisas: 
+
+1) La velocidad del clock de las distintas Spectrums es constante y 
+2) la velocidad de la cinta es constante. Con eso en mente, grabar 0s y 1s usando sendas frecuencias no presenta problemas.
+En nuestro caso, dado que la velocidad de la cinta no es ni remotamente estable, el método de las frecuencias fracasaría 
+(a menos que se usaran frecuencias muy bajas, reduciendo la capacidad del cassette y aumentando los tiempos de lectura/escritura)
 Nuestra idea fue mas o menos la siguiente:
-                No grabar frecuencias sino “pulsos magnéticos individuales”. En vez de variar la polarización del cabezal para generar una frecuencia, la idea fue grabar pulsos consistentes en un solo cambio de polaridad.
-Cada byte estaba precedido por una secuencia de pulsos y, a continuación, 8 pulsos cuya polaridad determinaba si eran 0s o 1s. Los pulsos que preceden al dato del byte servían para calibrar la velocidad que tenia la cinta en ese preciso momento. La rutina lee “raw” la cinta contando pulsos y midiendo el tiempo entre ellos. Una vez leida la cabecera del byte, el resto de los pulsos se leia simplemente “escuchando” cada N fracción de segundo siendo N el valor obtenido a partir de la lectura de la cabecera de cada byte. Experimentalmente comprobamos que el error, dentro de 8 bits, no llegaba nunca a “salirse” de cada bit.
+
+                No grabar frecuencias sino “pulsos magnéticos individuales”. En vez de variar la polarización del cabezal para generar 
+                una frecuencia, la idea fue grabar pulsos consistentes en un solo cambio de polaridad.
+Cada byte estaba precedido por una secuencia de pulsos y, a continuación, 8 pulsos cuya polaridad determinaba si eran 0s o 1s. 
+Los pulsos que preceden al dato del byte servían para calibrar la velocidad que tenia la cinta en ese preciso momento. 
+La rutina lee “raw” la cinta contando pulsos y midiendo el tiempo entre ellos. Una vez leida la cabecera del byte, el resto de los pulsos se 
+leia simplemente “escuchando” cada N fracción de segundo siendo N el valor obtenido a partir de la lectura de la cabecera de cada byte. 
+Experimentalmente comprobamos que el error, dentro de 8 bits, no llegaba nunca a “salirse” de cada bit.
 El proceso se repite para cada byte. La cabecera de cada byte “configura” los tiempos de la rutina que lee los bits del byte.
-De ese modo, las variaciones de velocidad no afectaban la lectura de los datos. Tampoco importaba si al momento de leer los datos, la velocidad de la cinta era diferente a la del momento de la grabación.
+De ese modo, las variaciones de velocidad no afectaban la lectura de los datos. Tampoco importaba si al momento de leer los datos, 
+la velocidad de la cinta era diferente a la del momento de la grabación.
 IMPORTANTE: no hay ningún hardware de apoyo (ni circuito ni integrado ni nada) para la lectura/escritura. Todo esta hecho por software.
  
-Al comienzo de cada cassette se graba un directorio con la información de ubicación, longitud, etc. de cada archivo almacenado. Cuando un cassette es insertado, en el primer acceso el HiLow levanta el directorio y lo “cachea” en la RAM estatica de la interfase. Hasta que no se abra la tapa del dispositivo (detectado por un botoncito que tiene) y mientras no se modifiquen datos en la cinta, el directorio permanece en memoria. Por eso, la primera vez que se lee un directorio el HiLow va a la cinta pero de ahí en adelante lo trae rápidamente de la Ram.
-Los bytes de cada archivo no necesariamente estarán contiguos en el cassette. La lógica del software, en base a la información que tiene en el directorio, planifica la distribución de los bytes en la cinta, procurando que no sea necesario rebobinar para completar un archivo. Vale mencionar que en algunos casos de cassettes en los que se habían almacenado y borrado varios archivos, los espacios quedaban tan fragmentados que en algunos casos el HiLow rebobinaba un poco al final de la cinta para aprovecharla mejor.
-Para la carga de un archivo, en base a la información del directorio, el software avanza la cinta rapidamente y va leyendo y contando determinados pulsos grabados durante el formateo. La lectura a alta velocidad puede fallar; por lo tanto, cuando la cuenta se acerca al numero esperado, el software baja la velocidad de la cinta y la rutina lee mas en detalle, pudiendo leer correctamente el numero del sector que esta leyendo.
+Al comienzo de cada cassette se graba un directorio con la información de ubicación, longitud, etc. de cada archivo almacenado. 
+Cuando un cassette es insertado, en el primer acceso el HiLow levanta el directorio y lo “cachea” en la RAM estatica de la interfase. 
+Hasta que no se abra la tapa del dispositivo (detectado por un botoncito que tiene) y mientras no se modifiquen datos en la cinta, 
+el directorio permanece en memoria. Por eso, la primera vez que se lee un directorio el HiLow va a la cinta pero de ahí en adelante lo trae 
+rápidamente de la Ram.
+Los bytes de cada archivo no necesariamente estarán contiguos en el cassette. La lógica del software, en base a la información que tiene 
+en el directorio, planifica la distribución de los bytes en la cinta, procurando que no sea necesario rebobinar para completar un archivo. 
+Vale mencionar que en algunos casos de cassettes en los que se habían almacenado y borrado varios archivos, los espacios quedaban tan 
+fragmentados que en algunos casos el HiLow rebobinaba un poco al final de la cinta para aprovecharla mejor.
+Para la carga de un archivo, en base a la información del directorio, el software avanza la cinta rapidamente y va leyendo y contando 
+determinados pulsos grabados durante el formateo. La lectura a alta velocidad puede fallar; por lo tanto, cuando la cuenta se acerca al 
+numero esperado, el software baja la velocidad de la cinta y la rutina lee mas en detalle, pudiendo leer correctamente el numero del 
+sector que esta leyendo.
 No recuerdo los detalles de la información grabada en los sectores, pero es mas o menos como lo acabo de describir.
  
-Por todo lo expresado, creo que intentar preservar las rutinas de cinta emulando los datos como si llegaran de un cassette, no va a ser tarea fácil.
-La buena noticia es que desde el principio el sistema fue concebido para separar totalmente el software de organización de los archivos (sistema operativo)  del software de control del grabador.
-La idea original era que se pudiera cambiar el medio de almacenamiento (ejemplo cambiar el cassettero por una disquetera) sin cambiar nada de la interfase.
+Por todo lo expresado, creo que intentar preservar las rutinas de cinta emulando los datos como si llegaran de un cassette, 
+no va a ser tarea fácil.
+La buena noticia es que desde el principio el sistema fue concebido para separar totalmente el software de organización de los archivos 
+(sistema operativo)  del software de control del grabador.
+La idea original era que se pudiera cambiar el medio de almacenamiento (ejemplo cambiar el cassettero por una disquetera) 
+sin cambiar nada de la interfase.
 En ese momento ni pensamos que en el futuro se podría justamente eliminar el dispositivo de grabación y emular el hardware.
-Sea como sea, al final de la ROM hay una tabla de saltos a funciones primitivas de grabación/lectura. La tabla separa totalmente la parte que se debe preservar intacta en el proyecto de emulación, de la parte que se puede ignorar totalmente.
-De hecho, durante el desarrollo, la taba saltaba a rutinas que devolvían datos tomados de memoria (no de cassette). Sin proponernoslo, hicimos un emulador del dispositivo para poder avanzar en el desarrollo del “operativo” antes de tener el hardware funcionando.
+Sea como sea, al final de la ROM hay una tabla de saltos a funciones primitivas de grabación/lectura. La tabla separa totalmente 
+la parte que se debe preservar intacta en el proyecto de emulación, de la parte que se puede ignorar totalmente.
+De hecho, durante el desarrollo, la tabla saltaba a rutinas que devolvían datos tomados de memoria (no de cassette). 
+Sin proponernoslo, hicimos un emulador del dispositivo para poder avanzar en el desarrollo del “operativo” antes de tener el hardware funcionando.
 Todavia recuerdo el dia en el que juntamos los fuentes y los “linkeamos” mediante la tabla de saltos y funciono de primera!!!
-Sugiero que se investigue que es exactamente lo que devuelve cada una de las funciones de la tabla. Recuerdo que los argumentos de las funciones iban en registros. Las funciones son bastante primitivas, o sea que hacen cosas muy puntuales. Si se logra determinar que es lo que hacen, se puede sustituir la tabla de saltos por otra tabla donde se implemente el modo de almacenamiento que se quiera.
-En este momento no tengo un HiLow ni la posibilidad de “debugear” el código, pero ya que el emulador ya esta invocando a las funciones de la tabla, tal vez sea fácil detener ahí la ejecución y ver como estan los registros.
+Sugiero que se investigue que es exactamente lo que devuelve cada una de las funciones de la tabla. 
+Recuerdo que los argumentos de las funciones iban en registros. Las funciones son bastante primitivas, o sea que hacen cosas muy puntuales. 
+Si se logra determinar que es lo que hacen, se puede sustituir la tabla de saltos por otra tabla donde se implemente el modo de 
+almacenamiento que se quiera.
+En este momento no tengo un HiLow ni la posibilidad de “debugear” el código, pero ya que el emulador ya esta invocando a las funciones 
+de la tabla, tal vez sea fácil detener ahí la ejecución y ver como estan los registros.
 
 -----
+
+
+El asunto complicado para mi es emular la electrónica del datadrive, lamentablemente no soy entendido en electrónica (ni de lejos) 
+y no se como ayudar en ello, solo puedo decir que el interfaz se comunica con el datadrive a través del puerto #FF muy probablemente en 
+formato serial, lo mejor sería entender como es que funcionaba el datadrive de la Adam Coleco (ignoro si hay bibliografía sobre ello).
+
+Se comentó que el datadrive tenía modificaciones, pero en realidad no tiene ninguna, sólamente se le quitó unas muescas mediante 
+el método de romperlas, que servían para que no se pudiese insertar un cassette de audio común excepto los "oficiales" de Coleco.
+
+
+otros:
+
+No crc
+12 cables de la interfaz 
+
+1 de audio
+Resto de control 
+
+Cabezal en mismo sitio para un sector entero
+
+
+---
+
+FAQ
+
+Hola a todos! 
+Gracias por el esfuerzo!
+
+>Cuando se pagina la rom del hilow sobre la de spectrum? Al acceder a algunas direcciones? Cuales? Se pagina 8k/16kb... cuantos?
+
+A través de mi estudio de la ROM, puedo decir con seguridad que como mínimo se pagina cuando se detecta en el bus de direcciones una de 
+estas en tiempo de ejecución del procesador:
+
+04C2 (entrada rutina load)
+0556 (entrada rutina save)
+0976 (en donde se interpreta el nombre fichero al hacer un save en la rom normal del spectrum)
+
+Finalmente y por hardware al activar NMI:
+
+0038 (petición de NMI)
+
+También es importante saber cuando se DESpagina y por lo que pude ver al estudiar su ROM se produce cuando hay un acceso a la 
+dirección #0052 en tiempo de ejecución, en donde en la rom spectrum hay una instrucción
+
+RET
+
+Cuando se activa el interfaz, se paginan 8K de ROM a partir de #0000 naturalmente como si fuera el Interface 1, al accederse a cualquiera 
+de las direcciones anteriormente dichas.
+
+Pero, por otro lado, también se paginan 2K de RAM estática a partir de #2000, la particularidad es que la RAM está cableada de tal manera 
+que se mapea simultáneamente entre:
+
+#2000 -> #27FF
+#2800 -> #2FFF
+#3000 -> #37FF
+#3800 -> #3FFF
+
+dicho de otro modo
+
+
+
+Con esto quiero decir que si hiciera "POKE #2000,#FF" afectaría igualmente a las posiciones #2800, #3000, y #3800, 
+es algo así como la RAM "fantasma" de los 128K cuando tenemos paginada la RAM 7 a partir de #C000, y si hacemos un POKE #C000,#FF 
+veremos una rayita en #4000
+
+
+
+-tienes una lista de comandos para acceder al Basic desde el hilow?
+
+El Hilow al paginarse cuando se accede a la dirección #0976 antedicha, comienza a analizar el nombre de fichero usado en el comando SAVE y 
+responde con diferentes acciones dependiendo del primer carácter del mismo.
+
+
+-------
+
+La siguiente información adicional no se sabe seguro si es del HiLow Data Drive o es del Coleco ADAM Digital Data Pack:
+
 
 Extra info:
 
@@ -151,72 +297,3 @@ Each “group” is ~8ms. It contains
 	•	8 peaks and valleys (~6ms) ==> the 8 bits in a byte?
 
 A few “zeros” and a few non-zeros:
-￼
-
-
------
-
-El asunto complicado para mi es emular la electrónica del datadrive, lamentablemente no soy entendido en electrónica (ni de lejos) 
-y no se como ayudar en ello, solo puedo decir que el interfaz se comunica con el datadrive a través del puerto #FF muy probablemente en 
-formato serial, lo mejor sería entender como es que funcionaba el datadrive de la Adam Coleco (ignoro si hay bibliografía sobre ello).
-
-Se comentó que el datadrive tenía modificaciones, pero en realidad no tiene ninguna, sólamente se le quitó unas muescas mediante 
-el método de romperlas, que servían para que no se pudiese insertar un cassette de audio común excepto los "oficiales" de Coleco.
-
-
-otros:
-
-No crc
-12 cables de la interfaz 
-
-1 de audio
-Resto de control 
-
-Cabezal en mismo sitio para un sector entero
-
-
----
-
-FAQ
-
-Hola a todos! 
-Gracias por el esfuerzo!
-
->Cuando se pagina la rom del hilow sobre la de spectrum? Al acceder a algunas direcciones? Cuales? Se pagina 8k/16kb... cuantos?
-
-A través de mi estudio de la ROM, puedo decir con seguridad que como mínimo se pagina cuando se detecta en el bus de direcciones una de estas en tiempo de ejecución del procesador:
-
-04C2 (entrada rutina load)
-0556 (entrada rutina save)
-0976 (en donde se interpreta el nombre fichero al hacer un save en la rom normal del spectrum)
-
-Finalmente y por hardware al activar NMI:
-
-0038 (petición de NMI)
-
-También es importante saber cuando se DESpagina y por lo que pude ver al estudiar su ROM se produce cuando hay un acceso a la dirección #0052 en tiempo de ejecución, en donde en la rom spectrum hay una instrucción
-
-RET
-
-Cuando se activa el interfaz, se paginan 8K de ROM a partir de #0000 naturalmente como si fuera el Interface 1, al accederse a cualquiera de las direcciones anteriormente dichas.
-
-Pero, por otro lado, también se paginan 2K de RAM estática a partir de #2000, la particularidad es que la RAM está cableada de tal manera que se mapea simultáneamente entre:
-
-#2000 -> #27FF
-#2800 -> #2FFF
-#3000 -> #37FF
-#3800 -> #3FFF
-
-dicho de otro modo
-
-
-
-Con esto quiero decir que si hiciera "POKE #2000,#FF" afectaría igualmente a las posiciones #2800, #3000, y #3800, 
-es algo así como la RAM "fantasma" de los 128K cuando tenemos paginada la RAM 7 a partir de #C000, y si hacemos un POKE #C000,#FF 
-veremos una rayita en #4000
-
-
-
--tienes una lista de comandos para acceder al Basic desde el hilow?
-
-El Hilow al paginarse cuando se accede a la dirección #0976 antedicha, comienza a analizar el nombre de fichero usado en el comando SAVE y responde con diferentes acciones dependiendo del primer carácter del mismo.
