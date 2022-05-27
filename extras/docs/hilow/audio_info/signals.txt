@@ -105,3 +105,19 @@ ondas de sync: durante 4350 muestras - 0,098639455782313 s (cada onda con period
 
 hueco vacio durante 1575 muestras = 0,035714285714286 segundos
 
+* En Cara B, variaciones:
+
+-no hay los 20 segundos de ondas
+-no hay los 2 segundos de ondas que indican inicio de sector (es zona no grabada, habra silencio en cinta virgen, o datos antiguos). Aunque hay onda de sync durante 4350 muestras al inicio de sector
+-no hay los 5 bytes que indican numero de sector
+
+o sea en cada sector:
+
+ondas de sync: durante 4350 muestras
+2 ondas delimitadoras de inicio de bits
+47 bytes aprox. Contiene el nombre del archivo que usa ese sector
+
+ondas de sync: durante 4350 muestras
+2 ondas delimitadoras de inicio de bits
+-Datos de sector: 2049 bytes
+
