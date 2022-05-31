@@ -5,9 +5,9 @@
 
 1 sector (2048 bytes) cada 16.33 segundos
 
-Marca inicio byte: 71 samples
-Bit a 1: 56 samples -> 0.788 de la marca
-Bit a 0: 37 samples -> 0.521 de la marca
+Marca inicio byte: 71 samples "S_START_BYTE"
+Bit a 1: 56 samples -> 0.788 de la marca "S_BIT_ONE"
+Bit a 0: 37 samples -> 0.521 de la marca "S_BIT_ZERO"
 
 
 Tiempo 22.480:
@@ -77,26 +77,31 @@ estructura cinta (Cara A):
 -inicio cinta
 0.6 segundos silencio
 19.448 segundos de ondas (periodo onda: 87 muestras a 44100 hz = 0,001972789115646 s)
-
+"S_START_TAPE"
 
 -inicio sector:
 Inicio de sector (2 segundos exactos) de ondas (periodo onda: 904 muestras = 20 ms)
+"S_START_SECTOR"
 
 2 ondas delimitadoras de inicio de bits: (periodo onda: 367 muestras = 0,008321995464853 s)
+"S_START_BITS"
 
-5 bytes con patron: 0, sector, sector, sector, sector (lo comentado antes)
+5 bytes con patron: 0, sector, sector, sector, sector (lo comentado antes): "SECTOR_MARKS"
 
 ondas de sync: durante 4350 muestras - 0,098639455782313 s (cada onda con periodo 87 muestras a 44100 hz = 0,001972789115646 s)
+"S_SEPARATOR_SECTIONS"
 
 2 ondas delimitadoras de inicio de bits: (periodo onda: 367 muestras = 0,008321995464853 s)
+"S_START_BITS"
 
-47 bytes aprox. Contiene el nombre del archivo que usa ese sector
+47 bytes aprox. Contiene el nombre del archivo que usa ese sector. "SECTOR_LABEL"
 Nota: en sectores de directorio contiene 17 bytes:
 
 2D2A4449524543544F52494F2A2DE90000   -*DIRECTORIO*-
 
 
 ondas de sync: durante 4350 muestras - 0,098639455782313 s (cada onda con periodo 87 muestras a 44100 hz = 0,001972789115646 s)
+"S_SEPARATOR_SECTIONS"
 
 
 2 ondas delimitadoras de inicio de bits: (periodo onda: 367 muestras = 0,008321995464853 s)
