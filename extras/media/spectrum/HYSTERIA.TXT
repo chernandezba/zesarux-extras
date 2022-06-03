@@ -1,0 +1,1 @@
+This HYSTERIA.TAP is included here because it's a modified version by me, because it didn't load and I had to fix some bytes with errors (look at the sprite of the horse)
