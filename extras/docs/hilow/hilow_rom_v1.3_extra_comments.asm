@@ -3162,17 +3162,17 @@ L1949:          LD      (L3D6E),A
                 JP      NZ,L1A33
                 RET     NC
                 JR      NC,L1949
-                LD      IX,DIRMSG
+                LD      IX,DIRMSG   
                 LD      DE,$000E
                 LD      A,$FF
-                AND     A
+                AND     A        ;no carry, NZ. Escribir label del sector?
                 CALL    L1A2D
                 CALL    L1726
                 RET     NC
                 LD      IX,L3800
-                LD      DE,$0514
+                LD      DE,$0514 ;514H es la longitud total de un sector de directorio (1300 decimal)
                 LD      A,(L3D6E)
-                SCF
+                SCF              ;Carry. Read?
                 CALL    L1A2D
                 CALL    L1726
                 RET
@@ -3188,12 +3188,12 @@ L1978:          CALL    L1BE6
                 LD      A,$FF
                 LD      C,$26
                 CALL    L1A2D
-                CALL    L16E7
+                CALL    L16E7     ;relacionado con formateo?
                 LD      IX,L3800
-                LD      DE,$0514
+                LD      DE,$0514  ;514H es la longitud total de un sector de directorio (1300 decimal)
                 LD      A,(L3BF2)
                 CALL    L1A2D
-                CALL    L16E7
+                CALL    L16E7     ;relacionado con formateo?
                 LD      A,(L3BF2)
                 CALL    L17DC
                 RET     NC
@@ -3202,14 +3202,14 @@ L1978:          CALL    L1BE6
                 LD      IX,DIRMSG
                 LD      DE,$000E
                 LD      A,$FF
-                AND     A
+                AND     A     ;No carry, NZ. Escribir label del sector?
                 CALL    L1A2D
                 CALL    L1726
                 RET     NC
                 LD      IX,L3800
-                LD      DE,$0514
+                LD      DE,$0514 ;514H es la longitud total de un sector de directorio (1300 decimal)
                 LD      A,(L3BF2)
-                AND     A
+                AND     A    ;No carry, NZ. Escribir?
                 CALL    L1A2D
                 CALL    L1726
                 RET
