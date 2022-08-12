@@ -1,0 +1,187 @@
+                          Z88 BBC BASIC Version 3.10
+
+The new features provided in Z88 BBC BASIC Version 3.10 are as follows:
+
+*EDIT line number
+
+     This command allows you to edit a specified program line.   It  results 
+     in  the  line  being displayed (after a short delay)  with  the  cursor 
+     positioned at the end,  and you can then edit the line using any of the 
+     usual line-editing features, as follows:
+
+          left           Move cursor left one character
+          right          Move cursor right one character
+          SHIFT left     Move cursor left one word
+          SHIFT right    Move cursor right one word
+          <> left        Move cursor to start of line
+          <> right       Move cursor to end of line
+          DEL            Backspace and delete
+          SHIFT DEL      Delete character under cursor
+          <> DEL         Delete entire line
+          <> D           Delete from cursor to end of line
+          <> G           Delete character under cursor
+          <> S           Swap case
+          <> T           Delete up to next space
+          <> U           Insert space at cursor position
+          <> V           Toggle between insert and overtype
+
+     To enter the edited line into the program press ENTER;  to abandon  the 
+     edit and leave the line unchanged press ESC.
+
+     You  can  also use *EDIT to concatenate two or more program  lines,  by 
+     specifying the first line and last line separated by commas (e.g. *EDIT 
+     10,30).  In this case you will have to edit out the line numbers of the 
+     second and subsequent lines (and delete the old lines afterwards).
+
+     *EDIT may be abbreviated to *E. (the dot is required).
+
+
+*LOAD filename hexaddress
+
+     This command loads the specified file into memory at the given address.
+     The load address must be given as a hexadecimal number  and must always
+     be specified.   You must ensure that the specified address is valid and
+     that there is sufficient  room for the file to be loaded there;  if you
+     don't you are very likely to crash the Z88  and possibly lose data!  If
+     the filename and/or address are known only at run-time use OSCLI:
+
+     OSCLI "LOAD "+filename$+" "+STR$~address%
+
+     *LOAD may be abbreviated to *L. (the dot is required).
+
+
+*SAVE filename hexaddress +hexlength
+*SAVE filename hexaddress hexafter
+
+     This command saves to a file  the specified range of  memory addresses.
+     You must specify the start address and either the length (preceded by a
+     plus sign) or the address immediately after the block to be saved;  the
+     values must be given  as hexadecimal numbers.   If the filename  and/or
+     addresses are known only at run-time use OSCLI:
+
+     OSCLI "SAVE "+filename$+" "+STR$~start%+" +"+STR$~length%
+
+     *SAVE may be abbreviated to *S. (the dot is required).
+
+
+MODE n
+
+     The  MODE statement allows selection of the normal text-only mode (MODE 
+     0)  or  a text-and-graphics mode (MODE 1).   In MODE 1 the  display  is 
+     split into two parts:  a text-window on the left and a  graphics-window 
+     on the right.  The text window consists of 8 rows of 50 characters, and 
+     the  graphics window is 64 pixels high by 256 pixels wide;  you  cannot 
+     (normally) mix text and graphics in the same window.
+
+     Points in the graphics window are addressed as x,y coordinates from 0,0 
+     (the bottom-left corner) to 255,63 (the top-right corner), although the 
+     origin can be moved using the PLOT -1 statement (q.v.).
+
+     Although MODE 1 sets up the window positions and sizes as described, it 
+     is  possible  to  change these using the VDU  statement.   However  the 
+     method of doing this is outside the scope of this document.   It is not 
+     advisable to cause the text and graphics windows to  overlap,  although 
+     this may occasionally be useful.
+
+     MODE  clears  the display (both text and graphics windows),  moves  the 
+     text  cursor  to  0,0 (the top left of the  text  window),  resets  the 
+     graphics  origin and moves the graphics cursor to 0,0 (the bottom  left 
+     of the graphics window).
+
+     In  MODE  0  (the  normal  94-column  text  mode)  the  other  graphics 
+     statements have no effect.
+
+
+CLG
+
+     This clears the graphics window (only); it does not affect the position 
+     of  the graphics cursor.   Note that CLS can be used to clear the  text 
+     window and leave the graphics window unchanged.
+
+
+DRAW x,y
+
+     Draws  a  straight line (in black) between the current position of  the 
+     graphics cursor and the specified coordinates,  then moves the graphics 
+     cursor to the specified position.
+
+     This statement is identical to PLOT 5,x,y.
+
+
+MOVE x,y
+
+     Moves  the graphics cursor to the specified coordinates,  but does  not 
+     affect what is displayed.
+
+     This statement is identical to PLOT 4,x,y.
+
+
+PLOT n,x,y
+
+     A multi-purpose plotting statement,  whose effect is controlled by  the 
+     first parameter n:
+
+          n              action
+
+          -1        Move the graphics origin to x,y.
+
+          0         Move the graphics cursor relative to the last point.
+
+          1         Draw a line, in 'black', relative to the last point.
+
+          2         Draw a line, in 'inverse', relative to the last point.
+
+          3         Draw a line, in 'white', relative to the last point.
+
+          4         Move the graphics cursor to the absolute position x,y.
+
+          5         Draw a line, in 'black', to the absolute position x,y.
+
+          6         Draw a line, in 'inverse', to the absolute position x,y.
+
+          7         Draw a line, in 'white', to the absolute position x,y.
+
+          8-15      As 0-7,  but plot the last point on the line twice (i.e. 
+                    in the 'inverting' modes omit the last point).
+
+          16-31     As 0-15, but draw the line dotted.
+
+          32-63     As  0-31,  but  plot the first point on the  line  twice 
+                    (i.e. in the 'inverting' modes omit the first point).
+
+          64-71     As 0-7, but plot a single point at x,y.
+
+          72-79     Draw a horizontal line left and right from the point x,y 
+                    until the first 'lit' pixel is encountered,  or the edge 
+                    of the window.  This can be used to fill shapes.
+
+          80-87     Plot  and fill a triangle defined by the two  previously 
+                    visited points and the point x,y.
+
+          88-95     Draw  a  horizontal line to the right of the  point  x,y 
+                    until  the  first 'unlit' pixel is encountered,  or  the 
+                    edge of the window. This can be used to 'undraw' things.
+
+          96-103    Plot  and  fill a rectangle whose opposite  corners  are 
+                    defined by the last visited point and the point x,y.
+
+     
+POINT(x,y)
+
+     This function returns the state of the pixel at the specified location, 
+     as  0  (unlit)  or  1 (lit).   If the specified point  is  outside  the 
+     graphics  window  (taking  into account the position  of  the  graphics 
+     origin), or if MODE 0 is selected, the value -1 is returned.
+
+
+Notes:
+
+1.  MODE cannot be used within a PROCedure, function,  FOR..NEXT or REPEAT..
+    UNTIL loop.  Doing so will result in the 'Bad MODE' error (code 153).
+
+2.  MODE 1 changes the value of HIMEM to &B800  and MODE 0 changes the value
+    of HIMEM  to &C000.   In MODE 1  the amount of memory available for user
+    programs is reduced by 2 Kbytes.
+
+
+Richard Russell, 18th November 2006.
