@@ -5,18 +5,57 @@ NOTICIERO 19 – NOVIEMBRE 1987
 
 ********* EL DATADRIVE DE HILOW *********
 
-Periférico para el almacenamiento de datos por grabación rápida en cassette común, de concepción y producción nacional.
-Hemos probado exhaustivamente este equipo y realmente nos ha sorprendido en sus prestaciones, en su rendimiento y en sus detalles. Carga Tasword II en 23 segundos o un juego en menos de 1 minuto, según donde se encuentre en el cassette. Formatea por sectores de 2K dejando cerca de 360K libres en un cassette de 60 minutos, en el cual podremos fácilmente grabar 10 o más programas.
-Con este aparato deja de ser problema el saber precisamente lo que está grabado en un cassette y a que punto ubicar el inicio de un programa. Mantiene uno –realmente dos- catálogos al inicio del cassette, los cuales indican el contenido del cassette en forma extendida: tipo de programa, largo de los bloques, etc. Cuando deseamos cargar un programa, el aparato identifica en el catálogo en que sectores está almacenado y los ubica a una velocidad vertiginosa, con rápidos movimientos adelante-atrás proporcionados por dos motores. Es realmente fascinante verlo funcionar. Los que viven en –o viajan a- Montevideo pueden verlo en acción en Palacio de la Música o en Bilboard. Si tiene preguntas más específicas cuente con nuestro auxilio como usuarios, o contacte directamente a los productores (tel. 914773).
+Periférico para el almacenamiento de datos por grabación rápida en cassette 
+común, de concepción y producción nacional.
+Hemos probado exhaustivamente este equipo y realmente nos ha sorprendido en sus 
+prestaciones, en su rendimiento y en sus detalles. Carga Tasword II en 23 
+segundos o un juego en menos de 1 minuto, según donde se encuentre en el 
+cassette. Formatea por sectores de 2K dejando cerca de 360K libres en un 
+cassette de 60 minutos, en el cual podremos fácilmente grabar 10 o más 
+programas.
+Con este aparato deja de ser problema el saber precisamente lo que está grabado 
+en un cassette y a que punto ubicar el inicio de un programa. Mantiene uno 
+–realmente dos- catálogos al inicio del cassette, los cuales indican el 
+contenido del cassette en forma extendida: tipo de programa, largo de los 
+bloques, etc. Cuando deseamos cargar un programa, el aparato identifica en el 
+catálogo en que sectores está almacenado y los ubica a una velocidad 
+vertiginosa, con rápidos movimientos adelante-atrás proporcionados por dos 
+motores. Es realmente fascinante verlo funcionar. Los que viven en –o viajan a- 
+Montevideo pueden verlo en acción en Palacio de la Música o en Bilboard. Si 
+tiene preguntas más específicas cuente con nuestro auxilio como usuarios, o 
+contacte directamente a los productores (tel. 914773).
 
-Es un prodigio de ingenuidad. Ojalá la disquetera Discovery y los Microdrives tuvieran las opciones inteligentes de este aparato. Por ejemplo, permite guardar un programa en cualquier momento, simplemente apretando un botón rojo, la misma función que se puede conseguir con un copiador por hardware que se comercializa en plaza por más de U$S 100. Los que tienen microdrive o disquetera saben la importancia de ese botón, sin el cual la mayoría de los programas quedan intransferibles. El DATADRIVE vale cerca de N$ 48000 (incl. IVA), menos que el sistema microdrive y mucho menos que una disquetera. El ahorro es más importante considerando el costo del diskette o del cartucho en relación a un cassette.
-Nuestra experiencia nos indica que tiene una fiabilidad irregular. Cassettes que no sean Fuji o TDK precisan frecuentes limpiezas de cabezal (con algodón y alcohol) y una conexión imperfecta puede causar pérdidas de datos. Debido a su reciente aparición es difícil poder evaluar con precisión su fiabilidad. Por lo tanto recomendamos inicialmente hacer copias periódicas de los archivos en grabador común, por si acaso…
-Si usted es un aficionado que desea cargar y almacenar sus archivos y sus juegos con un sistema económico, rápido e inteligente, el DATADRIVE es para Ud.
-Hemos comprobado su compatibilidad con microdrive, interfaces ZXLPRINT II, Kempston “E” y Joystick. Los constructores nos confirman que es compatible con toda la línea Spectrum y TK.
+Es un prodigio de ingenuidad. Ojalá la disquetera Discovery y los Microdrives 
+tuvieran las opciones inteligentes de este aparato. Por ejemplo, permite 
+guardar un programa en cualquier momento, simplemente apretando un botón rojo, 
+la misma función que se puede conseguir con un copiador por hardware que se 
+comercializa en plaza por más de U$S 100. Los que tienen microdrive o 
+disquetera saben la importancia de ese botón, sin el cual la mayoría de los 
+programas quedan intransferibles. El DATADRIVE vale cerca de N$ 48000 (incl. 
+IVA), menos que el sistema microdrive y mucho menos que una disquetera. El 
+ahorro es más importante considerando el costo del diskette o del cartucho en 
+relación a un cassette.
+Nuestra experiencia nos indica que tiene una fiabilidad irregular. Cassettes 
+que no sean Fuji o TDK precisan frecuentes limpiezas de cabezal (con algodón y 
+alcohol) y una conexión imperfecta puede causar pérdidas de datos. Debido a su 
+reciente aparición es difícil poder evaluar con precisión su fiabilidad. Por lo 
+tanto recomendamos inicialmente hacer copias periódicas de los archivos en 
+grabador común, por si acaso…
+Si usted es un aficionado que desea cargar y almacenar sus archivos y sus 
+juegos con un sistema económico, rápido e inteligente, el DATADRIVE es para Ud.
+Hemos comprobado su compatibilidad con microdrive, interfaces ZXLPRINT II, 
+Kempston “E” y Joystick. Los constructores nos confirman que es compatible con 
+toda la línea Spectrum y TK.
 
-Deseamos el mejor éxito a esta joya de la industria informática nacional, esperando que encuentre el reconocimiento doméstico e internacional que se merece.
+Deseamos el mejor éxito a esta joya de la industria informática nacional, 
+esperando que encuentre el reconocimiento doméstico e internacional que se 
+merece.
 
-“En ustedes, jóvenes con computadoras se apoyan muchas esperanzas para que el país sepa entrar bien equipado en el siglo veintiuno. Hagan todos los esfuerzos necesarios para estar siempre al tanto de todas las novedades en el campo de la informática. Traten de llevar a cabo las tareas iniciadas, y no duden en hacer preguntas.” – Corso Serra (1942-2021).
+“En ustedes, jóvenes con computadoras se apoyan muchas esperanzas para que el 
+país sepa entrar bien equipado en el siglo veintiuno. Hagan todos los esfuerzos 
+necesarios para estar siempre al tanto de todas las novedades en el campo de la 
+informática. Traten de llevar a cabo las tareas iniciadas, y no duden en hacer 
+preguntas.” – Corso Serra (1942-2021).
 
 
 
