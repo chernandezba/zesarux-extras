@@ -1,6 +1,7 @@
 clock.bin: load at 0f16h. run at 0f16h  (on mk14 keyboard: 0f16g)
 duckshoot.bin: load at 0f20h. run at 0f23h
 mastermind.bin. load at 0f1ch. run at 0f1ch . ;       Term: new game .  Mem: clear .  Go: process
+dechexconvert.bin. load at 0f50h. run at 0f50h. convert decimal to hex. 'MEM' = minus, 'TERM' clears display
 moonlanding.bin. load at 0F14h. run at 0f52h.
 ;       Moon landing (MK14 Manual)
 ;
