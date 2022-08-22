@@ -1,0 +1,9 @@
+Para transtape2 y 1, podemos tomar como referencia la guia del transtape 3, con siguientes modificaciones:
+
+-switch de menu/tape, se convierte en microdrive/tape
+-en modo tape, las teclas para cargar y grabar son las mismas que el transtape 3 en modo "cinta" (o sea sin menu):
+I: copia independiente en cinta en 2 bloques
+1: copia personal velocidad normal
+2: copia personal 2250 baudios
+3: copia personal 3000 baudios
+P: volver al basic?? tambien vale para transtape3
