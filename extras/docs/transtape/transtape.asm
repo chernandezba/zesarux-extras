@@ -1,4 +1,4 @@
-;Desensamble directo de la ROM. archivo transtape3.rom. md5: 133ec2129ebf57555662d899d55fe374
+;Desensamble directo de la ROM. archivo transtape3-vC.rom. md5: 133ec2129ebf57555662d899d55fe374
 ;Todo comentario es susceptible de ser erroneo!!
 ;Nota: las direcciones no suelen coincidir, pues el contenido que ve la cpu de la rom no se corresponde exactamente con las lineas
 ;de direcciones A0-A13 , sino que:
