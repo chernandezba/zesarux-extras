@@ -1,0 +1,519 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<title>El SD1</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+</head>
+
+<body>
+<div align="center"> 
+  <p>&nbsp;</p>
+  <p><font size="+5">EL SD1<br>
+    </font><font size="-1">Por Robert Perelegre</font> </p>
+  <p>&nbsp;</p>
+  <p align="justify">El fenómeno de la piratería no es nada nuevo 
+    y prueba de ellos son los diferentes sistemas de protección que ya 
+    incluían muchos de los títulos de Spectrum: sistemas de carga 
+    turbo, anti-merges, cabeceras falsas, checksums... Todos ellos intentando 
+    hacer más difícil la vida a los piratas.<br>
+    Por encima de todos estos sistemas de protección destaco el SD1 de 
+    Dinamic. Una protección hardware incluida en las primeras versiones 
+    del Camelot Warriors. <br>
+  </p>
+  <p align="justify"> En este mini-artículo vamos a intentar mostrar el 
+    aspecto físico del SD1, explicar su funcionamiento (tanto a nivel Hardware 
+    como Software) y analizar el porqué de su no-continuidad.<br>
+  </p>
+  <p align="justify">&nbsp;</p>
+  <p align="justify"><strong>Hardware</strong></p>
+  <p align="justify">Dentro de un trozo de conector del bus de expansión 
+    de Spectrum se esconde una pequeña resistencia de unos 1000 ohmios. 
+    Su misión consiste en conmutar a masa D5, uniendo el Pin10 de la cara 
+    de los componentes con el Pin6 de la cara de las pistas. Como consecuencia 
+    de ello todos los puertos del Spectrum que no ponga expresamente el bit D5 
+    a 1 pasaran a tener este bit a 0 (por defecto, en el Spectrum, todos los bits 
+    de los puertos no usados están a 1). Por ejemplo, si hacemos PRINT 
+    IN 255 (por citar un puerto que no se usa) sin el SD1 conectado obtendremos 
+    255 (todos los bits a 1). Si hacemos lo mismo con el SD1 conectado obtendremos 
+    223 (el bit 5 a 0).<br>
+    Como hemos podido observar no era ningún milagro de la ingeniería; 
+    pero funcionaba y además era compatible con la Interface 1.</p>
+  <p align="justify">Para aclarar el tema nada mejor que unas fotos. Originariamente 
+    el SD1 tenía los conectores cubiertos completamente por una pasta verde. 
+    Mi afán de conocimientos de juventud hizo que pusiese al descubierto 
+    la resistencia, tal como se puede apreciar en las fotos.</p>
+  <table width="440" border="0" align="center">
+    <tbody><tr> 
+      <td width="205"><div align="center"><a href="http://www.robertp.net/SD1/Fotos/InsSD1(1).jpg" target="_blank"><img src="El%20SD1_files/InsSD1(1).jpg" width="105" height="157" border="0"></a><br>
+          <font size="-2">El Manual del SD1, cara A</font></div></td>
+      <td width="19">&nbsp;</td>
+      <td width="202"><div align="center"><a href="http://www.robertp.net/SD1/Fotos/InsSD1(2).jpg" target="_blank"><img src="El%20SD1_files/InsSD1(2).jpg" width="103" height="156" border="0"></a><br>
+          <font size="-2">El Manual del SD1, cara B</font></div></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td><div align="center"><a href="http://www.robertp.net/SD1/Fotos/Paquet.jpg" target="_blank"><img src="El%20SD1_files/Paquet.jpg" width="200" height="133" border="0"></a><br>
+          <font size="-2">El Paquete completo del Camelot Warriors</font></div></td>
+      <td>&nbsp;</td>
+      <td><div align="center"><a href="http://www.robertp.net/SD1/Fotos/SD1_Sup.jpg" target="_blank"><img src="El%20SD1_files/SD1_Sup.jpg" width="200" height="133" border="0"></a><br>
+          <font size="-2">El SD1 (Vista Superior, aún se aprecía 
+          los restos de la pasta verde)</font></div></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td><div align="center"><a href="http://www.robertp.net/SD1/Fotos/SD1_Conec.jpg" target="_blank"><img src="El%20SD1_files/SD1_Conec.jpg" width="200" height="133" border="0"></a><br>
+          <font size="-2">El SD1 (Por el lado del conector)</font> <br>
+        </div></td>
+      <td>&nbsp;</td>
+      <td><div align="center"><a href="http://www.robertp.net/SD1/Fotos/SD1_Resis.jpg" target="_blank"><img src="El%20SD1_files/SD1_Resis.jpg" width="200" height="133" border="0"></a><br>
+          <font size="-2">El SD1 (Por el lado de la resistencia)</font></div></td>
+    </tr>
+  </tbody></table>
+  <p align="justify">&nbsp;</p>
+  <p align="justify"><strong>Software</strong></p>
+  <p align="justify">Así de entrada se me ocurren unas cuantas maneras 
+    de detectar el SD1. Por ejemplo, al terminar la carga de juego, leer el puerto 
+    255 y si el bit 5 está a 1 hacer un reset. O leer dicho puerto durante 
+    la carga del juego y si está a 1 responder con el famoso "R Tape 
+    loading error"....</p>
+  <p align="justify">Pero, ¿cómo lo hizo realmente Dinamic?. Ellos 
+    no utilizaron ningún puerto extraño, sino que lo hicieron a 
+    través del más conocido y utilizado. El puerto 254 ya que sorprendentemente 
+    el SD1 es capaz de alterar el bit 5 poniéndolo a 0 (por defecto siempre 
+    está a 1). De esta forma detectaron la presencia del SD1 al mismo tiempo 
+    que leían el teclado.<br>
+    Pusieron la detección en tres lugares diferentes del juego :</p>
+</div>
+<ol>
+  <li> 
+    <div align="justify">Al iniciar el juego se ejecuta una presentación 
+      donde unos pájaros presentan el nombre del juego y el copyright. 
+      Pulsando una tecla podemos iniciar la partida. Ahora bien si no tenemos 
+      el SD1 conectado la partida se inicia automáticamente, como si tuviésemos 
+      pulsada continuamente una tecla. Este es el código que lo hace posible 
+      :<br>
+      <br>
+      <table width="479" border="0">
+        <tbody><tr> 
+          <td width="66">C86C</td>
+          <td width="123">IN A,(C)</td>
+          <td width="276">&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>C86E</td>
+          <td>LD L,A</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>C86F</td>
+          <td>LD H,00</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>C871</td>
+          <td>EX DE,HL</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>C872</td>
+          <td>LD HL,009F</td>
+          <td>{Normalmente tendría que ser 00BF}</td>
+        </tr>
+        <tr> 
+          <td>C875</td>
+          <td>XOR A</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>C876</td>
+          <td>SBC HL,DE</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>C878</td>
+          <td>JP Z,C87C</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>C87B</td>
+          <td>RET</td>
+          <td>&nbsp;</td>
+        </tr>
+      </tbody></table>
+      <br>
+    </div>
+  </li>
+  <li> 
+    <div align="justify"> Durante el juego si no tenemos el SD1 conectado el teclado 
+      no responderá a ningún comando, por lo tanto el primer pájaro 
+      acabará con nosotros nada más empezar el juego. Este es el 
+      código que lo hace posible :<br>
+      <br>
+      <table width="650" border="0">
+        <tbody><tr> 
+          <td width="51">7FC6</td>
+          <td width="92">LD A,00</td>
+          <td width="433">&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FC8</td>
+          <td>LD (5BD6),A</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FCB</td>
+          <td>LD C,FE</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FCD</td>
+          <td>LD A,00</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FCF</td>
+          <td>OUT (C),A</td>
+          <td>{Nos aseguramos la compatibilidad de la lectura entre la ISSUE TWO 
+            y resto}</td>
+        </tr>
+        <tr> 
+          <td>7FD1</td>
+          <td>LD BC,DFFE</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FD4</td>
+          <td>IN A,(C)</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FD6</td>
+          <td>CP 9E</td>
+          <td>{Lectura de la tecla P, normalmente tendría que ser BE}</td>
+        </tr>
+        <tr> 
+          <td>7FD8</td>
+          <td>JR NZ,7FDF</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FDA</td>
+          <td>LD A,01</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FDC</td>
+          <td>LD (5BD6),A</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FDF</td>
+          <td>CP 9D</td>
+          <td>{Lectura de la tecla O, normalmente tendría que ser BD}</td>
+        </tr>
+        <tr> 
+          <td>7FE1</td>
+          <td>JR NZ,7FE8</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FE3</td>
+          <td>LD A,02</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FE5</td>
+          <td>LD (5BD6),A</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FE8</td>
+          <td>LD BC,FBFE</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FEB</td>
+          <td>IN A,(C)</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FED</td>
+          <td>CP 9E</td>
+          <td>{Lectura de la tecla Q, normalmente tendría que ser BE}</td>
+        </tr>
+        <tr> 
+          <td>7FEF</td>
+          <td>JR NZ,7FF6</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FF1</td>
+          <td>LD A,03</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FF3</td>
+          <td>LD (5BD6),A</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FF6</td>
+          <td>LD BC,7FFE</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FF9</td>
+          <td>IN A,(C)</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FFB</td>
+          <td>CP 9D</td>
+          <td>{Lectura de la tecla Symbol Shift, , normalmente tendría 
+            que ser BD}</td>
+        </tr>
+        <tr> 
+          <td>7FFD</td>
+          <td>JR NZ,8004</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>7FFF</td>
+          <td>LD A,04</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>8001</td>
+          <td>LD (5BD6),A</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>8004</td>
+          <td>RET</td>
+          <td>&nbsp;</td>
+        </tr>
+      </tbody></table>
+      <br>
+      Esta rutina coloca en la dirección 5BD6 un :<br>
+      0 -&gt; Si no hemos pulsado ninguna tecla o si no tenemos conectado el SD1.<br>
+      1 -&gt; Si pulsamos la P<br>
+      2 -&gt; Si pulsamos la O<br>
+      3 -&gt; Si pulsamos la Q<br>
+      4 -&gt; Si pulsamos el Symbol Shift<br>
+      <br>
+    </div>
+  </li>
+  <li> 
+    <div align="justify">Una vez perdamos una vida, sale la pantalla indicando 
+      el número de vidas y espera la pulsación de una tecla para 
+      continuar con la partida. Si no tenemos el SD1 no detectará la pulsación 
+      de una tecla y quedará eternamente en la pantalla donde se muestra 
+      el número de vidas restantes. Este es el código que lo hace 
+      posible :<br>
+      <br>
+      <table width="479" border="0">
+        <tbody><tr> 
+          <td width="66">B0A8</td>
+          <td width="123">LD HL,00FE</td>
+          <td width="276">&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>B0AB</td>
+          <td>PUSH HL</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>B0AC</td>
+          <td>POP BC</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>B0AD</td>
+          <td>IN A,(C)</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>B0AF</td>
+          <td>LD L,A</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>B0B0</td>
+          <td>LD H,00</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>B0B2</td>
+          <td>EX DE,HL</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>B0B3</td>
+          <td>LD HL,009F</td>
+          <td>{Normalmente tendría que ser 00BF}</td>
+        </tr>
+        <tr> 
+          <td>B0B6</td>
+          <td>XOR A</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>B0B7</td>
+          <td>SBC HL,DE</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>B0B9</td>
+          <td>JP NZ,B0BD</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr> 
+          <td>B0BC</td>
+          <td>RET</td>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td>B0BD</td>
+          <td>JP B0A5</td>
+          <td>&nbsp;</td>
+        </tr>
+      </tbody></table>
+      <br>
+      En la dirección B0A5, que es donde salta si no hay ninguna tecla 
+      pulsada, hay un CALL 7FC6.</div>
+  </li>
+</ol>
+<div align="center">
+  <p align="justify">Resumiendo, si el SD1 no está conectado, el juego 
+    empieza automáticamente nada más terminar la carga. El primer 
+    pájaro nos mata, ya que no nos podemos mover ni usar la espada y el 
+    Spectrum entra en un bucle sin fin mostrando el cartelito de las vidas restantes. 
+    Interesante, ¿no?. </p>
+  <table width="316" border="0" align="center">
+    <tbody><tr> 
+      <td width="316" align="left"><div align="center"><a href="http://www.robertp.net/SD1/Fotos/Caratula.jpg" target="_blank"><img src="El%20SD1_files/Caratula.jpg" width="200" height="130" border="0"></a><br>
+          <font size="-2">La caratula del Juego</font></div></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td><div align="center"><a href="http://www.robertp.net/SD1/Fotos/InsJoc(1).jpg" target="_blank"><img src="El%20SD1_files/InsJoc(1).jpg" width="278" height="156" border="0"></a><br>
+          <font size="-2">Las instrucciones del Juego, cara A</font></div></td>
+    </tr>
+    <tr> 
+      <td>&nbsp;</td>
+    </tr>
+    <tr> 
+      <td><div align="center"><a href="http://www.robertp.net/SD1/Fotos/InsJoc(2).jpg" target="_blank"><img src="El%20SD1_files/InsJoc(2).jpg" width="278" height="159" border="0"></a><br>
+          <font size="-2">Las instrucciones del Juego, cara B</font><br>
+        </div></td>
+    </tr>
+  </tbody></table>
+  <p align="justify">Si quieres el TZX original del juego (con la protección 
+    activa), haz clic <a href="http://www.robertp.net/SD1/Fitxers/camelot.tzx">aquí</a>.</p>
+  <p align="justify">&nbsp;</p>
+  <p align="justify"><strong>Compatibilidad</strong></p>
+  <table width="646" border="1" align="left">
+    <tbody><tr> 
+      <td width="170"><strong>Modelo</strong></td>
+      <td width="476"><strong>Compatibilidad</strong></td>
+    </tr>
+    <tr> 
+      <td>Spectrum 48K y +</td>
+      <td>Funciona perfectamente, faltaría más.</td>
+    </tr>
+    <tr> 
+      <td>Inves Spectrum +</td>
+      <td>El juego funciona perfectamente, ahora bien, el SD1 no es capaz de cambiar 
+        el bit 5 del puerto 254 (sí que lo hace en el 255, por ejemplo). 
+        Quedando siempre el bit 5 a 1. Por lo tanto el juego se comporta como 
+        si el SD1 no estuviese conectado.</td>
+    </tr>
+    <tr> 
+      <td>Spectrum 128</td>
+      <td>En modo 128 el juego tiene errores gráficos, en modo 48 funciona 
+        perfectamente. Ahora bien el SD1 tiene el mismo problema que con el Inves 
+        Spectrum +.</td>
+    </tr>
+    <tr> 
+      <td>Spectrum +2</td>
+      <td>En modo 128 el juego tiene errores gráficos, en modo 48 funciona 
+        perfectamente. El SD1 funciona perfectamente tanto en modo 128 como 48.</td>
+    </tr>
+    <tr>
+      <td>Spectrum +2A/+2B y +3</td>
+      <td>El SD1 es totalmente incompatible con estos modelos. No deja arrancar 
+        el ordenador, quedando la pantalla negra con el borde blanco (como si 
+        el botón de reset estuviese pulsado indefinidamente)</td>
+    </tr>
+  </tbody></table>
+  <p align="justify">&nbsp;</p>
+  <p align="justify">&nbsp;</p>
+  <p align="justify">&nbsp;</p>
+  <p align="justify">&nbsp;</p>
+  <p align="justify">&nbsp;</p>
+  <p align="justify">&nbsp;</p>
+  <p align="justify">&nbsp;</p>
+  <p align="justify">&nbsp;</p>
+  <p align="justify">&nbsp;</p>
+  <p align="justify">&nbsp;</p>
+  <p align="justify"><strong>¿Realmente funcionó?</strong></p>
+  <p align="justify">La respuesta es así de contundente : NO.<br>
+    Y prueba de ello es que no pusieron el SD1 en ningún otro juego, es 
+    más al poco sacaron otra versión del Camelot Warriors sin esta 
+    protección.</p>
+  <p align="justify">En el número 5 de MicroHobby especial publicaron una 
+    entrevista a diferentes personalidades (entre ellas alguien de Dinamic) donde 
+    comentaron el fenómeno de la piratería y el aquí comentado 
+    SD1. Estos fueron los párrafos más interesantes :</p>
+  <p align="justify"><em>(...) el primero es el máximo dirigente del al 
+    empresa <strong>SINCLAIR STORE:</strong> José Villar:<br>
+    (...)<br>
+    -Sr. Villar, Respecto a los productos de software que precisen algún 
+    tipo de hardware para funcionar (por ejemplo en Camelot Warriors), ¿nota 
+    alguna diferencia en las ventas?<br>
+    -Lo primero que hay que decir, es que el pueblo español es uno de los 
+    más ricos a nivel mundial en lo respectivo al ingenio. En este programa 
+    que necesitaba de un conector final para su funcionamiento, hemos visto en 
+    el <strong>Rastro </strong>que era duplicado de una manera totalmente artesanal 
+    fantástica con un artilugio de madera. Fue más difícil 
+    pero al final el resultado fue exacatamente igual.</em><br>
+    <em>Yo creo que la solución hay que buscarla en la creatividad de origen, 
+    es decir, si se quiere erradicar la piratería de forma total hay que 
+    hacer el juego en <strong>EPROM</strong>. En este sentido tendríamos 
+    que entrar en un análisis de costos.</em><br>
+    <em>(...)<br>
+    <br>
+    Ahora le toca el turno a Dynamic<a href="#AclaDinamic">(*)</a> :<br>
+    (...)<br>
+    - A vosotros en particular, ¿en qué manera os perjudica?</em><font size="-2">(Se 
+    refiere al fenómeno de la pirateria)<br>
+    </font><em>- Nosotros no tenemos cifras, pero sabemos las cosas que podemos 
+    ver, comprobamos hasta qué punto nuestros programas son blanco de los 
+    piratas. Cuando sacamos el Camelot Warriors, la primera versión llevaba 
+    el sistema éste del protección del "chirimbolito". 
+    Cuando éste fue "polimerizado" empezaron a "comercializar" 
+    la copia pirata sin el chirimbolito. Llegamos al <strong>Rastro</strong> y 
+    vimos que las mesas de piratas de Spectrum tenían dos programas: el 
+    Gunfright de Ultimate, y el Camelot de Dynamic. Y tenían 100 ó 
+    <strong>200 cassettes</strong> tirados en cada mesa. Yo lo que me gustaría 
+    destacar, es que los lectores se imaginen que escriben un libro, y que cuando 
+    lo han acabado, lo ven en la estantería del Corte Inglés muy 
+    bonito y bien presentado. Si ese fin de semana van al <strong>Rastro</strong> 
+    y ven que su trabajo está siendo vendido por unos piratas a 200 "pelas", 
+    y que él no percibe un sólo duro podrán comprender en 
+    qué situación estamos.</em></p>
+  <p align="justify"><a name="AclaDinamic"></a>(*)En la entrevista original se 
+    escribió Dynamic en lugar de Dinamic</p>
+</div>
+
+
+</body></html>
