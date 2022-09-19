@@ -1,0 +1,177 @@
+SPEC-MATE
+
+For Spectrum software transfer to
+
+DISCDRIVE*MICRODRIVE*WAFADRIVE*TAPE*SPRINT DOUBLESPEED
+
+INSTRUCTION MANUAL.
+
+With the purchase of this SPEC-MATE your transfer problems are over! Please read these instructions carefully and you will discover how quickly you will be operating this unique interface.
+
+WHY IS THE SPEC-MATE NECESSARY?
+
+SPEC-MATE enables you to transfer any software to fast loading systems as mentioned above at the touch of a button!
+
+QUICK REFERENCE GUIDE FOR KEYS USED WITH SPEC-MATE
+
+BLACK BORDER MODE
+
+t = save to tape
+m = save to microdrive
+d = save to disc drive (NB this applies to Beta Interface Only)
+w = save to wafadrive
+f =  save 'FAST' to tape (i.e. twice normal tape speed)
+0 = remove attirbutes
+
+RED BORDER MODE
+
+n = normal save with one screen
+s = screenless save
+a = save part A of program (with double screen)
+b = save part B of program (with double screen)
+
+BLUE BORDER MODE
+
+1 = use top part of screen for *SPEC-MATE* data
+2 = use middle part of screen for *SPEC-MATE* data
+2 = use bottom part of screen for *SPEC-MATE* data
+
+MAGENTA BORDER MODE
+
+Type the name of the program. Press 'ENTER' to save
+
+
+GETTING STARTED
+
+THE PROCEDURE USING MICRODRIVE AS AN EXAMPLE
+
+In nearly all cases the following procedure will work every single time. Details of how to tailor and save to your own particular needs are given further on in this manual. This first worked example is for a save to microdrive. Refer to 'Transfer to other systems' section on to see how to adapt it to your storage device.
+
+ENSURE YOUR MAINS SUPPLY IS OFF BEFORE FITTING SPEC-MATE TO YOUR SPECTRUM
+
+1) Push SPEC-MATE onto the edge connector found at the rear of your SPECTRUM and reconnect the mains supply to your computer.
+
+2) Place a blank formatted cartridge in the microdrive and load the cassette software you wish to transfer.
+
+3) When it has loaded press the red button on SPECMATE (The border will flash for a second and the program will be 'frozen' with BLACK BORDER)
+
+4) Press 'm' for a microdrive save (BORDER goes RED)
+
+5) Press 'n' to signify normal save (BORDER goes BLUE)
+
+6) Press '2' (Border goes MAGENTA) N.B. This saves the SPEC-MATE working data to the middle part of the screen.
+
+7) Type in the name with which your program will be saved, ensuring the name you choose does not already exist on the cartridge - maximum 9 characters (a BEEP sounds with every key press).
+
+8) Press 'ENTER' and the program will now transfer to your microdrive!
+
+On completion the program 'unfreezes' and continues to run normally without the need to load your back-up. On rare occasions you may find that this does not happen wiich means that your back-up will also not function. If so please read the rest of this manual for details on how to modify the above procedure paying particular attention to the 'Problem' section.
+
+TAPE (& SPRINT) - The procedure for back-up to tape is the same as that shown in the 'Getting Started' example except that: SPRINT USERS - DISCONNECT SPRINT BEFORE ATTACHING SPEC-MATE TO YOUR SPECTRUM
+
+A) At step 4 press 't'
+B) At step 7 the maximum number of characters allowed in the naming is 10.
+C) After step 7 remember to start recording before proceeding to step 8.
+
+The resulting tape back-up will now ALSO be compatible with the CHALLENGE SPRINT loading system.
+
+DOUBLE SPEED TAPE BACK-UP - The procedure for making a tape back-upthat will subsequently load at double speed is the same as in the 'Getting Started' example except that:
+
+A) At step 4 press 'f' and you will automatically be taken to step 6.
+B) At step 7 the maximum number of characters allowed in the naming is 10.
+
+NOTE FOR ALL USERS
+
+i) Any back-up you make to any storage device will subsequently load INDEPENDANTLY of the SPEC-MATE interface allowing you to use any peripheral you wish.
+
+ii) When naming a program you may use all the Spectrums symbols as SPEC-MATE alows you to obtain Shifted L Mode symbols by just pressing Symbol Shift. For example you can obtain a square bracket on the 'U' key by holding down Symbol Shift/U.
+
+iii) You can reset the computer at any stage when SPEC-MATE is attached.
+
+iv) Please do not use SPEC-MATE's powerful utulities to pirate software!
+
+FURTHER INFORMATION
+
+'FREEZING' POINT - see step 3 in 'Getting Started' - In most cases yoiu can 'freeze' the program at the options page i.e. the part which asks you to select KEMPSTON, KEYBOARD etc. However in some cases you may find the back-up does not work. Try 'freezing' at a different point e.g. at the 'GAME OVER' or 'HIGH SCORE TABLE' stage or if all else failseven in the middle of the program (It is very unlikely but you may need to refer to 'The 0 Key' section below).
+
+RED BORDER MODE - (This section does not apply to Wafadrive users) A program usually has a loading screen. You can opt to save this or do away with it altogether. The trade-off is on the amount of space you use on your drive or tape and the time it takes to load. Remember a spectrum screen picture uses about 7K of memory space. You have the following options:
+
+1) SAVING WITH A SINGLE SCREEN: (complete back-up uses 48K of storage space). You save the program with the screen you 'froze' at. Follow the procedure in the 'Getting Started' example.
+
+2) SAVING WITH TWO SCREENS: (55K). You save the screen you 'froze' at  AND (if you think it is pretty enough!) the original loading screen. This is what you do - 
+A) Load the program until you can see the complete loading screen picture on your T.V.
+B) Interrupt the loading process by pressing the red button.
+C) Press 'm', 't' or 'd' as required.
+D) Press 'a' (BORDER goes MAGENTA)
+E) Type in the name of the program
+F) Tape users start recording. Press 'ENTER' to save first screen.
+G) Reset the computer, rewind the cassette and begin loading from the beginning again.
+H) When the complete program has loaded press the red button again.
+I) Press 'm', 't' or 'd' as required.
+J) Press 'b' (BORDER goes BLUE)
+K) Tape users start recording. Press '2' (for other options see 'Bluse Border' section of this manual).
+FOR TAPE USERS THE OPERATION IS NOW COMPLETE
+L) Type in the SAME name as you typed in step E
+M) Press 'ENTER' to save second part of program.
+
+TWO SCREEN SAVING IS NOW COMPLETE
+
+3) SAVING WITHOUT A SCREEN: (43K) YOu save the program so that it loads with a blank screen. This means that you must be careful where you 'freeze'. Try to do it where the program has a 'press any key to continue' option or just before it moves to another section by itself. Remember a screenless back-up will have no instructions on the screen when it loads The advantage is the saving of storage space. For example you can fit two programs on a microdrive cartridge.
+This is what you do - 
+
+A) After 'freezing' press 'm', 't' or 'd' as required.
+B) Press 's' (BORDER goes MAGENTA)
+C) Type in the name and press 'ENTER' as you have done in other examples.
+
+BLUE BORDER MODE - (This section does not apply to Wafadrive users). When you pressed '2' in the 'Getting Started' example you probably noticed that the middle part of the screen picture was changed (For tape users only one line was affected). This is where SPEC-MATE strores its working data. You may however wish to change a different part of the picture. Pressing '1' will cover the top third of the screen and '3' the bottom third. Thus, you can decide which parts ot the picture you wish to keep intact. Just remember SPEC-MATE always needs to cover one third of the screen. YOu select the third by using '1', '2' or '3' in BLUE BORDER MODE.
+
+THE '0' KEY
+On very rare occasions a particular third of the screen MUST NOT be changed because the program also stores working data 'hidden' in the screen picture and this data must be preserved intact in your back-up or it will not work at all. This is where the '0' key comes in. It enables you to discover if any of this 'hidden' code exists and if so which third of the screen it lies in. When you press '0' in BLACK BORDER MODE (see 'Quick Reference Guide) the colours will be removed from the screen picture where you 'froze' the program. This enables you to see the #hidden' data. If there is any present you will see a series of little black lines, dots or shapes on the screen. After you have examined the screen you can press any key to 'unfreeze' and return to the program in order to continue the back-up procedure. Use the '1', '2' or '3' keys as described above to ensure that this 'hidden' data in not disturbed. Please let us emphasise that this will only be necessary on very rare occasions. We have only included this option so that you can transfer all programs in any way you wish making SPEC-MATE a very powerful tool indeed.
+
+HINTS AND TIPS
+
+This section outlines some other things you can do with SPEC-MATE apart from just transferring your programs.
+
+You can save any screen picture at any point during play by following the in the first part of the Red Border Mode 'saving with two screens'
+
+For the more advanced user......
+
+If you use a program that handles files you can transfer the whole program with it's files. For example, if you are a discdrive user and want to use Tasword II, there is no need to adapt Tasword, just transfer the whole program together with the file you are using.
+
+* You can add pokes to your back-up by pressing break as soon as the screen goes black when you begin loading. If you now change the 'INK' to 9 and 'LIST' the basic program loader you can add a poke statement
+
+N.B. Any normal spectrum error report such as 'microdrive not present' or reading to a write file' etc will crash the spectrum when SPEC-MATE is in use.
+
+TRANSFER TO OTHER SYSTEMS
+
+DISC DRIVE - The procedure for back-up to disc drive is the same as shown in the 'Getting Started' example except that:
+A) Ensure that you do not use a password on your disc as this interferes with the operation of SPEC-MATE.
+B) At step 4 press 'd'
+C) When naming your back-up in step 7 the maximum number of characters allowed is 6
+
+WAFADRIVE - The procedure to back-up for WAFA is the same as that shown in the 'Getting Started' example except that:
+A) Ensure that you are using a wafer large enough to take the back-up which will occupy 48K of space.
+B) At step 4 press 'w' and you will AUTOMATICALLY be taken to ste 7.
+C) After step 8 SPEC-MATE will make a special save to your wafadrive. Programs are always in this way because the wafadrive itself uses a large amount of working space. In consequence much of this manual will not apply to wafadrive users BUT you should pay SPECIAL ATTENTION to the 'Freezing point' and 'Saving without a screen' sections of this manual and save your back-ups accordingly.
+
+PROBLEMS
+
+If for any reason transfer of your program fails you will find that on completion the program does not 'unfreeze' and carry on running as described above. If this happens check the following:
+
+1) There is always the possibility that the original software you are trying to load is faulty or that you had the volume control set at an innapropriate level or that your tape head is in need of attention. In general if the original does not load then obvioulsy SPEC-MATE cannot transfer it! Check your original.
+
+2) Try 'freezing' the program at a different point as described in the 'FREEZING' POINT section of this manual.
+
+3) Try using an alternative number in BLUE BORDER MODE i.e. if you used '1' try '2' or '3' instead.
+
+IF ALL ELSE FAILS - You can contact us on: 01-733 6175 (Evenings are best) and we will try to sort out your problem.
+
+------------------------------------------------------------
+
+Notes: I have typed these instructions pretty much verbatim from a scanned copy of the original (Many thanks Michael!) and I stayed true to the way it was written, grammar, punctuation and all with only minor changes.
+
+I have done this as a compainion to my own recreation of the SPEC-MATE interface, the details of which can be found on www.ProjectSPECCY.com for anyone to utilise. Should you decide to build one, you need only download the GERBER files and send them to a fabricator to have PCBs made. You can then obtain the required components and build your own.
+
+I have fond memories of this interface. I loaned one from a friend back in the heyday of the Spectrum and used it to hack lots of games along with a microdrive, DEVPAC Monitor and later Laser Genius Monitor. Although it didn't work with all games, it did with most of the ones I was interested in. I can remember vividly trying to press the SPEC-MATE's 'Red Button' to catch Knightlore as it's loading screen dissapeared but before it's main menu appeared to obtain the perfect back-up. It took mutiple attempts! Those were good times.
+
+Steve Smith - 30/12/2018 - www.ProjectSPECCY.com
