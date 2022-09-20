@@ -34,7 +34,7 @@ BLUE BORDER MODE
 
 1 = use top part of screen for *SPEC-MATE* data
 2 = use middle part of screen for *SPEC-MATE* data
-2 = use bottom part of screen for *SPEC-MATE* data
+3 = use bottom part of screen for *SPEC-MATE* data
 
 MAGENTA BORDER MODE
 
