@@ -1,8 +1,7 @@
 owzthat.epr is a eprom card that contains the files:
 - OWZTHAT.B: Tokenised basic file
 - OWZTHAT.EXE: Plain text file ready to be executed from the Filter (just added the #B characters at the beginning)
-
-There's a info file (in pipedream format) which explains the included files
+- INFO.PPD: Pipedream file which explains the included files
 
 More info:
 
