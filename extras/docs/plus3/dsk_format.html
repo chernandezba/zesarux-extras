@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="client-nojs">
+<head>
+<meta charset="UTF-8" />
+<title>Format:DSK disk image file format - CPCWiki</title>
+<meta name="generator" content="MediaWiki 1.25.1" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="/opensearch_desc.php" title="CPCWiki - THE Amstrad CPC encyclopedia! (en)" />
+<link rel="EditURI" type="application/rsd+xml" href="https://www.cpcwiki.eu/api.php?action=rsd" />
+<link rel="alternate" hreflang="x-default" href="/index.php/Format:DSK_disk_image_file_format" />
+<link rel="copyright" href="/index.php/MediaWiki:Copyright" />
+<link rel="alternate" type="application/atom+xml" title="CPCWiki - THE Amstrad CPC encyclopedia! Atom feed" href="/index.php?title=Special:RecentChanges&amp;feed=atom" />
+<link rel="stylesheet" href="https://www.cpcwiki.eu/load.php?debug=false&amp;lang=en&amp;modules=mediawiki.legacy.commonPrint%2Cshared%7Cmediawiki.sectionAnchor%7Cmediawiki.skinning.interface%7Cmediawiki.ui.button%7Cskins.vector.styles&amp;only=styles&amp;skin=vector&amp;*" />
+<meta name="ResourceLoaderDynamicStyles" content="" />
+<style>a:lang(ar),a:lang(kk-arab),a:lang(mzn),a:lang(ps),a:lang(ur){text-decoration:none}
+/* cache key: wikidb:resourceloader:filter:minify-css:7:b36fd1c042133c9c9b60260f7c29b237 */</style>
+<script src="https://www.cpcwiki.eu/load.php?debug=false&amp;lang=en&amp;modules=startup&amp;only=scripts&amp;skin=vector&amp;*"></script>
+<script>if(window.mw){
+mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Format:DSK_disk_image_file_format","wgTitle":"Format:DSK disk image file format","wgCurRevisionId":109312,"wgRevisionId":109312,"wgArticleId":13822,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Cpctech.org"],"wgBreakFrames":false,"wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgMonthNamesShort":["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"wgRelevantPageName":"Format:DSK_disk_image_file_format","wgRelevantArticleId":13822,"wgIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgWikiEditorEnabledModules":{"toolbar":true,"dialogs":true,"hidesig":true,"preview":true,"publish":false}});
+}</script><script>if(window.mw){
+mw.loader.implement("user.options",function($,jQuery){mw.user.options.set({"variant":"en"});});mw.loader.implement("user.tokens",function($,jQuery){mw.user.tokens.set({"editToken":"+\\","patrolToken":"+\\","watchToken":"+\\"});});
+/* cache key: wikidb:resourceloader:filter:minify-js:7:a5c52c063dc436c1ca7c9f456936a5e9 */
+}</script>
+<script>if(window.mw){
+mw.loader.load(["mediawiki.page.startup","mediawiki.legacy.wikibits","mediawiki.legacy.ajax","skins.vector.js"]);
+}</script>
+<!--[if lt IE 7]><style type="text/css">body{behavior:url("/skins/Vector/csshover.min.htc")}</style><![endif]-->
+</head>
+<body class="mediawiki ltr sitedir-ltr ns-0 ns-subject page-Format_DSK_disk_image_file_format skin-vector action-view">
+		<div id="mw-page-base" class="noprint"></div>
+		<div id="mw-head-base" class="noprint"></div>
+		<div id="content" class="mw-body" role="main">
+			<a id="top"></a>
+
+						<div class="mw-indicators">
+</div>
+			<h1 id="firstHeading" class="firstHeading" lang="en">Format:DSK disk image file format</h1>
+						<div id="bodyContent" class="mw-body-content">
+									<div id="siteSub">From CPCWiki - THE Amstrad CPC encyclopedia!</div>
+								<div id="contentSub"></div>
+												<div id="jump-to-nav" class="mw-jump">
+					Jump to:					<a href="#mw-head">navigation</a>, 					<a href="#p-search">search</a>
+				</div>
+				<div id="mw-content-text" lang="en" dir="ltr" class="mw-content-ltr"><div style="border: 1px solid rgb(228, 222, 222); margin: 0px 0px 5px; padding: 0.5em 1em; background-color: rgb(249, 249, 249);">
+<center>
+<i><b>This article originally came from Kevin Thackers' archive at <a class="external free" href="http://www.cpctech.org.uk">http://www.cpctech.org.uk</a>.</b></i> </center></div>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Disk_image_file_format"><span class="tocnumber">1</span> <span class="toctext">Disk image file format</span></a>
+<ul>
+<li class="toclevel-2 tocsection-2"><a href="#Disc_Information_block"><span class="tocnumber">1.1</span> <span class="toctext">Disc Information block</span></a></li>
+<li class="toclevel-2 tocsection-3"><a href="#Track_Information_Block"><span class="tocnumber">1.2</span> <span class="toctext">Track Information Block</span></a>
+<ul>
+<li class="toclevel-3 tocsection-4"><a href="#Sector_info"><span class="tocnumber">1.2.1</span> <span class="toctext">Sector info</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-5"><a href="#General_format"><span class="tocnumber">1.3</span> <span class="toctext">General format</span></a>
+<ul>
+<li class="toclevel-3 tocsection-6"><a href="#Single_sided_DSK_images"><span class="tocnumber">1.3.1</span> <span class="toctext">Single sided DSK images</span></a></li>
+<li class="toclevel-3 tocsection-7"><a href="#Double_sided_DSK_images"><span class="tocnumber">1.3.2</span> <span class="toctext">Double sided DSK images</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-8"><a href="#Extended_DSK_image_definition"><span class="tocnumber">2</span> <span class="toctext">Extended DSK image definition</span></a>
+<ul>
+<li class="toclevel-2 tocsection-9"><a href="#Extended_DiSK_Format_.28Rev.5.29"><span class="tocnumber">2.1</span> <span class="toctext">Extended DiSK Format (Rev.5)</span></a></li>
+<li class="toclevel-2 tocsection-10"><a href="#DISK_INFORMATION_BLOCK"><span class="tocnumber">2.2</span> <span class="toctext">DISK INFORMATION BLOCK</span></a></li>
+<li class="toclevel-2 tocsection-11"><a href="#TRACK_OFFSET_TABLE"><span class="tocnumber">2.3</span> <span class="toctext">TRACK OFFSET TABLE</span></a></li>
+<li class="toclevel-2 tocsection-12"><a href="#TRACK_INFORMATION_BLOCK_2"><span class="tocnumber">2.4</span> <span class="toctext">TRACK INFORMATION BLOCK</span></a></li>
+<li class="toclevel-2 tocsection-13"><a href="#SECTOR_INFORMATION_LIST"><span class="tocnumber">2.5</span> <span class="toctext">SECTOR INFORMATION LIST</span></a></li>
+<li class="toclevel-2 tocsection-14"><a href="#Extensions_to_the_above_specification"><span class="tocnumber">2.6</span> <span class="toctext">Extensions to the above specification</span></a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+<h1><span class="mw-headline" id="Disk_image_file_format">Disk image file format</span></h1>
+<p>This document describes the standard disk image format. It has the file extension ".DSK". 
+</p>
+<h2><span class="mw-headline" id="Disc_Information_block">Disc Information block</span></h2>
+<p>The "Disc Information block" is always at offset 0 in the disk image file. If track data exists, then this will immediately follow the Disc Information Block and will start at offset &amp;100 in the disc image file. 
+</p><p>The "Disc Information block" has the following structure: 
+</p>
+<table border="1">
+
+<tr>
+<th> offset
+</th>
+<th> description
+</th>
+<th> bytes
+</th></tr>
+<tr>
+<td> 00-21
+</td>
+<td> "MV - CPCEMU Disk-File\r\nDisk-Info\r\n"
+</td>
+<td> 34
+</td></tr>
+<tr>
+<td> 22-2f
+</td>
+<td> name of creator
+</td>
+<td> 14
+</td></tr>
+<tr>
+<td> 30
+</td>
+<td> number of tracks
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 31
+</td>
+<td> number of sides
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 32-33
+</td>
+<td> size of a track (little endian; low byte followed by high byte)
+</td>
+<td> 2
+</td></tr>
+<tr>
+<td> 34-ff
+</td>
+<td> not used (0)
+</td>
+<td> 204
+</td></tr></table>
+<p>Notes: 
+</p>
+<ul><li>Track 0 (or Track 0 side 0 for double sided disks) immediatly follows the Disk Information Block, and is at offset &amp;100 in the disk image. </li>
+<li>"MV - CPC" must be present, because it is used to identify the file as a disk image. It is sufficient to check this to identify the file as being a disk image. </li>
+<li>"\r" is the C programming language equivalent of ASCII character 13. </li>
+<li>"\n" is the C programming language equivalent of ASCII character 10. </li>
+<li><b>All</b> tracks must be the same size. </li>
+<li>"size of track" is used to calculate the location of the data for a chosen track. </li>
+<li>"size of track" includes the &amp;100 byte Track Information Block. </li>
+<li><b>All</b> tracks must have a "Track Information Block" </li>
+<li>track lengths are stored in the same order as the tracks in the image e.g. In the case of a double sided disk: Track 0 side 0, Track 0 side 1, Track 1 side 0 etc... </li>
+<li>The track blocks are stored in increasing order 0..number of tracks, with alternating sides interleaved if the disc image describes a double sided disk. e.g. if the disk image represents a double sided disk, the order of tracks is: track 0 side 0, track 0 side 1, track 1 side 0, track 1 side 1.... track (number of tracks-1) side 0, track (number of tracks-1) side 1 The tracks are <b>always</b> ordered in this way regardless of the disc-format described by the disc image. </li>
+<li>A standard disk image can be used to describe a copy-protected disk, but will often result in a file which is larger than the same disk described by a extended disk image. For a standard disk image to represent a copy-protected disk: 
+<ul><li>All track sizes in the standard disk image must be the same. This value therefore would be the size of the largest track, and other tracks would have unused space in them. </li>
+<li>All sector sizes within each track must be the same size, but not necessarily the same size as the sectors for another track. If a track contained different sized sectors, the size of the largest sector should be used. This would result in some wasted space.</li></ul></li></ul>
+<h2><span class="mw-headline" id="Track_Information_Block">Track Information Block</span></h2>
+<p>Each Track Block comprises a Track Information Block and sector data. The sector data is always at an offset of &amp;100 bytes from the start of the track block. The data for the next track in the disc image immediatly follows the data for the current track. 
+</p><p>The first Track Block is located at offset &amp;100 in the disk image file. The track block starts with the Track Information Block and has this form. 
+</p>
+<table border="1">
+
+<tr>
+<th> offset
+</th>
+<th> description
+</th>
+<th> bytes
+</th></tr>
+<tr>
+<td> 00 - 0b
+</td>
+<td> "Track-Info\r\n"
+</td>
+<td> 12
+</td></tr>
+<tr>
+<td> 0c - 0f
+</td>
+<td> unused
+</td>
+<td> 4
+</td></tr>
+<tr>
+<td> 10
+</td>
+<td> track number
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 11
+</td>
+<td> side number
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 12 - 13
+</td>
+<td> unused
+</td>
+<td> 2
+</td></tr>
+<tr>
+<td> 14
+</td>
+<td> sector size
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 15
+</td>
+<td> number of sectors
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 16
+</td>
+<td> GAP#3 length
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 17
+</td>
+<td> filler byte
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 18 - xx
+</td>
+<td> Sector Information List
+</td>
+<td> xx
+</td></tr></table>
+<p>Notes: 
+</p>
+<ul><li>"number of sectors" is used to identify the number of valid entries in the sector information list. </li>
+<li>"sector size" parameter is used to calculate the location of each sector's data. Therefore, The data allocated for each sector must be the same. If the track contains different sized sectors, then the data allocated must be the size of the biggest sector. The "sector size" parameter is used to calculate the location of the sector data. Note that sector size's unit is 256-bytes. So, a sector size of 2, translates to 256 &lt;&lt; (2-1), or 512 bytes.</li>
+<li>Sector data always follows Track Information Block at offset &amp;100 from the start of the track information block. </li>
+<li>Sector data is stored in the same order as the sectors in the sector info block.</li></ul>
+<h3><span class="mw-headline" id="Sector_info">Sector info</span></h3>
+<table border="1">
+
+<tr>
+<th> offset
+</th>
+<th> description
+</th>
+<th> bytes
+</th></tr>
+<tr>
+<td> 00
+</td>
+<td> track (equivalent to C parameter in NEC765 commands)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 01
+</td>
+<td> side (equivalent to H parameter in NEC765 commands)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 02
+</td>
+<td> sector ID (equivalent to R parameter in NEC765 commands)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 03
+</td>
+<td> sector size (equivalent to N parameter in NEC765 commands)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 04
+</td>
+<td> FDC status register 1 (equivalent to NEC765 ST1 status register)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 05
+</td>
+<td> FDC status register 2 (equivalent to NEC765 ST2 status register)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 06 - 07
+</td>
+<td> notused (0)
+</td>
+<td> 2
+</td></tr></table>
+<p>Notes: 
+</p>
+<ul><li>The following bits are used from NEC765 status register 1: 
+<ul><li>b7 EN (End of Cylinder) </li>
+<li>b5 DE (Data Error) </li>
+<li>b2 ND (No Data) </li>
+<li>b0 MA (Missing Address Mark) </li></ul></li>
+<li>The following bits are used from NEC765 status register 2: 
+<ul><li>b5 CM (Control Mark) </li>
+<li>b5 DD (Data Error in Data field) </li>
+<li>b0 MD (Missing address Mark in Data field) </li></ul></li>
+<li>For 8k Sectors (N="6"), only 1800h bytes is stored.</li></ul>
+<h2><span class="mw-headline" id="General_format">General format</span></h2>
+<h3><span class="mw-headline" id="Single_sided_DSK_images">Single sided DSK images</span></h3>
+<ul><li>Disc Information Block </li>
+<li>Track 0 data 
+<ul><li>Track Information Block </li>
+<li>Sector data </li></ul></li>
+<li>Track 1 data 
+<ul><li>Track Information Block </li>
+<li>Sector data . . . . </li></ul></li>
+<li>Track (number_of_tracks-1) data 
+<ul><li>Track Information Block </li>
+<li>Sector data</li></ul></li></ul>
+<h3><span class="mw-headline" id="Double_sided_DSK_images">Double sided DSK images</span></h3>
+<ul><li>Disc Information Block </li>
+<li>Track 0 side 0 data 
+<ul><li>Track Information Block </li>
+<li>Sector data </li></ul></li>
+<li>Track 0 side 1 data 
+<ul><li>Track Information Block </li>
+<li>Sector data . . . . </li></ul></li>
+<li>Track (number_of_tracks-1) side 1 data 
+<ul><li>Track Information Block </li>
+<li>Sector data</li></ul></li></ul>
+<p><br /> 
+</p>
+<h1><span class="mw-headline" id="Extended_DSK_image_definition">Extended DSK image definition</span></h1>
+<p>The extended DSK image is a file designed to describe copy-protected floppy disk software. It's definition was defined by Marco Vieth, Ulrich Doewich and Kevin Thacker. 
+</p><p>This format has been widely adopted and is one of the major file formats used (the other major format is the standard disk image with the "MV - CPC" identifier). 
+</p><p>The extended disk image format should be used for copy-protected disc software, or in place of a standard disk image if the resulting image is smaller than in the standard disk image form. 
+</p>
+<h2><span class="mw-headline" id="Extended_DiSK_Format_.28Rev.5.29">Extended DiSK Format (Rev.5)</span></h2>
+<p>The disc image has the following format: 
+</p>
+<table border="1">
+
+<tr>
+<td> DISK INFORMATION BLOCK (256 bytes)
+</td></tr>
+<tr>
+<td> TRACK INFORMATION BLOCK * number of tracks * number of sides
+</td></tr></table>
+<p>The track blocks are stored in increasing order 0..number of tracks, with alternating sides interleaved if the disc image describes a double sided disk. e.g. if the disk image represents a double sided disk, the order of tracks is: track 0 side 0, track 0 side 1, track 1 side 0, track 1 side 1.... track (number of tracks-1) side 0, track (number of tracks-1) side 1 
+</p><p>The tracks are <b>always</b> ordered in this way regardless of the disc-format described by the disc image. 
+</p><p>The location of the track information block is found by using the track size table. 
+</p>
+<h2><span class="mw-headline" id="DISK_INFORMATION_BLOCK">DISK INFORMATION BLOCK</span></h2>
+<p>The "DISK INFORMATION BLOCK" is always located at offset 0 in the disk image file, and has the following structure: 
+</p>
+<table border="1">
+
+<tr>
+<th> offset
+</th>
+<th> description
+</th>
+<th> bytes
+</th></tr>
+<tr>
+<td> 00 - 21
+</td>
+<td> "EXTENDED CPC DSK File\r\nDisk-Info\r\n"
+</td>
+<td> 34
+</td></tr>
+<tr>
+<td> 22 - 2f
+</td>
+<td> name of creator (utility/emulator)
+</td>
+<td> 14
+</td></tr>
+<tr>
+<td> 30
+</td>
+<td> number of tracks
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 31
+</td>
+<td> number of sides
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 32 - 33
+</td>
+<td> unused
+</td>
+<td> 2
+</td></tr>
+<tr>
+<td> 34 - xx
+</td>
+<td> track size table
+</td>
+<td> number of tracks*number of sides
+</td></tr></table>
+<p>NOTES: 
+</p>
+<ul><li>An extended DSK image is identified by the "EXTENDED" tag. The track size at offset 32h and 33h, used by the STANDARD disk image is ignored for extended format DSK images. </li>
+<li>If track data exists, then it starts at offset 100h. </li>
+<li>The "EXTENDED" tag is present to prevent existing emulators which support the standard DSK image from interpreting the data wrong and possibly crashing. </li>
+<li>"\r" is the C programming language equivalent of ASCII character 13. </li>
+<li>"\n" is the C programming language equivalent of ASCII character 10.</li></ul>
+<h2><span class="mw-headline" id="TRACK_OFFSET_TABLE">TRACK OFFSET TABLE</span></h2>
+<table border="1">
+
+<tr>
+<th> offset
+</th>
+<th> description
+</th>
+<th> bytes
+</th></tr>
+<tr>
+<td> 01
+</td>
+<td> high byte of track 0 length (equivalent to track length/256)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> ...
+</td>
+<td> ...
+</td>
+<td> ...
+</td></tr></table>
+<p>NOTES: 
+</p>
+<ul><li>Depending on the information in the disk information block, the table contains 
+<ul><li>track lengths for a single sided floppy disc </li>
+<li>track lengths for a double sided floppy disc </li></ul></li>
+<li>track lengths are stored in the same order as the tracks in the image e.g. In the case of a double sided disk: Track 0 side 0, Track 0 side 1, Track 1 side 0 etc... </li>
+<li>A size of "0" indicates an unformatted track. In this case there is no data, and no track information block for this track in the image file! </li>
+<li>Actual length of track data = (high byte of track length) * 256 </li>
+<li>Track length includes the size of the TRACK INFORMATION BLOCK (256 bytes) </li>
+<li>The location of a Track Information Block for a chosen track is found by summing the sizes of all tracks up to the chosen track plus the size of the Disc Information Block (&amp;100 bytes). The first track is at offset &amp;100 in the disc image.</li></ul>
+<h2><span class="mw-headline" id="TRACK_INFORMATION_BLOCK_2">TRACK INFORMATION BLOCK</span></h2>
+<table border="1">
+
+<tr>
+<th> offset
+</th>
+<th> description
+</th>
+<th> bytes
+</th></tr>
+<tr>
+<td> 00 - 0b
+</td>
+<td> "Track-Info\r\n"
+</td>
+<td> 12
+</td></tr>
+<tr>
+<td> 0c - 0f
+</td>
+<td> unused
+</td>
+<td> 4
+</td></tr>
+<tr>
+<td> 10
+</td>
+<td> track number
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 11
+</td>
+<td> side number
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 12 - 13
+</td>
+<td> unused
+</td>
+<td> 2
+</td></tr>
+<tr>
+<td> 14
+</td>
+<td> sector size
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 15
+</td>
+<td> number of sectors
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 16
+</td>
+<td> GAP#3 length
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 17
+</td>
+<td> filler byte
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 18 - xx
+</td>
+<td> Sector Information List
+</td>
+<td> xx
+</td></tr></table>
+<p>NOTES: 
+</p>
+<ul><li>Identical to the original DSK format definition.</li></ul>
+<h2><span class="mw-headline" id="SECTOR_INFORMATION_LIST">SECTOR INFORMATION LIST</span></h2>
+<table border="1">
+
+<tr>
+<th> offset
+</th>
+<th> description
+</th>
+<th> bytes
+</th></tr>
+<tr>
+<td> 00
+</td>
+<td> track (equivalent to C parameter in NEC765 commands)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 01
+</td>
+<td> side (equivalent to H parameter in NEC765 commands)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 02
+</td>
+<td> sector ID (equivalent to R parameter in NEC765 commands)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 03
+</td>
+<td> sector size (equivalent to N parameter in NEC765 commands)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 04
+</td>
+<td> FDC status register 1 (equivalent to NEC765 ST1 status register)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 05
+</td>
+<td> FDC status register 2 (equivalent to NEC765 ST2 status register)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 06 - 07
+</td>
+<td> actual data length in bytes
+</td>
+<td> 2
+</td></tr></table>
+<p>NOTES: 
+</p>
+<ul><li>Identical to the original definition except for the addition of the sector data length. This value is in bytes and stored in little endian notation. (low byte followed by high byte) </li>
+<li>The location of each sectors data is found by adding the size of the previous sectors, plus the size of the 256 byte header. </li>
+<li>For 8k Sectors (N="6"), only 1800h bytes is stored. Please see extensions below!!!</li></ul>
+<h2><span class="mw-headline" id="Extensions_to_the_above_specification">Extensions to the above specification</span></h2>
+<p>1. This extension was proposed by John Elliott. Extension to TRACK INFORMATION BLOCK: 
+</p>
+<table border="1">
+
+<tr>
+<th> offset
+</th>
+<th> description
+</th>
+<th> bytes
+</th></tr>
+<tr>
+<td> 12
+</td>
+<td> Data rate. (See note 1 and note 3)
+</td>
+<td> 1
+</td></tr>
+<tr>
+<td> 13
+</td>
+<td> Recording mode. (See note 2 and note 3)
+</td>
+<td> 1
+</td></tr></table>
+<dl><dd>Notes:</dd></dl>
+<dl><dd>1. Data rate defines the rate at which data was written to the track. This value applies to the entire track.</dd></dl>
+<table border="1">
+
+<tr>
+<th> Date rate
+</th>
+<th> description
+</th></tr>
+<tr>
+<td> 0
+</td>
+<td> Unknown.
+</td></tr>
+<tr>
+<td> 1
+</td>
+<td> Single or double density
+</td></tr>
+<tr>
+<td> 2
+</td>
+<td> High Density
+</td></tr>
+<tr>
+<td> 3
+</td>
+<td> Extended density
+</td></tr></table>
+<p>Existing files should have zeroes in these bytes; hence the use of 0 for unknown. 
+</p>
+<dl><dd>2. Recording mode is used to define how the data was written. It defines the encoding used to write the data to the disc and the structure of the data on the disc including the layout of the sectors. This value applies to the entire track.</dd></dl>
+<table border="1">
+
+<tr>
+<th> Date rate
+</th>
+<th> description
+</th></tr>
+<tr>
+<td> 0
+</td>
+<td> Unknown.
+</td></tr>
+<tr>
+<td> 1
+</td>
+<td> FM
+</td></tr>
+<tr>
+<td> 2
+</td>
+<td> MFM
+</td></tr></table>
+<p>Existing files should have zeroes in these bytes; hence the use of 0 for unknown. 
+</p>
+<dl><dd>3. How to determine the actual rate. The NEC765 floppy disc controller is supplied with a single clock. When reading from and writing to a disc using the NEC765 you can choose FM or MFM recording modes. Use of these modes and the clock into the NEC765 define the final rate at which the data is written to the disc. </dd>
+<dd>When FM recording mode is used, data is read from or written to at a rate which is double that of when MFM is used. The time for each bit will be twice the time for MFM. </dd>
+<dd>Examples:</dd></dl>
+<table border="1">
+
+<tr>
+<th> NEC765 Clock
+</th>
+<th> FM/MFM
+</th>
+<th> Actual rate
+</th></tr>
+<tr>
+<td> 4Mhz
+</td>
+<td> FM
+</td>
+<td> 4us per bit
+</td></tr>
+<tr>
+<td> 4Mhz
+</td>
+<td> MFM
+</td>
+<td> 2us per bit
+</td></tr></table>
+<p>2. This extension was proposed by Simon Owen. 
+</p>
+<dl><dd>1. It has been found that many protections using 8K Sectors (N="6") do store more than &amp;1800 bytes of useable data. It was thought that &amp;1800 was the maximum useable limit, but this has proved wrong. So you should support 8K of data to ensure this data is read correctly. The size of the sector will be reported in the SECTOR INFORMATION LIST as described above. </dd>
+<dd>For sector size N="7" the full 16K will be stored. It is assumed that sector sizes are defined as 3 bits only, so that a sector size of N="8" is equivalent to N="0". </dd>
+<dd>2. Storing Multiple Versions of Weak/Random Sectors. </dd>
+<dd>Some copy protections have what is described as 'weak/random' data. Each time the sector is read one or more bytes will change, the value may be random between consecutive reads of the same sector. </dd>
+<dd>To support these formats the following extension has been proposed. </dd>
+<dd>Where a sector has weak/random data, there are multiple copies stored. The actual sector size field in the SECTOR INFORMATION LIST describes the size of all the copies. To determine if a sector has multiple copies then compare the actual sector size field to the size defined by the N parameter. For multiple copies the actual sector size field will have a value which is a multiple of the size defined by the N parameter. The emulator should then choose which copy of the sector it should return on each read.</dd></dl>
+
+<!-- 
+NewPP limit report
+CPU time usage: 0.024 seconds
+Real time usage: 0.030 seconds
+Preprocessor visited node count: 56/1000000
+Preprocessor generated node count: 62/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Highest expansion depth: 2/40
+Expensive parser function count: 0/100
+-->
+
+<!-- 
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 - -total
+-->
+
+<!-- Saved in parser cache with key wikidb:pcache:idhash:13822-0!*!*!!en!*!* and timestamp 20221104175152 and revision id 109312
+ -->
+</div>									<div class="printfooter">
+						Retrieved from "<a dir="ltr" href="https://www.cpcwiki.eu/index.php?title=Format:DSK_disk_image_file_format&amp;oldid=109312">https://www.cpcwiki.eu/index.php?title=Format:DSK_disk_image_file_format&amp;oldid=109312</a>"					</div>
+													<div id='catlinks' class='catlinks'><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="/index.php/Special:Categories" title="Special:Categories">Category</a>: <ul><li><a href="/index.php/Category:Cpctech.org" title="Category:Cpctech.org">Cpctech.org</a></li></ul></div></div>												<div class="visualClear"></div>
+							</div>
+		</div>
+		<div id="mw-navigation">
+			<h2>Navigation menu</h2>
+
+			<div id="mw-head">
+									<div id="p-personal" role="navigation" class="" aria-labelledby="p-personal-label">
+						<h3 id="p-personal-label">Personal tools</h3>
+						<ul>
+							<li id="pt-createaccount"><a href="/index.php?title=Special:UserLogin&amp;returnto=Format%3ADSK+disk+image+file+format&amp;type=signup" title="You are encouraged to create an account and log in; however, it is not mandatory">Create account</a></li><li id="pt-login"><a href="/index.php?title=Special:UserLogin&amp;returnto=Format%3ADSK+disk+image+file+format" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o">Log in</a></li>						</ul>
+					</div>
+									<div id="left-navigation">
+										<div id="p-namespaces" role="navigation" class="vectorTabs" aria-labelledby="p-namespaces-label">
+						<h3 id="p-namespaces-label">Namespaces</h3>
+						<ul>
+															<li  id="ca-nstab-main" class="selected"><span><a href="/index.php/Format:DSK_disk_image_file_format"  title="View the content page [c]" accesskey="c">Page</a></span></li>
+															<li  id="ca-talk" class="new"><span><a href="/index.php?title=Talk:Format:DSK_disk_image_file_format&amp;action=edit&amp;redlink=1"  title="Discussion about the content page [t]" accesskey="t">Discussion</a></span></li>
+													</ul>
+					</div>
+										<div id="p-variants" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-variants-label">
+												<h3 id="p-variants-label"><span>Variants</span><a href="#"></a></h3>
+
+						<div class="menu">
+							<ul>
+															</ul>
+						</div>
+					</div>
+									</div>
+				<div id="right-navigation">
+										<div id="p-views" role="navigation" class="vectorTabs" aria-labelledby="p-views-label">
+						<h3 id="p-views-label">Views</h3>
+						<ul>
+															<li id="ca-view" class="selected"><span><a href="/index.php/Format:DSK_disk_image_file_format" >Read</a></span></li>
+															<li id="ca-viewsource"><span><a href="/index.php?title=Format:DSK_disk_image_file_format&amp;action=edit"  title="This page is protected.&#10;You can view its source [e]" accesskey="e">View source</a></span></li>
+															<li id="ca-history" class="collapsible"><span><a href="/index.php?title=Format:DSK_disk_image_file_format&amp;action=history"  title="Past revisions of this page [h]" accesskey="h">View history</a></span></li>
+													</ul>
+					</div>
+										<div id="p-cactions" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-cactions-label">
+						<h3 id="p-cactions-label"><span>More</span><a href="#"></a></h3>
+
+						<div class="menu">
+							<ul>
+															</ul>
+						</div>
+					</div>
+										<div id="p-search" role="search">
+						<h3>
+							<label for="searchInput">Search</label>
+						</h3>
+
+						<form action="/index.php" id="searchform">
+														<div id="simpleSearch">
+															<input type="search" name="search" placeholder="Search" title="Search CPCWiki - THE Amstrad CPC encyclopedia! [f]" accesskey="f" id="searchInput" /><input type="hidden" value="Special:Search" name="title" /><input type="submit" name="fulltext" value="Search" title="Search the pages for this text" id="mw-searchButton" class="searchButton mw-fallbackSearchButton" /><input type="submit" name="go" value="Go" title="Go to a page with this exact name if exists" id="searchButton" class="searchButton" />								</div>
+						</form>
+					</div>
+									</div>
+			</div>
+			<div id="mw-panel">
+				<div id="p-logo" role="banner"><a class="mw-wiki-logo" href="/index.php/Main_Page"  title="Visit the main page"></a></div>
+						<div class="portal" role="navigation" id='p-Contents' aria-labelledby='p-Contents-label'>
+			<h3 id='p-Contents-label'>Contents</h3>
+
+			<div class="body">
+									<ul>
+													<li id="n-mainpage"><a href="/index.php/Main_Page" title="Visit the main page [z]" accesskey="z">Main Page</a></li>
+													<li id="n-Random-page"><a href="/index.php/Special:Random">Random page</a></li>
+													<li id="n-recentchanges"><a href="/index.php/Special:RecentChanges" title="A list of recent changes in the wiki [r]" accesskey="r">Recent changes</a></li>
+													<li id="n-CPCWiki-portal"><a href="/index.php/CPCWiki:Portal">CPCWiki portal</a></li>
+													<li id="n-Content-Categories"><a href="/index.php/Special:Categories">Content Categories</a></li>
+											</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id='p-Hardware' aria-labelledby='p-Hardware-label'>
+			<h3 id='p-Hardware-label'>Hardware</h3>
+
+			<div class="body">
+									<ul>
+													<li id="n-Amstrad-CPC-Buyers.27-Guide-for-new-users"><a href="/index.php/Amstrad_CPC_Buyers_Guide">Amstrad CPC Buyers' Guide for new users</a></li>
+													<li id="n-In-short"><a href="/index.php/CPC">In short</a></li>
+													<li id="n-CPC-464.2F664.2F6128"><a href="/index.php/CPC_old_generation">CPC 464/664/6128</a></li>
+													<li id="n-CPC.2B.2FGX4000"><a href="/index.php/Plus">CPC+/GX4000</a></li>
+													<li id="n-Peripherals"><a href="/index.php/Peripherals">Peripherals</a></li>
+													<li id="n-DIY-.26-Repair"><a href="/index.php/DIY">DIY &amp; Repair</a></li>
+													<li id="n-Gallery"><a href="/index.php/Photo_Gallery">Gallery</a></li>
+											</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id='p-Software' aria-labelledby='p-Software-label'>
+			<h3 id='p-Software-label'>Software</h3>
+
+			<div class="body">
+									<ul>
+													<li id="n-The-Games"><a href="/index.php/Games">The Games</a></li>
+													<li id="n-Serious-software"><a href="/index.php/Applications">Serious software</a></li>
+													<li id="n-Programming"><a href="/index.php/Programming">Programming</a></li>
+													<li id="n-Emulators"><a href="/index.php/Emulators">Emulators</a></li>
+											</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id='p-Printed_matter' aria-labelledby='p-Printed_matter-label'>
+			<h3 id='p-Printed_matter-label'>Printed matter</h3>
+
+			<div class="body">
+									<ul>
+													<li id="n-Books.2C-magazines.2C-technical.2C-manuals"><a href="/index.php/Print">Books, magazines, technical, manuals</a></li>
+											</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id='p-The_Scene' aria-labelledby='p-The_Scene-label'>
+			<h3 id='p-The_Scene-label'>The Scene</h3>
+
+			<div class="body">
+									<ul>
+													<li id="n-Groups.2FMembers"><a href="/index.php/Demogroups">Groups/Members</a></li>
+													<li id="n-Parties.2FEvents"><a href="/index.php/CPC_parties">Parties/Events</a></li>
+													<li id="n-Links"><a href="/index.php/Links">Links</a></li>
+											</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id='p-Wiki-related' aria-labelledby='p-Wiki-related-label'>
+			<h3 id='p-Wiki-related-label'>Wiki-related</h3>
+
+			<div class="body">
+									<ul>
+													<li id="n-Upload"><a href="/index.php/Special:Upload">Upload file</a></li>
+													<li id="n-Upload-multi-files"><a href="/index.php/Special:UploadWizard">Upload multi files</a></li>
+													<li id="n-Special-Pages"><a href="/index.php/Special:SpecialPages">Special Pages</a></li>
+													<li id="n-About---Contribute"><a href="/index.php/About">About - Contribute</a></li>
+													<li id="n-Statistics"><a href="/index.php/Special:Statistics">Statistics</a></li>
+													<li id="n-Create-Page"><a href="/index.php/Loose_lemas">Create Page</a></li>
+													<li id="n-Editing-Help"><a href="http://www.cpcwiki.eu/index.php?title=Help:Editing">Editing Help</a></li>
+													<li id="n-Discussion-forum"><a href="http://www.cpcwiki.eu/forum">Discussion forum</a></li>
+											</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id='p-tb' aria-labelledby='p-tb-label'>
+			<h3 id='p-tb-label'>Tools</h3>
+
+			<div class="body">
+									<ul>
+													<li id="t-whatlinkshere"><a href="/index.php/Special:WhatLinksHere/Format:DSK_disk_image_file_format" title="A list of all wiki pages that link here [j]" accesskey="j">What links here</a></li>
+													<li id="t-recentchangeslinked"><a href="/index.php/Special:RecentChangesLinked/Format:DSK_disk_image_file_format" title="Recent changes in pages linked from this page [k]" accesskey="k">Related changes</a></li>
+													<li id="t-specialpages"><a href="/index.php/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q">Special pages</a></li>
+													<li id="t-print"><a href="/index.php?title=Format:DSK_disk_image_file_format&amp;printable=yes" rel="alternate" title="Printable version of this page [p]" accesskey="p">Printable version</a></li>
+													<li id="t-permalink"><a href="/index.php?title=Format:DSK_disk_image_file_format&amp;oldid=109312" title="Permanent link to this revision of the page">Permanent link</a></li>
+													<li id="t-info"><a href="/index.php?title=Format:DSK_disk_image_file_format&amp;action=info" title="More information about this page">Page information</a></li>
+											</ul>
+							</div>
+		</div>
+				</div>
+		</div>
+		<div id="footer" role="contentinfo">
+							<ul id="footer-info">
+											<li id="footer-info-lastmod"> This page was last modified on 21 October 2022, at 12:34.</li>
+											<li id="footer-info-copyright">Content is available under <a href="/index.php/MediaWiki:Copyright" title="MediaWiki:Copyright"></a> unless otherwise noted.</li>
+									</ul>
+							<ul id="footer-places">
+											<li id="footer-places-privacy"><a href="/index.php/CPCWiki_-_THE_Amstrad_CPC_encyclopedia!:Privacy_policy" title="CPCWiki - THE Amstrad CPC encyclopedia!:Privacy policy">Privacy policy</a></li>
+											<li id="footer-places-about"><a href="/index.php/CPCWiki_-_THE_Amstrad_CPC_encyclopedia!:About" title="CPCWiki - THE Amstrad CPC encyclopedia!:About">About CPCWiki - THE Amstrad CPC encyclopedia!</a></li>
+											<li id="footer-places-disclaimer"><a href="/index.php/CPCWiki_-_THE_Amstrad_CPC_encyclopedia!:General_disclaimer" title="CPCWiki - THE Amstrad CPC encyclopedia!:General disclaimer">Disclaimers</a></li>
+											<li id="footer-places-mobileview"><a href="https://www.cpcwiki.eu/index.php?title=Format:DSK_disk_image_file_format&amp;mobileaction=toggle_view_mobile" class="noprint stopMobileRedirectToggle">Mobile view</a></li>
+									</ul>
+										<ul id="footer-icons" class="noprint">
+											<li id="footer-poweredbyico">
+															<a href="//www.mediawiki.org/"><img src="/resources/assets/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" srcset="/resources/assets/poweredby_mediawiki_132x47.png 1.5x, /resources/assets/poweredby_mediawiki_176x62.png 2x" width="88" height="31" /></a>
+													</li>
+									</ul>
+						<div style="clear:both"></div>
+		</div>
+		<script>if(window.jQuery)jQuery.ready();</script><script>if(window.mw){
+mw.loader.state({"site":"ready","user":"ready","user.groups":"ready"});
+}</script>
+<script>if(window.mw){
+mw.loader.load(["mediawiki.toc","mediawiki.action.view.postEdit","mediawiki.user","mediawiki.hidpi","mediawiki.page.ready","mediawiki.searchSuggest"],null,true);
+}</script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-5211067-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<script>if(window.mw){
+mw.config.set({"wgBackendResponseTime":38});
+}</script>
+	</body>
+</html>
