@@ -1,0 +1,3 @@
+-joycesoftspec.txt: al parecer documentacion original tecnica de pcw, creo que es lo mas fiable aunque muy resumida
+
+-tanto hardware.html como hardware.pdf tienen contradicciones entre ellos...
