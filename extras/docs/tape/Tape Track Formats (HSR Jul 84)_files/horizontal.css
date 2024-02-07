@@ -1,0 +1,402 @@
+body { background: #e8e8e8; }
+.container { margin: 0 auto; }
+
+/* Example wrapper */
+.wrap {
+	position: relative;
+	margin: 3em 0;
+}
+
+/* main sly frame */
+.frame {
+	height: 285px;
+	line-height: 250px;
+	overflow: hidden;
+	padding: 0;
+/* 
+	border: 1px solid orange;
+ */
+/*	margin-bottom: 10px; */
+}
+
+.frame ul {
+	list-style: none;
+	margin: 0;
+	height: 100%;
+	padding: 0;
+	font-size: 50px;
+}
+.frame ul li {
+	float: left;
+	width: 180px;
+	height: 100%;
+	margin: 0 1px 0 0;
+	padding: 0;
+/*	background: #333; */
+	color: #ddd;
+	text-align: center;
+	cursor: pointer;
+}
+
+/* iphone landscape */
+@media (max-width: 480px) {
+	.frame {
+		height: 285px;
+	}
+	.frame ul li {
+		width: 180px;
+	}
+}
+/* iphone portrat */
+@media (max-width: 320px) {
+	.frame {
+		height: 285px;
+	}
+	.frame ul li {
+		width: 188px;
+	}
+}
+
+/* iPad landscape */
+/* 
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
+	.frame {
+		height: 285px;
+		width: 938px;
+	}
+	.frame ul li {
+		width: 185px;
+	}
+}
+ */
+/* iPad portrait */
+/* 
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
+	.frame {
+		height: 285px;
+		width: 725px;
+	}
+	.frame ul li {
+		width: 183px;
+	}
+}
+ */
+
+
+/* full sly frame (shrinked one page on desktop) */
+@media (max-width: 767px) {
+#slybox .frame {
+/* 
+	height: 700px;
+	line-height: 800px;
+ */
+/* 
+	margin-top: -60px;
+ */
+	height: 550px;
+/* 
+	line-height: 550px;
+ */
+	overflow: hidden;
+/* 
+	border: 1px solid blue;
+ */
+}
+}
+
+@media (max-width: 480px) {
+	#slybox .frame {
+		height: 310px;
+/* 
+		width: 200px;
+ */
+		line-height: 300px;
+		overflow: hidden;
+/* 
+		background: #090;
+ */
+	}
+}
+@media (max-width: 320px) {
+	#slybox .frame {
+		height: 340px;
+/* 
+		width: 200px;
+ */
+		line-height: 300px;
+		overflow: hidden;
+/* 
+		background: #090;
+ */
+	}
+}
+
+@media (min-width: 768px) {
+	#slybox .frame {
+		height: 800px;
+		line-height: 800px;
+		overflow: hidden;
+	/*	margin-bottom: 10px; */
+	}
+}
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
+	#slybox .frame {
+		height: 540px;
+		line-height: 450px;
+		overflow: hidden;
+	/*	margin-bottom: 10px; */
+	}
+}
+
+
+/* extra large monitor */
+@media (min-width: 1800px) and (min-height: 1250px) {
+#slybox .frame {
+/* 
+	border: 1px solid orange;
+ */
+	height: 1150px;			/* just guessing at this point */
+	line-height: 1100px;
+	overflow: hidden;
+/*	margin-bottom: 10px; */
+}
+}
+
+
+#slybox .frame ul li {
+	float: left;
+/*	width: 450px; */
+	width: 590px
+	height: 100%;
+	margin: 0 1px 0 0;
+	padding: 0;
+/*	background: #333; */
+	color: #ddd;
+	text-align: center;
+	cursor: auto;
+}
+
+@media (max-width: 767px) {
+	#slybox .frame ul li {
+/* 
+		width: 450px;
+		height: 100%;
+ */
+		width: 330px;
+		height: 90%;
+	}
+}
+
+@media (min-width: 768px) {
+	#slybox .frame ul li {
+		width: 590px;
+		height: 100%;
+	}
+}
+
+@media (max-width: 480px) {
+	#slybox .frame ul li {
+		width: 170px;
+		height: 100%;
+		margin-left: 10px;
+	}
+
+	#lazyview {
+		width: 510px;
+		margin-left: -60px;
+	}
+}
+
+@media (max-width: 320px) {
+	#slybox .frame ul li {
+		width: 200px;
+		height: 90%;
+		margin-left: 10px;
+	}
+
+	#lazyview {
+		width: 360px;
+		margin-left: -60px;
+	}
+}
+
+/* iPad landscape */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
+	#slybox .frame ul li {
+		width: 394px;
+		height: 100%;
+/* 
+		border: 1px solid red;
+ */
+	}
+}
+
+/* iPad Portrait */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
+	#slybox .frame ul li {
+		width: 570px;
+		height: 100%;
+	}
+}
+
+/* extra large monitor */
+@media (min-width: 1800px) and (min-height: 1250px) {
+	#slybox .frame ul li {
+		width: 776px;			/* just guessing at this point */
+		height: 100%;
+		max-height: 1500px;
+/* 
+		border: 1px solid yellow;
+ */
+	}
+}
+
+.frame ul li.active {
+	color: #fff;
+/* 
+	background: #404040;
+ */
+/* 
+	background: #a03232;
+ */
+/* 
+	background: #C7B299;	
+ */
+}
+
+/* Scrollbar */
+.scrollbar {
+	margin: 1em 0 1em 0;
+	height: 3px;
+	background: #ccc;
+	line-height: 0;
+}
+#slybox .scrollbar {
+	margin: 0;
+	margin-top: -17px;
+	height: 3px;
+	background: #ccc;
+	line-height: 0;
+}
+
+@media (max-width: 320px) {
+	#slybox .scrollbar {
+		margin-left: 20px;
+	}
+}
+
+@media (max-width: 767px) {
+	#slybox .scrollbar {
+		margin-top: -30px;
+		margin-bottom: 20px;
+	}
+}
+
+@media (min-width: 768px) {
+	#slybox .scrollbar {
+		margin-top: 0px;
+		margin-bottom: 20px;
+	}
+}
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
+	#slybox .scrollbar {
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+}
+
+.scrollbar .handle {
+	width: 100px;
+	height: 100%;
+	background: #292a33;
+	cursor: pointer;
+}
+.scrollbar .handle .mousearea {
+	position: absolute;
+	top: -9px;
+	left: 0;
+	width: 100%;
+	height: 20px;
+}
+
+
+.muzines button, .muzines button { background: transparent; border: 0; color: #fff; opacity: .5; }
+.muzines button:hover, .muzines button:hover { opacity: 1; }
+.muzines button:disabled, .muzines button:disabled { opacity: .2; }
+
+.muzines .forward, .muzines .backward { float: left; width: 35px; height: 210px; margin-top: 30px; font-size: 30px; }
+.muzines .forward { float: right; }
+.muzines .pages_close { float: right; font-size: 18px; margin-left: -50px; z-index: 50; }
+
+.muzines .forwardH, .muzines .backwardH { float: left; width: 35px; height: 150px; margin-top: 10px; font-size: 30px; }
+.muzines .forwardH { float: right; }
+
+/* iPad landscape */
+/* 
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
+	.muzines .forwardH, .muzines .backwardH { display: none; }
+}
+ */
+
+/* iPad portrait */
+/* 
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
+	.muzines .forwardH, .muzines .backwardH { display: none; }
+}
+ */
+
+/* 
+@media (max-width: 768px) {
+	.muzines .forwardH, .muzines .backwardH { display: none; }
+}
+ */
+
+
+/* iPad landscape */
+/* 
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
+	.muzines .forward, .muzines .backward { display: none; }
+}
+ */
+/* iPad landscape */
+/* 
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
+	.muzines .forward, .muzines .backward { display: none; }
+}
+ */
+/* iPad landscape */
+/* 
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
+	.show { display: inline; }
+}
+ */
+/* iPad landscape */
+/* 
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
+	.show { display: inline; }
+}
+ */
+
+
+/* Controls */
+.controls { margin: 25px 0; text-align: center; }
+
+/* Hide miniscans when screen is narrow */
+@media (max-width: 767px) {
+	#miniScans {
+		display: none;
+	}
+}
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
+	#miniScans {
+/* 
+		display: none;
+ */
+		width: 138px;
+		height: 45px;
+		overflow: hidden;
+	}
+}

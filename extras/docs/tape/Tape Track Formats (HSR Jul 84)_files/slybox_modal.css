@@ -1,0 +1,174 @@
+#slybox {
+
+	background: #333;
+	color: #bbb;
+
+}
+
+#myModal {
+}
+
+.modal-header, .modal-footer {
+
+	border-style: none;
+
+}
+
+.modal {
+  text-align: center;
+  padding: 0!important;
+}
+.modal:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px;
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.slyVd {
+  height: 97%;
+  width: 583px;
+  padding: 0;
+  margin-top: 0px;
+}
+
+.dummy_page {
+	display: none;
+}
+
+@media (min-width: 320px) {
+	.slyVd {
+	  width: 300px;
+	}
+}
+@media (min-width: 480px) {
+	.slyVd {
+	  width: 460px;
+	}
+}
+@media (min-width: 768px) {
+	.slyVd {
+/* 
+	  width: 698px;
+ */
+	  width: 720px;
+	}
+}
+
+/* iPad landscape */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+/* CSS */
+	.slyVd {
+	  width: 980px;
+/* 
+	  border: 1px solid yellow;
+ */
+	}
+
+	.dummy_page {
+		display: block;
+	}
+
+}
+
+/* iPad Portrait */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) {
+/* CSS */
+	.slyVd {
+	  width: 745px;
+	}
+
+	.dummy_page {
+		display: none;
+	}
+
+}
+
+@media (min-width: 1400px) {
+	.slyVd {
+/* 
+		width: 1314px;
+ */
+		width: 1320px;
+	}
+	/* double page, unhide blank first page to make dual pages line up like the mag */
+
+	.dummy_page {
+		display: block;
+	}
+}
+
+/* extra large monitor */
+@media (min-width: 1800px) and (min-height: 1250px) {
+	.slyVd {
+		width: 1690px;	/* just guessing at this point */
+	}
+	/* double page, unhide blank first page to make dual pages line up like the mag */
+
+	.dummy_page {
+		display: block;
+	}
+}
+
+
+.modal-content {
+/* 
+  height: 100%;
+ */
+}
+
+/* extra large monitor - expand height to full size - just guessing at this point*/
+@media (min-width: 1800px) and (min-height: 1250px) {
+	.modal-content {
+	  height: 100%;
+	}
+}
+
+
+#slybox .close {
+	color: #FFFFFF;
+}
+
+.modal-body {
+/* 
+	border: 1px solid green;
+ */
+/* 
+  width: 400px;
+ */
+}
+
+.fullVd {
+  height: auto;
+  margin: 30px auto;
+  width: 90%;
+/* 
+  width: 90%;
+  padding: 0;
+ */
+}
+
+.fullVc {
+  height: auto;
+  min-height: 100%;
+}
+
+.fullVb {
+  height: 250px;
+  width: 300px;
+}
+
+#output_tag {
+	position: absolute;
+	color: yellow;
+	margin-left: 1086px;
+	margin-top: 20px;
+}
+
