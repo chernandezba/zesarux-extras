@@ -1,0 +1,84 @@
+Port FE
+Every even I/O address will address the ULA, but to avoid problems with other I/O devices only port FE should be used. If this port is written to, bits have the following meaning:
+
+        Bit   7   6   5   4   3   2   1   0
+            +-------------------------------+
+            |   |   |   | E | M |   Border  |
+            +-------------------------------+
+The lowest three bits specify the border colour; a zero in bit 3 activates the MIC output, whilst a one in bit 4 activates the EAR output and the internal speaker. However, the EAR and MIC sockets are connected only by resistors, so activating one activates the other; the EAR is generally used for output as it produces a louder sound. The upper two bits are unused.
+
+If port FE is read from, the highest eight address lines are important too. A zero on one of these lines selects a particular half-row of five keys:
+
+      IN:    Reads keys (bit 0 to bit 4 inclusive)
+
+      #FEFE  SHIFT, Z, X, C, V            #EFFE  0, 9, 8, 7, 6
+      #FDFE  A, S, D, F, G                #DFFE  P, O, I, U, Y
+      #FBFE  Q, W, E, R, T                #BFFE  ENTER, L, K, J, H
+      #F7FE  1, 2, 3, 4, 5                #7FFE  SPACE, SYM SHFT, M, N, B
+A zero in one of the five lowest bits means that the corresponding key is pressed. If more than one address line is made low, the result is the logical AND of all single inputs, so a zero in a bit means that at least one of the appropriate keys is pressed. For example, only if each of the five lowest bits of the result from reading from port 00FE (for instance by XOR A/IN A,(FE)) is one, no key is pressed. A final remark about the keyboard. It is connected in a matrix-like fashion, with 8 rows of 5 columns, as is obvious from the above remarks. Any two keys pressed simultaneously can be uniquely decoded by reading from the IN ports. However, if more than two keys are pressed decoding may not be uniquely possible. For instance, if you press Caps , B and V, the Spectrum will think also the Space key is pressed, and react by giving the "Break into Program" report. Without this matrix behaviour Zynaps, for instance, won't pause when you press 5,6,7,8 and 0 simultaneously.
+
+Bit 6 of IN-port FE is the ear input bit. The value read from this port is not trivial, as can be seen from the following program:
+
+      10 OUT 254,BIN 11101111
+      20 PRINT IN 254
+      30 OUT 254,BIN 11111111
+      40 PRINT IN 254
+      50 GOTO 10
+For a correct test do not press any key while running, and have no EAR input.
+
+If the output is 191,255,191,255 etc, you are on real Spectrum Issue 3.
+If output is always 191 or always 255, change the value in line 10 to BIN 11100111.
+If output is then 191,255,191,255 etc, then you are on Spectrum Issue 2.
+If output is still always 191 or always 255 you are on Spectrum emulator.
+Correctly responding emulators include R80, zx32 and xzx (All of these can do either Issue 2 or Issue 3 emulation). Also, ZXAM always behaves like an Issue 2 machine.
+
+The ULA chip uses the same pin (28) for all of the MIC socket, EAR socket and the internal speaker, so bits 3 and 4 of an OUT to port #FE will affect bit 6 as read by an IN from port FE. The difference between Issue 2 and 3 machines is:
+
+Value output to bit: 4  3  |  Iss 2  Iss 3   Iss 2 V    Iss 3 V
+                     1  1  |    1      1       3.79       3.70
+                     1  0  |    1      1       3.66       3.56
+                     0  1  |    1      0       0.73       0.66
+                     0  0  |    0      0       0.39       0.34
+Iss 2 is value of bit 6 read by IN 254 after the appropriate OUT from an Issue 2, and Iss 3 is same for an Issue 3. Iss 2 V and Iss 3 V are voltage levels on pin 28 of the ULA chip after the OUT, with no input signal on the EAR socket.
+
+From the above, it is clear that the difference between Issue 2 and 3 is:
+
+On an Issue 3, an OUT 254 with bit 4 reset will give a reset bit 6 from IN 254.
+On an Issue 2, both bits 3 and 4 must be reset for the same effect to occur.
+Pera Putnik tested the level at pin 28 at which input bit 6 changes from 0 to 1 or reverse. This is exactly 0.70 Volts on both Issue 2 and Issue 3, with no inverting or hysteresis; this means that bit 6 is 1 if the voltage on pin 28 is over 0.70 V, and otherwise it is 0, on both Issues. At the hardware level, the only apparent difference between Issue 2 and 3 is that there are slightly higher voltages from Issue 2 machines. As can be seen from the table, the input combination '0 1' gives output voltages that are very close to the crucial 0.7 V.
+
+The BASIC program used above is relatively slow, and for faster programs the situation isn't so simple, as there is some delay when output bit 4 changes from 1 to 0. To illustrate this, here are 2 short assembler routines:
+
+       ORG 45000
+       LD A,#18
+       OR #F8
+       OUT (254),A
+       LD A,#08
+       OR #E8
+       OUT (254),A
+TIMING LD B,7      ;crucial value
+DL     LD IX,0
+       DJNZ DL
+       IN A,(254)  ;query state
+In this case IN A,(254), or output of this value sometimes gives 255 and sometimes 191. If you make the constant in the TIMING line smaller then result will be always 255, if delay is longer then result will be always 191. Of course, the effect occurs only for Issue 3 machines.
+
+The situation is again slightly different for a longer duration of high output level on port 254:
+
+       ORG 50000
+       HALT        ;synchronize with interrupts
+       LD A,#18
+       OUT (254),A
+       HALT        ;wait 20ms
+       LD A,#08
+       OUT (254),A
+       LD B,107    ;crucial value
+DL     LD IX,0
+       DJNZ DL
+       IN A,(254)
+As you can see, after a longer high level duration, the delay is also much longer. The delay varies from approximately 180 T states (about 50 microsec) to 2800 T states (about 800 microsec), depending from duration of high level on port 254. The explanation for this delay is that there are capacitors connected between pin 28 of the ULA and the EAR and MIC connectors, but note that there is no delay when bit 4 changes from 0 to 1.
+
+The 'traditional' explanation of the difference between Issue 2 and 3 Spectrum (from techinfo.doc) is that PRINT IN 254 gives bit 6 reset on an Issue 3 and set on an Issue 2 machine occurs because, as PRINT IN 254 is typed at a BASIC prompt, the speaker is called for every keystroke, and the ROM beep routine contains a OR 8 before OUT (#FE),A, so bit 3 is always set, and therefore an Issue 2 machine will always return a set bit 6.
+
+Bits 5 and 7 as read by INning from port #FE are always one. The ULA with the lower 16K of RAM, and the processor with the upper 32K RAM and 16K ROM are working independently of each other. The data and address buses of the Z80 and the ULA are connected by small resistors; normally, these do effectively decouple the buses. However, if the Z80 wants to read or write the lower 16K, the ULA halts the processor if it is busy reading, and after it's finished lets the processor access lower memory through the resistors. A very fast, cheap and neat design indeed!
+
+If you read from a port that activates both the keyboard and a joystick port (e.g. Kempston), the joystick takes priority. Emulators known to have this feature correct are SpecEm, WSpecEm, x128 and xzx. This effect can be seen on Street Hawk and Command4.
