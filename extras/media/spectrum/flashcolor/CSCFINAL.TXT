@@ -1,0 +1,2 @@
+CSCFINAL.TRD seems to need 256kb of ram
+It uses the "Flash color" mode; you must activate it on main menu - preferences (the second item)
