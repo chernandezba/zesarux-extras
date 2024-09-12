@@ -25,7 +25,7 @@ Renegade: plays slow, game hangs after losing one life
 
 
 * Games that flicker due to start of scanline
-Taipai
+Taipan
 Knight Tyme
 
 
