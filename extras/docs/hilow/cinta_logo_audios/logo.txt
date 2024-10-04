@@ -1,0 +1,14 @@
+File LOGO_Hilow_Lado_1_2.zip has a sample hilow tape, recorded at 44100 hz, mono, 8 bit , unsigned. There are two files, each for every side of the tape. The tape is a snapshot of the Logo program in Spanish
+The file logo.ddh is the conversion of that tape, using ZEsarUX integrated conversion. There were some crc errors reading the tape, I'm not sure if these errors are really on the original audio tape or my conversion tool is not perfect.
+You may get the directory of the logo.ddh file by running:
+
+SAVE " CAT "
+
+There is the snapshot logo: "*LOGO"
+
+You may load it by running:
+
+LOAD "*LOGO"
+
+As there were crc errors reading the tape, the snapshot loads but seems to be crashed
+
