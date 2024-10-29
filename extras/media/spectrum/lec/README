@@ -1,6 +1,17 @@
+Esta carpeta contiene documentación y ejemplos de uso de la extensión de memoria LEC.
+Dicha memoria permite extender un Spectrum 48k hasta 80, 272 o 528 kb de RAM.
+Para ello, se extraen físicamente los últimos 32kb de memoria (conservando los 16kb de ram entre las direcciones 16384-32767), y se le añade
+un chip de memoria adicional de 64kb, 256kb o 512 kb. Al sumar los existentes 16kb de ram a cada una de esas ampliaciones, obtenemos 80, 272 o 528 kb de RAM totales.
+
+---
+
+Sobre CP/M 2.2:
+
+Se trata de una implementación de CP/M 2.2 para memoria LEC.
+
 Para iniciar este CP/M:
 
--Seleccionar maquina Spectrum 48k
+-Seleccionar máquina Spectrum 48k
 -Habilitar extensión de memoria LEC, de 272 o 528 kb
 -Seleccionar cinta "CPM v2.2.tzx" y LOAD ""
 
