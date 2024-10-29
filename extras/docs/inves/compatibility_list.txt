@@ -34,3 +34,5 @@ It overwrites the interrupt table and when the table does not have a 255, it wil
 
 Ranarama (resets) - Erbe Edition, Players premiere edition. It changes R register to something > 127 so the last two bytes of the interrupt table are overwritten
 4x4 Off-road Racing
+Super Pipeline II
+Prince of Persia (version converted from td-dos to tap)
