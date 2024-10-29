@@ -1,0 +1,429 @@
+
+TODO SOBRE: EXPANSIÓN DE RAM Y ROM LEC
+
+
+A modo de introducción
+
+He decidido esta vez reunir todas mis notas sobre la ROM LEC 80k y 528k, tanto lo
+que encontré en internet así como lo que he podido experimentar con los emuladores.
+
+
+En la internet
+
+Si buscamos en la web de Speccy4ever, encontraremos en su sección Custom-made ROM
+for Spectrum 48k (cuyo enlace es: http://zxspectrum.it.omegahg.com/_CMS.htm) entre
+otras ROMs, dos LEC: la LEC v1.6 u 80-lec.rom y la LEC v2.4 528k con soporte para
+CP/M 2.22, junto con información acerca de ambas ROMs y el TZX del CP/M para poder
+instalarlo en un cartucho Microdrive.
+En World of Spectrum también está dicho programa para descargar con algo de info al
+respecto. O lo había, tras su actualización solamente está mencionado pero no puedo
+accesar a la info, está desaparecida, supongo que habrá que verla en Archive.org.
+Aparte de esto, no hay mucha información al respecto salvo que es mencionada en la
+web de Philip Kendall - The Spectrum ROMs collection, la web de Yarek: 8bit Projects
+For Everyone, la página checa de wikipedia: Rozšířená syntaxe Sinclair BASICu.
+En la web sobre el SAM Coupé con enlace https://sam.speccy.cz/mzbasic.html, menciona
+un BASIC para la 80lec.rom.
+También es mencionado en: 80K RAM per ZX Spectrum 48K - Facebook (en italiano)
+Y en el foro: RetroWikiPortalRetroInformáticaOrdenadores SinclairSoftware Spectrum
+¿ CP/M para Spectrum 48 K ?
+En: https://www.retrogaminghistory.com/forum/retrogaming/famiglia-sinclair/14321-
+espansione-ram-80k-ram-rom-custom-lec-80k
+Así como en: Ampliación de memoria 320K - https://foro.speccy.org/viewtopic.php?
+t=4776
+
+Hasta ahí todo cuanto he podido encontrar sobre el LEC, ahora paso a...
+
+
+La cosa real
+
+Lo que nos dice Zeljko Juric al respecto:
+
+                        80-LEC.ROM INFO FILE
+                        --------------------
+
+He aquí otra ROM, cuya fuente es deconocida para mí, esta es una lista de sus
+opciones, descubiertas usando un desensamblador.
+
+1) Menú inicial
+
+Tras arrancar, aparece un  menú ofreciedonos:
+
+- BASIC :   Entra al Basic
+- MONITOR : Entra al monitor
+- BOOT :    Carga y ejecuta 'run' en el Microdrive
+
+2) Teclado Destokenizado
+
+En esta ROM el teclado ha sido destokenizado. La rutina de tokenizado es buena:
+las palabras clave se tipean tanto en matúsculas como en minúsculas, y un espacio
+entre GO y TO (o GO SUB, DEF FN etc.) ya no es necesario. El espacio tampoco es
+necesario tras un comando (así, PRINT1 es aceptado), excepto cuando el argumento
+empieza con una letra (PRINTA no es aceptado).
+
+Si se desea el teclado tokenizado, basta con usar la sentencia FORMAT (ver más
+adelante).
+
+3) Editor extendido
+
+Durante la edición de una línea larga, es posible moverse con el cursor arriba y
+abajo.
+
+4) 80K soportados
+
+Esta ROM tiene un comando extra (MOVE) para el Spectrum con memoria expandida a
+80 K (ver abajo). Desconozco quien es el creador de tal expansión, pero me parece
+que no es la expansión más usual de 80 K, en la cual la parte alta de 32 K de RAM
+es paginada. Es decir, que de acuerdo a la ROM desensamblada, en esta expansión los
+PRIMEROS 32 K están paginados (dirección 0-32767) usando el bit 7 del puerto 253,
+con el sigte. significado:
+
+b0=0 : configuración estandar (0-16383 ROM, 16384-32767 RAM estandar)
+b0=1 : 0-32767 RAM extra de 32K
+
+Si alguien quiere cambiar el puerto usado, y desea soporte para la paginación de los
+80K estandar, puedo dar la info necesaria via E-mail.
+
+5) Nuevos comandos BASIC:
+
+Esta ROM tiene 4 nuevas instrucciones BASIC (para ser más preciso, un nuevo uso de
+sentencias ya existentes):
+
+CAT
+---
+CAT sin parámetros accede al monitor, en caso contrario opera del modo usual.
+
+FORMAT
+------
+FORMAT "k" activa o desactiva el teclado tokenizado; en otros casos opera como se
+espera.
+
+ERASE
+-----
+ERASE "i" borra las variables extra de la Interface 1, canales extendidos, etc. sin
+afectar al programa BASIC en memoria; las otras formas de ERASE operan por igual.
+
+MOVE
+----
+Esta es la instrucción más compleja de todo el nuevo set, con la sigte. sintaxis:
+MOVE "<src_code><src_addr>,<src_len>","<dest_code><dest_addr>"
+
+Mueve <src_len> bytes desde <src_addr> a <dest_addr>. Donde <src_code> y <dest_code>
+pueden ser "r" con el significado de "estandar ROM/RAM" y "d" que alude a "extra 32K
+de RAM". Prueben por ejemplo (en un emulador):
+
+MOVE "r0,6144","r16384"
+
+Todas las expresiones son de cadena. Las otras formas de MOVE operan del modo usual.
+Su sintaxis tal vez parezca extraña (parámetros como parte de una cadena), pero es
+obvio que el autor quería preservar la sintaxis original: MOVE <string>,<string>.
+
+6) Monitor
+
+El monitor tiene los sigtes. comandos (todos sus parámetros excepto para H, son
+números hexadecimales):
+
+B             Salida en caliente al BASIC (de ser posible)
+
+D<hex_num>    Muestra los núm. hex. ingresados en notación decimal
+
+G<addr>       Ejecuta una subrutina en la dirección G (RET volverá al monitor)
+
+H<dec_num>    Muestra los núm. decimales en notación hex.
+
+M<addr>       Hex y ASCII volcados desde la dirección dada (espacio para salir)
+
+R             Ver y/o cambiar registros AF, BC, DE, HL, IX y SP.
+
+S<addr>       Parcha la memoria desde la dirección dada usando el editor hex. (pulsa
+              espacio para salir del editor).
+
+7) Una nueva rutina de interrupción
+
+La rutina estandar de interrupción ha sido cambiada, así que presionar SYMBOL SHIFT,
+SPACE y B simultaneamente nos enviará al the monitor (excepto si las interrupciones
+están desabilitadas, o si el modo IM 2 es usado sin llamar a RST 56). Además, el bug
+del NMI ha sido corregido (NMI es redirigido via NMIADD si es <> 0).
+
+8) Otros cambios
+
+- Cambio en los ajustes iniciales (color de la pantallla, el click del teclado, la
+  velocidad de autorepetición).
+
+- Una nueva fuente de texto.
+
+- Los bugs de CHR$ 8 y CHR$ 9 han sido corregidos.
+
+- El bug "WAIT_KEY" durante la aparición del mensaje "scroll?", etc.
+
+- El bug en CLOSE (crash con CLOSE #4 sin el Interface 1 si el flujo 4 no está
+  abierto).
+
+- La demora es menor entre la cabecera y el bloque durante el acto de salvar algo.
+
+Y eso es todo. So alguien desea más info extra, mándeme un E-mail al correo:
+zjuric@utic.net.ba
+
+
+De la página original de WOS - Hardware - la ficha del LEC:
+
+Nombre del dispositivo: LEC Memory Extension 
+Año: 1987
+Fabricante: Jiri Lamac (Checo)
+Tipo de	Hardware: RAM/ROM
+Precio original: deesconocido
+Notas:
+Un sistema de memoria acoplable para los modelos 48K y clones. Tres versiones del LEC
+estuvieron disponibles: 80K, 272K y 528K de memoria RAM.
+Jiri creó su propia ROM a la que llamó LEC ROM. Esta corrige algunos bugs bien
+conocidos en la ROM original del Spectrum, además tiene un editor BASIC destokenizado
+y unos pocos comandos para copiar datos entre bancos de RAM. Dicha ROM es opcional,
+ya que el formato CP/M y otros programas trabajan con la ROM original.
+Este aditamento venía con un software en cinta (CP/M 2.2 para la Extension de Memoria
+LEC).
+Puntaje: 9.80 (5 votos)   
+
+
+
+En emulación
+
+El 80-LEC es emulado por MESS/MAME y LnxSpectrum para Linux.
+El 272k-LEC está MIA al momento de escribir estas notas.
+El 528k-LEC es emulado a modo experimental en X128w y por el Jspeccy-0.93.jar.
+Este último menciona lo sigte.:
+LEC es una espansión de memoria diseñada en 1987 por Jiri Lamac para el Spectrum 48k
+para proporcionarle 528k de RAM.
+Jiri escribió su popia ROM llamada 'lec rom'. Soluciona los errores conocidos de la
+ROM. Proporciona un editor de Basic mejorado y comandos adicionales para copiar datos
+entre los bancos de RAM. icha ROM es opcional. CP/M y los programas que usan el LEC
+funcionan igual con la ROM normal del Spectrum.
+La versión de CP/M v2.2 de Jiri puede emplear las unidades de Microdrive como medio
+de almacenamiento, usando su propio formato de cinta. Para saber más busca LEC en WOS.
+
+80-LEC
+Fue una de muchas ROMs que descargué de la Internet hace tiempo y la única que hallé
+de la serie LEC. Sin mayor info que la del TXT de Zeljko Juric, decidí probarla con
+REALSpectrum. Una vez activada me da el menú de la pantalla inicial:
+                ------------------
+                |   1 basic      |
+                |   2 monitor    |
+                |   3 boot       |
+                ------------------
+        (c)1987 LEC.      ROM V1.6 RAM 80K
+1 - tal como dice ahí, se va de frente al Basic
+2 - para acceder al monitor incorporado de base
+3 - para autoejecutar un cartucho de microdrive
+Una vez en Basic, nos encontramos con un cursor "L" parpadeante en la zona baja.
+El monitor nos muestra un * con el prompt "C" esperando un comando.
+Tal como dice la nota de Juric, podemos trabajar en dos modos, tipeando todo letra a
+letra, o al estilo Sinclair. Nada mal como alternativa a la ROM del 48k sin expandir.
+Sin la RAM extra, las opciones "r" y "d" de MOVE actúan sobre la RAM única del ZX.
+En Mess/Mame se la encuentra bajo el nombre de Spectrum 80k.
+Para probarla tal cual en X128w hay que renombrarla como su equivalente 528k. Y en el
+Jspeccy, cargándola como cartucho de ROM.
+De hecho solo X128w y Jspeccy la emulan correctamente.
+Mess la ejecuta como lo haría REALS u otro emulador, o sea sin la RAM extra.
+Para probar que la RAM extra ha sido emulada basta con tipear y correr:
+        10 MOVE"r0,1694","d20000"
+        20 STOP
+        30 MOVE"d20000,1694","r16384"
+En el 80-LEC la opción "d" acepta los valores de 0 a 32768, más allá de eso se porta
+como "r" accesando a la RAM normal. Si la RAM extra está presente hacer RUN dará OK.
+Pero sino, aparecerá un galimatías en pantalla ya que "d" se portará entonces igual
+que "r".
+
+528-LEC
+Esta la encontré mucho más tarde junto con el TAP del CP/M 2.2 para microdrives.
+Tras iniciarla, nos muestra el mismo menú que el 80 LEC, pero el mensaje de fondo es:
+        (c)1988 LEC.      Omega +528Kb RAM
+Esta vez al ir al Basic se nos saluda con un cursor cuadrado parpadeante. De hecho,
+el cursor no cambia ni para indicar cuando se está en modo "G".
+El monitor nos muestra una pantalla con información y el mismo cursor cuadrado abajo.
+Parece tener más instrucciones que antes, para salir hay que tipear "quit".
+Al menos eso es lo que pasa cuando se usa con REALS o X128w. en este último ya es
+posible usar los comandos extras de la RAM ampliada. En el caso de JSpeccy, éste sólo
+emula la expansión de RAM pero no la ROM, pues siempre aparece el mensaje original de
+Sinclair, pero nunca el de la LEC. Sin embargo es posible cargarla en Jspeccy como un
+cartucho de ROM.
+Una podría esperar que con mayor RAM la limitación de los 32k desaparece y ya nos es
+posible tipear algo como "d70000" o "d444000", pero no, en vez de eso parecen haber
+15 bancos de 32k todos con letras de la "a" a la "o", es decir ahora la "d" es solo
+un banco más de entre varios a escoger.
+
+272-LEC
+No existe esta ROM, pero podemos suponer por lo antes visto en las otras LEC, que
+debía tener 7 bancos de 32k, desde la "a" hasta la "g".
+
+LEC DDR 80K
+Existe en X128w como su última opción en su lista de sistemas emulados, pero no es
+el LEC-80, parece ser un Spectrum normal con la extensión LEC de 80k. Ninguna info
+de cómo aprovechar tal memoria extra de tenerla presente.
+
+
+Sistemas de disco.
+
+Fue pensado para funcionar correctamente con el ZX Microdrive. Acepta al Wafadrive,
+Opus Discovery, Speccy-Dos, Disciple y +D.
+Se cuelga con Beta Disco 48 en x128w. En el caso de Beta128, no puede volver del
+Trdos al Basic, debido a que no acepta RETURN tipeado letra a letra, pero si lo hace
+con los demas comandos. Eso no pasa con el Trdos modificado 505 (CZ).
+No permite el catálogo de disco con CAT y algunos comandos del Didaktik D80.
+
+
+
+Software para el LEC
+
+MZ Extended Basic (sam.speccy.cz)
+
+Es una alternativa moderna y compatible con el GW-BASIC de IBM PC, al Basic Sinclair.
+Fue convertido por Sinsoft, en 1987, para el Spectrum 80k.
+
+MZ BASIC para el ZX Spectrum fue publicado en cinta de cassette junto con otros
+programas, varias ROMs modificadas y toda la documentación (en lengua Checa) con
+relación al Spectrum 80k. Tres versiones fueron hechas, pero solamente la segunda
+ha sido preservada. La tercera versión soporta acceso a disco (DOS y subdirectorios).
+
+El Spectrum 80k fue una expansión de memoria muy popular en la Checoslovakia a fines
+de los 80s. Fue usada como una expansión económica allram (RAM en lugar de la ROM) y
+que inició la linea de expansiones caseras hasta llegar a los 528KB. El Spectrum 80k
+no es compatible con la expansión de East London Robotics SP80.
+
+
+De la página original de WOS - Hardware - la ficha del CP/M:
+
+Título completo: CP/M 2.2 for the LEC Memory Extension
+Año de publicación: 1987
+Autor: Jiri Lamac (Checo)
+Tipo de máquina: ZX Spectrum 48K
+Númbero de jugadores: 1
+Control: por teclado
+Tipo: Programación en General
+Idioma: inglés
+Publicado Originalmente: como Freeware
+Disponibilidad: sí
+Protección: Ninguna
+Comentarios: Requiere de la LEC Memory Extension.
+
+
+
+Para cerrar:
+
+Extraido y traducido del texto en PDF de Tomas “Omikron” Franke.
+
+Algo de historia:
+La extensión de memoria LEC fue desarrollada por el (entonces) joven diseñador Checo
+Jiri Lamac a comienzos de 1987, cuando el chip DRAM 41256 (256K*1) se volvió
+disponible en los paises vecinos.
+Permite mapear la RAM rápida con toda el área de memoria del Z80 y correr CP/M 2.2
+en Microdrives, Beta Disco o disco RAM.
+Era facil de construir en casa pero se necesitaba tener habilidad con las soldaduras
+ya que todos los chips de memoria 4332 tenían que ser sacados de la placa madre del
+Spectrum y soldar en su lugar el 41256.
+Era necesario añadir pequeños circuitos de control y encajarlos een el espacio entre
+la ULA y el Z80, así toda la modificación cabía incluso en el viejo "gomas" 48K.
+
+Beta Disc hack:
+Es necesario para un acceso directo al controlador del floppy, para el CP/M BIOS o
+programas de formateo "customizado", etc. ya que so oculta los puertos FDC y la ROM
+sombra tan pronto como una instrucción es dada desde la RAM.
+La modificación misma bloquea el cicuito de paginado y despaginado cuando D4=0 es
+escrito a (A1=0 y A15=0 e iorq=0 y wr=0). Cuando D4=1 es escrito de nuevo, o tras un
+RESET, dicha característica se interrumpe.
+
+Al programador de emuladores:
+El Microdrive y el Beta deben ser emulados al nivel de puertos E/S, no al nivel de
+llamadas a la ROM solamente.
+Esto es porque Jiri Lamac usa su propia rutina y su propio formato de cartucho.
+Solamente la cinta de CP/M para LEC 272/528 y Microdrive ha sido incluida, de ese
+modo pueden comprobar si su emulación es buena.
+
+Aclaración:
+Jiri Lamac ha dado su aprobación plena de archivar, usar y distribuir su trabajo por
+nostalgia a las computadoras de 8 bits de forma gratuita, es decir, siempre que no
+se busque obtener beneficios con ello y toda la info sobre su autor sea incluida.
+
+Contacto al autor: lec@lec.cz
+Mantenedor del documento: Tomas “Omikron” Franke - tomas.f@volny.cz
+
+
+Extraido de un post de Retrowiki y cacharreo:
+
+Jose Luis Sanchez, autor del Jspeccy, menciona un texto sobre el 528k que le enviara
+Tomas Franke y resulta se aplica también al 80-LEC, pero que Zeljko Juric no mencionó
+en sus notas. Así que por no ser repetitivo, sólo pondré la info que falta ya que es
+común al parecer a todas las ROMs LEC.
+
+- Mejor RAM test, puede detectar el error en un bit.
+- Las teclas tienen un más rápido autorepeat
+- Estando en mayúsculas, con CS + la letra, sale en minúsculas y viceversa.
+- Se puede accesar al Monitor HEX presionando SPACE+SS+B si habilitamos interrup. IM-1
+- Es posible omitir los espacios al tipear, por ejemplo, GOTO en vez de GO TO
+- Se pueden usar abreviaciones para muchos tokens, por ejemplo bo. para BORDER. Tabla:
+
+<= <.         <>            >= >.          ABS ab.        ACS ac.        AND an.
+ASN as.       AT            ATN            ATTR a.        BEEP be.       BIN b.
+BORDER bo.    BRIGHT br.    CAT ca.        CHR$ ch.       CIRCLE ci.     CLEAR cle.
+CLOSE # cl.   CLS           CODE c.        CONTINUE con.  COPY cop.      COS
+DATA da.      DEF FN d.     DIM di.        DRAW dr.       ERASE er.      EXP e.
+FLASH fl.     FN f.         FOR            FORMAT fo.     GO SUB gos.    GO TO g.
+IF            IN            INK            INKEY$ i.      INPUT inp.     INT
+INVERSE inv.  LEN l.        LET            LINE li.       LIST lis.      LLIST ll.
+LN            LOAD lo.      LPRINT lp.     MERGE me.      MOVE m.        NEW ne.
+NEXT nex.     NOT n.        OPEN # op.     OR o.          OUT ou.        OVER ov.
+PAPER pa.     PAUSE pau.    PEEK pe.       PI p.          PLOT pl.       POINT po.
+POKE pok.     PRINT pr.     RANDOMIZE ra.  READ re.       REM            RESTORE res.
+RETURN ret.   RND r.        RUN ru.        SAVE sa.       SCREEN$ s.     SGN sg.
+SIN si.       SQR sq.       STEP ste.      STOP sto.      STR$ st.       TAB t.
+TAN           THEN th.      TO             USR u.         VAL            VAL$ v.
+VERIFY ve.
+
+
+Un emulador que me faltó mencionar es el ZXMAK2, el cual también incluye al Spectrum
+48/528k pero en estado Beta y nada más. Para activarlo hay que ir a la pestaña opción
+ VM --> Settings. Esto abre la ventana Machine settings.
+Ahí elegimos la ULA, ya sea 48k o 128k. De ahí pasamos a la memoria y elegimos LEC
+48/528k y la ROM debe quedar fija en LEC. Tras hacer esto aparece la pantalla del LEC
+528k y ya podemos cargar el CP/M de la cinta. Aquí no podemos usar microdrives, pero
+sí discos TRD, si hubiera la versión Betadisco claro está.
+
+
+En suma:
+
+Zeljko Juric, cuando escribió sus notas (las únicas publicadas en internet), él no
+conocía al autor de la ROM LEC. El texto tampoco fue actualizado con el tiempo.
+Por la info de WOS (tampoco actualizada) uno podría creer que se trataba de un pack
+de RAM o aditamento tipo interface 1. Pero por la info encontrada en sam.speccy.cz
+y el documento de Tomas “Omikron” Franke, podemos ver que era una modificación hack
+al hardware de un Spectrum 48k para convertirlo en un 80k.
+En cuanto al nombre de las ROMs 80-LEC y LEC24 así como LEC Memory Extension se debe
+a que el mensaje de la ROM al empezar tiene ese nombre: LEC. Y el correo del autor
+real Jiri Lamac es precisamente lec@lec.cz. De hecho su propia empresa se llama LEC y
+aun existe. El nombre correcto es ZX Spectrum 80k, seguido del Spectrum 272k y 528k
+el último.
+
+Usa el puerto #FD como control del paginado de la RAM extra. Y por los diagramas
+ofrecidos parece que usa 16k de la RAM como RAM video, a menos que esa nota este
+errada. También parece que es posible modificar un 128k para convertirlo en un 272
+o 528 kb. No se nos dice sobre si dicha modificación es posible de hacer también a
+las máquinas de Timex como el 2048 o el 2068.
+No hay ninguna mención de si el Betadisco es el 48 o el 128, pero podría ser este
+último. La única razón de hackear o modificar el Beta disco es solamente para que
+acceda al CP/M, fuera de eso no hay otra razón. Lo mismo con su emulación.
+
+En cuanto al Basic MZ, no he podido hacer que ninguno de los emuladores que aceptan
+el LEC lo ejecute. Siempre se cuelga.
+Sería interesante poderlo probar. Ya que el Basic MZ no es cualquier extensión, se
+trata de dotar al Spectrum del Basic del MZ-700 de Sharp.
+
+Bueno pues, eso era hasta probar con LNXSpectrum, el cual sí corre el MZ Basic. Para
+ello hay que seleccionar el Spectrum 48k + Troller 80k y listo, a cargar el MZ Basic.
+A ver si alguien se decide a convertirlo o adaptarlo para que corra ya sea en un 128k
+o siquiera un +3 y sin necesidad del LEC.
+
+Tanto el CP/M o el Basic MZ merecen un texto aparte por derecho propio.
+
+
+
+(c)2020
+zx_if1@hotmail.com
+
+

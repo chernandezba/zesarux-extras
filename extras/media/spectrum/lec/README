@@ -14,3 +14,18 @@ Este sample_cpm_filesystem.rmd es una imagen en crudo de microdrive, formateada 
 Incluye dos archivos de ejemplo:
 -PW.COM: El mismo que se encuentra en la unidad a: al iniciar cp/m
 -HUNT.COM: Juego de cp/m de tipo aventura
+
+---
+
+Sobre archivos rom:
+
+- 80-lec.rom: hay un archivo 80-lec.txt explicativo
+- lec24.rom: creo que es una versión mejorada del 80-lec.rom para soportar los modos de memoria de 272 o 528 kb
+
+---
+
+Mas info: 
+
+Consultar archivo todo_sobre_la_ram_y_rom_lec.txt, extraido de:
+
+https://trastero.speccy.org/cosas/FLeon/todo_sobre_la_ram_y_rom_lec.txt
