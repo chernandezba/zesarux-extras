@@ -1,0 +1,138 @@
+                        80-LEC.ROM INFO FILE
+                        --------------------
+
+This is yet another ROM file, the source of it is unknown to me, but this is a
+list of features, discovered using the disasembler.
+
+1) Startup menu
+
+After startup, a menu appears, with following options:
+
+- BASIC :   Enter the basic
+- MONITOR : Enter the monitor (see below)
+- BOOT :    Load and run 'run' file from the microdrive
+
+2) Detokenized keyboard
+
+This ROM has detokenized keyboard input. The tokenizer routine is good:
+keywords may be entered both in capitals and lower letters, and a space between
+GO and TO in GO TO command (or GO SUB, DEF FN etc.) is not necessary. Space is
+not necessary after a command (so, PRINT1 is acceptable), except when the
+argument begin with letter (e.g, PRINTA is not acceptable).
+
+If you prefer tokenized keybord, you can turn detokenized keybord input off
+using basic command:
+
+FORMAT "k"
+
+The same command given again will turn on tokenized input again. This is
+controled via bit 7 in FLAGS2 (address 23658).
+
+3) Extended editor
+
+During editing a long line, it is possible to move cursor up and down.
+
+4) 80 K support
+
+This ROM has extended BASIC co ed Spectrum expanded to
+80 K (see below). I don't know which is producer of supported expansion, but it
+seems that it is not the most usual 80 K expansion, in which upper 32 K of RAM
+is paged. Namely, in according to ROM dissasembly, it seems that in this
+expansion FIRST 32 K is paged (address 0-32767) using bit 7 of port 253, with
+following meaning:
+
+b0=0 : standard configuration (0-16383 ROM, 16384-32767 standard RAM)
+b0=1 : 0-32767 extra 32K RAM
+
+If somebody wants to change used port, and wants support for standard 80K
+paging, I will support necessary infos via E-mail.
+
+5) Extra BASIC commands:
+
+This ROM has 4 new BASIC commands (more precise, a new meaning of existing
+ones):
+
+CAT
+---
+
+CAT without parameters enter the monitor, else works as usual.
+
+FORMAT
+------
+
+FORMAT "k" turns on or off tokenized keyboard; other forms of FORMAT work as
+usual.
+
+ERASE
+-----
+
+ERASE "i" erases extra Interface 1 variables, extended channels etc. without
+affecting the BASIC program in memory; other forms of ERASE work as usual.
+
+MOVE
+----
+
+This is the most complex extra command, with the following syntax:
+
+MOVE "<src_code><src_addr>,<src_len>","<dest_code><dest_addr>"
+
+This will move <src_len> bytes from <src_addr> to <dest_addr>. <src_code> and
+<dest_code> may be "r" with meaning "standard ROM/RAM" and "d" with meaning
+"extra 32K RAM". Try for example (on the emulator):
+
+MOVE "r0,6144","r16384"
+
+An expressions are allowed between quotes. Other forms of MOVE works as usual.
+This syntax seems strange (parameters as part of a string), but obviously
+author wants to preserve original syntax of MOVE <string>,<string>.
+
+6) Monitor
+
+The monitor has following commands (all parameters except for command H are
+hex numbers):
+
+B             Warm exit to BASIC (if possible)
+
+D<hex_num>    Displays entered hex number in decimal notation
+
+G<addr>       Execute a subroutine at address G (RET will return to the
+              monitor).
+
+H<dec_num>    Displays entered decimal number in hex notation
+
+M<addr>       Hex and ASCII dump from given address (space for exit).
+
+R             View and/or change registers AF, BC, DE, HL, IX and SP.
+
+S<addr>       Patch memory from given address using hex editor (enter just
+              space to exit hex editor).
+
+7) A new interupt routine
+
+The standard interrupt routine is changed, so pressing SYMBOL SHIFT, SPACE and
+B simultaneously will enter the monitor (except when interrupts are disabled,
+or when IM 2 mode is used without calling RST 56). Also, NMI bug is corrected
+(NMI is redirected via NMIADD if <>0).
+
+8) Other changes
+
+- Changed startup parameters (black-on-white screen, keyboard click, autorepeat
+  speed).
+
+- A new screen font.
+
+- Corrected CHR$ 8 and CHR$ 9 bug.
+
+- Corrected WAIT_KEY bug during displaying of "scroll?" message, etc.
+
+- Corrected CLOSE bug (crash on CLOSE #4 without Interface 1 if stream 4 is not
+  open).
+
+- Shorter delay between header and block during saving.
+
+That's all. If somebody wants extra infos, E-mail me at address:
+
+zjuric@utic.net.ba
+
+Zeljko Juric
+

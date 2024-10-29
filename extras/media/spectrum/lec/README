@@ -1,0 +1,16 @@
+Para iniciar este CP/M:
+
+-Seleccionar maquina Spectrum 48k
+-Habilitar extensión de memoria LEC, de 272 o 528 kb
+-Seleccionar cinta "CPM v2.2.tzx" y LOAD ""
+
+Si todo va bien, iniciara con un prompt de cp/m y algunos archivos en la unidad A:
+
+Opcionalmente: 
+-Habilitar interface1 y seleccionar microdrive sample_cpm_filesystem.rmd. Este aparecerá disponible en la unidad B:
+
+Este sample_cpm_filesystem.rmd es una imagen en crudo de microdrive, formateada desde este cp/m.
+
+Incluye dos archivos de ejemplo:
+-PW.COM: El mismo que se encuentra en la unidad a: al iniciar cp/m
+-HUNT.COM: Juego de cp/m de tipo aventura
