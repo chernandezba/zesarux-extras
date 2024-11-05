@@ -29,13 +29,24 @@ Taipan
 Knight Tyme
 
 
-* Games reseting or bad behaviour due to the "Inves write-on-interrupt bug". Overwrite address (I*256+R) with 255.
-It overwrites the interrupt table and when the table does not have a 255, it will crash
+* Games that show different effects on border due to start of scanline
+Aquaplane
+Paperboy
+Super wonder boy (on Pause)
 
-Ranarama (resets) - Erbe Edition, Players premiere edition. It changes R register to something > 127 so the last two bytes of the interrupt table are overwritten
+
+* Games reseting or bad behaviour due to the "Inves write-on-interrupt bug". Overwrite address (I*256+R) with 255.
+It overwrites the interrupt table, when R<128 (on cold reset) there's no danger because the interrupt vector are in the two last bytes of the table,
+and having R<128, only the first 128 bytes are overwritten.
+But if the game changes R to be >=128, the last two bytes will be overwritten soon: if they have 255 value, no problem. But if not, they will be overwritten with 255 and the game will crash or hang
+
 4x4 Off-road Racing
-Super Pipeline II
-Prince of Persia (version converted from td-dos to tap)
 Commando
 Commando Tracer
+Gothik
+Prince of Persia (version converted from td-dos to tap)
+Ranarama - Erbe Edition, Players premiere edition
 Shadow of the Beast
+Super Pipeline II
+
+
