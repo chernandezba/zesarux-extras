@@ -1,23 +1,34 @@
+Inves games compatibility list
+------------------------------
+
+
 * Games which writes to ROM
-Ping Pong -> but does not affect to sound this
 Enduro Racer. Due to Speedlock?? No sound because of this
+Ping Pong -> but does not affect to sound this
 
 
 * Games with strange sound due to out XXFEH 
-Ping Pong
 Hysteria
+Ping Pong
 
 
 * Games with no sound or 1-channel sound (on 2-channel) due to bit 3&4 to out 254
 The way of the exploding fist (no sound)
 ATV (1 channel)
+Batman (the caped crusader) (menu) (no music at all)
 Lemmings (menu) (1 channel)
 Renegade: no sound on game (kicks, jumps, etc) but music does work
-Batman (the caped crusader) (menu) (no music at all)
+
+
+* Games running a bit faster due to the lack of contended memory
+Death chase?
+Sabre wulf: music in menu plays faster
 
 
 * Games not working due to not having floating bus port
-Arkanoid, Short Circuit 1,2, Cobra
+Arkanoid
+Cobra
+Short Circuit 1,2
 
 
 * Games working bad to not having floating bus port
@@ -25,8 +36,8 @@ Renegade: plays slow, game hangs after losing one life
 
 
 * Games that flicker due to start of scanline
-Taipan
 Knight Tyme
+Taipan
 
 
 * Games that show different effects on border due to start of scanline
