@@ -4,12 +4,12 @@
 ; # Este listado en assembler Z80, produce un binario de 8KB exactamente  #
 ; # igual a la ROM del dispositivo de almacenamiento HiLow para Spectrum  #
 ; #                                                                       #
-; # El listado est† preparado para ser ensamblado con TASM, puede ser     #
+; # El listado est√° preparado para ser ensamblado con TASM, puede ser     #
 ; # ensamblado con el comando: TASM -80 -b -f00 hilowrom.zx               #
 ; # produciendo un binario de nombre hilowrom.obj exactamente igual a     #
 ; # la ROM HiLow V1.3E                                                    #
 ; #                                                                       #
-; # NOTA:     El dise§o y programaci¢n de este dispositivo para Spectrum  #
+; # NOTA:     El dise√±o y programaci√≥n de este dispositivo para Spectrum  #
 ; #           pertenece a: Juan Arias, Carlos Galucci, Roberto Eimer      #
 ; #           Ramiro Arias y Alfredo Mussio.                              #
 ; #                                                                       #
@@ -18,22 +18,22 @@
 ; Si fuiste un usuario del ensamblador para Spectrum GENS, debes tener
 ; en cuenta lo siguiente para poder guiarte mejor:
 
-;	1)	Al principio del fuente encontrar†s un pseudo-nem¢nico
+;	1)	Al principio del fuente encontrar√°s un pseudo-nem√≥nico
 ;		.TITLE "xxxxx" que no tiene utilidad alguna pero queda
 ;		bonito si imprimes por impresora HILOWROM.LST luego
-;		de ensamblar. Con ciertos reparos podr°a ser equivalente
+;		de ensamblar. Con ciertos reparos podr√≠a ser equivalente
 ;		a "*H" del GENS.
 
-;	2)	Al final del fuente encontrar†s un pseudo-nem¢nico ".END"
+;	2)	Al final del fuente encontrar√°s un pseudo-nem√≥nico ".END"
 ;		que es obligatorio para TASM y marca el final del fuente.
 ;		Directamente no tiene equivalente para el GENS.
 
 ;	3)	Cada etiqueta en este fuente termina con dos puntos ':'
-;		no es obligatorio, pero TASM lo acepta y hace m†s legible
+;		no es obligatorio, pero TASM lo acepta y hace m√°s legible
 ;		el listado.
 
-;	4)	En el GENS se usa la notaci¢n #NN para indicar un n£mero
-;		en base 16, aqu° se usa la notaci¢n $NN teniendo el mismo
+;	4)	En el GENS se usa la notaci√≥n #NN para indicar un n√∫mero
+;		en base 16, aqu√≠ se usa la notaci√≥n $NN teniendo el mismo
 ;		significado.
 
 ; =============================================================================
@@ -51,7 +51,7 @@
 #DEFINE		ORIGEN	$0000
 #ENDIF
 
-; Definici¢n del nem¢nico "LD A,Ix"
+; Definici√≥n del nem√≥nico "LD A,Ix"
 #DEFINE		LDA_Ix	DEFB $DD,$7C
 
 		.TITLE	"ROM Hilow - V1.3E"
@@ -65,7 +65,7 @@
 
 START:		DI			;RST 00H el ejecutarse el RET en
 		LD	SP,L1016+3	;en L0052 (y por lo tanto se produce
-		JP	L0052		;despaginaci¢n) saltar°a a #21FF en
+		JP	L0052		;despaginaci√≥n) saltar√≠a a #21FF en
 		DEFS	$01		;la ROM normal provocando un RESET.
 					;no veo que utilidad tiene esto...
 
@@ -78,18 +78,18 @@ RST08:		DEFS	$08		;RST 08H no hace nada, en principio
 					;por contener 0's ejecuta un RST 10H
 					
 RST10:		RST	18H		;RST 10H al usar el RST 18H con un
-		DEFW	RST10		;DW $0010, tiene la misma funci¢n
+		DEFW	RST10		;DW $0010, tiene la misma funci√≥n
 		RET			;que el RST 10H de la ROM normal.
 		DEFS	$04
 
 RST18:		JP	L05A8		;RST 18H sirve para llamar a una
 		DEFS	$05		;rutina de la ROM normal, cuya
-					;direcci¢n se indique a continuaci¢n
+					;direcci√≥n se indique a continuaci√≥n
 					;con un DWORD
 
 RST20:		LD	B,$FF		;RST 20H imprime un mensaje cuyos
 		JP	L0989		;bytes se indican a partir de la
-		DEFS	$03		;direcci¢n DE, los c¢digos son impresos
+		DEFS	$03		;direcci√≥n DE, los c√≥digos son impresos
 					;hasta que B=0 o (DE)=0
 
 RST28:		JP	PR_ERRMSG	;RST 28H imprime los mensajes
@@ -99,12 +99,12 @@ RST28:		JP	PR_ERRMSG	;RST 28H imprime los mensajes
 RST30:		INC	SP		;RST 30H despagina el HiLow
 		INC	SP		;retornando al elemento de pila
 L0032:		EI			;inmediatamente anterior.
-		JR	L0052		;Tiene como funci¢n el retorno con
+		JR	L0052		;Tiene como funci√≥n el retorno con
 		DEFS	$03		;las int. activadas a la ROM normal.
 
 RST38:		PUSH	AF		;RST 38H (rutina de servicio IM1)
 		LD	A,$01		;simplemente pone un uno en L3EED,
-		LD	(L3EED),A	;tiene la funci¢n de indicar cual es
+		LD	(L3EED),A	;tiene la funci√≥n de indicar cual es
 		POP	AF		;el modo de interrupcion activo en el
 		EI			;momento de ejecutar la NMI
 		RET                     ;(ver etiqueta NOTA2)
@@ -115,10 +115,10 @@ WINDOW1:	DEFB	$01,$01,$03,$03	;Estos bytes definen el mapa de bits
 		DEFB	$03,$00,$00,$00	;ventanas usadas para los mensajes de
 		DEFB	$00		;error.
 
-L0052:		RET			;Cuando se accede a esta direcci¢n la
-					;electr¢nica del HiLow despagina su
-					;ROM, continuando la ejecuci¢n en la
-					;misma direcci¢n de la ROM normal.
+L0052:		RET			;Cuando se accede a esta direcci√≥n la
+					;electr√≥nica del HiLow despagina su
+					;ROM, continuando la ejecuci√≥n en la
+					;misma direcci√≥n de la ROM normal.
 
 WINDOW2:	DEFB	$80,$80,$80,$80	;Estos bytes definen el mapa de bits
 		DEFB	$80,$80,$80,$80	;(tipo UDG) para imprimir en pantalla
@@ -127,48 +127,48 @@ WINDOW2:	DEFB	$80,$80,$80,$80	;Estos bytes definen el mapa de bits
 		DEFB	$00,$00,$00	;error.
 
 NMI:		LD	(NMI_STACK),SP	;RUTINA DE SERVICIO DE LA NMI
-		LD	SP,START_RAM	;ƒƒø
-		PUSH	AF		;  √ƒ ObsÇrvese c¢mo se guardan
-		DEC	SP		;  ≥  los registros, y la ejecuci¢n
-		DEC	SP		;  ≥  de un RETN para avisar al Z80
-		PUSH	BC		;  ≥  el fin de la NMI.
-		PUSH	DE		;  ≥
-		PUSH	HL		;  ≥  Aparentemente se trata de un
-		PUSH	IX		;  ≥  error (no estoy seguro) de
-		PUSH	IY		;  ≥  concepto ya que haciendo esto,
-		EX	AF,AF'		;  ≥  en teor°a es posible hacer una
-		PUSH	AF		;  ≥  petici¢n de NMI cuando YA se
-		EXX			;  ≥  estaba dando servicio a una.
-		PUSH	BC		;  ≥
-		PUSH	DE		;  ≥
-		PUSH	HL		;  ≥
-		LD	HL,CONTINT	;  √ƒø
-		PUSH	HL		;  ≥ ≥
-		RETN			;ƒƒŸ ≥
-					;    ≥
-CONTINT:	AND	A		;ƒƒƒƒ¡ƒ Notar que aqu° contin£a la NMI
-		LD	A,I		;       luego de la ejecuci¢n del RETN
+		LD	SP,START_RAM	;‚îÄ‚îÄ‚îê
+		PUSH	AF		;  ‚îú‚îÄ Obs√©rvese c√≥mo se guardan
+		DEC	SP		;  ‚îÇ  los registros, y la ejecuci√≥n
+		DEC	SP		;  ‚îÇ  de un RETN para avisar al Z80
+		PUSH	BC		;  ‚îÇ  el fin de la NMI.
+		PUSH	DE		;  ‚îÇ
+		PUSH	HL		;  ‚îÇ  Aparentemente se trata de un
+		PUSH	IX		;  ‚îÇ  error (no estoy seguro) de
+		PUSH	IY		;  ‚îÇ  concepto ya que haciendo esto,
+		EX	AF,AF'		;  ‚îÇ  en teor√≠a es posible hacer una
+		PUSH	AF		;  ‚îÇ  petici√≥n de NMI cuando YA se
+		EXX			;  ‚îÇ  estaba dando servicio a una.
+		PUSH	BC		;  ‚îÇ
+		PUSH	DE		;  ‚îÇ
+		PUSH	HL		;  ‚îÇ
+		LD	HL,CONTINT	;  ‚îú‚îÄ‚îê
+		PUSH	HL		;  ‚îÇ ‚îÇ
+		RETN			;‚îÄ‚îÄ‚îò ‚îÇ
+					;    ‚îÇ
+CONTINT:	AND	A		;‚îÄ‚îÄ‚îÄ‚îÄ‚î¥‚îÄ Notar que aqu√≠ contin√∫a la NMI
+		LD	A,I		;       luego de la ejecuci√≥n del RETN
 		DI
 		PUSH	AF
 		XOR	A               ;I <- 0, cuando llegue al HALT se
-		LD	I,A		;ejecutar† RST38 o INT_IM2 dependiendo
-		EI			;del MODO de interrupci¢n, entonces
-NOTA2:		HALT			;quedar† un 0 en L3EED si IM1, o un 1
-		DI			;si fuÇ una IM2. QUE INGENIOSO!
+		LD	I,A		;ejecutar√° RST38 o INT_IM2 dependiendo
+		EI			;del MODO de interrupci√≥n, entonces
+NOTA2:		HALT			;quedar√° un 0 en L3EED si IM1, o un 1
+		DI			;si fu√© una IM2. QUE INGENIOSO!
 		POP	HL
-		LD	A,(L3EED)	;La rutina L0116 que se llama m†s
+		LD	A,(L3EED)	;La rutina L0116 que se llama m√°s
 		LD	C,A		;adelante comprueba las teclas [1] y
 		LD	A,L		;[SPACE]... es decir:
 		OR	C
 		LD	L,A		;BOTON NMI + [SPACE] (fuerza un BREAK)
 		PUSH	HL		;BOTON NMI + [1]     (hace un RESET,
-		LD	IX,(L3F2B)	;ya que la computadora TK90X carec°a
-		LD	HL,START_RAM	;de bot¢n RESET este interface se lo
+		LD	IX,(L3F2B)	;ya que la computadora TK90X carec√≠a
+		LD	HL,START_RAM	;de bot√≥n RESET este interface se lo
 		LD	(L3F31),HL	;proporcionaba)
 TEST_1SPACE:	CALL	L0116
-		IN	A,(HLWPORT)	;Aqu° cancela el SAVE del snap NMI si
-		BIT	3,A		;se abri¢ la tapa del grabador, adem†s
-		JP	Z,L0E31		;tambiÇn cancela si el SAVE si es que
+		IN	A,(HLWPORT)	;Aqu√≠ cancela el SAVE del snap NMI si
+		BIT	3,A		;se abri√≥ la tapa del grabador, adem√°s
+		JP	Z,L0E31		;tambi√©n cancela si el SAVE si es que
 		LD	A,(L3EEC)	;ya fue usado.
 		CP	$7B		;La rutina L0D32 prueba SYMBOL y SPACE
 		JP	NZ,L0E31	;si se pulsa SYMBOL hace el SAVE, si
@@ -184,7 +184,7 @@ L00B6:		LD	A,$2E
 		LD	(L3EEC),A
 		JP	L1129
 
-L00CD:		LD	A,(IX+0)	;Aqu° se decide si se salva el juego
+L00CD:		LD	A,(IX+0)	;Aqu√≠ se decide si se salva el juego
 		AND	A		;por ser un header tipo BASIC o
 		JR	Z,L00DF		;bien la pantalla del juego por ser
 		LD	(IX+1),$2E	;un header tipo CODE. I.e.
@@ -192,7 +192,7 @@ L00CD:		LD	A,(IX+0)	;Aqu° se decide si se salva el juego
 		LD	BC,START_RAM	;SAVE "*JUEGO" -> header basic
 		JR	L00E7		;SAVE "*PANT" SCREEN$ -> header CODE
 
-L00DF:		LD	HL,$C000	;Aqu° se salva toda la RAM para el
+L00DF:		LD	HL,$C000	;Aqu√≠ se salva toda la RAM para el
 		LD	BC,START_RAM	;juego con ID 4 -> NMI
 		LD	A,$04
 L00E7:		LD	(IX+$0B),L
@@ -209,14 +209,14 @@ L00E7:		LD	(IX+$0B),L
 ; NOTA A NMI:
 ;
 ; Si IM2 estuviera activa, al dar un 0 al registro I, entonces el Z80 leera
-; la direcci¢n contenida en L00FF y saltar† a INT_IM2 para dar servicio a la
-; interrupci¢n forzada por el HALT de la etiqueta NOTA2.
+; la direcci√≥n contenida en L00FF y saltar√° a INT_IM2 para dar servicio a la
+; interrupci√≥n forzada por el HALT de la etiqueta NOTA2.
 ;
 ; Por el contrario, si el modo era IM1 entonces se ejecuta RST 38h.
 ;
-; En una palabra: si despuÇs de poner un 0 en el registro 'I' y al hacer luego
-; un HALT, entonces quedar† en el contenido de L3EED un 0 si las interrupciones
-; estaban en MODO 2, o quedar† un 1 si estaban en MODO 1.
+; En una palabra: si despu√©s de poner un 0 en el registro 'I' y al hacer luego
+; un HALT, entonces quedar√° en el contenido de L3EED un 0 si las interrupciones
+; estaban en MODO 2, o quedar√° un 1 si estaban en MODO 1.
 
 L00FF:		DEFW	INT_IM2
 
@@ -224,7 +224,7 @@ INT_IM2:	PUSH	AF		;con este fragmento se averigua el modo
 		LD	A,$00		;de interrupciones que estaba activo
 		LD	(L3EED),A	;cuando se ejecute el HALT de la rutina
 		POP	AF		;NMI (ver etiqueta NOTA2) al quedar un
-		EI                      ;0 en la direcci¢n L3EED
+		EI                      ;0 en la direcci√≥n L3EED
 		RET
 
 L010A:		JP	C,L05E0
@@ -252,17 +252,17 @@ L012B:		CALL	READ_KBD
 
 PR_ERRMSG:	PUSH	HL		;Esta rutina imprime uno de los
 		LD	HL,MSGSYS1	;mensajes de la tabla MSGSYS1
-		LD	(DIRMSGS),HL	;Entrando con A=n£mero de mensaje
+		LD	(DIRMSGS),HL	;Entrando con A=n√∫mero de mensaje
 		POP	HL		;siendo 1 el primero.
 L013F:		CALL	SAVE_REGS	;Observar que hay un punto opcional
 		LD	HL,$FFC4	;de entrada para poder usar otra
 		LD	DE,L3D14	;tabla de mensajes... i.e. la nuestra
 		LD	BC,$003C
 		LDIR			;Para hacer esto simplemente hay que
-		LD	($FFFE),SP	;poner en (DIRMSGS) la direcci¢n de
+		LD	($FFFE),SP	;poner en (DIRMSGS) la direcci√≥n de
 		LD	SP,$FFFE	;nuestra tabla, entrando por L013F.
 		AND	A
-		JP	Z,L01F6		;Conviene entrar a esta direcci¢n
+		JP	Z,L01F6		;Conviene entrar a esta direcci√≥n
 		LD	HL,L3D63	;usando la entrada en el JUMP_BLOCK1
 		LD	(L3D5B),HL
 		CALL	L023D
@@ -279,10 +279,10 @@ L013F:		CALL	SAVE_REGS	;Observar que hay un punto opcional
 		JP	L1016
 
 L017C:		LD	A,(DE)		;Este fragmento imprime todo el
-		AND	A		;mensaje, siendo (DE) la direcci¢n
-		RET	Z		;del mensaje y HL la direcci¢n de
+		AND	A		;mensaje, siendo (DE) la direcci√≥n
+		RET	Z		;del mensaje y HL la direcci√≥n de
 		PUSH	DE		;la pantalla en donde imprimir el
-		CALL	L0187		;car†cter.
+		CALL	L0187		;car√°cter.
 		POP	DE
 		INC	DE		;Observar -> fin del mensaje (DE)=0
 		JR	L017C
@@ -296,11 +296,11 @@ L0187:		PUSH	HL
 		CALL	L0B7B		;calcula sig. SCAN
 		POP	AF
 		PUSH	HL
-		CALL	L01CE		;Direcci¢n (mapa bits) del car†cter
+		CALL	L01CE		;Direcci√≥n (mapa bits) del car√°cter
 		POP	DE
 		EX	DE,HL
 		LD	B,$08
-		CALL	L01D9		;Imprime el car†cter
+		CALL	L01D9		;Imprime el car√°cter
 		LD	B,$FF
 		LD	C,$FF
 		CALL	L01B5		;repite la "raya" parte inferior marco
@@ -324,14 +324,14 @@ L01B5:		LD	DE,(L3D5B)	;Ver comentario en L0187
 
 		CALL	L0B7B		;Este fragmento no es usado por nadie
 		LD	A,(HL)		;aparentemente se trata de un residuo
-		LD	(DE),A		;de programaci¢n.
+		LD	(DE),A		;de programaci√≥n.
 		INC	DE
 		LD	(L3D5B),DE
 		LD	(HL),C
 		RET
 
-L01CE:		LD	H,$00		;Recibe en A el ASCII de un car†cter
-		LD	L,A		;y retorna en HL su direcci¢n en el
+L01CE:		LD	H,$00		;Recibe en A el ASCII de un car√°cter
+		LD	L,A		;y retorna en HL su direcci√≥n en el
 		LD	DE,$3C00	;font
 		ADD	HL,HL
 		ADD	HL,HL
@@ -342,16 +342,16 @@ L01CE:		LD	H,$00		;Recibe en A el ASCII de un car†cter
 L01D9:		LD	A,(HL)		;Este fragmento imprime en pantalla
 		PUSH	DE		;el caracter cuyo mapa de bits se
 		LD	DE,(L3D5B)	;encuentra en (DE) y lo hace en la
-		LD	(DE),A		;direcci¢n de pantalla (HL)
+		LD	(DE),A		;direcci√≥n de pantalla (HL)
 		INC	DE
 		LD	(L3D5B),DE
 		POP	DE
 		EX	DE,HL
 CALLRST18_1:	RST	18H		;Observar que despagina el HiLow para
 		DEFW	RET_WHL		;poder leer de la ROM normal el mapa
-		LD	C,A		;bits del car†cter a imprimir.
+		LD	C,A		;bits del car√°cter a imprimir.
 		RRA
-		OR	C		;Observar que pone el car†cter en
+		OR	C		;Observar que pone el car√°cter en
 		EX	DE,HL		;"negritas"
 		INC	DE
 		LD	(HL),A
@@ -363,7 +363,7 @@ L01F6:		LD	HL,(SCR_DIR)	;Esta rutina restituye lo guardado
 		LD	DE,L3D63	;por PR_ERRMSG en la pantalla
 		LD	BC,(L3D5F)	;Es decir, restablece la pantalla.
 		INC	C
-		INC	C		;Siendo esta rutina s¢lamente llamada
+		INC	C		;Siendo esta rutina s√≥lamente llamada
 		LD	B,C		;cuando A=0 al usar PR_ERRMSG
 L0203:		CALL	L020E
 		DJNZ	L0203
@@ -389,14 +389,14 @@ L0218:		LD	A,(DE)
 L0222:		PUSH	HL		;Esta rutina imprime el contorno
 		LD	B,$0B		;izquierdo o derecho del marco de los
 L0225:		PUSH	BC		;mensajes siendo (DE) mapa de bits
-		LD	A,(HL)		;a imprimir y HL direcci¢n de la
+		LD	A,(HL)		;a imprimir y HL direcci√≥n de la
 		LD	BC,(L3D5B)	;pantalla.
 		LD	(BC),A
-		INC	BC		;Adem†s salvaguarda en ((L3D5B)) el
+		INC	BC		;Adem√°s salvaguarda en ((L3D5B)) el
 		LD	(L3D5B),BC	;contenido previo de lo que va a
 		LD	A,(DE)		;afectar.
 		OR	(HL)
-		LD	(HL),A		;Esta rutina s¢lamente es usada por
+		LD	(HL),A		;Esta rutina s√≥lamente es usada por
 		INC	DE		;RST 28H
 		CALL	L0B7B
 		POP	BC
@@ -405,13 +405,13 @@ L0225:		PUSH	BC		;mensajes siendo (DE) mapa de bits
 		RET
 
 L023D:		LD	DE,(DIRMSGS)	;Esta rutina es usada para averiguar
-		LD	B,A		;la direcci¢n del mensaje en la tabla
+		LD	B,A		;la direcci√≥n del mensaje en la tabla
 L0242:		LD	C,$00		;indicada por (DIRMSGS).
 		PUSH	DE
-		POP	HL		;Retorna DE=direcci¢n mensaje
-L0246:		LD	A,(DE)		;        HL=direcci¢n pantalla
+		POP	HL		;Retorna DE=direcci√≥n mensaje
+L0246:		LD	A,(DE)		;        HL=direcci√≥n pantalla
 		INC	DE		;        (SCR_DIR) idem anterior
-		AND	A		;        (ATR_DIR) direcci¢n atributos
+		AND	A		;        (ATR_DIR) direcci√≥n atributos
 		JR	Z,L024E		;        (L3D5F) ancho mensaje
 		INC	C
 		JR	L0246
@@ -494,12 +494,12 @@ MSGSYS1:	DEFB	" CONFIRME SUSTITUCION ",0		; 01
 ; DEL HILOW PAGINA SU ROM
 ; ********************************************************
 
-SAVE:		DI			;Aqu° se pagina la ROM... ojo porque
-		JP	TEST_PAGEON	;en TEST_PAGEON est† la protecci¢n.
+SAVE:		DI			;Aqu√≠ se pagina la ROM... ojo porque
+		JP	TEST_PAGEON	;en TEST_PAGEON est√° la protecci√≥n.
 
 CONT_SAVE:	AND	A		;SI A=0 entonces interpreta si es una
 		JP	Z,L0628		;cabecera legal y retorna al programa
-		EX	AF,AF'		;que llam¢.
+		EX	AF,AF'		;que llam√≥.
 		LD	A,(L3EF5)
 		RLA			;Si la cabecera fue legal la variable
 		JP	NC,L0654	;L3EF5 queda con el valor de la tabla
@@ -573,7 +573,7 @@ L055A:		LD	HL,RAMHLW
 		RET
 
 TEST_OFF:	IN	A,(HLWPORT)	;Esta rutina testea si el grabador
-		BIT	0,A		;est† apagado, solo sale de aqu°
+		BIT	0,A		;est√° apagado, solo sale de aqu√≠
 		RET	Z		;cuando se lo enciende o bien se
 		BIT	6,A		;presiona SPACE.
 		RET	NZ
@@ -584,14 +584,14 @@ TEST_OFF:	IN	A,(HLWPORT)	;Esta rutina testea si el grabador
 		LD	DE,L3800	;Para el caso de que el grabador
 L0579:		LD	A,(DE)		;estuviera apagado hace una chequeo XOR
 		XOR	H		;desde 3800h hasta el fin de la RAM.
-		LD	H,A		;dicha comprobaci¢n queda en H
+		LD	H,A		;dicha comprobaci√≥n queda en H
 		INC	DE
 		LD	A,D
 		OR	E
 		JR	NZ,L0579
 L0581:		IN	A,(HLWPORT)
 		BIT	6,A
-		JR	NZ,L0593	;Se encendi¢ el grabador!
+		JR	NZ,L0593	;Se encendi√≥ el grabador!
 		LD	A,$7F
 		IN	A,($FE)
 		RRA
@@ -600,7 +600,7 @@ L0581:		IN	A,(HLWPORT)
 		RST	28H
 		JP	BREAKCONT
 
-L0593:		LD	B,$00		;Vuelve a hacer la comprobaci¢n XOR
+L0593:		LD	B,$00		;Vuelve a hacer la comprobaci√≥n XOR
 		LD	DE,L3800	;de todos los bytes entre 3800h y FFFFh
 L0598:		LD	A,(DE)
 		XOR	B
@@ -610,7 +610,7 @@ L0598:		LD	A,(DE)
 		OR	E
 		JR	NZ,L0598
 		LD	A,B
-		CP	H		;Si no concuerda la comprobaci¢n
+		CP	H		;Si no concuerda la comprobaci√≥n
 		JP	NZ,RESET	;anterior => la RAM fue corrupta al
 		XOR	A		;al encender el grabador. (por eso
 		RST	28H		;el RESET).
@@ -641,16 +641,16 @@ L05A8:		EX	(SP),HL
 		RST	30H
 
 		; ------------------------------------------------
-		; Aqu° est† la "dichosa" forma de paginar el Hilow
-		; debemos poner un 0 como direcci¢n de retorno en
+		; Aqu√≠ est√° la "dichosa" forma de paginar el Hilow
+		; debemos poner un 0 como direcci√≥n de retorno en
 		; la pila y saltar a la rutina 'SAVE_BYTES' de la
 		; ROM normal. (04C2h)
 		;
-		; ≠ pero eso es un reset !... ≠para nada! y sino
+		; ¬° pero eso es un reset !... ¬°para nada! y sino
 		; observar el siguiente fragmento hasta el 'RET'
 		; ------------------------------------------------
 
-TEST_PAGEON:	EX	(SP),HL		;Carga en HL la direcci¢n de retorno
+TEST_PAGEON:	EX	(SP),HL		;Carga en HL la direcci√≥n de retorno
 		PUSH	AF		;guarda AF
 		LD	A,H		;mira si HL (dir. de retorno) es 0
 		OR	L
@@ -661,7 +661,7 @@ TEST_PAGEON:	EX	(SP),HL		;Carga en HL la direcci¢n de retorno
 
 USER_RET:	POP	AF		;restituye AF
 		POP	HL		;restituye HL original
-		RET			;"retorna" a la direcci¢n de llamada.
+		RET			;"retorna" a la direcci√≥n de llamada.
 
 L05D9:		CALL	L06FC
 		JR	NC,L05EE
@@ -699,10 +699,10 @@ L0622:		LD	A,$04
 		CALL	L09A8
 		RST	30H
 
-L0628:		LD	A,D		;Aqu° se hace la segunda interpretaci¢n
+L0628:		LD	A,D		;Aqu√≠ se hace la segunda interpretaci√≥n
 		XOR	E		;del save, a esta rutina se accede
-		CP	$11		;s¢lamente cuando el usuario hace un
-		JR	NZ,L064F	;SAVE desde c/m de una cabecera v†lida
+		CP	$11		;s√≥lamente cuando el usuario hace un
+		JR	NZ,L064F	;SAVE desde c/m de una cabecera v√°lida
 		LD	B,$10		;y no con los comandos del BASIC
 		LD	A,(IX+1)
 		CP	'.'		; . = LOAD FILE
@@ -722,7 +722,7 @@ L0628:		LD	A,D		;Aqu° se hace la segunda interpretaci¢n
 
 L064F:		XOR	A		;En cualquier otro caso se pone
 		LD	(L3EF5),A	;a 0 la var. L3EF5 para indicar
-		EX	AF,AF'		;al Hilow que no tome acci¢n alguna
+		EX	AF,AF'		;al Hilow que no tome acci√≥n alguna
 L0654:		LD	HL,SALO_RET	;cuando haya que cargar el bloque FFh
 		EX	AF,AF'
 		RST	18H
@@ -833,12 +833,12 @@ L06FC:		CALL	L0947
 L06FF:		CALL	L1F46		;Esta parte aparentemente salva
 		JR	NZ,L0724	;un bloque de bytes cuyos datos
 		LD	A,$01		;son los siguientes:
-		RST	28H		;(IX+$0B) ƒ¬ƒ LONGITUD
-		CALL	W_SOUND		;(IX+$0C) ƒŸ
-		CALL	L0768		;(IX+$0D) ƒ¬ƒ COMIENZO
-		LD	A,$00		;(IX+$0E) ƒŸ
-		RST	28H		;(IX+$00) ƒƒƒ FLAG (*)
-		LD	A,$01		;(IX+$01) ƒƒƒ NOMBRE (10 bytes)
+		RST	28H		;(IX+$0B) ‚îÄ‚î¨‚îÄ LONGITUD
+		CALL	W_SOUND		;(IX+$0C) ‚îÄ‚îò
+		CALL	L0768		;(IX+$0D) ‚îÄ‚î¨‚îÄ COMIENZO
+		LD	A,$00		;(IX+$0E) ‚îÄ‚îò
+		RST	28H		;(IX+$00) ‚îÄ‚îÄ‚îÄ FLAG (*)
+		LD	A,$01		;(IX+$01) ‚îÄ‚îÄ‚îÄ NOMBRE (10 bytes)
 		CCF			;
 		RET	C		;el FLAG es igual a lo acostumbrado
 		CALL	L0737		;excepto los NMI i.e.:
@@ -887,7 +887,7 @@ L0742:		PUSH	HL
 		RET
 
 L0768:		LD	A,$7F		; Esta rutina testea BREAK (NC)
-		IN	A,($FE)		; y ejecuta el sonido caracter°stico
+		IN	A,($FE)		; y ejecuta el sonido caracter√≠stico
 		RRA			; cuando se cancela algo.
 		JR	NC,L0777
 		RRA
@@ -938,8 +938,8 @@ L07B7:		IN	A,(HLWPORT)	; el cassette de la unidad y no	sale
 		BIT	2,A		; de ella a menos que se lo haga.
 		JR	Z,L07CB
 		LD	A,$0E		; A diferencia de la rutina en L118B
-		RST	28H		; aqu° se retorna al punto desde
-		CALL	W_SOUND		; donde se llam¢.
+		RST	28H		; aqu√≠ se retorna al punto desde
+		CALL	W_SOUND		; donde se llam√≥.
 L07C3:		IN	A,(HLWPORT)
 		BIT	2,A
 		JR	NZ,L07C3
@@ -956,7 +956,7 @@ L07CD:		RST	28H
 		RST	28H
 		RET
 
-;Aqu° se comprueba el primer car†cter del nombre dado en el SAVE "..."
+;Aqu√≠ se comprueba el primer car√°cter del nombre dado en el SAVE "..."
 ;(ver etiqueta ON_SAVE)
 
 PARSE_SAVE:	POP	HL
@@ -990,18 +990,18 @@ PARSE_SAVE:	POP	HL
 
 		PUSH	HL		; Emula un SAVE normal de ROM SPECTRUM
 		CALL	W_SOUND
-		LD	HL,$1392	; ƒƒø
-		RST	18H             ;   √ Aqu° decide si es ROM SPECTRUM
-		DEFW	RET_WHL         ;   ≥ o TK90X
-		CP	$4F             ; ƒƒŸ
+		LD	HL,$1392	; ‚îÄ‚îÄ‚îê
+		RST	18H             ;   ‚îú Aqu√≠ decide si es ROM SPECTRUM
+		DEFW	RET_WHL         ;   ‚îÇ o TK90X
+		CP	$4F             ; ‚îÄ‚îÄ‚îò
 		LD	A,$0D		; SI (1392h)=4FH => es una ROM SPECTRUM
 		JR	Z,L0831		; y usa el mensaje "Start tape..."
 		LD	A,$18		; SI (1392h)<>4FH => es una ROM TK90X
 L0831:		RST	28H		; y usa mensaje "Conecte grabador..."
 L0832:		CALL	READ_KBD	;
-		JR	Z,L0832		; Esta es la £nica diferenciaci¢n que
+		JR	Z,L0832		; Esta es la √∫nica diferenciaci√≥n que
 		XOR	A		; se hace en base a si es una ROM
-		RST	28H		; Spectrum o TK90, despuÇs no sÇ de
+		RST	28H		; Spectrum o TK90, despu√©s no s√© de
 		PUSH	IX		; ninguna otra.
 		LD	DE,$0011
 		XOR	A
@@ -1046,14 +1046,14 @@ FORMAT:		CALL	L11A1		;Borra pantalla
 		CALL	L07B6		;Rutina q' pide que se quite el cass.
 L088A:		LD	A,$0F		;Mensaje: "PONGA CASSETTE A FORMATEAR"
 		RST	28H		;				     
-		CALL	W_SOUND		;sonido de aviso                     ≥
-		CALL	L0768		;testea BREAK (NC si es as°)         ≥
-		LD	A,$00		;				     ≥
-		RST	28H		;				     ≥
-		JP	NC,L0032	;SI SE PRESIONO BREAK ==> CANCELA    ≥
-		IN	A,(HLWPORT)	;				     ≥
-		BIT	2,A		;				     ≥
-		JR	Z,L088A		;repite si ni hay cassette puesto ƒƒƒŸ
+		CALL	W_SOUND		;sonido de aviso                     ‚îÇ
+		CALL	L0768		;testea BREAK (NC si es as√≠)         ‚îÇ
+		LD	A,$00		;				     ‚îÇ
+		RST	28H		;				     ‚îÇ
+		JP	NC,L0032	;SI SE PRESIONO BREAK ==> CANCELA    ‚îÇ
+		IN	A,(HLWPORT)	;				     ‚îÇ
+		BIT	2,A		;				     ‚îÇ
+		JR	Z,L088A		;repite si ni hay cassette puesto ‚îÄ‚îÄ‚îÄ‚îò
 		LD	A,$10
 		CALL	L0B21		;Pregunta: [CON BORRADO  SIN BORRADO]
 		LD	A,$01		;1=con borrado
@@ -1067,8 +1067,8 @@ L08A9:		LD	(L3EF9),A
 		SET	1,A
 		LD	(L3EF9),A
 L08BB:		LD	DE,MSFORM	;DE=Mensaje "FORMATEANDO CASSETTE..."
-		JR	L08D9		;La rutina de formateo en s°, comienza
-					;a partir de esta direcci¢n.
+		JR	L08D9		;La rutina de formateo en s√≠, comienza
+					;a partir de esta direcci√≥n.
 
 GO_FORMAT:	CALL	EX_FORMAT
 		AND	A
@@ -1093,9 +1093,9 @@ L08D9:		RST	20H		;IMPRIME RESTO DE LA PRESENTACION
 		CALL	L0989
 		JR	GO_FORMAT
 
-CATALOGO:	CALL	L0947		;Rutina que d† el cat†logo del
-		CALL	L1198		;del cassette. Puede serle £til
-		CALL	L0B94		;para imprimir un cat†logo directamente
+CATALOGO:	CALL	L0947		;Rutina que d√° el cat√°logo del
+		CALL	L1198		;del cassette. Puede serle √∫til
+		CALL	L0B94		;para imprimir un cat√°logo directamente
 L08EF:		LD	A,$BF		;sin tener que preparar una cabecera,
 		IN	A,($FE)		;despaginar luego, etc..
 		RRA
@@ -1167,16 +1167,16 @@ L0964:		LD	A,$C0		;Esta rutina no la entiendo,
 		LD	R,A		;aparentemente encripta algo, pero
 L0968:		LD	D,(HL)		;ignoro para que... y cuando.
 		LD	A,R		;Se me ocurre que esto sirve para
-		XOR	D		;protecci¢n, cuando se hace:
+		XOR	D		;protecci√≥n, cuando se hace:
 		LD	(HL),A		;SAVE ".ROM" CODE <alguna_parte_rom>
 		INC	HL		;
 		INC	HL		;Tampoco entiendo la secuencia:
 		DEC	HL		;INC HL / INC HL / DEC HL
 		DEC	BC		;lo cual es equivalente a un
-		LD	A,B		;solo INC HL (no sÇ que ganan)...
+		LD	A,B		;solo INC HL (no s√© que ganan)...
 		OR	C		;sera un retardo?
 		JR	NZ,L0968	;Si alguien entiende algo por
-		RET			;favor, h†gamelo saber.
+		RET			;favor, h√°gamelo saber.
 					;
 					;Por lo pronto encripta desde HL
 					;BC bytes, con el valor de R que
@@ -1190,11 +1190,11 @@ L0968:		LD	D,(HL)		;ignoro para que... y cuando.
 ; DEL HILOW PAGINA SU ROM
 ; ********************************************************
 
-ON_SAVE:	DI			;Aqu° esta la tercera direccion
+ON_SAVE:	DI			;Aqu√≠ esta la tercera direccion
 		JP	PARSE_SAVE	;en donde se pagina el HiLow para
 					;procesar el comando SAVE "...."
 					;Observar que en la ROM normal, en
-					;esta direcci¢n se est†n preparando
+					;esta direcci√≥n se est√°n preparando
 					;las cosas para ejecutar el SAVE.
 
 L097A:		CALL	L0947
@@ -1208,10 +1208,10 @@ L097A:		CALL	L0947
 L0989:		LD	A,(DE)		;Esta es la rutina principal de imp.
 		AND	A		;de mensajes.
 		RET	Z		;
-		CP	$20		;DE debe apuntar al mensaje y contin£a
+		CP	$20		;DE debe apuntar al mensaje y contin√∫a
 		JR	C,L0994		;imprimiendo hasta B=0 o (DE)=0
 		CP	$7F		;
-		JR	C,L099A		;Observar que los c¢digos menores a 20h
+		JR	C,L099A		;Observar que los c√≥digos menores a 20h
 L0994:		CP	$0D		;y mayores a 7Fh (excepto 0Dh) son
 		JR	Z,L099A		;filtrados y sustituidos por 8Fh
 		LD	A,$8F
@@ -1232,17 +1232,17 @@ L09A8:		RST	28H
 		RST	28H
 		RET
 
-L09AF:		LD	A,$7F		;Este fragmento mira si est† apretada
-		IN	A,($FE)		;[SPACE] y se queda en bucle si es as°.
+L09AF:		LD	A,$7F		;Este fragmento mira si est√° apretada
+		IN	A,($FE)		;[SPACE] y se queda en bucle si es as√≠.
 		RRA
 		JR	C,L09AF		;Esta rutina es muy usada en muchas
 		RET			;partes
 
-PARSE_LOAD:	EX	(SP),HL		;HL=direcci¢n de retorno
+PARSE_LOAD:	EX	(SP),HL		;HL=direcci√≥n de retorno
 		PUSH	AF
 		LD	A,H
 		CP	$07		;Si H=7 ==> entonces LOAD fue llamada
-		JP	NZ,L0A90	;desde la direcci¢n 76Eh en la ROM
+		JP	NZ,L0A90	;desde la direcci√≥n 76Eh en la ROM
 		POP	AF		;normal para la carga de una cabecera.
 		LD	HL,L07B7
 		EX	(SP),HL
@@ -1357,7 +1357,7 @@ L0A8B:		INC	D
 		RST	30H
 
 L0A90:		CP	$08		;Si H=8 ==> entonces LOAD fue llamada
-		JR	NZ,L0AAD	;desde la direcci¢n 802h en la ROM
+		JR	NZ,L0AAD	;desde la direcci√≥n 802h en la ROM
 		PUSH	HL		;normal para la carga de una bloque.
 		LD	HL,$0007
 		ADD	HL,SP
@@ -1500,7 +1500,7 @@ L0B73:		LD	A,(HL)
 
 L0B7B:		INC	H		;Esta rutina retorna en HL la dir.
 		LD	A,H		;en pantalla del siguiente SCAN, y es
-		AND	$07		;usada para la impresi¢n de mensajes.
+		AND	$07		;usada para la impresi√≥n de mensajes.
 		RET	NZ
 		LD	A,L
 		ADD	A,$20
@@ -1819,7 +1819,7 @@ L0E01:		PUSH	HL
 		RET
 
 ;-------------------------------------------------
-; Esta rutina carga el NMI que ya fuÇ seleccionado
+; Esta rutina carga el NMI que ya fu√© seleccionado
 
 LOAD_NMI:	LD	SP,START_RAM
 		PUSH	HL
@@ -1915,13 +1915,13 @@ L0EBA:		CALL	L09A3
 		JP	BREAKCONT
 
 ;-----------------------------------
-;A partir de aqu° rutina para copiar
+;A partir de aqu√≠ rutina para copiar
 ;archivos
 
 L0EC0:		PUSH	HL
 		POP	IX
 		LD	A,$2A		; A = ASCII de '*'
-		CP	(IX+1)		; ® Queremos copiar un NMI ?
+		CP	(IX+1)		; ¬ø Queremos copiar un NMI ?
 PROTECCION:	JR	NZ,L0EE0	; no?==>vamos a copiar
 
 		LD	A,$12		; si?==>mensaje "NMI NO SE COPIA"
@@ -1929,10 +1929,10 @@ PROTECCION:	JR	NZ,L0EE0	; no?==>vamos a copiar
 		CALL	W_SOUND_SPC	; sonido de aviso
 
 					; pero entonces....
-		CALL	TEST_HIW	; !!!aqu° comprueba algo interesante!!!
+		CALL	TEST_HIW	; !!!aqu√≠ comprueba algo interesante!!!
 					; si a la salida de esta rutina se
 					; pulsaron en secuencia las teclas
-					; [H] [I] y [W] entonces hay condici¢n
+					; [H] [I] y [W] entonces hay condici√≥n
 					; ZERO
 
 		EX	AF,AF'		; pone AF' para conservar AF normales
@@ -1942,15 +1942,15 @@ PROTECCION:	JR	NZ,L0EE0	; no?==>vamos a copiar
 L0ED4:		CALL	READ_KBD	; lee el teclado y espera hasta que
 		JR	NZ,L0ED4	; NO haya tecla(s) pulsada(s)
 
-		EX	AF,AF'		; recupera AF para saber que pas¢ con
+		EX	AF,AF'		; recupera AF para saber que pas√≥ con
 					; la rutina TEST_HIW
 
-		LD	A,$00		; c¢digo para restituir la pantalla
+		LD	A,$00		; c√≥digo para restituir la pantalla
 		RST	28H		; borramos mensaje "NMI NO SE COPIA"
 
 		JP	NZ,BREAKCONT	; si no estaban presionadas las teclas
 					; HIW como se explica en TEST_HIW
-					; entonces hay condici¢n NZ y salta
+					; entonces hay condici√≥n NZ y salta
 					; BREAKCONT en donde se envia un error
 					; 'D - BREAK conts repeats'
 
@@ -2080,7 +2080,7 @@ READ_KBD:	LD	A,$00
 ; las teclas [H] [I] y [W] en secuencia.
 ;
 ; Es decir, esta rutina solamente es llamada cuando queremos copiar
-; un NMI, y est† en pantalla el mensaje "NMI NO SE COPIA".
+; un NMI, y est√° en pantalla el mensaje "NMI NO SE COPIA".
 ;
 ; Entonces:
 ;
@@ -2092,7 +2092,7 @@ READ_KBD:	LD	A,$00
 ;	6) soltamos la [I]
 ;
 
-; A continuaci¢n comento esta rutina por considerla importante:
+; A continuaci√≥n comento esta rutina por considerla importante:
 
 TEST_HIW:
 
@@ -2105,7 +2105,7 @@ WAIT_KEY:	CALL	READ_KBD	;<-----------------------------------+
 		LD	A,$BF		;selecciona semifila HJKL-enter
 		IN	A,($FE)		;lee el teclado
 		BIT	4,A		;TESTEA TECLA H
-		RET	NZ		;®estaba pulsada? - no? ==> retornamos
+		RET	NZ		;¬øestaba pulsada? - no? ==> retornamos
 
 TEST_H:		CALL	READ_KBD	;<---------------------------------+
 		LD	A,$BF		;                                  |
@@ -2116,7 +2116,7 @@ TEST_H:		CALL	READ_KBD	;<---------------------------------+
 		LD	A,$DF		;selecciona semifila YUIOP
 		IN	A,($FE)		;lee el teclado
 		BIT	2,A		;TESTEA TECLA I
-		RET	NZ		;®estaba pulsada? - no? ==> retornamos
+		RET	NZ		;¬øestaba pulsada? - no? ==> retornamos
 
 TEST_I:		CALL	READ_KBD	;<---------------------------------+
 		LD	A,$DF		;                                  |
@@ -2128,14 +2128,14 @@ TEST_I:		CALL	READ_KBD	;<---------------------------------+
 		IN	A,($FE)		;lee el teclado
 		BIT	1,A		;TESTEA TECLA W
 
-		RET			;se retorna con ZERO si se lleg¢
-					;hasta aqu° con la W pulsada
+		RET			;se retorna con ZERO si se lleg√≥
+					;hasta aqu√≠ con la W pulsada
 					;En cualquier otro caso retorna con
 					;NOZERO (NZ)
 
-L1009:		LD	A,$12		;Este peque§o fragmento pone FLASH 1
+L1009:		LD	A,$12		;Este peque√±o fragmento pone FLASH 1
 		RST	10H		;si fuera necesario al imprimir el
-		LD	A,$01		;cat†logo.
+		LD	A,$01		;cat√°logo.
 		RST	10H
 		RET
 
@@ -2155,7 +2155,7 @@ L1016:		LD	SP,($FFFE)
 
 L1029:		LD	A,(BORDCR)	;Esta rutina emite un sonido
 		RRA			;En el registro B recibe la
-		RRA			;duraci¢n y en HL alg£n tipo
+		RRA			;duraci√≥n y en HL alg√∫n tipo
 		RRA			;de "frecuencia".
 L102F:		DEC	D
 		JR	NZ,L1037
@@ -2190,29 +2190,29 @@ REST_REGS:	POP	HL		;Idem anterior pero para recuperar
 		RET
 
 L1056:		CALL	SAVE_REGS	;Emite uno de los sonidos de
-		LD	B,$64		;"movimiento" en la selecci¢n
-		LD	HL,$1900	;de archivos o elecci¢n de opciones
+		LD	B,$64		;"movimiento" en la selecci√≥n
+		LD	HL,$1900	;de archivos o elecci√≥n de opciones
 L105E:		CALL	L1029		;en las ventanas-menu.
 		CALL	REST_REGS
 		RET
 
 L1065:		CALL	SAVE_REGS	;Emite uno de los sonidos de
-		LD	B,$64		;"movimiento" en la selecci¢n
-		LD	HL,$1400	;de archivos o elecci¢n de opciones
+		LD	B,$64		;"movimiento" en la selecci√≥n
+		LD	HL,$1400	;de archivos o elecci√≥n de opciones
 		JR	L105E		;en las ventanas-menu.
 
-W_SOUND_SPC:	CALL	SAVE_REGS	;Emite el sonido de cancelaci¢n
+W_SOUND_SPC:	CALL	SAVE_REGS	;Emite el sonido de cancelaci√≥n
 		LD	B,$00		;cuando se presiona SPACE
 		LD	HL,$3500
 		JR	L105E
 
-L1079:		CALL	SAVE_REGS	;Emite el sonido de aceptaci¢n
+L1079:		CALL	SAVE_REGS	;Emite el sonido de aceptaci√≥n
 		LD	B,$96		;cuando se presiona SHIFT
 		LD	HL,$2100
 		JR	L105E
 
 L1083:		CALL	SAVE_REGS	;Emite el sonido de "sirena" cuando
-		LD	B,$00		;se est† ejecutando la NMI despuÇs de
+		LD	B,$00		;se est√° ejecutando la NMI despu√©s de
 		LD	HL,$1443	;haber echo un SAVE "*..."
 		JR	L105E
 
@@ -2377,7 +2377,7 @@ L118B:		LD	A,$0E		;Esta rutina solicita al usuario
 L118E:		IN	A,(HLWPORT)	;tapa) y no sale de ella hasta que
 		BIT	2,A		;lo haga.
 		JR	NZ,L118E
-		LD	A,$00		;Atenci¢n porque la ROM queda
+		LD	A,$00		;Atenci√≥n porque la ROM queda
 		RST	28H		;despaginada al retornar.
 		RST	30H
 
@@ -2441,8 +2441,8 @@ L11F8:	ADD		HL,DE
 
 L11FC:	PUSH	HL			;Esta rutina es usada para imprimir
 		LD		A,H			;el Copyright del grabador.
-		OR		L			;SI HL=0 el usario solicit¢ un RESET
-		JR		Z,L120D		;(bot¢n NMI+1)
+		OR		L			;SI HL=0 el usario solicit√≥ un RESET
+		JR		Z,L120D		;(bot√≥n NMI+1)
 		CALL	L11A1		;si no ==> borra pantalla
 		CALL	L1198		;abre canal #02
 		CALL	HLW_COPYR	;imprime logotipo y copyright
@@ -2656,10 +2656,10 @@ L1631:		LD	A,B
 
 ;=============================================================================
 ; Las siguientes rutinas aparentemente... leen o escriben un
-; byte / sector / registro_de_estado / o_que_se_y¢! :) :)
+; byte / sector / registro_de_estado / o_que_se_y√≥! :) :)
 ; desde el grabador.
 ;
-; No lo tengo muy claro porque no dispongo de informaci¢n tÇcnica
+; No lo tengo muy claro porque no dispongo de informaci√≥n t√©cnica
 ; del datadrive.
 ;=============================================================================
 
@@ -2764,7 +2764,7 @@ L16BF:		DJNZ	L16BF
 		OUT	($FE),A
 		JP	L1655
 
-		LD	B,H		; ≠®?!
+		LD	B,H		; ¬°¬ø?!
 
 L16D0:		PUSH	AF
 		PUSH	IX
@@ -3030,11 +3030,11 @@ READ_SECTOR:	CALL	L1720		;RUTINA QUE CARGA UN SECTOR?
 		EX	AF,AF'		;Aparentemente A=indica nr. sector
 		EXX			;siendo 0 y 1 los que corresponden
 		LD	DE,$0000	;a los 2 directorios.
-		EX	DE,HL		;IX creo que apunta a la direcci¢n
+		EX	DE,HL		;IX creo que apunta a la direcci√≥n
 		ADD	HL,SP		;en donde cargar los 2048 bytes.
 		EX	DE,HL
-		EXX			;Y retornar°a con A=0 el resultado
-		EX	AF,AF'		;de la lectura, seg£n la siguiente
+		EXX			;Y retornar√≠a con A=0 el resultado
+		EX	AF,AF'		;de la lectura, seg√∫n la siguiente
 		PUSH	AF		;tabla:
 		AND	A		;
 		JP	Z,L18A9		;FFh = SE PRESIONO BREAK
@@ -3248,7 +3248,7 @@ L1A2D:		LD	HL,L3EF9
 L1A33:		LD	B,$02		; [ERROR EN LA CINTA]
 		JR	L1A54
 
-		LD	B,$02		; ≠REPETICION! (innecesario)
+		LD	B,$02		; ¬°REPETICION! (innecesario)
 		JR	L1A54
 
 L1A3B:		LD	B,$FF		; SE PRESIONO BREAK
@@ -3257,7 +3257,7 @@ L1A3B:		LD	B,$FF		; SE PRESIONO BREAK
 L1A3F:		LD	B,$01		; [ERROR EN LA CINTA]
 		JR	L1A54
 
-L1A43:		LD	B,$01		; ≠REPETICION! (innecesario)
+L1A43:		LD	B,$01		; ¬°REPETICION! (innecesario)
 		JR	L1A54
 
 L1A47:		LD	B,$04		; [ESTE CASSETTE NO SIRVE]
@@ -3793,11 +3793,11 @@ LAST_BYTE:	EQU	$
 HLWPORT:	EQU	$FF		;Este es el puerto principal
 					;usado por el grabador.
 
-START_RAM:	EQU	$4000		;Direcci¢n de comienzo de la
+START_RAM:	EQU	$4000		;Direcci√≥n de comienzo de la
 					;RAM 'normal'
 
 RETARDO1:	EQU	$7530		;Estos valores son usados para poner
-RETARDO2:	EQU	$0BB8		;retardos en b£squeda y r/w de sects.
+RETARDO2:	EQU	$0BB8		;retardos en b√∫squeda y r/w de sects.
 
 ; SUBRUTINAS USADAS DE LA ROM NORMAL
 ; ==================================
@@ -3823,10 +3823,10 @@ ATTRT:		EQU	$5C8F		;ATTR_T
 BORDCR:		EQU	$5C48		;BORDCR
 SCRCT:		EQU	$5C8C		;SCR_CT
 
-;A continuacion viene la definici¢n de las variables del sistema del Hilow,
-;no las comento todas ya que aun no estudiÇ en profundidad su manejo y funci¢n.
+;A continuacion viene la definici√≥n de las variables del sistema del Hilow,
+;no las comento todas ya que aun no estudi√© en profundidad su manejo y funci√≥n.
 ;
-;Por otra parte es muy dif°cil disernir el uso de c/u ya que una misma variable
+;Por otra parte es muy dif√≠cil disernir el uso de c/u ya que una misma variable
 ;es usada para varias funciones por diferentes rutinas... (tal vez se deba al
 ;hecho de ahorrar la mayor cantidad posible de memoria)
 
@@ -3844,11 +3844,11 @@ L3D14:		EQU	LAST_BYTE+$1D14	;Aqui se guarda el contenido previo de la RAM
 					;colocar la pila en RAM normal. Hay espacio
 					;para $3C bytes
 L3D5B:		EQU	LAST_BYTE+$1D5B
-ATR_DIR:	EQU	LAST_BYTE+$1D5D	;Direcci¢n atributos en donde se imprimir†
+ATR_DIR:	EQU	LAST_BYTE+$1D5D	;Direcci√≥n atributos en donde se imprimir√°
 					;el mensaje de error (ver L023D y PR_ERRMSG)
 L3D5F:		EQU	LAST_BYTE+$1D5F	;Cuando se imprimen mens. error aqui se guarda
 					;ancho del mensaje y luego su nro. (ver L023D)
-SCR_DIR:	EQU	LAST_BYTE+$1D61	;Direcci¢n de pantalla en donde se imprimir†
+SCR_DIR:	EQU	LAST_BYTE+$1D61	;Direcci√≥n de pantalla en donde se imprimir√°
 					;el mensaje de error (ver L023D)
 L3D63:		EQU	LAST_BYTE+$1D63
 L3D64:		EQU	LAST_BYTE+$1D64
@@ -3869,34 +3869,34 @@ L3EF7:		EQU	LAST_BYTE+$1EF7
 L3EF9:		EQU	LAST_BYTE+$1EF9
 L3EFB:		EQU	LAST_BYTE+$1EFB
 L3EFD:		EQU	LAST_BYTE+$1EFD
-L3F19:		EQU	LAST_BYTE+$1F19	;Cuando salva progs. desde C/M aqu° se guardan
+L3F19:		EQU	LAST_BYTE+$1F19	;Cuando salva progs. desde C/M aqu√≠ se guardan
 					;las cabeceras a la espera del bloque $FF.
 L3F2B:		EQU	LAST_BYTE+$1F2B
 L3F2D:		EQU	LAST_BYTE+$1F2D
 L3F2F:		EQU	LAST_BYTE+$1F2F
 L3F31:		EQU	LAST_BYTE+$1F31
-RUNMI_SP:	EQU	LAST_BYTE+$1F33	;Aqui se guarda la direcci¢n de retorno de
+RUNMI_SP:	EQU	LAST_BYTE+$1F33	;Aqui se guarda la direcci√≥n de retorno de
 					;la rutina de servicio al NMI.
-AUX_STACK:	EQU	LAST_BYTE+$1FE6	;Aparantemente aqu° se coloca el stack cuando
-					;se est†n cargando o salvando archivos.
+AUX_STACK:	EQU	LAST_BYTE+$1FE6	;Aparantemente aqu√≠ se coloca el stack cuando
+					;se est√°n cargando o salvando archivos.
 COPY_STACK:	EQU	LAST_BYTE+$1FE8	;Aqui se pone el stack cuando se efectuan
 					;copias de archivos.
 NMI_STACK:	EQU	LAST_BYTE+$1FFC	;Aqui se guarda el SP cuando se da servicio a
-					;un NMI (tambiÇn es el SP de los juegos).
+					;un NMI (tambi√©n es el SP de los juegos).
 RAMHLW:		EQU	LAST_BYTE+$1FFF	;Fin de la RAM del sistema.
 
 ; NOTA 1:	El HiLow usa dos directorios, uno de ellos contiene el
-;		nro.  de actualizaciones+1, es decir, que ese es el m†s
-;		reciente y por lo tanto el que contiene la £ltima
-;		actualizaci¢n, tambiÇn puede ocurrir que ambos sean
+;		nro.  de actualizaciones+1, es decir, que ese es el m√°s
+;		reciente y por lo tanto el que contiene la √∫ltima
+;		actualizaci√≥n, tambi√©n puede ocurrir que ambos sean
 ;		iguales.
 ;
 ;		En ninguno de estos 2 casos se considera que haya un
 ;		error en el directorio, pero si uno de ellos contiene un
-;		n£mero de actualizaciones mayor a 1, entonces se
+;		n√∫mero de actualizaciones mayor a 1, entonces se
 ;		considera que hay error.
 ;
-;		Para indicar esta condici¢n se pone a 1 el bit 15 del
+;		Para indicar esta condici√≥n se pone a 1 el bit 15 del
 ;		nro.  de actualizaciones.  (ver fragmento con la
 ;		etiqueta NOTA1)
 
