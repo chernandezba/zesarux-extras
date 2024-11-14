@@ -4,7 +4,8 @@ Inves games compatibility list
 * Games reseting or bad behaviour due to the "Inves write-on-interrupt bug". Overwrite address (I*256+R) with 255.
 It overwrites the interrupt table, when R<128 (on cold reset) there's no danger because the interrupt vector are in the two last bytes of the table,
 and having R<128, only the first 128 bytes are overwritten.
-But if the game changes R to be >=128, the last two bytes will be overwritten soon: if they have 255 value, no problem. But if not, they will be overwritten with 255 and the game will crash or hang
+But if the game changes R to be >=128, the last two bytes will be overwritten soon: if they have 255 value, no problem. But if not, they will be overwritten with 255 and the game will crash or hang.
+This list was partially discovered by an automatic script (see file compatibility_list_additional.txt if you are curious)
 
 4x4 Off-road Racing
 Commando

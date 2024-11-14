@@ -1,0 +1,20 @@
+To find the write-on-interrupt bug automatically for all games (I have a local WOS mirror) I used:
+
+cd "to where the local mirror is"
+
+mkdir /tmp/unzips
+
+ARCHIVOS=`find .`
+
+# files from wos mirror are in ZIP
+for i in $ARCHIVOS; do unzip -n -d /tmp/unzips $i; done
+
+
+for i in /tmp/unzips/*; do echo $i >> /tmp/inves.log ; ./zesarux --noconfigfile --vo stdout --ao null  --exit-after 5 --fastautoload --realloadfast --machine inves --disablemenuandexit --disableallbetawarningpause --deletetzxpauses $i >> /tmp/inves.log; done
+
+
+Then, when a game has this bug, you will see the following line on the inves.log file:
+
+Error:    This game will probably crash due to the Inves write-on-interrupt bug (ISR=FDFDH, I=FEH, R=86H, IM_MODE=2, IFF1=1)
+
+It only waits 5 seconds for every game, maybe it's too little time as some games change R register after some more seconds
