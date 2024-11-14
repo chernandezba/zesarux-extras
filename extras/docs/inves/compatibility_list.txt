@@ -55,9 +55,17 @@ But if the game changes R to be >=128, the last two bytes will be overwritten so
 Commando
 Commando Tracer
 Gothik
-Prince of Persia (version converted from td-dos to tap)
+JINJ 2 Belmonte's Revenge (jinj2.tzx, by Retroworks)
+KliatbaNoci (KliatbaNoci.tzx)
+Pick Out 2 (PickOut2.tzx, same authors as KliatbaNoci)
+Prince of Persia (POPERSIA.TAP, version converted from td-dos to tap)
 Ranarama - Erbe Edition, Players premiere edition
+Sach Mat (Sach-Mat.tzx, same authors as KliatbaNoci)
 Shadow of the Beast
-Super Pipeline II
-
-
+Super Pipeline II (PIPELIN2.TAP)
+Teodoro no sabe volar (TeodoroNSVen.tap, by Retroworks)
+Tiddly Drinks (T_DRINKS.TAP)
+Tuition (Tuition.tzx, same authors as KliatbaNoci)
+Twilight (Twilight.tzx, same authors as KliatbaNoci)
+World Series Basketball (BSKETBAL.TAP, cracked version by Digital Cracking Service)
+Zaxxon (ZAXXON.TAP)
