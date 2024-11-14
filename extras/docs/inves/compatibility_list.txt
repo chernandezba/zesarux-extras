@@ -48,13 +48,18 @@ The way of the exploding fist (no sound)
 ATV (1 channel)
 Batman (the caped crusader) (menu) (no music at all)
 Lemmings (menu) (1 channel)
+Manic Miner (no sound on menu)
 Renegade: no sound on game (kicks, jumps, etc) but music does work
 
 
-* Games running a bit faster due to the lack of contended memory
-Death chase?
-Sabre wulf: music in menu plays faster
+* Games that show colours or snow in border when it's supposed to sound music
+Manic miner
 
+
+* Games running a bit faster due to the lack of contended memory
+Death chase
+Manic miner
+Sabre wulf: music in menu plays faster
 
 
 * Games working bad to not having floating bus port
@@ -64,6 +69,7 @@ Renegade: plays slow, game hangs after losing one life
 * Games that flicker due to start of scanline
 Knight Tyme
 Taipan
+
 
 
 * Games that show different effects on border due to start of scanline
