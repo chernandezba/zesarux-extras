@@ -1,0 +1,377 @@
+Sprites Overview
+2.00.27
+
+The Spectrum Next has a hardware sprite system with the following
+characteristics:
+
+* Total of 128 sprites
+* Display surface is 320x256 overlapping the ULA screen by 32 pixels on
+  each side
+* Minimum of 100 sprites per scanline (see below)
+* Size of each sprite is 16x16 pixels but sprites can be magnified
+  1x, 2x, 4x or 8x horizontally and vertically
+* Sprites can be mirrored and rotated
+* Sprites can be grouped together to form larger sprites under the control
+  of a single anchor
+* A 16k pattern memory can contain 64 8-bit sprite images or 128 4-bit
+  sprite images and combinations in between
+* A per-sprite palette offset allows sprites to share images but colour
+  them differently
+* A nextreg interface allows the copper to move sprites during the video
+  frame
+
+A minimum of 100 16x16 sprites are guaranteed to be displayed in any
+scanline. Any additional sprites will not be displayed with the hardware
+ensuring sprites are not partially plotted.
+
+The actual limit is determined by how many 28MHz clock cycles there are in
+a scanline. The sprite hardware is able to plot one pixel per cycle and
+uses one cycle to qualify each sprite. Since the number of cycles there
+are in a scanline varies with video timing (hdmi, vga) the number of pixels
+that can be plotted also varies but the minimum will be 1600 pixels per
+line including overhead cycles needed to qualify 100 sprites.
+Since sprites magnified horizontally involve plotting more pixels,
+x2 x4 x8 sprites will take more cycles to plot and the presence of these
+sprites in a line will reduce the total number of sprites that can be
+plotted.
+
+
+Sprite Patterns
+
+Sprite patterns are the images that each sprite can take on. The images are
+ stored in a 16k memory internal to the FPGA and are identified by pattern 
+number. A particular sprite chooses a pattern by storing a pattern number 
+in its attributes.
+
+All sprites are 16x16 pixels in size but they come in two flavours: 4-bit 
+and 8-bit. The bit width describes how many bits are used to code the 
+colour of each pixel.
+
+An 8-bit sprite uses a full byte to colour each of its pixels so that each 
+pixel can be one of 256 colours. In this case, a 16x16 sprite requires 256 
+bytes of pattern memory to store its image.
+
+A 4-bit sprite uses a nibble to colour each of its pixels so that each pixel
+ can be one of 16 colours. In this case, a 16x16 sprite requires just 128 
+bytes of pattern memory to store its image.
+
+The 16k pattern memory can contain any combination of these images, whether 
+they are 128 bytes or 256 bytes and their locations in the pattern memory 
+are described by a pattern number. This pattern number is 7 bits with bits 
+named as follows:
+
+  Pattern Number
+  N5 N4 N3 N2 N1 N0 N6
+
+N6, despite the name, is the least significant bit.
+
+This 7-bit pattern number can identify 128 patterns in the 16k pattern 
+memory, each of which are 128 bytes in size. The full 7-bits are therefore 
+used for 4-bit sprites.
+
+For 8-bit sprites, N6=0 always. The remaining 6 bits can identify 64 
+patterns, each of which is 256 bytes in size.
+
+The N5:N0,N6 bits are stored in a particular sprite's attributes to identify
+ which image to use for the sprite.
+
+
+8-Bit Sprite Patterns
+
+The 16x16 pixel image uses 8-bits for each pixel so that each pixel can be 
+one of 256 colours. One colour indicates transparency and this is 
+programmed into the Sprite Transparency Index register (nextreg 0x4B).
+By default the transparent value is 0xE3.
+
+As an example of an 8-bit sprite let's have a look at the sprite below:
+
+.... [sword from existing page]
+
+Using the default palette, which is initialized with RGB332 colours from 
+0-255, the hexadecimal values for this pattern arranged in a 16x16 array 
+are shown below:
+
+04040404040404E3E3E3E3E3E3E3E3E3
+04FFFFFFFFFF04E3E3E3E3E3E3E3E3E3
+04FFFBFBFBFF04E3E3E3E3E3E3E3E3E3
+04FFFBF5F5FBFF04E3E3E3E3E3E3E3E3
+04FFFBF5A8A8FBFF04E3E3E3E3E3E3E3
+04FFFFFBA844A8FBFF04E3E3E3E3E3E3
+040404FFFBA844A8FBFF04E3E3E3E3E3
+E3E3E304FFFBA84444FBFF04E304E3E3
+E3E3E3E304FFFB444444FBFF044D04E3
+E3E3E3E3E304FFFB44444444FA4D04E3
+E3E3E3E3E3E304FFFB44FFF54404E3E3
+E3E3E3E3E3E3E304FF44F5A804E3E3E3
+E3E3E3E3E3E3E3E304FA4404A804E3E3
+E3E3E3E3E3E3E3044D4D04E304F504E3
+E3E3E3E3E3E3E3E30404E3E3E304FA04
+E3E3E3E3E3E3E3E3E3E3E3E3E3E30404
+
+Here 0xE3 is used as the transparent index.
+
+These 256 bytes would be stored in the pattern memory in left to right, 
+top to bottom order.
+
+
+4-Bit Sprite Patterns
+
+The 16x16 pixel image uses 4-bits for each pixel so that each pixel can be 
+one of 16 colours. One colour indicates transparency and this is programmed
+ into the lower 4-bits of the Sprite Transparency Index register 
+(nextreg 0x4B). By default the transparency value is 0x3. Note that the 
+same register is shared with 8-bit patterns to identify the transparent 
+index.
+
+Since each pixel only occupies 4-bits, two pixels are stored in each byte.
+The leftmost pixel is stored in the upper 4-bits and the rightmost pixel is
+stored in the lower 4-bits.
+
+As an example we will use the same sprite image as was given in the 8-bit
+pattern example. Here only the lower 4 bits of each pixel is retained to
+confine each pixel's color to 4-bits:
+
+4444444333333333
+4FFFFF4333333333
+4FBBBF4333333333
+4FB55BF433333333
+4FB588BF43333333
+4FFB848BF4333333
+444FB848BF433333
+3334FB844BF43433
+33334FB444BF4D43
+333334FB4444AD43
+3333334FB4F54433
+33333334F4584333
+333333334A448433
+33333334DD434543
+33333333443334A4
+3333333333333344
+
+0x3 is used as the transparent index.
+
+These 128 bytes would be stored in pattern memory in left to right, top to
+bottom order.
+
+The actual colour that will appear on screen will depend on the palette,
+described below. The default palette will not likely generate suitable
+colours for 4-bit sprites.
+
+
+Sprite Palette
+
+Each pixel of a sprite image is 8-bit for 8-bit patterns or 4-bit for 4-bit
+patterns. The pixel value is known as a pixel colour index. This colour
+index is combined with the sprite's palette offset. The palette offset is
+a 4-bit value added to the top 4-bits of the pixel colour index.
+The purpose of the palette offset is to allow a sprite to change the colour
+of an image.
+
+The final sprite colour index generated by the sprite hardware is then the
+sum of the pixel index and the 4-bit palette offset. In pictures using
+binary math:
+
+   8-bit Sprite
+	  PPPP0000
+   + IIIIIIII
+	----------
+	  SSSSSSSS
+
+   4-bit Sprite
+	  PPPP0000
+	+ 0000IIII
+	----------
+	  SSSSSSSS = PPPPIIII
+
+Where "PPPP" is the 4-bit palette offset from the sprite's attributes and
+the "I"s represent the pixel value from the sprite pattern. The final
+sprite index is represented by the 8-bit value "SSSSSSSS".
+
+For 4-bit sprites the palette offset can be thought of as selecting one of
+16 different 16-colour palettes.
+
+This final 8-bit sprite index is then passed through the sprite palette
+which acts like a lookup table that returns the 9-bit RGB333 colour
+associated with the sprite index.
+
+At power up, the sprite palette is initialized such that the sprite index
+passes through unchanged and is therefore interpretted as an RGB332 colour.
+The missing third blue bit is generated as the logical OR of the two other
+blue bits. In short, for 8-bit sprites, the sprite index also acts like the
+colour when using the default palette.
+
+
+Sprite Attributes
+
+A sprite's attributes is a list of properties that determine how and where
+the sprite is drawn.
+
+Each sprite is described by either 4 or 5 attribute bytes listed below:
+
+Sprite Attribute 0
+
+  X X X X X X X X
+
+  The least significant eight bits of the sprite's X coordinate.
+  The ninth bit is found in sprite attribute 2.
+
+Sprite Attribute 1
+
+  Y Y Y Y Y Y Y Y
+
+  The least significant eight bits of the sprite's Y coordinate.
+  The ninth bit is optional and is found in attribute 4.
+
+Sprite Attribute 2
+
+  P P P P XM YM R X8/PR
+  
+  P  = 4-bit Palette Offset
+  XM = 1 to mirror the sprite image horizontally
+  YM = 1 to mirror the sprite image vertically
+  R  = 1 to rotate the sprite image 90 degrees clockwise
+  X8 = Ninth bit of the sprite's X coordinate
+  PR = 1 to indicate P is relative to the anchor's palette offset
+  (relative sprites only)
+
+  Rotation is applied before mirroring.
+  Relative sprites, described below, replace X8 with PR.
+
+Sprite Attribute 3
+
+  V E N5 N4 N3 N2 N1 N0
+  
+  V  = 1 to make the sprite visible
+  E  = 1 to enable attribute byte 4
+  N  = Sprite pattern to use 0-63
+  
+  If E=0, the sprite is fully described by sprite attributes 0-3.
+  The sprite pattern is an 8-bit one identified by pattern N=0-63.
+  The sprite is an anchor and cannot be made relative. The sprite is
+  displayed as if sprite attribute 4 is zero.
+  
+  If E=1, the sprite is further described by sprite attribute 4.
+
+Sprite Attribute 4
+
+A. Extended Anchor Sprite
+
+  H N6 T X X Y Y Y8
+  
+  H  = 1 if the sprite pattern is 4-bit
+  N6 = 7th pattern bit if the sprite pattern is 4-bit
+  T  = 0 if relative sprites are composite type else 1 for unified type
+  XX = Magnification in the X direction (00 = 1x, 01 = 2x, 10 = 4x, 11 = 8x)
+  YY = Magnification in the Y direction (00 = 1x, 01 = 2x, 10 = 4x, 11 = 8x)
+  Y8 = Ninth bit of the sprite's Y coordinate
+  
+  {H,N6} must not equal {0,1} as this combination is used to indicate a
+  relative sprite.
+
+B. Relative Sprite, Composite Type
+
+  0 1 N6 X X Y Y PO
+
+  N6 = 7th pattern bit if the sprite pattern is 4-bit
+  XX = Magnification in the X direction (00 = 1x, 01 = 2x, 10 = 4x, 11 = 8x)
+  YY = Magnification in the Y direction (00 = 1x, 01 = 2x, 10 = 4x, 11 = 8x)
+  PO = 1 to indicate the sprite pattern number is relative to the anchor's
+  
+C. Relative Sprite, Unified Type
+
+  0 1 N6 0 0 0 0 PO
+  
+  N6 = 7th pattern bit if the sprite pattern is 4-bit
+  PO = 1 to indicate the sprite pattern number is relative to the anchor's
+
+The display surface for sprites is 320x256. The X coordinate of the sprite
+is nine bits, ranging over 0-511, and the Y coordinate is optionally nine
+bits again ranging over 0-511 or is eight bits ranging from 0-255. The
+full extent 0-511 wraps on both axes, meaning a sprite 16 pixels wide
+plotted at X coordinate 511 would see its first pixel not displayed
+(coordinate 511) and the following pixels displayed in coordinates 0-14.
+
+The full display area is visible in VGA. However, the HDMI display is
+vertically shorter so the top eight pixel rows (Y = 0-7) and the bottom
+eight pixel rows (Y = 248-255) will not be visible on an HDMI display.
+
+Sprites can be fully described by sprite attributes 0-3 if the E bit in
+sprite attribute 3 is zero. These sprites are compatible with the original
+sprite module from core versions prior to 2.00.26.
+
+If the E bit is set then a fifth sprite attribute, sprite attribute 4,
+becomes active. This attribute introduces scaling, 4-bit patterns, and
+relative sprites. Scaling is self-explanatory and 4-bit patterns were
+described in the last section. Relative sprites are described in the next
+section.
+
+
+Relative Sprites
+
+Normal sprites (sprites that are not relative) are known as anchor sprites.
+As the sprite module draws sprites in the order 0-127 (there are 128 sprites),
+it internally stores characteristics of the last anchor sprite seen.
+If following sprites are relative, they inherit some of these
+characteristics, which allows relative sprites to have, among other things,
+coordinates relative to the anchor. This means moving the anchor sprite
+also causes its relatives to move with it.
+
+There are two types of relative sprites supported known as "Composite Sprites"
+and "Unified Sprites". The type is determined by the anchor in the T bit
+of sprite attribute 4.
+
+A. Composite Sprites
+
+The sprite module records the following information from the anchor:
+
+  - Anchor.visible
+  - Anchor.X
+  - Anchor.Y
+  - Anchor.palette_offset
+  - Anchor.N (pattern number)
+  - Anchor.H (indicates if the sprite uses 4-bit patterns)
+
+The anchor determines if all its relative sprites use 4-bit patterns or not.
+
+The visibility of a particular relative sprite is the result of ANDing the
+anchor's visibility with the relative sprite's visibility. In other words,
+if the anchor is invisible then so are all its relatives.
+
+Relative sprites only have 8-bit X and Y coordinates (the ninth bits are
+taken for other purposes). These are signed offsets from the anchor's X,Y
+coordinate. Moving the anchor moves all its relatives along with it.
+
+If the relative sprite has its PR bit set in sprite attribute 2, then the
+anchor's palette offset is added to the relative sprite's to determine the
+active palette offset for the relative sprite. Otherwise the relative
+sprite uses its own palette offset as usual.
+
+If the relative sprite has its PO bit set in sprite attribute 4, then the
+anchor's pattern number is added to the relative sprite's to determine the
+pattern used for display. Otherwise the relative sprite uses its own
+pattern number as usual. The intention is to supply a method to easily
+animate a large sprite by manipulating the pattern number in the anchor.
+
+A composite sprite is like a collection of independent sprites tied to an
+anchor.
+
+B. Unified Sprites
+
+Unified sprites are a further extension of the composite type. The same
+information is recorded from the anchor and the same behaviour as described
+under composite sprites applies.
+
+The difference is the collection of anchor and relatives is treated as if
+it were a single 16x16 sprite. The anchor's rotation, mirror, and scaling
+bits apply to all its relatives. Rotating the anchor causes all the
+relatives to rotate around the anchor. Mirroring the anchor causes the
+relatives to mirror around the anchor. The whole behaves as a single
+monolithic sprite. The sprite hardware will automatically adjust X,Y
+coords and rotation, scaling and mirror bits of all relatives according to
+settings in the anchor.
+
+Unified sprites should be defined as if all its parts are 16x16 in size
+with the anchor controlling overall look of the whole.
+
+A unified sprite is like a big version of an individual 16x16 sprite
+controlled by the anchor.
