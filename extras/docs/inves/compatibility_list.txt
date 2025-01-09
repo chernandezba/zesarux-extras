@@ -48,6 +48,7 @@ Ping Pong
 The way of the exploding fist (no sound)
 ATV (1 channel)
 Batman (the caped crusader) (menu) (no music at all)
+Ghostbusters: no "ghostbusters" voice
 Lemmings (menu) (1 channel)
 Manic Miner (no sound on menu)
 Renegade: no sound on game (kicks, jumps, etc) but music does work
