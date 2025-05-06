@@ -6,3 +6,13 @@ Files in this folder are examples of ZXMMC+ and Residos:
 - taskman.pkg: NMI task switcher for residos
 - taskman.txt: Information about taskman
 
+Quickstart with the bootrom:
+
+- Do a Reset to open the bootrom menu
+- Press Z to execute a 48k rom patched (NMI patched routines)
+- Trigger a NMI then press R to generate a snapshot on flashrom
+- Press T on bootrom menu to restore a snapshot from flashrom
+- Having a MMC card formated for snapshots, you will see on the bootrom menu the saved snapshots
+- Press Q,W or E on NMI patched rom to generate a snapshot on the MMC card formated for snapshots
+
+See zesarux-extras/extras/docs/zxmmcplus for more info
