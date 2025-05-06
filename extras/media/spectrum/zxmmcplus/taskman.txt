@@ -1,0 +1,16 @@
+copiar ese taskman.pkg en una imagen mmc. 
+
+lo facil es que este formateada con fat para poderla copiar desde fuera de ZEsarUX. si se tiene asi, saltar al proceso Instalación
+tambien se puede hacer desde ZEsarUX, con una imagen mmc de plus3dos:
+-cargar archivo taskman.pkg en la memoria del spectrum, en direccion 30000 por ejemplo
+-teniendo una imagen mmc montada (puede ser plus3dos) hacer: SAVE %"taskman.pkg" code 30000,3754
+-y seguir el proceso . Con esto lo que quiero decir es que el comando %INSTALL reconoce un archivo tal cual grabado en la imagen mmc (con formato fat) o tambien si es un archivo grabado con save code en una imagen mmc con formato plus3dos
+
+
+Instalación:
+luego iniciar residos con esa imagen mmc, hacer un %dir "a:" para confirmar que se vea, y hacer:
+
+CLEAR 32767
+%INSTALL "taskman.pkg"
+
+Desde ahi ya tendremos el task manager al lanzar la nmi
