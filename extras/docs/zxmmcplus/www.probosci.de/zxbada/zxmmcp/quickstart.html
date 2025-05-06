@@ -1,0 +1,2741 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Language" content="en-us">
+    <meta name="GENERATOR" content="Microsoft FrontPage 6.0">
+    <meta name="ProgId" content="FrontPage.Editor.Document">
+    <meta http-equiv="Content-Type" content="text/html;
+      charset=windows-1252">
+    <title>ZXMMC+ Home</title>
+  </head>
+  <body bgcolor="#336699">
+    <p align="center"><font color="#00ffff" face="Tahoma" size="5">ZXMMC+</font><i><font
+          color="#00ffff" face="Tahoma" size="5"> </font></i><font
+        color="#00ff00"><font size="5"><font face="Tahoma">(alm<font
+              size="5">ost) Q</font>uick Start</font></font></font></p>
+    <p align="center">&nbsp;</p>
+    <font color="#ffffff" face="Arial" size="2">A new interface will
+      have a blank Flash and Ram chips. In order to <font size="2">program</font>
+      the bootrom and<font size="2"> </font>other needed roms, follow
+      these steps.<br>
+      <br>
+      First thing to do is understanding the 4-ways microswitch block
+      located on the upper right corner of the board.<br>
+      <font size="2">Switches a<font size="2">re numbe<font size="2">red
+            from 1 to 4 and they are "ON" when in upper position (as
+            clearly marked on the block itself).<br>
+            <br>
+            SW1:&nbsp;&nbsp;&nbsp; Kempston Enable:&nbsp;&nbsp;&nbsp;
+            When "ON", the built-in Kempston Joystick interface is
+            enabled.<br>
+            SW2:&nbsp;&nbsp;&nbsp; IF1 Enable:&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; When "ON",
+            Interface 1 logic (network, serial port) <font size="2">is</font>
+            enabled.<br>
+            SW3:&nbsp;&nbsp;&nbsp; RAM/ROM Select:&nbsp;&nbsp;&nbsp;
+            When "ON", the machine will start from Flash chip; when
+            "OFF", from RAM (Residos)<br>
+            SW4:&nbsp;&nbsp;&nbsp; FastPage Disable: &nbsp;&nbsp; When
+            "ON", the <font size="2">machine will start from internal
+              ROM, otherwise <font size="2">from </font>Interface<font
+                size="2">'s memor<font size="2">y (RAM/ROM, based on
+                  SW3).<br>
+                  <br>
+                  <font color="#ffffff" face="Arial" size="2">Switches 3
+                    and 4 allow <font size="2">selec<font size="2">ting
+                        the "boot media" from which the <font size="2">computer</font>
+                        will start.<br>
+                        Since the Flash chip is blank, the only option
+                        is <font size="2">booting<font size="2"> from
+                            the machine's internal ROM, so SW4 should be
+                            set to "ON" position.<br>
+                            <br>
+                            <br>
+                            <br>
+                          </font></font></font></font></font></font></font></font></font></font></font></font>
+    <i><font color="#ffff99">STEP 1:</font></i><font color="#ffff99"> <small>connecting
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        and checking the interface:</small><br>
+    </font><i><font color="#ffff99"> <br>
+      </font></i><font color="#ffffff" face="Arial" size="2"><font
+        color="#ffffff" face="Arial" size="2">Place all four switche<font
+          size="2">s to the "ON" position, then plug the interface on a
+          working 48/128K <font size="2">ZX-Spectru<font size="2">m.<font
+                size="2"><font size="2"><font size="2"><br>
+                    <br>
+                    <font size="2"><font size="2">Switch on the
+                        computer. </font>Since internal ROM is selected
+                      by SW4, the machine should start as always.<br>
+                      <br>
+                      Both LEDs on the interface will glow, because the
+                      CPLD has not been initialized by any firmware.<br>
+                      <br>
+                      <font size="2">Type the command 'OUT 31, 3'.<br>
+                        <br>
+                        <font size="2">This <font size="2">should</font>
+                          turn off both LEDs<font size="2">, confi<font
+                              size="2">rming that <font size="2">the
+                                interface <font size="2">can receive
+                                  command<font size="2">s from the
+                                    processo<font size="2">r.<br>
+                                      <br>
+                                      <font size="2">(NOTE: this command
+                                        is not mandatory; it's just a
+                                        checkpoint to <font size="2">make
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                        </font>sure that the interface
+                                        is alive).<br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                      </font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><i><font
+        color="#ffff99">STEP 2: </font></i><font color="#ffff99"><small>Programming
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        the bootrom firmware into BANK 0 in the Flash chip:</small></font><i><font
+        color="#ffff99"><br>
+      </font></i><font color="#ffffff" face="Arial" size="2"><font
+        color="#ffffff" face="Arial" size="2"><font size="2"><font
+            size="2"><font size="2"><i><font color="#ffff99"><br>
+                </font></i><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2">You will need <font
+                    size="2">the 'Tape EAR' cable <font size="2">with</font></font>
+                  3.5mm jack to connect the speaker output of your PC to
+                  the <font size="2">Spectrum.<br>
+                    <br>
+                  </font>Download the bootrom fir<font size="2">mware
+                    from the <a href="software.html"><font
+                        color="#ffff00">software</font></a><font
+                      color="#ffff00"> </font></font></font></font></font></font></font></font></font><font
+      color="#ffffff" face="Arial" size="2"><font color="#ffffff"
+        face="Arial" size="2"><font size="2"><font size="2"><font
+              size="2"><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2"><font size="2"><font
+                      color="#ffff00"><font color="#ffffff"><font
+                          size="2">page. <font size="2">Along with <font
+                              size="2">source code and assembled
+                              binaries, you will find two "tape
+                              playable" files:<br>
+                            </font></font><font size="2"><font size="2"><font
+                                size="2"><font size="2">UPLOAD.TAP and
+                                  UPLOAD.<font size="2">WAV. The<font
+                                      size="2"> content of these t<font
+                                        size="2">wo files is the same.
+                                        If you don't have a .tap player,
+                                        the .wav version will <font
+                                          size="2">solve the problem.<br>
+                                          <br>
+                                          <font size="2"><font size="2">Type
+
+
+
+
+
+
+
+
+
+
+                                              the command 'LOAD "" CODE'
+                                              then manage to "play" the
+                                              upload.tap or upload.wav
+                                              file on the computer.<br>
+                                              <br>
+                                              When loading completes,
+                                              type the command
+                                              'RANDOMIZE U<font size="2">SR
+
+
+
+
+
+
+
+
+
+
+                                                3<font size="2">0100'.<br>
+                                                  <br>
+                                                  The BORD<font size="2">ER
+
+
+
+
+
+
+
+
+
+
+                                                    will cycle a f<font
+                                                      size="2">ew colors
+                                                      during the
+                                                      flashing operation<font
+                                                        size="2">:<br>
+                                                        <br>
+                                                        <font size="2">YELLOW
+
+
+
+
+
+
+
+
+
+
+                                                          while a 64K<font
+                                                          size="2">B</font>
+                                                          block from
+                                                          flash chip is
+                                                          backed-up to
+                                                          RAM (because
+                                                          the flash chip
+                                                          can only be
+                                                          erased <font
+                                                          size="2">on a
+                                                          64KB size
+                                                          basis);</font></font><br>
+                                                        <font size="2">CYAN
+
+
+
+
+
+
+
+
+
+
+                                                          while the 64KB
+                                                          ram copy is
+                                                          being patched
+                                                          with the new
+                                                          data;<br>
+                                                          <font size="2">GREEN
+
+
+
+
+
+
+
+
+
+
+                                                          while
+                                                          comparing
+                                                          flash content<font
+                                                          size="2">, to
+                                                          determine if <font
+                                                          size="2">an
+                                                          erase/flash
+                                                          cycle is
+                                                          needed;<br>
+                                                          <br>
+                                                          <font size="2">If
+
+
+
+
+
+
+
+
+
+                                                          <font size="2">flash
+
+
+
+
+
+
+
+
+
+                                                          content is
+                                                          different from
+                                                          the uploaded
+                                                          data, then you
+                                                          will also see
+                                                          these two
+                                                          colors on
+                                                          border:<br>
+                                                          <br>
+                                                          <font size="2">MAGENTA
+
+
+
+
+
+
+
+
+
+                                                          while the 64KB
+                                                          block is being
+                                                          erased;<br>
+                                                          <font size="2">BLUE
+
+
+
+
+
+
+
+
+
+                                                          while new data
+                                                          is being writt<font
+                                                          size="2">en <font
+                                                          size="2">to
+                                                          the chip.<br>
+                                                          <br>
+                                                          <font size="2">At
+
+
+
+
+
+
+
+
+
+                                                          end of
+                                                          operation, the
+                                                          bootrom
+                                                          program will <font
+                                                          size="2">be
+                                                          started from
+                                                          the Flash <font
+                                                          size="2">chip
+                                                          and the
+                                                          following
+                                                          screen should
+                                                          appear:<br>
+                                                          <br>
+                                                          <img alt=""
+                                                          src="firstboot.jpg"
+                                                          height="256"
+                                                          width="320"><br>
+                                                          <br>
+                                                          <font size="2">Note
+
+
+
+
+
+
+
+
+
+                                                          that the
+                                                          bottom line <font
+                                                          size="2">w</font>ill
+
+
+
+
+
+
+
+
+
+                                                          only appear if
+                                                          a<font
+                                                          size="2">n
+                                                          sd-card is
+                                                          detected in
+                                                          either of the
+                                                          two slots.</font></font><br>
+                                                          <font size="2">If
+
+
+
+
+
+
+
+
+
+                                                          you want th<font
+                                                          size="2">is</font>
+                                                          bootloader to
+                                                          start every
+                                                          time you turn
+                                                          on your <font
+                                                          size="2">S</font>pectrum,
+
+
+
+
+
+
+
+
+
+                                                          move SW4 to
+                                                          the <font
+                                                          size="2">"OFF"
+                                                          position.<br>
+                                                          <br>
+                                                          </font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><font
+      color="#ffffff" face="Arial" size="2"><font color="#ffffff"
+        face="Arial" size="2"><font size="2"><font size="2"><font
+              size="2"><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2"><font size="2"><font
+                      color="#ffff00"><font color="#ffffff"><font
+                          size="2"><font size="2"><font size="2"><font
+                                size="2"><font size="2"><font size="2"><font
+                                      size="2"><font size="2"><font
+                                          size="2"><font size="2"><font
+                                              size="2"><font size="2"><font
+                                                  size="2"><font
+                                                    size="2"><font
+                                                      size="2"><font
+                                                        size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2">T<font
+                                                          size="2">he
+                                                          bootrom menu
+                                                          allow <font
+                                                          size="2">launching
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          several
+                                                          different r<font
+                                                          size="2">oms<font
+                                                          size="2">. <font
+                                                          size="2">The
+                                                          only option
+                                                          that works by
+                                                          now is<font
+                                                          size="2">
+                                                          "[CAPS]
+                                                          Internal<font
+                                                          size="2">"</font></font>
+                                                          (rom),<br>
+                                                          because there
+                                                          are no rom in
+                                                          the Flash chip
+                                                          except the
+                                                          bootrom in BAN<font
+                                                          size="2">K 0</font>
+                                                          (which is
+                                                          working now).<br>
+                                                          <br>
+                                                          <font size="2">If
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          you press
+                                                          [CAPS LOCK] th<font
+                                                          size="2">e
+                                                          internal rom
+                                                          will be
+                                                          started and
+                                                          the machine
+                                                          will behave as
+                                                          <font size="2">always,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          except for the
+                                                          availability
+                                                          of the
+                                                          additional <font
+                                                          size="2">peripherals<br>
+                                                          <font size="2">pr<font
+                                                          size="2">ovided
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          by the
+                                                          interface </font>(for
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          example, the
+                                                          Kempston
+                                                          Joystick).</font><br>
+                                                          </font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><i><font
+        color="#ffff99"><br>
+        <br>
+        <br>
+        STEP 3: </font></i><font color="#ffff99"><small>Programming
+        remaining ROMs into the Flash chip:</small><br>
+    </font><font color="#ffffff" face="Arial" size="2"><font
+        color="#ffffff" face="Arial" size="2"><font size="2"><font
+            size="2"><font size="2"><i><font color="#ffff99"><br>
+                </font></i><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2">To drive<font
+                    size="2"> the new hardware, a few <font size="2">standard
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                      rom ha<font size="2">ve</font> been patched and
+                      made available<font size="2"><font size="2">. The
+                          most important change is an NMI handler<font
+                            size="2"> (for snapshots)</font>.<br>
+                          <font size="2">These roms should be <font
+                              size="2">programmed into the <font
+                                size="2"><font size="2">F</font>lash
+                                chip. T<font size="2">here</font> <font
+                                  size="2">is</font> room for 32 roms
+                                (16K each) and by now we just programmed
+                                BANK 0 with the bootrom.<br>
+                                <br>
+                              </font></font></font></font></font></font></font></font></font></font></font></font></font></font><font
+      color="#ffffff" face="Arial" size="2"><font color="#ffffff"
+        face="Arial" size="2"><font size="2"><font size="2"><font
+              size="2"><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2"><font size="2"><font
+                      size="2"><font size="2"><font size="2"><font
+                            size="2"><font size="2"><font size="2"><font
+                                  size="2"><font color="#ffffff"
+                                    face="Arial" size="2"><font
+                                      color="#ffffff" face="Arial"
+                                      size="2"><font size="2"><font
+                                          size="2"><font size="2"><font
+                                              color="#ffffff"
+                                              face="Arial" size="2"><font
+                                                color="#ffffff"
+                                                face="Arial" size="2"><font
+                                                  size="2"><font
+                                                    size="2"><font
+                                                      size="2"><font
+                                                        size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffff00"><font color="#ffffff"><font size="2"><font size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2">To do
+                                                          so, you need a
+                                                          zx<font
+                                                          size="2">mmc+
+                                                          serial cable<font
+                                                          size="2">, </font>a
+                                                          PC with serial
+                                                          port</font></font>
+                                                          and</font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><font
+      color="#ffffff" face="Arial" size="2"><font color="#ffffff"
+        face="Arial" size="2"><font size="2"><font size="2"><font
+              size="2"><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2"><font size="2"><font
+                      size="2"><font size="2"><font size="2"><font
+                            size="2"><font size="2"><font size="2"><font
+                                  size="2"><font color="#ffffff"
+                                    face="Arial" size="2"><font
+                                      color="#ffffff" face="Arial"
+                                      size="2"><font size="2"><font
+                                          size="2"><font size="2"><font
+                                              color="#ffffff"
+                                              face="Arial" size="2"><font
+                                                color="#ffffff"
+                                                face="Arial" size="2"><font
+                                                  size="2"><font
+                                                    color="#ffff00"><font
+                                                      color="#ffffff"><font
+                                                        size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font size="2"> </font>the <a
+                                                          href="http://www.zxbada.bbk.org/dina.php?software.htm">
+                                                          <font
+                                                          color="#ffff00">Win32
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          ZX-Com</font></a>
+                                                          pro<font
+                                                          size="2">gram.<br>
+                                                          <font size="2"><br>
+                                                          <font size="2"><b>NOTE:</b>
+                                                          </font>Alternatively,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          take a<font
+                                                          size="2"> look
+                                                          at "STEP 3b<font
+                                                          size="2">is"
+                                                          which <font
+                                                          size="2">uses
+                                                          a properly
+                                                          prepared
+                                                          sd-card
+                                                          instead, in
+                                                          cas<font
+                                                          size="2">e you
+                                                          don't have the
+                                                          serial cable.<br>
+                                                          <br>
+                                                          Go to the
+                                                          'Bootrom'
+                                                          section in <font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2">the <a
+href="software.html"><font color="#ffff00">software</font></a><font
+                                                          color="#ffff00">
+                                                          </font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><font
+      color="#ffffff" face="Arial" size="2"><font color="#ffffff"
+        face="Arial" size="2"><font size="2"><font size="2"><font
+              size="2"><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2"><font size="2"><font
+                      color="#ffff00"><font color="#ffffff"><font
+                          size="2">page. There you will find the
+                          description of the standard layout to be
+                          programmed into the flash chip.<br>
+                          <font size="2">As you can see, banks <font
+                              size="2">2</font> and <font size="2">3</font>
+                            should receive a 16/48K Spectrum rom
+                            modified for NMI handling. T<font size="2">his
+
+
+
+
+
+
+
+
+
+
+
+
+
+                              will allow usin<font size="2">g the NMI
+                                button to save snapshots<br>
+                                <font size="2">to the sd-card. In the
+                                  same way, banks 6 and 7 are intended
+                                  for a patched version of the 128K
+                                  Spectrum roms.<br>
+                                  <br>
+                                  <font size="2">All these roms will
+                                    then be available from the bootrom
+                                    main menu, shown above. Pressing the
+                                    'Z' key will start the NMI-patched
+                                    rom programmed in bank 2.<br>
+                                    <br>
+                                    <font size="2">If you try now, the
+                                      machine will hang because the rom
+                                      is blank.<br>
+                                      <br>
+                                    </font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><font
+      color="#ffffff" face="Arial" size="2"><font color="#ffffff"
+        face="Arial" size="2"><font size="2"><font size="2"><font
+              size="2"><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2"><font size="2"><font
+                      size="2"><font size="2"><font size="2"><font
+                            size="2"><font size="2"><font size="2"><font
+                                  size="2"><font color="#ffffff"
+                                    face="Arial" size="2"><font
+                                      color="#ffffff" face="Arial"
+                                      size="2"><font size="2"><font
+                                          size="2"><font size="2"><font
+                                              color="#ffffff"
+                                              face="Arial" size="2"><font
+                                                color="#ffffff"
+                                                face="Arial" size="2"><font
+                                                  size="2"><font
+                                                    color="#ffff00"><font
+                                                      color="#ffffff"><font
+                                                        size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font size="2"><font size="2">Download
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          the program
+                                                          (no need <font
+                                                          size="2">to
+                                                          install) and
+                                                          start it.
+                                                          Connect the
+                                                          serial cable
+                                                          between the
+                                                          zxmmc+ and the
+                                                          PC.<br>
+                                                          <br>
+                                                          <font size="2">Start
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          the <font
+                                                          size="2">ZX-Com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          program.<br>
+                                                          <br>
+                                                          <font size="2">Under
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          the 'Options'
+                                                          --&gt; 'S<font
+                                                          size="2">erial
+                                                          Port' menu,
+                                                          select the
+                                                          proper serial
+                                                          port (where
+                                                          you connected
+                                                          the cable)<font
+                                                          size="2">;</font></font></font><br>
+                                                          <font size="2">Un<font
+                                                          size="2">der
+                                                          the 'Options'
+                                                          --&gt;
+                                                          'Hardware'
+                                                          menu, select<font
+                                                          size="2"> the
+                                                          'ZX<font
+                                                          size="2">-<font
+                                                          size="2">mmc+'
+                                                          interface<font
+                                                          size="2">.<br>
+                                                          <br>
+                                                          Download the
+                                                          zipfile with
+                                                          all the
+                                                          patched rom<font
+                                                          size="2"> from
+                                                          the link at
+                                                          the bottom of
+                                                          bank
+                                                          description,
+                                                          in the
+                                                          software page.<br>
+                                                          <br>
+                                                          <font size="2"><font
+                                                          size="2">Go to
+                                                          <font size="2">t<font
+                                                          size="2">he
+                                                          'Flash' --&gt;
+                                                          'Flash Rom'
+                                                          menu<font
+                                                          size="2">,
+                                                          then navigate
+                                                          to the folder
+                                                          where <font
+                                                          size="2">you
+                                                          unzipped the
+                                                          rom pack and
+                                                          select the
+                                                          file 'B23.bin<font
+                                                          size="2">'
+                                                          (which
+                                                          includes banks
+                                                          2 and <font
+                                                          size="2">3)<font
+                                                          size="2">;<br>
+                                                          <font size="2">click
+
+
+
+
+
+
+
+
+                                                          on the spin <font
+                                                          size="2">and
+                                                          select bank n.
+                                                          2 as <font
+                                                          size="2">destin<font
+                                                          size="2">ation
+                                                          in the flash
+                                                          chip<font
+                                                          size="2">;<br>
+                                                          <font size="2">Wait
+
+
+
+
+
+
+
+
+                                                          fo<font
+                                                          size="2">r the
+                                                          transfer to co<font
+                                                          size="2">mplete;<br>
+                                                          <font size="2"><br>
+                                                          A message will
+                                                          appear to
+                                                          confi<font
+                                                          size="2">rm
+                                                          that you are
+                                                          about to FLASH
+                                                          new data in<font
+                                                          size="2">to
+                                                          the flash chip
+                                                          (the selected
+                                                          bank(s) will
+                                                          be display<font
+                                                          size="2">ed);<br>
+                                                          <font size="2">Press
+
+
+
+
+
+
+
+
+
+                                                          'Y' to
+                                                          confirm;<br>
+                                                          <br>
+                                                          <font size="2">T<font
+                                                          size="2">he
+                                                          bootrom will
+                                                          then compare
+                                                          flash content
+                                                          and, if
+                                                          necessary,
+                                                          erase <font
+                                                          size="2">it
+                                                          and program
+                                                          with the new
+                                                          data.</font></font></font><br>
+                                                          <br>
+                                                          If eveything
+                                                          goes right,
+                                                          you will see
+                                                          the message<font
+                                                          size="2"> "ROM
+                                                          Successfully
+                                                          Flashed.
+                                                          Please RESET
+                                                          or send
+                                                          another ROM".<br>
+                                                          <br>
+                                                          <font size="2">At
+
+
+
+
+
+
+
+
+
+                                                          thi<font
+                                                          size="2">s
+                                                          point, repeat
+                                                          the s<font
+                                                          size="2">teps
+                                                          ('Flash --&gt;
+                                                          'Flash Rom')
+                                                          then select
+                                                          the fi<font
+                                                          size="2">le
+                                                          named
+                                                          B4567.bin,
+                                                          which contains
+                                                          data for banks
+                                                          4, 5, 6, 7.<br>
+                                                          <font size="2">click
+
+
+
+
+
+
+
+                                                          on the spin in
+                                                          order to
+                                                          select bank n.
+                                                          4 as
+                                                          destination in
+                                                          the flash chip
+                                                          and g<font
+                                                          size="2">o
+                                                          ahead.<br>
+                                                          <br>
+                                                          <font size="2">Repea<font
+                                                          size="2">t
+                                                          again for file
+                                                          B<font
+                                                          size="2"><font
+                                                          size="2">89A</font>.bin,
+
+
+
+
+
+
+
+                                                          to be
+                                                          programmed <font
+                                                          size="2">starting
+
+
+
+
+
+
+
+                                                          from bank 8.</font><font
+                                                          size="2"><br>
+                                                          <br>
+                                                          <font size="2">When
+
+
+
+
+
+
+
+                                                          you're done,
+                                                          reset the
+                                                          Spectrum and
+                                                          try any of the
+                                                          new rom<font
+                                                          size="2"> <font
+                                                          size="2">you
+                                                          installed. For
+                                                          example,
+                                                          pressing 'V'
+                                                          will start BBC
+                                                          Basic<font
+                                                          size="2">.<br>
+                                                          <br>
+                                                          <font size="2">All
+
+
+
+
+
+
+
+                                                          these rom
+                                                          provide <font
+                                                          size="2">an
+                                                          NMI handler,
+                                                          which means
+                                                          that you can
+                                                          freeze the
+                                                          machine state
+                                                          into snapshots
+                                                          on sd-card or
+                                                          using <font
+                                                          size="2">the
+                                                          ZX-Com
+                                                          program.<br>
+                                                          <br>
+                                                          <font size="2">For
+
+
+
+
+
+
+
+                                                          example, start
+                                                          the
+                                                          NMI-patched
+                                                          48K rom (<font
+                                                          size="2">by
+                                                          pressing the
+                                                          'Z' key at the
+                                                          bootrom menu).
+                                                          <font size="2">Go
+
+
+
+
+
+
+
+                                                          to the ZX-Com
+                                                          pro<font
+                                                          size="2">gram
+                                                          on the PC and
+                                                          press <font
+                                                          size="2">the <font
+                                                          size="2">'Log
+                                                          IN' button<font
+                                                          size="2"> (if
+                                                          you come from
+                                                          previous flash
+                                                          programming,
+                                                          you need to
+                                                          cycle 'Log
+                                                          OUT' and the<font
+                                                          size="2">n
+                                                          'Log IN'). The
+                                                          border will
+                                                          turn <font
+                                                          size="2">yellow.<br>
+                                                          <br>
+                                                          <font size="2">Now,
+
+
+
+
+
+
+
+                                                          you can
+                                                          transfer any
+                                                          memory region
+                                                          from/to the
+                                                          spect<font
+                                                          size="2">rum
+                                                          and also take
+                                                          snapshot that
+                                                          will be saved
+                                                          into files on
+                                                          the PC.<br>
+                                                          <br>
+                                                          <font size="2">For
+
+
+
+
+
+
+
+
+                                                          exa<font
+                                                          size="2">mple,
+                                                          press the
+                                                          'Screen'
+                                                          button (this
+                                                          will preset
+                                                          the address
+                                                          editboxes
+                                                          properly) then
+                                                          press the 'RX
+                                                          <font size="2">Block</font>'
+                                                          button.</font></font>
+                                                          After a few
+                                                          seconds, you
+                                                          will get the
+                                                          following
+                                                          screen<font
+                                                          size="2">:<br>
+                                                          <br>
+                                                          <img alt=""
+                                                          src="nmipatched.jpg"
+                                                          height="256"
+                                                          width="320"><br>
+                                                          <br>
+                                                          <br>
+                                                          </font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><font
+      color="#ffffff" face="Arial" size="2"><font color="#ffffff"
+        face="Arial" size="2"><font size="2"><font size="2"><font
+              size="2"><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2"><font size="2"><font
+                      size="2"><font size="2"><font size="2"><font
+                            size="2"><font size="2"><font size="2"><font
+                                  size="2"><font color="#ffffff"
+                                    face="Arial" size="2"><font
+                                      color="#ffffff" face="Arial"
+                                      size="2"><font size="2"><font
+                                          size="2"><font size="2"><font
+                                              color="#ffffff"
+                                              face="Arial" size="2"><font
+                                                color="#ffffff"
+                                                face="Arial" size="2"><font
+                                                  size="2"><font
+                                                    color="#ffff00"><font
+                                                      color="#ffffff"><font
+                                                        size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font size="2"><font size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><br>
+                                                          <br>
+                                                          <br>
+                                                          </font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><i><font
+        color="#ffff99">STEP 3bis: </font></i><font color="#ffff99"><small>Using
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        an sd-card to program remaining ROMs into the Flash chip,
+        instead of serial cable</small></font><font color="#ffff99">:<br>
+    </font><font color="#ffffff" face="Arial" size="2"><font
+        color="#ffffff" face="Arial" size="2"><font size="2"><font
+            size="2"><font size="2"><i><font color="#ffff99"><br>
+                </font></i><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2">If you're in
+                  trouble with the serial cable or the Win32 ZX-Com
+                  program, there is another way to program the patched
+                  roms into the Flash chip.<br>
+                  <br>
+                  <font size="2">Th<font size="2">is alternate meth<font
+                        size="2">od takes advantage of the Flash Chip
+                        Backup/Restore utility, available in the bootrom
+                        firmware.</font></font></font><br>
+                </font></font></font></font></font></font></font><br>
+    <font color="#ffffff" face="Arial" size="2"><font color="#ffffff"
+        face="Arial" size="2"><font size="2"><font size="2"><font
+              size="2"><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2"><font
+                    color="#ffffff" face="Arial" size="2"><font
+                      color="#ffffff" face="Arial" size="2"><font
+                        size="2"><font size="2"><font size="2"><font
+                              color="#ffffff" face="Arial" size="2"><font
+                                color="#ffffff" face="Arial" size="2"><font
+                                  size="2">This <a
+                                    href="software/flashrom_backup_bl2_21e.raw.zip"><font
+                                      color="#ffff00">Flash <font
+                                        size="2">chip Backup RAW Image</font></font></a><font
+                                    size="2"><font size="2"> has been
+                                      created <font size="2">from a
+                                        card containing a Flash chip
+                                        backup<font size="2">, made
+                                          using </font>the 'I' option
+                                        of the bootrom firmware.<br>
+                                      </font><font size="2"><font
+                                          size="2">Recreating an
+                                          identical sd-card and <font
+                                            size="2">r</font></font>estoring
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                        this backup to your <font
+                                          size="2">interface, will
+                                          program all Flash bank<font
+                                            size="2">s at once.<br>
+                                            <br>
+                                            <font size="2"><font
+                                                size="2"><font size="2"><font
+                                                    size="2"><font
+                                                      size="2"><font
+                                                        size="2">Since
+                                                        the FAT takes
+                                                        512KB<font
+                                                          size="2"> and
+                                                          the actual
+                                                          backup data of
+                                                          the Flash chip
+                                                          takes 512KB
+                                                          more, this
+                                                          file contain<font
+                                                          size="2">s <font
+                                                          size="2">1MB
+                                                          of raw
+                                                          data&nbsp;<font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2">that
+                                                          should be
+                                                          written at the
+                                                          physical
+                                                          beginning of
+                                                          the <font
+                                                          size="2">sd-</font>card<font
+                                                          size="2">, u<font
+                                                          size="2">sing
+                                                          a PC and a
+                                                          card reader<font
+                                                          size="2">/writer</font></font>.<br>
+                                                          <br>
+                                                          <font size="2">Just
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          for reference,
+                                                          <font size="2">t</font>he
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          command used
+                                                          to create the
+                                                          image <font
+                                                          size="2">was</font>:
+                                                          dd if=/dev/sdb
+                                                          of=flashrom_backup_bl2.21e.raw
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          count=1024
+                                                          bs=1024</font><br>
+                                                          <br>
+                                                          </font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><font
+      color="#ffffff" face="Arial" size="2"><font color="#ffffff"
+        face="Arial" size="2"><font size="2"><font size="2"><font
+              size="2"><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2"><font size="2"><font
+                      size="2"><font size="2"><font size="2"><font
+                            size="2"><font size="2"><font size="2"><font
+                                  size="2"><font color="#ffffff"
+                                    face="Arial" size="2"><font
+                                      color="#ffffff" face="Arial"
+                                      size="2"><font size="2"><font
+                                          size="2"><font size="2"><font
+                                              color="#ffffff"
+                                              face="Arial" size="2"><font
+                                                color="#ffffff"
+                                                face="Arial" size="2"><font
+                                                  size="2"><font
+                                                    color="#ffff00"><font
+                                                      color="#ffffff"><font
+                                                        size="2"><font
+                                                          color="#ffffff"
+                                                          face="Arial"
+                                                          size="2">After
+                                                          downloading
+                                                          the image
+                                                          file, write it
+                                                          to the card
+                                                          using a raw
+                                                          writing
+                                                          program. Under
+                                                          Linux,
+                                                          assuming that
+                                                          the sd-ca<font
+                                                          size="2">rd is
+                                                          seen as
+                                                          /dev/sdb, use
+                                                          the following
+                                                          command:<br>
+                                                          <font size="2">dd
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          if=</font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><font
+      color="#ffffff" face="Arial" size="2"><font color="#ffffff"
+        face="Arial" size="2"><font size="2"><font size="2"><font
+              size="2"><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2"><font size="2"><font
+                      size="2"><font size="2"><font size="2"><font
+                            size="2"><font size="2"><font size="2"><font
+                                  size="2"><font color="#ffffff"
+                                    face="Arial" size="2"><font
+                                      color="#ffffff" face="Arial"
+                                      size="2"><font size="2"><font
+                                          size="2"><font size="2"><font
+                                              color="#ffffff"
+                                              face="Arial" size="2"><font
+                                                color="#ffffff"
+                                                face="Arial" size="2"><font
+                                                  size="2"><font
+                                                    color="#ffff00"><font
+                                                      color="#ffffff"><font
+                                                        size="2"><font
+                                                          color="#ffffff"
+                                                          face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2">flashrom_backup_bl2.21e.raw
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          of<font
+                                                          size="2">=/dev/sdb<br>
+                                                          <br>
+                                                          Remove the
+                                                          card from the
+                                                          PC and put it
+                                                          <font size="2">in
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          one of the two
+                                                          slots
+                                                          available <font
+                                                          size="2">on
+                                                          the ZXmmc+.<br>
+                                                          <br>
+                                                          <font size="2">Switch
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          on the
+                                                          Spectrum<font
+                                                          size="2">. The
+                                                          menu' should<font
+                                                          size="2"> show
+                                                          a "512K Flash
+                                                          Backup<font
+                                                          size="2">"</font></font>
+                                                          in the first
+                                                          slot of the
+                                                          newly prepared
+                                                          sd-card, like
+                                                          in the
+                                                          screenshot
+                                                          shown at the
+                                                          end of<font
+                                                          size="2"> STEP
+                                                          4.<br>
+                                                          <br>
+                                                          <font size="2">Press
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          the '1' key
+                                                          (or select
+                                                          this <font
+                                                          size="2">snapshot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          using 'O' and
+                                                          'P' keys then
+                                                          press 'ENTER<font
+                                                          size="2">') to
+                                                          start
+                                                          restoring the
+                                                          <font size="2">backup
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          to the Flash
+                                                          ch<font
+                                                          size="2">ip.<br>
+                                                          <br>
+                                                          <font size="2">When
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          the process
+                                                          completes,
+                                                          reset the
+                                                          Spectrum and
+                                                          test your new
+                                                          rom<font
+                                                          size="2">s.<br>
+                                                          <br>
+                                                          <br>
+                                                          </font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><i><font
+        color="#ffff99"><br>
+        <br>
+        STEP 4: </font></i><font color="#ffff99"><small>Preparing an
+        sd-card for use with snapshots (raw filesystem):</small><br>
+    </font><font color="#ffffff" face="Arial" size="2"><font
+        color="#ffffff" face="Arial" size="2"><font size="2"><font
+            size="2"><font size="2"><i><font color="#ffff99"><br>
+                </font></i><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2">In order to take
+                  and restore screenshots to an sd-card<font size="2">,
+                    the sd-card sh<font size="2">ould be initialized by
+                      the bootrom.<br>
+                      <br>
+                      To do so, insert the card (preferably small sized<font
+                        size="2">, i.e. <font size="2">less than 4GB)</font></font>,
+                      start the machine then press 'Q'<font size="2">.<br>
+                        <br>
+                        <font size="2">You will be asked an offset (in
+                          256MB increments) from which <font size="2">using
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            the memor<font size="2">y</font> space. This
+                            allows "partitioning" the sd-card with a
+                            standard filesysyem (at the beginning of the
+                            card<font size="2">)</font> then using <font
+                              size="2">the reminder of the space a<font
+                                size="2">s RAW area.<br>
+                                <br>
+                                <font size="2"><font size="2">NOTE: the
+                                    number of available <font size="2">offsets
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                      depends on the size of the
+                                      sd-card.<br>
+                                      <br>
+                                      <font size="2"><font size="2">The
+                                          iniziali<font size="2">zation
+                                            process does NOT erase the
+                                            raw data that may <font
+                                              size="2">be present on the
+                                              card. This means that
+                                              after being prepared by
+                                              using the 'Q' comman<font
+                                                size="2">d, the screen
+                                                layout may look like
+                                                this:<br>
+                                                <br>
+                                                <img alt=""
+                                                  src="newsdcard.jpg"
+                                                  height="256"
+                                                  width="320"><br>
+                                                <br>
+                                                <font size="2">From this
+                                                  picture, you can see <font
+                                                    size="2">the content
+                                                    of the first 8
+                                                    snapshot slots<font
+                                                      size="2"> an<font
+                                                        size="2">d that
+                                                        they all contain
+                                                        garbage. The
+                                                        bottom row shows
+                                                        "Snap ---&gt;
+                                                        0000" which
+                                                        means that the
+                                                        next snapshot
+                                                        will be saved
+                                                        into slot num<font
+                                                          size="2">ber
+                                                          0000. You can
+                                                          change this
+                                                          sav<font
+                                                          size="2">ing
+                                                          position by
+                                                          keys 'SPACE'
+                                                          (increase) and
+                                                          'SYM<font
+                                                          size="2">BOL
+                                                          SHIFT'</font></font>
+                                                          (decrease).<br>
+                                                          <br>
+                                                          <font size="2"><font
+                                                          size="2">To
+                                                          test the s<font
+                                                          size="2">napshot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          capability,
+                                                          jump into <font
+                                                          size="2">one
+                                                          of the patched
+                                                          roms (for <font
+                                                          size="2">example
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          press the 'Z'
+                                                          key to run a
+                                                          16/48K
+                                                          spectrum) then
+                                                          <font size="2">type
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          in <font
+                                                          size="2">a<font
+                                                          size="2">ny
+                                                          simple basic
+                                                          program.<br>
+                                                          <font size="2">Then<font
+                                                          size="2">,
+                                                          press the NMI
+                                                          hardware
+                                                          button (placed
+                                                          on top of the
+                                                          interface).
+                                                          The border
+                                                          will turn<font
+                                                          size="2">
+                                                          BLUE. Now
+                                                          press <font
+                                                          size="2">the
+                                                          'W' key<font
+                                                          size="2">, to
+                                                          save a 48K RAM
+                                                          snapshot.<br>
+                                                          <br>
+                                                          <font size="2">The
+
+
+
+
+
+                                                          led on the <font
+                                                          size="2">sd-card
+
+
+
+
+
+                                                          slot will glow
+                                                          a<font
+                                                          size="2">nd,
+                                                          after a few
+                                                          seconds (depen<font
+                                                          size="2">ding
+                                                          on the card
+                                                          speed)<font
+                                                          size="2"> a
+                                                          flashing
+                                                          square will
+                                                          appear<font
+                                                          size="2"> on
+                                                          the upper left
+                                                          corner of the
+                                                          s<font
+                                                          size="2">creen.<br>
+                                                          <br>
+                                                          <font size="2">The
+
+
+
+
+
+                                                          snapshot has
+                                                          been saved!<font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"> </font>The
+
+
+
+
+
+                                                          computer <font
+                                                          size="2">will</font>
+                                                          <font size="2">keep</font>
+                                                          working<font
+                                                          size="2"> as
+                                                          nothing
+                                                          happened.<br>
+                                                          <br>
+                                                          <font size="2">The
+
+
+
+
+
+                                                          screen will
+                                                          look like
+                                                          this:<br>
+                                                          <br>
+                                                          <img alt=""
+                                                          src="snapshot.jpg"
+                                                          height="256"
+                                                          width="320"><br>
+                                                          </font><br>
+                                                          Note <font
+                                                          size="2">the
+                                                          coloured
+                                                          square box in
+                                                          the upper left
+                                                          corner<font
+                                                          size="2">,
+                                                          which means
+                                                          that a
+                                                          snapshot has
+                                                          been taken
+                                                          (this is not
+                                                          saved to the s<font
+                                                          size="2">napshot).</font></font></font><br>
+                                                          <br>
+                                                          <br>
+                                                          <font size="2">The
+
+
+
+
+
+                                                          next time you
+                                                          reset <font
+                                                          size="2">your
+                                                          computer</font>,
+                                                          the bootrom
+                                                          menu' will be
+                                                          like this:<br>
+                                                          <br>
+                                                          <img alt=""
+                                                          src="bootromsnap.jpg"
+                                                          height="256"
+                                                          width="320"><br>
+                                                          <br>
+                                                          <font size="2">As
+
+
+
+
+
+                                                          you c<font
+                                                          size="2">an
+                                                          see, the first
+                                                          slot is no<font
+                                                          size="2">w
+                                                          occupied by
+                                                          your first
+                                                          snapshot and
+                                                          the name ("New
+                                                          SnapShot ..."<font
+                                                          size="2">)</font>
+                                                          <font size="2">no
+
+
+
+
+
+                                                          longer
+                                                          contains
+                                                          garbage. You
+                                                          can edit the
+                                                          na<font
+                                                          size="2">me of
+                                                          the snapshot
+                                                          by selectin<font
+                                                          size="2">g <font
+                                                          size="2">it's
+                                                          row (keys 'O',
+                                                          'P') then
+                                                          pressing the<font
+                                                          size="2"> 'E'
+                                                          key. You can
+                                                          also edit
+                                                          snapshot's
+                                                          parameters by
+                                                          pressing the
+                                                          'W' key.<font
+                                                          size="2"> Note
+                                                          that the
+                                                          frequency
+                                                          selection only
+                                                          applie<font
+                                                          size="2">s to
+                                                          a<font
+                                                          size="2">
+                                                          ZX-Badaloc
+                                                          FPGA hardware.<br>
+                                                          <br>
+                                                          I<font
+                                                          size="2">f you
+                                                          now press key
+                                                          '1' or select
+                                                          the snapshot's
+                                                          <font size="2">row
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          then press
+                                                          ENTER, the
+                                                          exact machine
+                                                          state frozen
+                                                          when you
+                                                          pressed the
+                                                          NMI button
+                                                          will be
+                                                          restore<font
+                                                          size="2">d and
+                                                          program
+                                                          execution
+                                                          resumed from
+                                                          there.<br>
+                                                          <br>
+                                                          <font size="2">Finally,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          this is how
+                                                          the bootrom
+                                                          should look <font
+                                                          size="2">when
+                                                          started with
+                                                          an sd-card
+                                                          that contains
+                                                          data on all <font
+                                                          size="2">of
+                                                          the first 8
+                                                          slots:<br>
+                                                          <br>
+                                                          <img alt=""
+                                                          src="sdcardfilled.jpg"
+                                                          height="256"
+                                                          width="320"><br>
+                                                          <br>
+                                                          <font size="2">The
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          color of the
+                                                          line indicated
+                                                          the size of
+                                                          the snapshot.
+                                                          <font size="2">GREEN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          for 16K, C<font
+                                                          size="2">YAN
+                                                          for 48<font
+                                                          size="2">K and
+                                                          RED for 128K.
+                                                          Dark blue is
+                                                          for unknow<font
+                                                          size="2">n
+                                                          format.<br>
+                                                          <font size="2">Eve<font
+                                                          size="2">ry
+                                                          slot always
+                                                          occupies a fix<font
+                                                          size="2">ed
+                                                          size of </font>128KB
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          on the sd-card</font></font>.
+                                                          The meaning of
+                                                          having smaller
+                                                          sized s<font
+                                                          size="2">napshot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          is saving
+                                                          read/write
+                                                          time.</font><br>
+                                                          <br>
+                                                          <br>
+                                                          There are
+                                                          other <font
+                                                          size="2">snapshot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          types, please
+                                                          look at the
+                                                          bootrom source
+                                                          code for these
+                                                          information.<br>
+                                                          <br>
+                                                          <font size="2">For
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                          example, by
+                                                          pressing key
+                                                          'I' in the
+                                                          bootrom, you
+                                                          can save the
+                                                          entire 512KB
+                                                          Flash chip
+                                                          content into <font
+                                                          size="2">the
+                                                          sd-card (4
+                                                          slot are used,
+                                                          since they are
+                                                          128KB each).<br>
+                                                          <font size="2"><font
+                                                          size="2">Such
+                                                          a snapshot wou<font
+                                                          size="2">d
+                                                          look lik<font
+                                                          size="2">e
+                                                          this:<br>
+                                                          <br>
+                                                          <img alt=""
+                                                          src="flashbackup.jpg"
+                                                          height="256"
+                                                          width="320"><br>
+                                                          <br>
+                                                          To restore the
+                                                          backup to the
+                                                          Flash chip,
+                                                          simply select
+                                                          and launch it
+                                                          (or press the
+                                                          corresponding
+                                                          key, <font
+                                                          size="2">which
+                                                          is '1' in the
+                                                          example<font
+                                                          size="2">).<font
+                                                          size="2"><font
+                                                          size="2"><br>
+                                                          <br>
+                                                          <font size="2">This
+
+
+
+
+                                                          function would
+                                                          allow to setup
+                                                          a new board
+                                                          and program
+                                                          all ROM bank<font
+                                                          size="2">s at
+                                                          once, without
+                                                          the need of
+                                                          the ser<font
+                                                          size="2">ial
+                                                          cable and
+                                                          ZX-Com pr<font
+                                                          size="2">ogram
+                                                          (see STEP<font
+                                                          size="2">
+                                                          3bis)</font>.<br>
+                                                          <br>
+                                                          <font size="2"><font
+                                                          size="2"><font
+                                                          size="2"><br>
+                                                          <br>
+                                                          </font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><font
+      color="#ffffff" face="Arial" size="2"><font color="#ffffff"
+        face="Arial" size="2"><font size="2"><font size="2"><font
+              size="2"><font color="#ffffff" face="Arial" size="2"><font
+                  color="#ffffff" face="Arial" size="2"><font size="2"><font
+                      size="2"><font size="2"><font size="2"><font
+                            size="2"><font size="2"><font size="2"><font
+                                  size="2"><font color="#ffffff"
+                                    face="Arial" size="2"><font
+                                      color="#ffffff" face="Arial"
+                                      size="2"><font size="2"><font
+                                          size="2"><font size="2"><font
+                                              color="#ffffff"
+                                              face="Arial" size="2"><font
+                                                color="#ffffff"
+                                                face="Arial" size="2"><font
+                                                  size="2"><font
+                                                    color="#ffff00"><font
+                                                      color="#ffffff"><font
+                                                        size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font size="2"><font size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><font
+                                                          size="2"><br>
+                                                          </font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><i><font
+        color="#ffff99">STEP 5:</font></i><font color="#ffff99"><small>
+        Installing ResiDos in the interface's RAM chip</small></font><font
+      color="#ffff99">:</font><br>
+    <br>
+    <font color="#00ff00"><a href="mailto:alessandro.poppi@tiscali.it"><font
+          color="#ffffff"></font></a></font><font color="#ffffff"
+      face="Arial" size="2"><font color="#ffffff" face="Arial" size="2"><font
+          size="2"><font size="2"><font size="2"><i><font
+                  color="#ffff99"> </font></i><font color="#ffffff"
+                face="Arial" size="2"><font color="#ffffff" face="Arial"
+                  size="2">Re<font size="2">siDos is an operating system
+                    written by Garry Lancaster, who made a specific
+                    version for the ZXmmc+, that works entirely into the
+                    battery-backed 512KB RAM memory of the ZXmmc+
+                    interface. Once installed, the bootrom recognize<font
+                      size="2">s i<font size="2">t and offers an
+                        additiona<font size="2">l option ('R') to start
+                          it<font size="2">, as shown in this <font
+                              size="2">screenshot:<br>
+                              <br>
+                              <img alt="" src="residosdetected.jpg"
+                                height="256" width="320"><br>
+                            </font></font> <br>
+                          <font size="2">Alternatively, you can set SW3
+                            to the "OFF" position <font size="2">(Ram/Rom
+
+
+
+                              boot selector</font></font>) and have the
+                          Resi<font size="2">Dos starting immediately <font
+                              size="2">at power-on.<br>
+                              <br>
+                              The <font color="#ffffff" face="Arial"
+                                size="2"><font color="#ffffff"
+                                  face="Arial" size="2"><font size="2"><font
+                                      size="2"><font size="2"><font
+                                          color="#ffffff" face="Arial"
+                                          size="2"><font color="#ffffff"
+                                            face="Arial" size="2"><font
+                                              size="2"><font size="2"><font
+                                                  size="2"><font
+                                                    size="2"><font
+                                                      size="2"><font
+                                                        color="#ffffff"
+                                                        face="Arial"
+                                                        size="2"><a
+                                                          href="http://www.worldofspectrum.org/residos/"><font
+color="#ffff00">ResiDos Homepage</font></a> <font size="2">provides
+                                                          installers in
+                                                          both .tap and
+                                                          .t<font
+                                                          size="2">zx
+                                                          format.</font></font></font></font>
+                                                    You can load these f<font
+                                                      size="2">iles from
+                                                      "tape" and install
+                                                      <font size="2">ResiDos</font>
+                                                      into the
+                                                      interface's RAM.</font><br>
+                                                    <br>
+                                                    <font size="2"><font
+                                                        size="2"><font
+                                                          size="2"><font
+                                                          size="2">Furthermore,
+
+
+                                                          in <font
+                                                          color="#ffffff"
+                                                          face="Arial"
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font size="2"><font size="2"><font
+                                                          size="2"><font
+color="#ffffff" face="Arial" size="2"><font color="#ffffff" face="Arial"
+                                                          size="2"><font
+                                                          size="2">the <a
+href="software.html"><font color="#ffff00">software</font></a><font
+                                                          color="#ffff00">
+                                                          </font></font></font></font></font></font></font></font></font></font></font></font></font><font
+                                                      color="#ffffff"><font
+                                                        size="2"><font
+                                                          face="Arial">page
+
+                                                          you will find
+                                                          a link to the
+                                                          latest <font
+                                                          size="2">tested
+
+
+                                                          version, which
+                                                          includes a
+                                                          ZX-Com serial
+                                                          <font size="2">snapshot
+
+
+                                                          of the
+                                                          installer:
+                                                          this way, if
+                                                          you have a
+                                                          serial cable,
+                                                          you can upload
+                                                          the snapshot
+                                                          to the board
+                                                          without having
+                                                          to deal with
+                                                          EAR cable and
+                                                          .tap/.tzx
+                                                          players.<br>
+                                                          <br>
+                                                          Also, if you
+                                                          managed to use
+                                                          the Flash chip
+                                                          RAW image
+                                                          described in <font
+                                                          size="2">STEP
+                                                          3bis, then you
+                                                          <font size="2">will
+
+
+                                                          find the <font
+                                                          size="2">latest
+
+
+                                                          tested
+                                                          installer
+                                                          ready for use
+                                                          in the special
+                                                          Flash-based
+                                                          snapshot slot.
+                                                          Just press the
+                                                          'T' key while
+                                                          in the bootrom
+                                                          menu to <font
+                                                          size="2">start
+                                                          the ResiDos
+                                                          instal<font
+                                                          size="2">ler<font
+                                                          size="2">.</font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font></font><br>
+                <br>
+                <br>
+              </font></font></font></font></font></font><br>
+    <div align="center"><a href="index.html"><font color="#ffffff">Home</font></a><font
+        color="#ffffff">&nbsp;&nbsp;&nbsp; </font><font color="#c0c0c0"><a
+          href="hardware.html"><font color="#ffffff"> Hardware Details</font></a>&nbsp;&nbsp;&nbsp;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <a href="software.html"><font color="#ffffff"> Software</font></a></font><font
+        color="#ffff00"> </font><font color="#00ff00">&nbsp;&nbsp; </font><a
+        href="schematic.html"><font color="#ffffff">Schematic</font></a><font
+        color="#ffffff"> </font><font color="#00ff00">&nbsp;&nbsp; </font><font
+        color="#c0c0c0"><a href="pcb.html"> <font color="#ffffff">PCB</font></a>&nbsp;&nbsp;&nbsp;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </font><font color="#00ff00"> <a
+          href="mailto:alessandro.poppi@tiscali.it"><font
+            color="#ffffff">Contact the Author</font></a></font></div>
+  </body>
+</html>

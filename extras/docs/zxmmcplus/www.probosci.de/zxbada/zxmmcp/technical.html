@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Language" content="en-us">
+    <meta name="generator" content="Bluefish 2.2.3" >
+    <meta name="ProgId" content="FrontPage.Editor.Document">
+    <meta http-equiv="Content-Type" content="text/html;
+      charset=windows-1252">
+    <title>ZXMMC+ Home</title>
+  </head>
+  <body bgcolor="#336699">
+    <p align="center"><font color="#00ffff" face="Tahoma" size="5">ZXMMC+</font><i><font
+          color="#00ffff" face="Tahoma" size="5"> </font></i> <font
+        color="#00ff00" face="Tahoma" size="5">Tech Specs</font></p>
+    <p align="center">&nbsp;</p>
+    <p align="left"><font color="#ffffff" size="4">The heart of this
+        interface is a 72 macrocell CPLD. </font><font color="#ffffff">This
+
+
+        page describes it's functions and the layout of all the I/O
+        registers built in it.</font></p>
+    <p align="left">&nbsp;</p>
+    <p style="color: rgb(51, 204, 255);" align="left"><b><font
+          face="Tahoma" size="4">MEMORY PAGING:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2">The interface has
+        512KB of nonvolatile RAM and 512KB of FLASHROM. They can be
+        "PAGED-IN" in 16KBytes blocks on address space 0 - $3FFF. This
+        is the only region that allows such a feature, as the "ROMCS"
+        signal provided on the Edge Connector can be used to disable the
+        internal ZX-Spectrum ROM and avoid any conflict. This makes the
+        ZXMMC+ interface able to run <a
+          href="http://www.worldofspectrum.org/residos/"><font
+            color="#ffff00">ResiDOS</font></a> by Garry Lancaster. To
+        tell it right, this interface was designed just for this
+        purpose.</font></p>
+    <p><b><font color="#ffffff" face="Tahoma" size="2">The PAGING
+          Control Register:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2">This RD/WR register,
+        built into the CPLD, works exactly as on the ZX-Badaloc clone.
+        The I/O address on ZXMMC+ is $7F and it's bit layout is as
+        follows:</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">D7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+        RAM WR Enable<br>
+        D6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PAGE-IN
+        Enable<br>
+        D5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RAM/ROM
+        Select<br>
+        D4:D0&nbsp;&nbsp;&nbsp; Page number (0 - 31)</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">D7: This is a
+        stand-alone bit. When SET, the RAM Chip is WRITE ENABLED, no
+        matter what is enabled on READ. For example, a simple BASIC
+        program may copy the Sinclair ROM to one RAM bank by just
+        setting this bit then performing a FOR/NEXT loop which POKEs
+        back what is read by PEEK on the 0 - 16383 address space. The
+        PEEK will read the Sinclair ROM, while the POKE will write in
+        RAM. When the loop completes, the RAM can be enabled in READ
+        mode in place of the internal ROM. Being a separate bit, D7
+        allows write-only operation as well as write protection, turning
+        the nonvolatile RAM into some kind of fast ROM. This is the key
+        feature used by ResiDOS to work. NOTE: Sinclair basic uses to
+        alter a few locations of the "ROM", if the zxmmc+ ram is left
+        write-enabled. If the above basic example is tried, it is
+        advisable to write-protect the ram bank prior to returning to
+        the basic "prompt" (i.e. by including the OUT instruction in the
+        command, after a colon).</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">D6: When SET, this
+        bit activates the PAGE IN on READ cycles. The internal ROM is
+        disabled and one bank from RAM or ROM is accessed instead.</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">D5: When LOW, the RAM
+        chip is selected for PAGE IN function. When HIGH, the ROM
+        (FLASH) is selected.</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">D4:D0&nbsp;&nbsp;&nbsp;
+
+
+        These 5 bits are used to select one of 32 banks, 16KB each, from
+        RAM or ROM (depending on D5). Their state directly affects the
+        logic level on the 5 upper address lines of bot the RAM and
+        FLASH chips, who are provided by the CPLD.</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">The power-on status
+        of D5 and D6 is user-selectable by means of dip switch n. 3 and
+        4 respectively. When PAGING is OFF, the internal ROM will show
+        up when the system is powered or reset. If RAM paging is enabled
+        and ResiDOS was previously installed into nonvolatile ram, then
+        ResiDOS will start on power-on. If ROM paging is enabled, then
+        ROM BANK 0 will be selected at power-on.</font></p>
+    <p><b><font color="#ffffff" face="Arial" size="2">128K
+          Compatibility:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2"><b>The CPLD detects
+          the OUT $7FFD instruction and captures data bit D4 to the
+          lower address line of the bank page. </b>This means that a
+        complete 128K Spectrum ROM SET can be programmed and will work
+        in flashrom, enabling the creation of NMI-patched rom for
+        snapshot purposes. This feature is disabled when zxmmc+ RAM is
+        paged-in, to avoid problems when running ResiDOS or bootrom
+        firmware.</font></p>
+    <p align="left">&nbsp;</p>
+    <p style="color: rgb(51, 204, 255);" align="left"><b><font
+          face="Tahoma" size="4">MASS MEMORY STORAGE:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2">The interface
+        provides two SD/MMC card slots, accessible through an hardware
+        SPI port built into the CPLD. This port is capable of
+        transferring one byte in 16T-states, so the 21T-states INIR/OTIR
+        or even a 16T-states INI/OUTI "unrolling" instruction sequence
+        (proposed by Paolo Ferraris) can be used. This means that,
+        beside header overhead, reading a block of data from the card is
+        as fast as transferring it from memory to memory. Write can be
+        somehow slower, because the SD card needs time to physically
+        "program" the internal flash memory array and will respond as
+        "busy" in the meantime. Further details on the SPI port can be
+        found in the <a href="../index.html"><font
+            color="#ffff00">ZX-Badaloc</font></a> clone technical
+        reference and, later, in the hardware page of this site.</font></p>
+    <p><b><font color="#ffffff" face="Tahoma" size="2">The SPI Port
+          Registers:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2">I/O <b>$1F</b> (WR
+        Only):</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">D0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+
+        Slot 0 Chip Select (active LOW);<br>
+        D1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Slot 1 Chip Select
+        (active LOW);<br>
+        D2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Not used<br>
+        D3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RS-232 Start Bit's
+        NMI ENABLE (described in the RS-232 section)<br>
+        D7:D4&nbsp;&nbsp; Used for FLASH WR unlock code (described in
+        the 'Flash Rom Chip' section of the Hardware page)</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">I/O <b>$3F</b>
+        (Read/Write): SPI DATA Register</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">Note: $1F is the
+        Kempston Joystick Port when read.</font></p>
+    <p>&nbsp;</p>
+    <p style="color: rgb(51, 204, 255);" align="left"><b><font
+          face="Tahoma" size="4">KEMPSTON JOYSTICK:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2">This is a simple
+        5-bit Kempston compatible Joystick port, readable at I/O address
+        $1F. The Kempston Joystick can be enabled/disabled by means of
+        Dip Switch n.1. Due to a lack of free pins on the CPLD, two
+        joystick data lines are shared with two of the 5-bit BANK
+        Address for RAM and ROM bank selection. As can be seen in the
+        schematic, Kempston D4 and D5 are placed on MSB_A17 and MSB_A18
+        respectively, through a resistor. When memory is accessed by the
+        processor, these two CPLD pins are turned into Outputs and the
+        complete 5-bit MSB address is formed on RAM/ROM address bus. In
+        all other cases, the pins work as Inputs so that reading the
+        Kempston port will give the expected result.</font></p>
+    <p>&nbsp;</p>
+    <p style="color: rgb(51, 204, 255);" align="left"><b><font
+          face="Tahoma" size="4">IF 1 FEATURES:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2">The zxmmc+ implements
+        a RS-232 and a Network port that works like those on the
+        Sinclair INTERFACE 1, with a few exceptions. These peripherals
+        can be enabled/disabled by means of dip-switch n. 2.</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">Both the RS-232 and
+        NetWork interfaces has been successfully tested. The IF1's
+        Shadow ROM can be programmed into ZXmmc+ flash memory, turning
+        the machine into a real IF1-equipped system under any point of
+        view, except microdrives.</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">Due to PCB size
+        constraints, RS-232 and Network connections end up on a single
+        6-pin strip connector. It's pinout is as follows:</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">PIN
+        1&nbsp;&nbsp;&nbsp; NET<br>
+        PIN 2&nbsp;&nbsp;&nbsp; RXDATA (output)<br>
+        PIN 3&nbsp;&nbsp;&nbsp; TXDATA (input)<br>
+        PIN 4&nbsp;&nbsp;&nbsp; DTR (input)<br>
+        PIN 5&nbsp;&nbsp;&nbsp; GND<br>
+        PIN 6&nbsp;&nbsp;&nbsp; CTS (output)</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">With the exception of
+        PIN 1, this can be straight pin-to-pin connected to a female
+        DB-9 to be directly plugged into an IBM-PC 9 pin serial port. It
+        should however be noted that the CTS input on ibm-pc is pin 8
+        and not 6; a straight connection is still possible as pin 6 is
+        DSR (which is an input as well).</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">The IF1 NetWork
+        signal goes to pin 1; this could be wired to a 3.5mm male jack
+        to be plugged into the NET socket of a real IF1 interface (which
+        of course should be plugged on another ZX-Spectrum). An on-board
+        330 ohm termination resistor is provided (and can be disabled by
+        removing a jumper, in case the zxmmc+ is not at one end of the
+        network).</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">As on the original
+        hardware, I/O Addresses involved in RS-232 and Network
+        communication are $EF and $F7. However, in order to simplify the
+        internal CPLD logic and thanks to the fact that there are no
+        data bits with different meaning at same position on these two
+        ports, both $EF and $F7 returns the same data when read, as
+        follows:</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">D7&nbsp;&nbsp;&nbsp;
+        TXDATA status (rs-232 data input) (in the original IF1, this is
+        on port $F7 only)<br>
+        D3&nbsp;&nbsp;&nbsp; DTR status (rs-232 DTR input) (in the
+        original IF1, this is on port $EF only)<br>
+        D0&nbsp;&nbsp;&nbsp; NET status (Network) (in the original IF1,
+        this is on port $F7 only, while on $EF this is the zx-microdrive
+        write protect bit)</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">All remaining bits
+        will read '0'.</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">On write access,
+        these two ports will behave in different way. Supported bits are
+        as follows:</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">$F7
+        D0&nbsp;&nbsp;&nbsp; NET Output / RXDATA (Network output or
+        rs-232 data output, depending on $EF D0 state)<br>
+        $EF D5&nbsp;&nbsp;&nbsp; WAIT: when '0', this bit will LOCK THE
+        PROCESSOR in WAIT STATE, if the NET line is active (+5V). Wait
+        state will cease as soon as NET is resting.<br>
+        $EF D4&nbsp;&nbsp;&nbsp; CTS Output<br>
+        $EF D0&nbsp;&nbsp;&nbsp; COMMS_OUT: When LOW, net/rxdata ($F7
+        D0) out goes to NET; when HIGH, net/rxdata goes to RS-232</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">A nonstandard feature
+        of the RS-232 port is the capability to generate an NMI when a
+        Start Bit is detected. This is disabled by default and can be
+        activated by setting bit D3 on $1F port, described in the "mass
+        storage" section. This feature allows an NMI handler to
+        establish serial a communication, no matter what the Spectrum is
+        doing, when requested by a remote device. This is how the
+        provided "bootrom" firmware performs RS232-based screenshots and
+        snapshots on a running ZX-Spectrum. The NMI handler should
+        immediately disable further NMI calls by resetting bit D3 on $1F
+        port, to avoid nested execution on each rising edge of the
+        RS-232 input line. The feature should then be re-enable just
+        before quitting (the firmware takes care of all this).<br>
+        <br>
+      </font></p>
+    <p align="center"><a href="index.html"><font color="#ffffff">Home</font></a><font
+        color="#ffffff">&nbsp;&nbsp;&nbsp; </font><font color="#c0c0c0"><a
+          href="hardware.html"><font color="#ffffff"> Hardware Details</font></a>&nbsp;&nbsp;&nbsp;
+
+        <a href="software.html"><font color="#ffffff"> Software</font></a></font><font
+        color="#ffff00"> </font><font color="#00ff00">&nbsp; </font><font
+        color="#00ff00"><font color="#c0c0c0"><a href="quickstart.html"><font
+              color="#ffffff">QuickStart</font></a></font><font
+          color="#ffff00"> </font><font color="#00ff00">&nbsp; </font></font><a
+        href="schematic.html"><font color="#ffffff">Schematic</font></a><font
+        color="#ffffff"> </font><font color="#00ff00">&nbsp;&nbsp; </font><font
+        color="#c0c0c0"><a href="pcb.html"> <font color="#ffffff">PCB</font></a>&nbsp;&nbsp;&nbsp;
+
+      </font><font color="#00ff00"> <a
+          href="mailto:alessandro.poppi@tiscali.it"><font
+            color="#ffffff">Contact the Author</font></a></font></p>
+  </body>
+</html>

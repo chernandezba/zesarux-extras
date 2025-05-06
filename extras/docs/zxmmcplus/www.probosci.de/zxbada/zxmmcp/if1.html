@@ -1,0 +1,407 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Language" content="en-us">
+    <meta name="GENERATOR" content="Microsoft FrontPage 6.0">
+    <meta name="ProgId" content="FrontPage.Editor.Document">
+    <meta http-equiv="Content-Type" content="text/html;
+      charset=windows-1252">
+    <title>ZXMMC+ IF1</title>
+  </head>
+  <body style="background-color: rgb(51, 102, 153);">
+    <p align="center"><font color="#00ffff" face="Tahoma" size="5">ZXMMC+
+
+
+      </font> <font color="#00ff00" face="Tahoma" size="5">IF1-ROM
+        Modification Details<br>
+      </font></p>
+    <p align="left">&nbsp;</p>
+    <font color="#ffffff" face="Arial" size="2">As stated on the
+      software page, the rom switch provided by IF1 hardware has been
+      implemented in software by applying some changes to the original
+      IF1 rom and zx-spectrum internal rom.<br>
+      <br>
+      The patched 48K-spectrum rom should be programmed on rom bank 4;<br>
+      The patched IF1 rom should be programmed on rom bank 5.<br>
+      <br>
+      These changes will replicate the behaviour of the original
+      hardware, which performs bank switch on the following address
+      match:<br>
+      <br>
+    </font><font color="#ffffff" face="Arial" size="2">OPCODE FETCH
+      +0008:&nbsp;&nbsp;&nbsp; 48K --&gt; IF1&nbsp;&nbsp;&nbsp; (IF1 ROM
+      should be paged in) <br>
+      OPCODE FETCH +0700:&nbsp;&nbsp;&nbsp; IF1 --&gt;
+      48K&nbsp;&nbsp;&nbsp; (MAIN ROM should be paged in) <br>
+      OPCODE FETCH +1708:&nbsp;&nbsp;&nbsp; 48K --&gt;
+      IF1&nbsp;&nbsp;&nbsp; (IF1 ROM should be paged in)<br>
+      <br>
+      The 48K rom has been manually edited. <br>
+      &nbsp;<br>
+      The IF1 ROM (Version 2), which requires more coding, has been
+      fully disassembled; the file "IF1-2ori.asm" (original), when
+      assembled, produces an exact copy of the IF1-2.ROM binary file. <br>
+      &nbsp;<br>
+      All needed changes in the IF1 ROM are made in the file
+      IF1-2new.asm, which will make a ready-to-use binary file <br>
+      to be programmed into BANK 5. The second half of this 16K rom (the
+      IF1 ROM is just 8K) is used as a placeholder <br>
+      for additional code, needed for the ROM switching tasks.<br>
+    </font><font color="#ffffff" face="Arial" size="2"><br>
+      The complete source code, tools and howto for all the patches can
+      be found <a style="color: lime;" href="https://www.probosci.de/zxbada/zxmmcp/software/IF1_ROM.zip">here</a>.<br>
+      <br>
+      A working example showing a LLIST command redirected to RS-232 by
+      IF1 functionality and then displayed into an Hyperterminal window,
+      using IF1 syntax, is available <a style="color: lime;"
+        href="if1_hyperterminal.html">here</a></font><br>
+    <br>
+    <br>
+    <font style="color: rgb(51, 204, 255);" color="#c0c0c0"><b><span
+          style="text-decoration: underline;">Description of all the
+          changes:</span></b></font><br>
+    <font color="#ffffff" face="Arial" size="2"><br>
+      <br>
+      <span style="color: rgb(51, 204, 255); font-weight: bold;">IF1ROM
+        PAGE-IN on +0008 opcode fetch: </span><br>
+      &nbsp;<br>
+      How it works on original hardware: <br>
+      The IF1 ULA pages-in the IF1 ROM when an opcode fetch is executed
+      at address +0008, so code is executed from there. <br>
+      &nbsp;<br>
+      How it works on ZXMMC+: <br>
+      48k ROM was modified at address +0008 so that the bank 5 (IF1 ROM)
+      is paged-in (this takes 5 bytes) <br>
+      IF1 ROM was modified at address +0008 so that program execution
+      keeps going on BANK CROSSING. <br>
+      A few bytes are used above first 8K (spare area) <br>
+      &nbsp;<br>
+      Original ZX-Spectrum ROM: <br>
+      &nbsp;<br>
+      0008 2a5d5c&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      hl,(5c5dh) &nbsp;&nbsp; ; this opcode fetch triggers the IF1 ROM
+      PAGE-IN on original hardware <br>
+      000b 225f5c&nbsp; &nbsp;&nbsp; ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      (5c5fh),hl&nbsp; &nbsp;&nbsp; ; from here on, code is never
+      executed when a IF1 is plugged-in <br>
+      000e 1843&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+      jr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0053h <br>
+      &nbsp;<br>
+      Original IF1-V2 ROM <br>
+      &nbsp;<br>
+      0008 2a5d5c&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      hl,(5c5dh)&nbsp;&nbsp;&nbsp; ; interestingly, this is the same
+      instruction as in the IF1 rom. perhaps the 16-bit operand's <br>
+      000b e1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
+      pop&nbsp;&nbsp;&nbsp;&nbsp; hl&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; ; memory read would
+      otherwise be page-crossed... or the opcode fetch could become
+      unreliable...? <br>
+      000c e5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;
+      push&nbsp;&nbsp;&nbsp; hl <br>
+      000d c39a00&nbsp;&nbsp;&nbsp; jp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      009ah <br>
+      &nbsp;<br>
+      &nbsp;<br>
+      Modified ZX-Spectrum ROM: <br>
+      &nbsp;<br>
+      0008 f5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      push&nbsp;&nbsp;&nbsp; af <br>
+      0009 3e65&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a,IF1ROMBANK&nbsp;&nbsp; ; IF1
+      SHADOW ROM Bank: lsb 5 = BANK 5 <br>
+      000b d37f&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+      out&nbsp;&nbsp;&nbsp;&nbsp; (FASTPAGE),a&nbsp;&nbsp;&nbsp;&nbsp; ;
+      bank switch: next opcode fetch will take place from the IF1 ROM in
+      BANK 5 <br>
+      000d 00&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+      nop&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+;
+
+
+      unused location: this is never fetched. <br>
+      &nbsp;<br>
+      Modified IF1-V2 ROM <br>
+      &nbsp;<br>
+      0008
+      00&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      nop&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+;
+
+
+      these 5 bytes are never fetched: MAIN ROM is still active <br>
+      0009 00&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      nop&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+;
+
+
+      NOP was chosen in case the IF1 ROM's +0008 function is called from
+      within <br>
+      000a 00&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      nop&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+;
+
+
+      this rom itself: it would work <br>
+      000b 00&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nop
+      <br>
+      000c 00&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nop
+      <br>
+      000d c30020&nbsp;&nbsp;&nbsp; jp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      2000h&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; jumps forward
+      to the spare, second half of this 16K rom bank <br>
+      &nbsp;<br>
+      2000
+      f1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      pop&nbsp;&nbsp;&nbsp;&nbsp; af&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+;
+
+
+      then execute the same code found at address +0008 of the IF1 ROM <br>
+      2002
+      e5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      push&nbsp;&nbsp;&nbsp; hl <br>
+      2003 c39a00&nbsp;&nbsp;&nbsp; jp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      009ah <br>
+      &nbsp;<br>
+      &nbsp;<br>
+      &nbsp;<br>
+      <span style="color: rgb(51, 204, 255); font-weight: bold;">MAINROM
+        PAGE-IN on +0700 opcode fetch:</span> <br>
+      &nbsp;<br>
+      How it works on original hardware: <br>
+      48K (main) ROM is paged-in when an opcode fetch is executed at
+      address +0700. The +0700 byte is fetched from IF1 ROM. <br>
+      This byte is a $C9 (RET), so the system will switch to the main
+      rom AND jump to the address saved on the STACK at the same time. <br>
+      &nbsp;<br>
+      How it works on ZXMMC+: <br>
+      A single byte $C9 (RET) instruction at address +0700 was changed
+      to $C3 (absolute jump). <br>
+      The next two bytes in IF1 ROM (which should NOT be changed as they
+      are part of another subroutine) will make up a jump to $20D7, <br>
+      which luckily is in the second half (SPARE) ROM SPACE. Then, after
+      a further jump, a place is found so that right after the execution
+      <br>
+      of the OUT (which pages-in the 48K ROM) the first two bytes in the
+      48K rom are POP AF, RET. This is perfect as we pushed AF on stack
+      <br>
+      just before the OUT instruction which actually switched the bank.
+      <br>
+      &nbsp;<br>
+      Original IF1-V2 ROM <br>
+      &nbsp;<br>
+      0700 c9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      ret&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; ; MAIN-ROM paging AND
+      jump to address saved on stack at same time (1 byte subroutine) <br>
+      0701 d7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      rst&nbsp;&nbsp;&nbsp;&nbsp; 10h&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; &nbsp;; other code (belonging to the 'EVALUATE
+      PARAMETERS' SUBROUTINE) <br>
+      0702 2000&nbsp;&nbsp;&nbsp;&nbsp; jr&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      nz,0704h <br>
+      &nbsp;<br>
+      &nbsp;<br>
+      &nbsp;<br>
+      Modified IF1-V2 ROM <br>
+      &nbsp;<br>
+      0700 c3d720&nbsp;&nbsp;&nbsp; jp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      20d7h&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; ; NOTE: only A SINGLE BYTE at
+      +0700 needs to be changed from '$C9' to '$C3' <br>
+      &nbsp;<br>
+      20d7 c3dc2d&nbsp;&nbsp;&nbsp; jp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      2ddch&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ; further
+      jump to covenient place, to match a POP AF, RET sequence in the
+      MAIN ROM <br>
+      2ddc
+      f5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      push&nbsp;&nbsp;&nbsp; af&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+;
+
+
+      AF is saved <br>
+      2ddd 3e64&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+      ld&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; a,MAINROMBANK&nbsp;&nbsp; ; lsb 4
+      = BANK 4 <br>
+      2ddf d37f&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      out&nbsp;&nbsp;&nbsp;&nbsp; (FASTPAGE),a&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; &nbsp;; BANK 4 is paged-in NOW: next opcode
+      fetch will take place from 48K ROM <br>
+      &nbsp;<br>
+      ... 48K ROM content on the next two bytes (no need for any
+      change): <br>
+      &nbsp;<br>
+      2de1
+      f1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      pop&nbsp;&nbsp;&nbsp;&nbsp; af&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; &nbsp;; AF is restored <br>
+      2de2
+      c9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      ret&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;; JP to address saved
+      on stack, as happens with the RET instruction at +0700 on original
+      hardware<br>
+      <br>
+      <br>
+      <br>
+      <span style="font-weight: bold; color: rgb(51, 204, 255);">IF1ROM
+        PAGE-IN on +1708 opcode fetch:</span> <br>
+      &nbsp;<br>
+      How it works on original hardware: <br>
+      The IF1 ULA pages-in the IF1 ROM when an opcode fetch is executed
+      at address +1708, so code is executed from there. <br>
+      This is in the middle of the CLOSE-2 subroutine, which begins at
+      address +1701 in the 48K ROM. <br>
+      &nbsp;<br>
+      How it works on ZXMMC+: <br>
+      The first 5 bytes of the CLOSE-2 routine at address +1701 in the
+      48K (MAIN) ROM are replaced by code which pages-in the IF1 ROM. <br>
+      In the IF1 ROM, a single byte at address +1706 (spare area) is
+      changed from $FF to $C3 (absolute jump). Note that +1706 is <br>
+      the first opcode fetch from IF1 ROM, after bank switch takes
+      place. The following two bytes (who are NOT modified in the IF1
+      ROM) <br>
+      will lead to a JP to $23FF, which, again, is within the second
+      half of the rom bank (spare). <br>
+      Here the program can perform the same way the original IF1/48K ROM
+      do, then jump back to +1708 (which holds the unmodified IF1 code).
+      <br>
+      Note that the +1708 location ($23) is left untouched and is used
+      twice: the first time as the MSB address for the absolute JUMP to
+      $23FF <br>
+      and later as a INC HL instruction (as happens in the original IF1
+      ROM). <br>
+      &nbsp;<br>
+      &nbsp;<br>
+      Original ZX-Spectrum ROM: <br>
+      &nbsp;<br>
+      1701 e5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      push&nbsp;&nbsp;&nbsp; hl&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+      &nbsp; &nbsp;&nbsp; ; CLOSE-2 subroutine <br>
+      1702 2a4f5c&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;
+      hl,(5c4fh) <br>
+      1705 09&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      add&nbsp;&nbsp;&nbsp;&nbsp; hl,bc <br>
+      1706 23&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; inc&nbsp;
+      &nbsp; &nbsp; hl <br>
+      1707 23&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+      inc&nbsp;&nbsp; &nbsp;&nbsp; hl <br>
+      1708 23&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; inc&nbsp;
+      &nbsp; &nbsp; hl&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ;
+      IF1 ROM paged-in NOW <br>
+      1709 4e&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
+      ld&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; c,(hl) <br>
+      170a eb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; ex&nbsp;
+      &nbsp;&nbsp; &nbsp; de,hl <br>
+      170b 211617&nbsp;&nbsp; ld&nbsp; &nbsp; &nbsp; &nbsp; hl,17 <br>
+      &nbsp;<br>
+      Original IF1-V2 ROM <br>
+      &nbsp;<br>
+      1701 ff&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      ; unused locations <br>
+      1702 ff <br>
+      1703 ff <br>
+      1704 ff <br>
+      1705 ff <br>
+      1706 ff <br>
+      1707 ff <br>
+      1708 23&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      inc&nbsp;&nbsp;&nbsp;&nbsp; hl&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+;
+
+
+      again, same instruction as in the MAIN ROM. <br>
+      1709 f7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+      rst&nbsp;&nbsp;&nbsp;&nbsp; 30h <br>
+      170a cb3f&nbsp;&nbsp;&nbsp;&nbsp; srl&nbsp;&nbsp; &nbsp;&nbsp; a <br>
+      170c d603&nbsp;&nbsp;&nbsp; sub&nbsp;&nbsp;&nbsp; 03h <br>
+      &nbsp;<br>
+      &nbsp;<br>
+      &nbsp;<br>
+      Modified ZX-Spectrum ROM: <br>
+      &nbsp;<br>
+      1701 f5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      push&nbsp;&nbsp;&nbsp; af <br>
+      1702 3e65&nbsp;&nbsp;&nbsp;&nbsp; ld&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp; a,IF1ROMBANK&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;;
+      this should point to the IF1 SHADOW ROM Bank: lsb 5 = BANK 5 <br>
+      1704 d37f&nbsp;&nbsp;&nbsp;&nbsp; out &nbsp;&nbsp; &nbsp;&nbsp;
+      (FASTPAGE),a&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; ; ZXMMC+
+      PAGE REGISTER: next opcode fetch will take place on the OTHER ROM
+      <br>
+      &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+;
+
+
+      no changes on next bytes <br>
+      &nbsp;<br>
+      Modified IF1-V2 ROM <br>
+      &nbsp;<br>
+      1706 c3ff23&nbsp;&nbsp;&nbsp; jp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      23ffh&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+;
+
+
+      jump forward. NOTE: only byte at +1706 needs to be changed from
+      $FF to $C3 <br>
+      &nbsp;<br>
+      23ff
+      f1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      pop&nbsp;&nbsp;&nbsp;&nbsp; af <br>
+      2400 e5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+      push&nbsp;&nbsp; hl <br>
+      2401 2a4f5c&nbsp;&nbsp; ld&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;
+      hl,(5c4fh) <br>
+      2404 09&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;
+      add&nbsp;&nbsp;&nbsp;&nbsp; hl,bc <br>
+      2405 23&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; inc&nbsp;&nbsp;
+      &nbsp;&nbsp; hl <br>
+      2406 23&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; inc&nbsp; &nbsp;
+      &nbsp; hl <br>
+      2407 c30817&nbsp; jp&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; 1708h <br>
+      <br>
+      <br>
+    </font>
+    <p align="center"><a href="index.html"><font color="#ffffff">Home</font></a><font
+        color="#ffffff" face="Arial" size="2">&nbsp;&nbsp;&nbsp; </font>
+      <font color="#c0c0c0"><a href="technical.html"><font
+            color="#ffffff">Technical Description</font></a></font><font
+        color="#ffffff">&nbsp;&nbsp;&nbsp; </font> <font
+        color="#c0c0c0"><a href="hardware.html"><font color="#ffffff">Hardware
+
+
+            Details</font></a>&nbsp;&nbsp;&nbsp; <a
+          href="software.html"><font color="#ffffff">Software</font></a></font><font
+        color="#ffff00"> </font><font color="#00ff00">&nbsp;&nbsp; </font><font
+        color="#c0c0c0"><a href="quickstart.html"><font color="#ffffff">QuickStart</font></a></font><font
+        color="#ffff00"> </font><font color="#00ff00">&nbsp;&nbsp; </font><a
+        href="schematic.html"> <font color="#ffffff">Schematic</font></a><font
+        color="#ffffff"> </font> <font color="#00ff00">&nbsp;&nbsp; </font><font
+        color="#c0c0c0"><a href="pcb.html"> <font color="#ffffff">PCB</font></a>&nbsp;&nbsp;&nbsp;
+
+      </font><font color="#00ff00"> <a
+          href="mailto:alessandro.poppi@tiscali.it"><font
+            color="#ffffff">Contact the Author</font></a></font></p>
+  </body>
+</html>

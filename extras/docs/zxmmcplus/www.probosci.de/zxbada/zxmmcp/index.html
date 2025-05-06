@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Language" content="en-us">
+    <meta name="GENERATOR" content="Microsoft FrontPage 6.0">
+    <meta name="ProgId" content="FrontPage.Editor.Document">
+    <meta http-equiv="Content-Type" content="text/html;
+      charset=windows-1252">
+    <title>ZXMMC+ Home</title>
+  </head>
+  <body bgcolor="#336699">
+    <p style="text-decoration: underline;" align="center"><font
+        color="#00ff00" face="Tahoma" size="5">The </font> <font
+        color="#00ffff" face="Tahoma" size="5">ZXMMC+</font><i><font
+          color="#00ffff" face="Tahoma" size="5"> </font></i> <font
+        color="#00ff00" face="Tahoma" size="5">HomePage</font></p>
+    <p align="center">&nbsp;</p>
+    <p><b><font color="#ffffff" face="Tahoma" size="2"></font></b></p>
+    <p><font color="#ffffff" face="Tahoma" size="2">The ZXMMC+ plugs
+        into the edge connector of a ZX-Spectrum providing sd-card
+        access, IF-1 compatible RS-232 and Network communication, 1MB
+        ram/rom, Kempston joystick.</font></p>
+    <p><font color="#ffffff" face="Tahoma" size="2">Technical specs:</font></p>
+    <ul>
+      <li><font color="#ffffff" face="Tahoma" size="2">Pass-through edge
+          connector, "vertical" board</font></li>
+      <li><font color="#ffffff" face="Tahoma" size="2">512KBytes of
+          nonvolatile, battery backed RAM for ResiDOS by Garry Lancaster</font></li>
+      <li><font color="#ffffff" face="Tahoma" size="2">512KBytes of
+          Flash Rom</font></li>
+      <li><font color="#ffffff" face="Tahoma" size="2">Two SD/MMC Slot
+          for Mass Memory Storage</font></li>
+      <li><font color="#ffffff" face="Tahoma" size="2">Kempston Joystick
+          Port</font></li>
+      <li><font color="#ffffff" face="Tahoma" size="2">Interface I
+          compatible (19200 baud) RS-232 port</font></li>
+      <li><font color="#ffffff" face="Tahoma" size="2">Interface I
+          compatible Network</font></li>
+      <li><font color="#ffffff" face="Tahoma" size="2">NMI and Reset
+          buttons</font></li>
+    </ul>
+    <br>
+    <p align="center"><br>
+    </p>
+    <p align="center"><img src="usb_eeepc.jpg" height="440" border="0"
+        width="656"></p>
+    <p align="center"><font color="#ffffff" face="Tahoma" size="2">EeePC
+        running the ZX-Com program (see the software section) connected
+        to a 48K ZX-Spectrum</font></p>
+    <p>&nbsp;</p>
+    <p><b><font color="#ffffff" face="Tahoma" size="2"> 28/06/2009 </font>
+        <font color="#ffffff" face="Tahoma" size="2">&nbsp; </font></b><font
+        color="#ffffff" face="Tahoma" size="2">New ResiDos 2.21
+        successfully tested. It solves issues about hook errors on
+        certain programs such as monitors/debuggers.</font></p>
+    <p><span style="background-color: rgb(51, 102, 153);"><b> <font
+            color="#ffffff" face="Tahoma" size="2">11</font></b></span><b><span
+          style="background-color: rgb(51, 102, 153);"><font
+            color="#ffffff" face="Tahoma" size="2">/01/2009 </font></span>
+        <font color="#ffffff" face="Tahoma" size="2">&nbsp; </font></b><font
+        color="#ffffff" face="Tahoma" size="2">NMI handling patch
+        modified for compatibility reasons</font><b><font
+          color="#ffffff" face="Tahoma" size="2"></font></b><font
+        color="#ffffff" face="Tahoma" size="2">: three bytes are no
+        longer changed in the NMI handler. See the software page.</font></p>
+    <p><b><font color="#ffffff" face="Tahoma" size="2">10/01/2009 </font></b><font
+        color="#ffffff" face="Tahoma" size="2">BootRom firmware V2.21e
+        released:</font><b><font color="#ffffff" face="Tahoma" size="2">
+        </font></b> <font color="#ffffff" face="Tahoma" size="2">real
+        execution FastPage register can now be edited by ZX-Com.
+        Snapshot may be set for NO-fastpage restore.</font></p>
+    <p><b><font color="#ffffff" face="Tahoma" size="2">29/08/2008 </font></b><font
+        color="#ffffff" face="Tahoma" size="2">An USB adaptor has been
+        developed by Pino Giaquinto. It allows USB communication between
+        a ZX-Spectrum and a Windows-based PC when a RS-232 port is not
+        available. The author obtained an unique ID from the USB chip
+        manufacturer for this device, so "ZXMMC+ COMx" will appear in
+        Windows Device Manager.</font></p>
+    <p align="center"></p>
+    <p><font color="#ffffff" face="Arial" size="2">The V1.1 pcb has been
+        assembled and tested.<b> </b><i>Changes from V1.0 are listed
+          here:</i></font></p>
+    <p><font color="#ffffff" face="Arial" size="2">- The Clock signal
+        amplifier/cleaner is now on-board<br>
+        - The Reset signal provided on Edge Connector goes through a
+        diode/resistor to prevent device latch-up<br>
+        - A pullup resistor has been added on the ROM chip select
+        signal.<br>
+        - Reset button moved closer to the top side, to avoid mechanical
+        problem with 48K+ and 128K machines<br>
+        - Reset circuitry modified for improved reliability on certain
+        Spectrum models</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">The clock amplifier
+        included on V1.1 still requires a little change: due to
+        different placement of the comparator, which is now on the
+        opposite side of pcb (while the patch pcb required by previous
+        version was glued directly on top of cpld chip), a fast
+        transistor with pullup should be added. Being a small change,
+        this can be done without any patch pcb. The picture on the left
+        shows the small 1/8W resistor and an additional sot23
+        transistor, below the cpld chip, on the lower right side of the
+        pcb.</font></p>
+    <p>&nbsp;</p>
+    <p align="center"><img src="foto1.jpg" height="384" border="0"
+        width="441">&nbsp;&nbsp;&nbsp; <img src="foto2.jpg"
+        height="384" border="0" width="407"></p>
+    <p align="center">&nbsp;</p>
+    <p align="center"><font color="#ffffff" face="Arial" size="2"><a
+          href="zxmmcp.avi"> <font color="#ffff00">This VIDEO</font></a>
+        (warning: 27MB) shows the ZXMMC+ (V1.0) under test with a few
+        ROMs and ResiDOS with an early bootrom release.</font></p>
+    <!-- Start Bravenet.com Service Code -->
+    <script language="JavaScript" type="text/javascript" src="http://pub20.bravenet.com/counter/code.php?id=398927&amp;usernum=1687177030&amp;cpv=2">
+</script><!-- END DO NOT MODIFY -->
+    <p align="left"><font color="#ffffff" face="Arial" size="2"></font></p>
+    <p align="center"><font color="#c0c0c0"><a href="technical.html"> <font
+            color="#ffffff">Technical Description</font></a></font><font
+        color="#ffffff">&nbsp;&nbsp;&nbsp; </font><font color="#c0c0c0">
+        <a href="hardware.html"><font color="#ffffff">Hardware Details</font></a>&nbsp;&nbsp;&nbsp;
+
+
+        <a href="software.html"><font color="#ffffff">Software</font></a></font><font
+        color="#ffff00"> </font><font color="#00ff00">&nbsp; </font><font
+        color="#00ff00"><font color="#c0c0c0"><a href="quickstart.html"><font
+              color="#ffffff">QuickStart</font></a></font><font
+          color="#ffff00"> </font><font color="#00ff00">&nbsp; </font></font><a
+        href="schematic.html"><font color="#ffffff">Schematic</font></a><font
+        color="#ffffff"> </font> <font color="#00ff00">&nbsp;&nbsp; </font><font
+        color="#c0c0c0"> <a href="pcb.html"><font color="#ffffff">PCB</font></a>&nbsp;&nbsp;&nbsp;
+
+
+      </font><font color="#00ff00"><a
+          href="mailto:alessandro@probosci.de"> <font
+            color="#ffffff">Contact the Author</font></a></font></p>
+    <p align="left">&nbsp;</p>
+  </body>
+</html>

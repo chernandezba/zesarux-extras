@@ -1,0 +1,35 @@
+ORIGINAL ROM content for both 16/48K ROM and 128K ROM 1:
+
+0066 f5        push    af
+0067 e5        push    hl
+0068 2ab05c    ld      hl,(5cb0h)
+006b 7c        ld      a,h
+006c b5        or      l
+006d 2001      jr      nz,0070h         ; (+01h)
+006f e9        jp      (hl)
+0070 e1        pop     hl
+0071 f1        pop     af
+0072 ed45      retn    
+
+
+NMI-HANDLER patch: this is performed by MKSINCLA.ASM for the 48K rom, but should be carried out manually
+for any other rom (such as the 128K ROM 1). 7 bytes are modified from original rom content:
+
+0066 f5        push    af		; same as original ROM
+0067 db7f      in      a,(7fh)
+0069 f5        push    af		; save FASTPAGE content onto stack
+006a 3edf      ld      a,0dfh		; RAM bank +1F (bootrom)
+006c d37f      out     (7fh),a		; last instruction fetched from this ROM: bank switch takes place
+
+Since the RETURN POINT needs no changes, a nonpatched ROM is capable of terminating a NMI procedure (for example, snapshot restore).
+
+
+
+OLD VERSION: these bytes are no longer changed for compatibility reason
+
+006e 00        nop     			; 2 never executed NOPs
+006f 00        nop
+0070 f1        pop     af		; never executed POP AF (but balance the second PUSH AF in case zxmmc+ is not present)
+0071 f1        pop     af		; RETURN POINT for handler termination, same as original: This rom is paged-in at this address.
+0072 ed45      retn    
+

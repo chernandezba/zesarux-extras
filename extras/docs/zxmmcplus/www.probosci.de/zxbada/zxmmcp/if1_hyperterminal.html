@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+
+
+
+
+<meta http-equiv="Content-Language" content="en-us">
+<meta name="GENERATOR" content="Microsoft FrontPage 6.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252"><title>ZXMMC+ Home</title></head><body bgcolor="#336699">
+
+<p align="center"><font color="#00ffff" face="Tahoma" size="5">ZXMMC+ </font>
+<font color="#00ff00" face="Tahoma" size="5">IF1-ROM Testing Page</font></p>
+<p align="left">&nbsp;</p>
+<p align="left"><u><font color="#ffffff">Testing RS-232 capabilities of ZXMMC+ 
+IF1 hardware with 
+Windows Hyperterminal:</font></u></p>
+
+<p align="left"><font color="#ffffff" face="Arial" size="2">This test shows that the ZXMMC+ 
+implementation of IF1 RS-232 port works just like on the original hardware. The 
+NETWORK works perfectly too, as a ZXMMC+ equipped ZX-Spectrum has been able to 
+transfer a SCREEN$ to another Spectrum with an original Interface I plugged in.</font></p>
+
+<p>&nbsp;</p>
+
+<p align="left"><font color="#ffffff" face="Arial" size="2">1) Create a new connection on the COM port 
+connected to the zxmmc+</font></p>
+<p align="left">
+<img src="https://www.probosci.de/zxbada/zxmmcp/software/creating_comm.gif" border="0" height="300" width="333"></p>
+<p align="left">&nbsp;</p>
+<p align="left"><font color="#ffffff" face="Arial" size="2">2) Select proper Speed and Flow Control 
+settings:</font></p>
+<p align="left">
+<img src="https://www.probosci.de/zxbada/zxmmcp/software/comm_parameters.gif" border="0" height="407" width="345"></p>
+<p align="left">&nbsp;</p>
+<p align="left"><font color="#ffffff" face="Arial" size="2">3) Type-in the software on your Spectrum: 
+this example will list itself on the hyperterminal window:</font></p>
+<p align="left">
+<img src="https://www.probosci.de/zxbada/zxmmcp/software/basic_listing.gif" border="0" height="579" width="864"></p>
+<p align="left"><font color="#ffffff" face="Arial" size="2">The OUT 127,100 activates the flash ROM 
+bank 4. Without this statement, the FORMAT and OPEN # commands would not work, 
+because they are added by the Interface I ROM. But how is it possible to switch 
+the active ROM by a basic command, without crashing the machine?</font></p>
+<p align="left"><font color="#ffffff" face="Arial" size="2">As explained in the 'Technical 
+Description' page, port $7F (127 decimal) is the ZXMMC+ Memory Paging Register. 
+It allows to select one 16K bank out of 32 from FLASHROM or 32 from RAM and to 
+page it in place of the internal Sinclair rom, at address 0 - $3FFF. Since 
+modified 48K roms are very similar, it is possible to switch between them <i>
+directly from basic</i> because the basic interpreter itself has not been 
+modified in any rom. Of course, switching to a bank that do not contain a 48K 
+Basic rom 
+will hang the machine. Why the parameter written to port 127 is '100'?</font></p>
+<p align="left"><font color="#ffffff" face="Arial" size="2">D6 SET = Page IN Enable<br>
+D5 SET = ROM is paged (instead of RAM)<br>
+D4-D0 = Bank number (the 48K modified rom 
+for IF1 purpose resides in ROM Bank 4)</font></p>
+<p align="left"><font color="#ffffff" face="Arial" size="2">D6 = (64 decimal) + D5 (32 decimal) + 4 
+(bank number) = 100.</font></p>
+<p align="left"><font color="#ffffff" face="Arial" size="2">An OUT 127,0 would disable zxmmc+ memory 
+paging and reactivate the internal Spectrum ROM.</font></p><br>
+<p><a href="index.html"><font color="#ffffff">Home</font></a><font color="#ffffff" face="Arial" size="2">&nbsp;&nbsp;&nbsp; </font>
+<font color="#c0c0c0"><a href="technical.html"><font color="#ffffff">Technical 
+Description</font></a></font><font color="#ffffff">&nbsp;&nbsp;&nbsp; </font>
+<font color="#c0c0c0"><a href="hardware.html"><font color="#ffffff">Hardware 
+Details</font></a>&nbsp;&nbsp;&nbsp; <a href="software.html"><font color="#ffffff">Software</font></a></font><font color="#ffff00">
+</font><font color="#00ff00">&nbsp;&nbsp; </font><a href="schematic.html">
+<font color="#ffffff">Schematic</font></a><font color="#ffffff"> </font>
+<font color="#00ff00">&nbsp;&nbsp; </font><font color="#c0c0c0"><a href="pcb.html">
+<font color="#ffffff">PCB</font></a>&nbsp;&nbsp;&nbsp; </font><font color="#00ff00">
+<a href="mailto:alessandro.poppi@tiscali.it"><font color="#ffffff">Contact the Author</font></a></font></p>
+
+</body></html>

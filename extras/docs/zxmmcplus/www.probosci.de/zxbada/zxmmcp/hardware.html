@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="Content-Language" content="en-us">
+    <meta name="generator" content="Bluefish 2.2.3" >
+    <meta name="ProgId" content="FrontPage.Editor.Document">
+    <meta http-equiv="Content-Type" content="text/html;
+      charset=windows-1252">
+    <title>ZXMMC+ Hardware</title>
+  </head>
+  <body style="background-color: rgb(51, 102, 153);">
+    <p align="center"><font color="#00ffff" face="Tahoma" size="5">ZXMMC+</font><i><font
+          color="#00ffff" face="Tahoma" size="5"> </font></i> <font
+        color="#00ff00" face="Tahoma" size="5">HardWare Page</font></p>
+    <p align="center">&nbsp;</p>
+    <p style="color: rgb(51, 204, 255);" align="left"><b><font
+          face="Tahoma" size="4">The CPLD:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2">The CPLD used in this
+        project is a 72 macrocell Xilinx <a
+          href="hardware/xc9572xl.pdf"><font color="#ffff00"> XC9572XL</font></a>
+        in VQ64 package and can (should) be programmed when already
+        soldered on the pcb. As the CPLD is powered at 3.3V, a suitable
+        voltage regulator is installed on the ZXMMC+ board.</p>
+        <p>The source code for the CPLD can be downloaded <a
+          href="hardware/9572_zxmmc2.zip"><font color="#ffff00"> HERE</font></a>.</font></p>
+    <p align="center"><img src="cpld.jpg" height="143" border="0"
+        width="156"></p>
+    <p align="center">&nbsp;</p>
+    <p style="color: rgb(51, 204, 255);" align="left"><b><font
+          face="Tahoma" size="4">The RAM chip:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2">The <a
+          href="hardware/CY62148E.pdf"><font color="#ffff00">512KB ram</font></a>
+        chip installed in the ZXMMC+ interface, which is the key feature
+        for ResiDOS compatibility, is ultra low-power: less than 10uA in
+        stand-by mode. This is particularly important for the battery
+        backup design. To prevent accidental data loss, the chip select
+        is forced HIGH (inactive) when the +5V power line falls below
+        4V, thanks to a "floating ground" circuit on a pulldown
+        resistor. This solution was borrowed from <a
+          href="http://user.tninet.se/%7Evjz762w/"><font color="#ffff00">Sami
+
+            Vehmaa's ZXCF</font></a> project.</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">After ResiDOS and all
+        the desired <i>packages </i>are installed into the RAM chip,
+        they will be always available even after a power loss, as the
+        memory keeps it's content thanks to a 3V "2330" (larger) or
+        "2032" (smaller) button cell battery.</font></p>
+    <p>&nbsp;</p>
+    <p style="color: rgb(51, 204, 255);" align="left"><b><font
+          face="Tahoma" size="4">The FLASH ROM chip:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2">The on-board FLASH
+        chip can be programmed with user firmware / data. An example
+        routine for erasing/programming/comparing the FLASH memory
+        content can be found in the software section, where a simple
+        boot loader is also available which let the user jump into a
+        particular ROM bank or into ResiDOS, provided that it was
+        previously installed into nonvolatile RAM. When this bootloader
+        is used, dip-switch should be set so that ROM is paged-in at
+        power on. The bootloader must be programmed into ROM BANK 0. The
+        first row of keys (10) will jump into one of the first 10 ROM
+        banks (programmed into banks 1-11 as bank 0 is used by the
+        bootloader itself), which may contain different custom ROMs. The
+        second row of keys will select the first 10 RAM banks (ResiDOS
+        startup bank is n. 0, so the first key will start ResiDOS). The
+        last key (lower right, [SPACE]) will disable the memory paging
+        and jump into the internal ZX-Spectrum ROM.</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">The FLASH ROM chip
+        provides an excellent protection against accidental memory
+        content overwrite by erratic program execution, as the FLASH
+        PROGRAM mechanism can only be activated by a complex WR sequence
+        (see the <a href="hardware/M29F040B.pdf"> <font
+            color="#ffff00">FLASH chip DataSheet</font></a>).</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">As an additional
+        protection, the CPLD will NOT enable the FLASH chip on WR cycles
+        by default. In order to enable WR cycles on the FLASH chip, the
+        software should first write an "unlock code" to the CPLD I/O
+        port $1F. This is simply a byte with 'A' on the MSB nibble,
+        while the LSB nibble is NOT AFFECTED (bits D3, D1 and D0 are
+        used for other purposes, who are described later). Writing any
+        other value to MSB nibble will deactivate WR cycles to the FLASH
+        chip and WILL AFFECT ALL BITS in the register.</font></p>
+    <p align="left">&nbsp;</p>
+    <p style="color: rgb(51, 204, 255);" align="left"><b><font
+          face="Tahoma" size="4">The SPI Port:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2">Data transfer to/from
+        SD/MMC cards is handled in HARDWARE, by a SPI port which is
+        built into the CPLD. A full byte can be read or written in just
+        16 Z80 T-states. This diagram shows the execution of two OUTI
+        instructions (16T-states each) to SPI address ($3F); the first
+        with data = $55 and the second with $0F. It can be noted how
+        data flow is continuous between the two bytes, as the processor
+        time for OUTI execution matches the 16T-states byte-cycle of the
+        CPLD. To achieve this speed, the first SPI clock cycle begins
+        while the processor is still in the middle of the WR cycle. The
+        rising edge of the <i>capture</i> signal marks the databus
+        sample by the CPLD, which happens on the falling edge of Z80 T3.
+        The card acknowledges a new bit on the rising edge of it's
+        clock. For this reason, the CPLD toggles the data output on the
+        falling edge of Z80 clock (which, on PCB V1.1, equals to the
+        rising edge of CPLD Clock).</font></p>
+    <p><font color="#ffffff" face="Arial" size="2">The current version
+        of cpld logic keeps the SPI CLOCK IDLE LOW, making the interface
+        compatible with the ENC28J60 Ethernet controller by Microchip.
+        An ethernet module may be designed and installed in place of the
+        second SD-CARD slot.</font></p>
+    <p>&nbsp;</p>
+    <p align="center"> <img src="hardware/SPI_2byte_32T.gif"
+        height="538" border="0" width="780"></p>
+    <p>&nbsp;</p>
+    <p style="color: rgb(51, 204, 255);" align="left"><b><font
+          face="Tahoma" size="4">Serial Port Hardware:</font></b></p>
+    <p align="left"><font color="#ffffff" face="Arial" size="2">The
+        4-wires serial port electrical levels are guaranteed by a CD3232
+        I.C. which is very similar to the popular MAX232.</font></p>
+    <p align="left">&nbsp;</p>
+    <p style="color: rgb(51, 204, 255);" align="left"><b><font
+          face="Tahoma" size="4">IF 1 Network Synchronization:</font></b></p>
+    <p><font color="#ffffff" face="Arial" size="2">As on the original
+        INTERFACE 1 hardware, writing a logic '0' to D5 of port $EF will
+        put the processor in WAIT STATE as long as the NET line is
+        active (+5V). This is used by network software to synchronize
+        communication. Performing this operation when the NET is
+        activated <i>by us</i>, will lead to an ENDLESS WAIT state.</font></p>
+    <p align="center">&nbsp;</p>
+    <p align="center"><font color="#ffffff" face="Arial" size="2">DIAGRAM
+1:
+
+        On the original IF1, WAIT is asserted immediately after IORQ and
+        WR goes LOW, so it halts the I/O write operation to port $EF
+        itself:</font></p>
+    <p align="center"> <img src="hardware/WAITassert.gif" height="536"
+        border="0" width="770"></p>
+    <p>&nbsp;</p>
+    <p align="center"><font color="#ffffff" face="Arial" size="2">DIAGRAM
+2:
+
+        On the original IF1, when the NET line goes inactive, the WAIT
+        signal is deasserted within 4 or 5 T-states:</font></p>
+    <p align="center"> <img src="hardware/WAITdeassert_1.gif"
+        height="527" border="0" width="772"></p>
+    <p>&nbsp;</p>
+    <p align="center"><font color="#ffffff" face="Arial" size="2">DIAGRAM
+3:
+
+        ZXMMC+: WAIT is asserted on the Clock's Falling Edge that
+        follows IORQ+WR assertion:</font></p>
+    <p align="center"> <img src="hardware/zxmmcp_waitassert.gif"
+        height="533" border="0" width="773"></p>
+    <p align="center">&nbsp;</p>
+    <p align="center"><font color="#ffffff" face="Arial" size="2">DIAGRAM
+4:
+
+        ZXMMC+: WAIT is deasserted after FOUR Clock's Falling Edges,
+        starting since NET becomes inactive:</font></p>
+    <p align="center"> <img src="hardware/zxmmcp_waitdeassert.gif"
+        height="539" border="0" width="775"></p>
+    <p align="center"> &nbsp;</p>
+    <p align="center"><font color="#ffffff"><a href="index.html"> <font
+            color="#ffffff">Home</font></a>&nbsp;&nbsp;&nbsp; </font> <font
+        color="#c0c0c0"><a href="technical.html"><font color="#ffffff">Technical
+
+            Description</font></a></font><font color="#ffffff">&nbsp;&nbsp;&nbsp;&nbsp;</font><font
+        color="#c0c0c0"><a href="software.html"><font color="#ffffff">Software</font></a></font><font
+        color="#ffff00"> </font><font color="#00ff00">&nbsp;&nbsp; </font><font
+        color="#c0c0c0"><a href="quickstart.html"><font color="#ffffff">QuickStart</font></a></font><font
+        color="#ffff00"> </font><font color="#00ff00">&nbsp;&nbsp; </font><font
+        color="#00ff00"></font><a href="schematic.html"> <font
+          color="#ffffff">Schematic</font></a><font color="#ffffff"> </font>
+      <font color="#00ff00">&nbsp;&nbsp; </font><font color="#c0c0c0"><a
+          href="pcb.html"> <font color="#ffffff">PCB</font></a>&nbsp;&nbsp;&nbsp;
+      </font><font color="#00ff00"> <a
+          href="mailto:alessandro.poppi@tiscali.it"><font
+            color="#ffffff">Contact the Author</font></a></font></p>
+  </body>
+</html>
