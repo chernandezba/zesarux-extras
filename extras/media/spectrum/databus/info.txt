@@ -1,0 +1,3 @@
+This utility "whichvector" can be used with ZEsarUX settings:
+- Settings-> Hardware-> ULA-> ULA Databus value
+- Settings-> Hardware-> Cheap Joystick
