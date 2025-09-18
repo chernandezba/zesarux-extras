@@ -32,6 +32,7 @@ Zaxxon (ZAXXON.TAP)
 Arkanoid
 Cobra
 Short Circuit 1,2
+Terra Cresta
 
 
 * Games which writes to ROM
@@ -42,6 +43,7 @@ Ping Pong -> but does not affect to sound this
 * Games with strange sound due to out XXFEH 
 Hysteria
 Ping Pong
+Mikie
 
 
 * Games with no sound or 1-channel sound (on 2-channel) due to bit 3&4 to out 254
@@ -49,6 +51,7 @@ The way of the exploding fist (no sound)
 ATV (1 channel)
 Batman (the caped crusader) (menu) (no music at all)
 Ghostbusters: no "ghostbusters" voice
+Hyper Active (menu) (1 channel). Rest of game: no sound
 Lemmings (menu) (1 channel)
 Manic Miner (no sound on menu)
 Renegade: no sound on game (kicks, jumps, etc) but music does work
