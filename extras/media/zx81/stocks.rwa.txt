@@ -1,0 +1,5 @@
+This is the real dump of the tape, it has some noise and to be able to load it as real tape set tape settings:
+- alternative algorithm: no
+- invert signal: no
+- volume bit 1 range: +4
+- level offset: 0
