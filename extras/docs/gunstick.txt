@@ -1,6 +1,6 @@
 -Juegos funcionando
 
-Gunstick MHT:
+* Gunstick MHT:
 
 Solo - opera soft. va. Requiere dejar pulsado el boton un tiempo largo
 Target Plus.  va. Requiere dejar pulsado el boton un tiempo largo
@@ -17,12 +17,11 @@ shooting range: no parece ser version de gunstick
 saygmix2: no es juego
 vgmix2: no es juego
 
-Phaser Light Gun: Leido por puerto de chip AY
-Rookie: en el juego funciona bastante bien, teniendo rango X 64 y rango Y 8
-JUNGLE WARFARE. en el juego funciona bastante bien, teniendo rango X 64 y rango Y 8. Debe detectar solo brillo 1
-QS Armoury. mas o menos, teniendo rango X 32y rango Y 8, offset y 24, y hay que disparar mas hacia la derecha
-Billy the kid. No parece detectar bien la y, solo va con brillo 0
-Parece que todos estos detecta la Y casi, pero luego la X no bien:
+* Magnum Light Phaser
+Rookie
+JUNGLE WARFARE
+QS Armoury
+Billy the kid
 Operation wolf
 Missile Ground Zero
 Solar Invasion
