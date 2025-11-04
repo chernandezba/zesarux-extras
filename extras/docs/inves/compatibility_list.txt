@@ -82,5 +82,7 @@ Aquaplane
 Paperboy
 Super wonder boy (on Pause)
 
-
+* Other effects in games
+Bubble Bobble (Bubble Bobble (Musical 1).tzx) : strange bubble sprites, also these bubbles doesn't dissapear well from the screen.
+It also happens on ZX Spectrum+ 48k (Spanish)
 
