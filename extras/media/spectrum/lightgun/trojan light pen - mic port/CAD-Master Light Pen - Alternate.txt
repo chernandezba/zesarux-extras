@@ -1,0 +1,2 @@
+Use key 1 to trigger actions
+Use key 2 to return to menu
