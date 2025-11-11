@@ -1,2 +1,2 @@
-Use key 1 to trigger actions
+Use key 1 to trigger actions. You must wait until the white square reaches the light pen (mouse) position
 Use key 2 to return to menu
