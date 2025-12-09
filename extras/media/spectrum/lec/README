@@ -23,7 +23,7 @@ Opcionalmente:
 Este sample_cpm_filesystem.rmd es una imagen en crudo de microdrive, formateada desde este cp/m.
 
 Incluye dos archivos de ejemplo:
--PW.COM: El mismo que se encuentra en la unidad a: al iniciar cp/m
+-PW.COM: El mismo que se encuentra en la unidad a: al iniciar cp/m (es un programa con utilidades de disco)
 -HUNT.COM: Juego de cp/m de tipo aventura
 
 ---
