@@ -1,0 +1,8 @@
+ The instructions for the 8K ROM version of the game describes a number of pokes that can be made to adjust the television picture. The pokes described are as follows:
+
+    17044 - Horizontal adjustment. Standard value is 27.
+    If the display bends to the left then the value should be increased. If the display bends to the right then the value should be decreased. It adjusts the timing of the first line of the top border. This poke is applied via BASIC line 20, which should always have the value specified using 3 digits.
+    17059 - Height of the display. Standard value is 24.
+    The value should be adjusted in multiples of 8 else the characters displayed will appear rotated. Reduce the value to move the display up (8 or 16), and increase the value to move it down (32, 40, etc). It changes the number of border lines above the game display area.
+    17068 - Vertical hold adjustment. Standard value is 24.
+    This value should be adjusted if the picture rolls vertically. This changes the number of border lines below the game display are
