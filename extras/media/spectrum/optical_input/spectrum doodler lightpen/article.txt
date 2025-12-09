@@ -1,0 +1,20 @@
+Like many of the products on show at the launch of the 128, the Doodler lightpen has only recently become fully available, and a first look at it seemed to indicate that, like many of those other products, this was just a 48K version hurriedly knocked together to be 128-compatible, but with no extra features to take advantage of the 128's extra memory.
+
+The pen is connected to an interface which plugs into the rear port of the machine, but unlike the 48K version this interface now has an RGB lead rather flimsily connected to it which plugs into the 128's RGB socket. This must be plugged in, regardless of whether you are using a monitor or an ordinary TV, which means that the lightpen can only be used with the 128 (as the 48K machine doesn't have an RGB socket). That would seem to indicate that this is a peripheral intended purely for use with the 128. But the graphics software that comes with the pen will only run when the 128 is in 48K mode, which rather gives the game away.
+
+Still, despite this I found that I did enjoy using the lightpen and that for certain purposes the pen was a more efficient tool than either a mouse or a joystick.
+Spectrum Doodler Lightpen
+
+The Doodler software is an icon-driven graphics package which allows you to use its facilities simply by pressing the lightpen onto the screen by the appropriate icon. Most of the time, this then activates a pull-down menu which appears over the drawing area and allows you to select whatever option you choose. All the standard features are there; fill and brush, line, box, and circle drawing routines which are fast though there is no 'elastic' option which allows you to change the size of the shape before fixing it on the screen - if the shape you draw is slightly the wrong size you'll just have to erase it and draw another one.
+
+Unfortunately the software, though quite sophisticated, isn't up to the standard of state of the art programs like The Artist or Art Studio - a number of important refinements such as a cut and paste option, and the ability to dra onto the area of screen occupied by the icons are missing. I also found the menu system a little cumbersome to use since the menus aren't self contained and changes that are made to one menu can often require you to make changes to another before you can get the effect that you want. That's a shame really, because though I found the software a little disappointing I enjoyed using the pen itself.
+
+For freehand drawing, I found that it allowed me to get better results than using a mouse or joystick because the pen really is in physical contact with the drawing surface (of the TV screen) and this allows finer control than any other method where the control instrument is at a distance from the surface of the screen.
+
+The pen is quite sturdily constructed (the manual states that it was constructed to be able to survive use in classrooms) as is the interface, and only the apparently hasty addition of the RGB lead spoils the look of the unit.
+
+The manual does give a few tips about how to write your own software for use with the lightpen, but that's a task that will be beyond most of us. If it were possible to patch together a routine allowing you to use the pen with The Art Studio (and I'm sure that it is, after all Kempston tell you how to adapt Art Studio for use with their mouse) then the combination of the two would work very well, and it would cost less than half the price of any of the mouse units on the market at the moment. As it stands, the lightpen hardware is very good but is let down a bit by its software.
+
+This article was converted to a web page from the following page of ZX Computing #25 (https://www.everygamegoing.com/litem/ZX-Computing-025/101501/)
+
+Original info from https://www.everygamegoing.com/larticle/Spectrum-Doodler-000/35201
