@@ -1,0 +1,32 @@
+Sample program from p17 of SP ROM Manual, to use with the standard ZX81 ROM + SP ROM
+Info from: https://derekbolli.wordpress.com/2015/06/05/sp-rom-basic-test-program-run-in-zesarux-emulator-in-os-x/
+
+
+
+First you need to:
+
+- Enable real video
+- Enable WRX
+- Enable RAM extensions to 2000H, 8000H, C000H
+- Load sp rom included in ZEsarUX (alternate_roms/sp-rom.rom) on 2000H
+- Disable autoload
+- Storage-> Tape-> Standard Tape-> Input: select sp-rom-test-manual-basic.p
+
+POKE 16389,102
+NEW
+
+LOAD ""
+
+RAND USR 8195
+
+You should see the Comprocsys copyright Banner appear
+Press Enter
+You should see the BASIC listing appear with the Extended BASIC commands
+
+Then RUN
+
+You should see the HiRes display ("diagonal lines" example)
+
+
+
+

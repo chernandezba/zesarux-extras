@@ -1,0 +1,14 @@
+Sample program to use with the ASZMIC ROM + SP ROM
+
+First you need to:
+
+- Start ZX81 with custom rom alternate_roms/aszmice07.rom
+- Enable real video
+- Enable WRX
+- Enable RAM extensions to 2000H, 8000H, C000H
+- Load sp rom included in ZEsarUX (alternate_roms/sp-rom.rom) on 2000H
+- Debug-> Reset
+- Load demo program zx-aszmic-sp-rom-hires-graphics-test.bin as a binary file to 4000H
+- Run demo with command:
+H :4200
+
