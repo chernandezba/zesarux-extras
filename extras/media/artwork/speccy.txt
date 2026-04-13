@@ -1,1 +1,2 @@
-Cabinet image for use with the Load BMP effect on a ZX Spectrum. Set tranparent color to 58 (3a hexadecimal)
+speccy.bmp Cabinet image for use with the Load BMP effect on a ZX Spectrum. Set tranparent color to 58 (3a hexadecimal)
+speccy_ZEsarUX.png: how the speccy is seen applying that bmp
