@@ -1,1 +1,2 @@
-Cabinet image for use with the Load BMP effect on a ZX Spectrum. Set tranparent color to -1 (no transparent color usage) and define a transparent rectangle section of: X=48, Y=56, width=256, height=192
+paperboy.bmp: Cabinet image for use with the Load BMP effect on a ZX Spectrum. Set tranparent color to -1 (no transparent color usage) and define a transparent rectangle section of: X=48, Y=56, width=256, height=192
+paperboy_ZEsarUX.png: how the game is seen applying that bmp

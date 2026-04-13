@@ -1,1 +1,2 @@
-Cabinet image for use with the Load BMP effect on a ZX Spectrum. Set tranparent color to 24 (18 hexadecimal)
+bubble.bmp: Cabinet image for use with the Load BMP effect on a ZX Spectrum. Set tranparent color to 24 (18 hexadecimal)
+bubble_ZEsarUX.png: how the game is seen applying that bmp
