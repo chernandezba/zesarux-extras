@@ -1,0 +1,521 @@
+RETURN TO HOLY TOWER (Gayumbos Mission) - V.R.3 Release (WIP)
+
+
+----------------------------------------------------------------------------------------------------
+Para ZX-Uno / ZX Spectrum compatible Modo Radastaniano - ZX-Prism
+----------------------------------------------------------------------------------------------------
+Código y Gráficos: Hark0 (11/08/2017)
+       Release 02: Hark0 (14/10/2017)
+	   Revisando9: Hark0 (Nov-Dic /2017)
+
+	   Release Final R3: Hark0 (10/03/2019)
+
+
+       Hark0 - thehark0@gmail.com - Jordi Bayó
+       http://www.zxuno.com/ht2
+
+
+----------------------------------------------------------------------------------------------------
+CONTENIDOS DE ESTE FICHERO:
+
+- INFORMACIÓN PREVIA
+- INSTALACIÓN
+- GAMEPLAY
+- MODOS DE JUEGO
+- CARGA DEL JUEGO
+- CONTROLES
+- OPCIONES DEL JUEGO
+- EL EDITOR DE NIVELES
+- FORMATO DE FICHERO NIVEL
+- FORMATO DE FICHERO CONFIG.BIN
+- ESTRUCTURA DE FICHEROS
+- MODIFICAR / COMPARTIR LOS FICHEROS DE LA AVENTURA
+- CRÉDITOS
+- AGRADECIMIENTOS
+
+
+----------------------------------------------------------------------------------------------------
+INFORMACIÓN PREVIA:
+
+. Este juego está diseñado para el ordenador ZX-Uno ó compatible con el modo gráfico Radastaniano.
+. Comprueba en la Bios que el módo gráfico Radastaniano está activado.
+  (Entra en la Bios del ZX-Uno y verifica que New G.Modes está ENABLED).
+. El juego está programado para un ZX-Spectrum 48 Kb, compatible con el modelo 128 Kb.
+. Se utiliza la tarjeta SD para leer y escribir datos, no la extraigas mientras juegas. 
+. Se recomienda utilizar una tarjeta SD vacía y recién formateada.
+. Si la carga es lenta o presenta pausas (led fijo), formatea la tarjeta SD y reinstala de nuevo.
+. Compatible con ZX-Prism (http://zxprism.blogspot.com).
+. Puedes utilizar uno de los emuladores que soportan el ZX-Uno empleando las imágenes SD que se
+  adjuntan en el paquete.
+
+* Esta versión incluye una copia de ESXDOS, con permiso de distribución de Miguel Guerreiro.
+
+
+
+----------------------------------------------------------------------------------------------------
+INSTALACIÓN:
+
+* SI YA TIENES UNA TARJETA CON ESXDOS:
+
+. Copia la carpeta /HOLYTOW2 a tu tarjeta SD.
+
+
+* SI TIENES UNA TARJETA NUEVA:
+
+. Formatea la tarjeta SD.
+
+. Descarga e instala la última versión de ESXDOS (http://www.esxdos.org).
+
+. Descomprime el fichero y copia la carpeta /HOLYTOW2 a la tarjeta SD.
+
+. Comprueba que la estructura de carpetas en la tarjeta SD tiene las siguientes
+  carpetas:
+
+    /bin 		(FICHEROS ESXDOS)
+    /sys 		(FICHEROS ESXDOS)
+    /tmp 		(FICHEROS ESXDOS)
+    /HOLYTOW2 	(Return to Holy Tower)
+
+
+
+----------------------------------------------------------------------------------------------------
+GAMEPLAY:
+
+. Return to Holy Tower presenta la historia de un demonio que debe ir recorriendo niveles
+  a través de una torre en busca de su objeto más preciado: los gayumbos. En su aventura deberá
+  evitar trampas, abrir puertas y recoger objetos mientras lucha contra el reloj. El premio final
+  aparece tras superar el último nivel.
+
+. El movimiento del personaje principal es en las cuatro direcciones; por cada paso que se
+  realiza, se descuenta una unidad de tiempo, cada diez pasos la vida disminuye en una unidad.
+  Si te quedas sin tiempo o vida, el juego finaliza. El juego NO tiene autoguardado, así que se
+  deben repetir todos los niveles desde el principio.
+
+. Cada nivel incluye una cantidad de monedas que hay que recoger para que se abra el camino 
+  de salida. En el caso de quedarte atrapado, puedes usar la tecla R (Reiniciar nivel), a costa
+  de perder veinte unidades de vida.
+
+. Los niveles incluyen puertas de diferentes colores, teletransporadores y otros objetos que
+  te ayudarán en la aventura.
+
+
+
+----------------------------------------------------------------------------------------------------
+MODOS DE JUEGO:
+
+. Aventura: Niveles diseñados por Hark0. 47 en esta versión.
+. Metsuke: Niveles diseñados por Metsuke. 72 en esta versión.
+. Editor: Niveles diseñados por el editor que incluye con 84 "espacios" disponibles.
+
+
+
+----------------------------------------------------------------------------------------------------
+CARGA DEL JUEGO:
+
+. Return to Holy Tower utiliza la tarjeta SD para leer y escribir algunos datos. Es necesario
+  que ESXDOS esté copiado en la misma tarjeta SD.
+
+
+. Para iniciar el juego (ESXDOS-NMI):
+  - Reinicia el ZX-Uno con la tarjeta SD introducida.
+  - Una vez el ordenador ya iniciado, realiza una NMI para poder acceder a la pantalla de ESXDOS.
+  - Accede a la carpeta /HOLYTOW2 y selecciona el fichero HT2-ZX1.TAP.
+
+
+. Para iniciar el juego (Usando comandos ESXDOS):
+  - Reinicia el ZX-Uno con la tarjeta SD introducida.
+  - Una vez el ordenador ya iniciado, teclea: ".ls" (sin las comillas). Nos debe presentar
+    un listado similar a este:
+
+    BIN              <DIR> 14.09.2016
+    SYS              <DIR> 14.09.2016
+    TMP              <DIR> 14.09.2016
+    HOLYTOW2         <DIR> 11.08.2017
+	...
+  
+  - Teclea ".cd holytow2" (sin las comillas) para acceder a la carpeta del juego.
+  - Teclea el comando ".tapein HT2-ZX1.tap" (sin las comillas) para "introducir el cassette".
+  - Inicia con LOAD ""
+
+
+* Si realizas una NMI con el juego en marcha, se mostrará la pantalla de ESXDOS, pero debido a la
+  configuración de vídeo en Modo Radastaniano, no podrás leer los textos. Pulsa Escape para volver
+  a la pantalla del juego.
+
+* Si tienes problemas con la configuración, elimina el fichero .../gamedata/config.bin
+
+
+----------------------------------------------------------------------------------------------------
+CONTROLES:
+
+. Generales:
+  - Q, A, O, P, Espacio y Escape.
+  - O, P, Q, A, Espacio y Escape.
+  - Joystick Kempston.
+
+. Durante el juego:
+  - R : Reiniciar nivel. Vida-20.
+  - Escape : Salir del juego.
+
+. Editor, pantalla selección de nivel a editar:
+  - C : Borra el nivel seleccionado.
+  - T : Borra TODOS los niveles del editor.
+  * NO pregunta confirmación a la hora de borrar nada.
+
+. Editor, pantalla mapa:
+  - Espacio : Coloca el item seleccionado
+  - Escape : Finaliza el editor SIN guardar el nivel.
+  - I : Abre pantalla selector items.
+  - C : Borra el contenido del nivel dejando los items minimos.
+  - T : Guarda / Sobreescribe el nivel y finaliza el editor.
+
+ . Editor, pantalla selección de item:
+  - Espacio : Selecciona item y cierra la pantalla.
+
+  
+* El juego utiliza en casi todas las pantallas la tecla Espacio (disparo) para aceptar y la
+  tecla Escape para volver a la pantalla anterior.
+
+* Se cancela el juego con Escape. (NO pregunta confirmación NI guarda el progreso de la aventura).
+
+* Si tienes problemas con la configuración, elimina el fichero .../gamedata/config.bin
+
+
+
+----------------------------------------------------------------------------------------------------
+OPCIONES DEL JUEGO:
+
+. Dentro del menú opciones podemos encontrar los siguientes apartados:
+  - Controles : Accede a la pantalla de los diferentes modos de control.
+
+  	* Si tienes problemas con la configuración, pulsa R en esta pantalla para reinicar los valores por defecto.
+
+  - Sonido : SI / NO. 
+    (El juego está escrito sin usar interrupcions de audio, por lo que al activar los efectos
+    de sonido presentará breves "pausas" al reproducirlos).
+
+  - Ajuste TV : Muestra una carta de colores para poder ajustar el color / brillo / contraste.
+
+
+
+----------------------------------------------------------------------------------------------------
+EL EDITOR DE NIVELES:
+
+. Return to Holy Tower incorpora un sencillo editor de niveles, aunque éstos se pueden escribir
+  también con un editor hexadecimal.
+
+. Están disponibles 84 espacios para alojar niveles en el editor. Si un espacio está vacío se crea
+  un nuevo fichero con el número seleccionado como nombre, en caso contrario se carga.
+
+. Desde la pantalla de selección se pueden BORRAR uno o TODOS los niveles. CUIDADO! El juego NO
+  pregunta confirmación para NINGUNA acción.
+
+. EDITOR: Línea de información inferior:
+
+  MAPA:00 PS: [grf1] 000 SL: [grf2] 000 [grf3] 00
+        .        .     .        .     .         .
+        .        .     .        .     .         .... Número de items animados (0-64)
+        .        .     .        .     . 
+        .        .     .        .     .............. Código del item seleccionado a colocar
+        .        .     .        .
+        .        .     .        .................... Gráfico del item seleccionado a colocar
+        .        .     .   
+        .        .     ............................. Código del item del cursor
+        .        .
+        .        ................................... Gráfico del item del cursor
+        .
+        ............................................ Número de nivel actual (1-84)
+
+
+. EDITOR: Pantalla de selección de item:
+
+  - Pulsando la tecla I se accede a la pantalla de selecctor de item, donde están los items
+    necesarios para formar un nivel. Hay algunos que son BASICOS para el correcto funcionamiento y
+    sin éstos el comportamiento del juego puede ser inesperado, llegando a provocar el cuelgue del ordenador.
+
+  - Se muestra información del item; código y tipo, así como la cantidad de items animados disponibles.
+
+  - Con la tecla Espacio se selecciona el item y se cierra la pantalla automáticamente.
+
+  - Los items de tipo NULL no se pueden añadir a los niveles, ya que están reservados para futuras
+    implementaciones.
+
+
+. EDITOR: Items básicos para crear un nivel:
+
+  - Requerimientos mínimos que precisa un nivel:
+    . Heroe  : Código 222. Solo 1.
+    . Final  : Código 150. Solo 1.
+    . Salida : Códigos 042-044. Minimo 1.
+    . Moneda : Código 054. Mínimo 1.
+    . Techo  : Códigos 000-009. Mínimo 1.
+    . Muro   : Códigos 010-019. Mínimo 1.
+    . Suelo  : Códigos 023-032. Mínimo 1.
+
+  - Item FINAL:
+    . Este item se representa en el juego como un bloque no pasable, y es eliminado cuando el jugador
+      recoge todas las monedas del mapa. Hay que tener en cuenta que NO se puede colocar en la primera
+      línea de pantalla, ya que se saldría del mapa. La posición del item delimita la base del bloque.
+    
+    . Solo hay que colocar UNO de este tipo y no es necesario que tape un item de "salida".
+
+  - Items Animados:
+    . Se pueden colocar hasta 64 items con gráficos animados. Se indica la cantidad que se está usando
+      en la pantalla del editor y en la de selección de item. 
+
+    . Listado de tiles animados:
+       - Moneda
+       - Llaves
+       - Reloj
+       - Teletransportadores
+       - Imán
+
+
+. EDITOR: Items y comportamiento:
+  
+  - Listado de los items disponibles y funcionamiento:
+    . Códigos 000-009 - Techo. No pasable. Fijo.
+    . Códigos 010-019 - Muro. No pasable. Fijo.
+    . Códigos 023-032 - Suelo. Pasable. Fijo.
+    . Códigos 033-041 - Puertas. Necesitan colocarse con los dos items como se muestra:
+
+        Horizontales:    Verticales:   
+         033 035 037     020 021 022
+         034 036 038     039 040 041
+
+    . Códigos 042-044 - Salidas. Fin de Nivel.
+    . Código      045 - Hielo. Resbala en la dirección en que se pisa.
+    . Códigos 046-049 - Obligatorio. Empuja en la dirección indicada.
+    . Código      050 - Muro que se levanta tras pisarlo. NO se puede colocar en la primera línea.
+    . Código      051 - Pincho. Vida-10.
+    . Código      052 - Pócima. +Vida.
+    . Código      053 - Lata de Monster. Velocidad X2. Temporal, controles invertidos.
+    . Código      054 - Moneda. Minimo 1.
+    . Códigos 055-057 - Llaves.
+    . Código      058 - Roloj. +Tiempo.
+    . Código  059-060 - Teletransportadores. Hay que colocar ambos. Bidireccional. Cuidado con ponerlo
+                        en los bordes de la pantalla.
+    . Código      061 - Imán. "Roba" una llave aleatoriamente.
+    . Código      150 - Final. No pasable. Se elimina al recoger todas las monedas.
+    . Código      222 - Heroe. Posición de partida. Mínimo 1.
+    
+
+
+----------------------------------------------------------------------------------------------------
+FORMATO DE FICHERO NIVEL:
+
+. Tamaño del fichero : 176 bytes
+
+  // 16 x 11 tiles (Hex).
+  unsigned char mapa_mundo[176] = {
+     17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,
+     17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,
+     17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,
+     00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,
+     00,0A,0A,0A,0A,0A,15,0A,0A 00,0A,00,0A,0A,2C,00,
+     00,DE,17,32,17,17,28,17,17,16,3B,00,3C,36,96,00,
+     00,17,36,00,17,38,00,39,3D,29,17,00,17,17,17,00,
+     00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,
+     0A,0A,0A,0A,0A 0A 0A 0A,0A 0A 0A 0A 0A 0A 0A 0A,
+     17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,
+     17,17,17,17,17,17,17,17,17,17,17,17,17,17,17,17
+  };
+
+
+
+----------------------------------------------------------------------------------------------------
+FORMATO DE FICHERO CONFIG.BIN:
+
+. Tamaño del fichero : 2 bytes
+  - Offset 0 : 00 - Sonido SI/NO (0/1)   
+  - Offset 1 : 00 - Tipo de Control (0-3) - QAOP - OPQA - KEMSPTON
+
+
+
+----------------------------------------------------------------------------------------------------
+ESTRUCTURA DE FICHEROS:
+
+TARJETA SD - Carpeta HOLYTOW2:
+
+	HT2-ZX1.tap ------------> Juego Return to Holy Tower 
+    
+	/DOCS 
+ 	  manual_r3.txt --------> Este fichero
+    
+    /GAMEDATA --------------> Carpeta datos del juego
+
+      config.bin -----------> Fichero configuración del juego (* Se puede eliminar si hay problemas de configuración).
+
+      endings.tap ----------> Cinta "bonus" que se carga al finalizar el juego.
+
+      /ENDING --------------> Carpeta con ficheros necesarios para endings.tap
+        .
+        h1.scr -------------> Pantalla 1/4 final Hark0
+        h2.scr -------------> Pantalla 2/4 final Hark0
+        h3.scr -------------> Pantalla 3/4 final Hark0
+        h4.scr -------------> Pantalla 4/4 final Hark0
+        m1.scr -------------> Pantalla 1/4 final Metsuke
+        m2.scr -------------> Pantalla 2/4 final Metsuke
+        m3.scr -------------> Pantalla 3/4 final Metsuke
+        m4.scr -------------> Pantalla 4/4 final Metsuke
+        winner.scr ---------> Pantalla "troll"
+
+      /FX ------------------> Carpeta efectos de sonido
+        .
+        beepfx-s.bin -------> Paquete de audio BeepFX
+
+      /MAPA ----------------> Carpeta niveles
+        .
+        /AVE ---------------> Niveles Aventura
+          .
+          00000000 ---------> Fichero nivel número 1 (Niveles Hark0)
+          00000001 ---------> Fichero nivel número 2
+          00000002
+          (etc)
+
+        /EDT ---------------> Niveles Editor
+          .
+          00000000 ---------> Fichero nivel número 1 (Niveles Editor)
+          00000001 ---------> Fichero nivel número 2
+          00000002
+          (etc)
+
+        /MSK ---------------> Niveles Metsuke
+          .
+          00000000 ---------> Fichero nivel número 1 (Niveles Metsuke)
+          00000001 ---------> Fichero nivel número 2
+          00000002
+          (etc)
+
+      /SCR -----------------> Gráficos en formato Radastaniano
+        .
+        1.bin --------------> Pantalla completa 128x96px. 12.288 bytes. Menu principal.
+        3.bin --------------> Pantalla completa 128x96px. 12.288 bytes. Opciones
+        4.bin --------------> Pantalla completa 128x96px. 12.288 bytes. Info.
+        5.bin --------------> Pantalla completa 128x96px. 12.288 bytes. Selección pack de niveles.
+        6.bin --------------> Pantalla completa 128x96px. 12.288 bytes. Ajuste TV,
+        7.bin --------------> Pantalla completa 128x96px. 12.288 bytes. Editor, seleccionar item.
+        8.bin --------------> Pantalla completa 128x96px. 12.288 bytes. Seleccionar nivel editor.
+        9.bin --------------> Pantalla completa 128x96px. 12.288 bytes. Seleccionar nivel jugar.
+        10.bin -------------> Pantalla completa 128x96px. 12.288 bytes. Controles.
+        11.bin -------------> Pantalla completa 128x96px. 12.288 bytes. Fin versión.
+        12.bin -------------> Pantalla completa 128x96px. 12.288 bytes. Cargando.
+        13.bin -------------> Pantalla completa 128x96px. 12.288 bytes. Intro página 1.
+        14.bin -------------> Pantalla completa 128x96px. 12.288 bytes. Intro página 2.
+        15.bin -------------> Pantalla completa 128x96px. 12.288 bytes. Intro página 3.
+		16.bin -------------> Pantalla completa 128x96px. 12.288 bytes. Intro página 4.
+		17.bin -------------> Pantalla completa 128x96px. 12.288 bytes. Intro página 5.
+		18.bin -------------> Pantalla completa 128x96px. 12.288 bytes. Intro página 6.
+		19.bin -------------> Pantalla completa 128x96px. 12.288 bytes. Lisboa Games Week 2017.
+		20.bin -------------> Pantalla completa 128x96px. 12.288 bytes. RetroShop.
+        creditos.bin -------> Bloque de pantalla 128x320px. 40.960 bytes. Créditos. 
+        splash20.bin -------> 1/3 Bloque de pantalla. 128x32px. 2.048 bytes. Vida -20.
+        splashfl.bin -------> 1/3 Bloque de Pantalla. 128x32px. 2.048 bytes. Fin de nivel.
+        splashim.bin -------> 1/3 Bloque de Pantalla. 128x32px. 2.048 bytes. Resumen Info nivel.
+        splashrp.bin -------> 1/3 Bloque de Pantalla. 128x32px. 2.048 bytes. Juego terminado.
+
+
+
+----------------------------------------------------------------------------------------------------
+- MODIFICAR / COMPARTIR LOS FICHEROS DE LA AVENTURA:
+
+. Los ficheros alojados en las carpetas /AVE, /EDT y /MSK contienen los niveles del juego. El nombre
+  del fichero corresponde con el número de nivel -1.
+
+   .                <DIR> 11.08.2017
+   ..               <DIR> 11.08.2017
+   00000000              176 23.04.1982 (Nivel 1)
+   00000001              176 23.04.1982 (Nivel 2)
+   00000002              176 23.04.1982 (Nivel 3)
+   ...
+
+. Para poder reemplazar los niveles de la Aventura, basta con copiar los ficheros de la carpeta /EDT a la carpeta /AVE. 
+
+. Los packs de niveles nuevos que se diseñen se pueden compartir a otros jugadores utilizando este
+  método.
+
+
+
+----------------------------------------------------------------------------------------------------
+CRÉDITOS:
+
+. Código y Gráficos : Hark0 (Jordi Bayó Montiel)
+
+. Basado en el juego original de Jevilon : "Escape from Holy Tower" (ZX-Spectrum)
+  (http://www.worldofspectrum.org/infoseekid.cgi?id=0027226)
+
+. Diseño de niveles extra : Metsuke
+
+. SDK Z88DK ZX-Uno Lib : Radastan (https://www.bytemaniacos.com/)
+. ESXDOS ZX-Uno SD Lib : Yombo
+. Emulador ZEsarUX : Chernandezba (https://sourceforge.net/projects/zesarux/)
+. Emulador RetroVirtualMachine: Juan Carlos González Amestoy (http://www.retrovirtualmachine.org/)
+. Modo Radastaniano : Mcleod_Ideafix (https://www.youtube.com/user/zxprojects)
+. BeepFX, editor y player : Shiru (https://shiru.untergrund.net/software.shtml)
+
+. Desarrollado con Z88DK (https://www.z88dk.org/)
+. Testeado en el emulador ZEsarUX (https://sourceforge.net/projects/zesarux/)
+
+. ESXDOS : Papaya Pezign (http://www.esxdos.org/index.html)
+
+
+
+----------------------------------------------------------------------------------------------------
+AGRADECIMIENTOS:
+
+. AVillena
+. Haplo
+. Javi Ortiz
+. Lord Raptor
+. Quest
+. Mcleod_Ideafix
+. Ricardo Saraiva
+. Miguel Guerreiro
+. Arnau Jess
+. Uto
+. Javi Diaz (Ofdimodo)
+. Juan Carlos González Amestoy
+
+. elmundodelspectrum.com
+. retromaniac.blogspot.com
+. Foro ZX-Uno
+. Grupo EMS Whatsapp
+. Grupo Retrodevs Telegram
+. Gourmet...
+
+. A la gente de la scene retro, por compartir conocimientos. Gracias ;-)
+
+
+----------------------------------------------------------------------------------------------------
+. Dedicado a los amantes de las máquinas de 8 bits.
+
+. In Memoriam M.B.B. (+ Ago 2017)
+
+
+
+----------------------------------------------------------------------------------------------------
+14/10/2017.
+07/12/2017.
+10/03/2019. Final Release 3
+
+
+thehark0 @ gmail.com
+
+www.zxuno.com
+litiopixel.blogspot.com
+
+
+**************************************
+Paquete Completo:
+207 archivos, 12 carpetas
+611 KB (626.481 bytes)
+‎Sábado, ‎10‎ de ‎febrero‎ de ‎2019, ‏‎8:52:42
+
+
+
+*****************************************************************
+Return of Holy Tower para ZX-Uno y compatibles Modo Radastaniano.
+Release Final 1. Requiere ESXDOS*.
+-----------------------------------------------------------------
+Hark0 - thehark0@gmail.com - Jordi Bayó
+http://www.zxuno.com/ht2/

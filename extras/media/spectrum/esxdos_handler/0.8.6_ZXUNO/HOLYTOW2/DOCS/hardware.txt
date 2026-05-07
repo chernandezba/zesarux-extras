@@ -1,0 +1,12 @@
+﻿Tested on:
+
+- Real ZX-Uno board by ZX-Uno Team. 
+  http://www.zxuno.com
+
+
+- ZEsarUX (ZX Second-Emulator And Released for UniX) by chernandezba
+  https://github.com/chernandezba/zesarux
+
+
+- Retro Virtual Machine by Juan Carlos González Amestoy
+  http://www.retrovirtualmachine.org
