@@ -1,0 +1,5 @@
+Gama RAMdisk is a system utility designed for the Didaktik Gama microcomputer, which extends the machine's RAM usage by emulating a RAM-disk. This program allows users to utilize the additional memory bank (bank B) available in Didaktik Gama models, enabling operations similar to those performed with tape storage, but executed entirely within RAM.
+
+The software works by enabling file operations on the RAM-disk using commands analogous to the BASIC tape functions: LOAD "name", SAVE "name", and MERGE "name". Additional commands are available for managing files on the RAM-disk: ERASE "name" removes a file, CAT lists all objects stored, and FORMAT clears the RAM-disk contents. Commands are invoked via a machine code interface with syntax similar to RAND USR X : command.
+
+The utility operates with approximately 1.5 kB of code, resident in the video RAM area under the memory space allocated for BASIC. It supports direct saving and loading of the entire RAM-disk content to and from tape. The program was distributed by ZENITCENTRUM and is specifically intended for configurations where the Didaktik Gama offers 80 kB RAM, utilizing its memory banking hardware feature.
